@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a72189fa-a0b0-4c33-b77a-b682eb6a4518" name="Default" comment="" />
+    <ignored path="CAF.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="CAF" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="84" selection-start="1080" selection-end="1080" vertical-scroll-proportion="-2.8387096" vertical-offset="374" max-vertical-offset="1782">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="caf.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="36" column="97" selection-start="755" selection-end="755" vertical-scroll-proportion="0.0" vertical-offset="446" max-vertical-offset="8800">
+              <folding>
+                <element signature="e#0#119#0" expanded="true" />
+                <element signature="e#175#199#0" expanded="true" />
+                <element signature="e#225#257#0" expanded="true" />
+                <element signature="e#1007#1075#0" expanded="true" />
+                <element signature="e#1109#1199#0" expanded="true" />
+                <element signature="e#1238#1317#0" expanded="true" />
+                <element signature="e#1356#1463#0" expanded="true" />
+                <element signature="e#1505#1685#0" expanded="true" />
+                <element signature="e#1738#1893#0" expanded="true" />
+                <element signature="e#1932#2008#0" expanded="true" />
+                <element signature="e#2017#2042#0" expanded="true" />
+                <element signature="e#2159#2202#0" expanded="true" />
+                <element signature="e#2234#2272#0" expanded="true" />
+                <element signature="e#2304#2347#0" expanded="true" />
+                <element signature="e#2760#6898#0" expanded="true" />
+                <element signature="e#4473#5041#0" expanded="true" />
+                <element signature="e#5103#5368#0" expanded="true" />
+                <element signature="e#5429#6186#0" expanded="true" />
+                <element signature="e#6938#7172#0" expanded="true" />
+                <element signature="e#7212#7256#0" expanded="true" />
+                <element signature="e#7293#8817#0" expanded="true" />
+                <element signature="e#8823#8883#0" expanded="true" />
+                <element signature="e#8908#11669#0" expanded="true" />
+                <element signature="e#9719#9806#0" expanded="true" />
+                <element signature="e#9848#9937#0" expanded="true" />
+                <element signature="e#9991#10160#0" expanded="true" />
+                <element signature="e#10211#10290#0" expanded="true" />
+                <element signature="e#10347#10432#0" expanded="true" />
+                <element signature="e#10474#10592#0" expanded="true" />
+                <element signature="e#10631#10698#0" expanded="true" />
+                <element signature="e#10732#10844#0" expanded="true" />
+                <element signature="e#10879#10992#0" expanded="true" />
+                <element signature="e#11026#11138#0" expanded="true" />
+                <element signature="e#11180#11260#0" expanded="true" />
+                <element signature="e#11301#11337#0" expanded="true" />
+                <element signature="e#11373#11496#0" expanded="true" />
+                <element signature="e#11534#11571#0" expanded="true" />
+                <element signature="e#11709#11747#0" expanded="true" />
+                <element signature="e#11809#12053#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/js/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="49" selection-start="921" selection-end="935" vertical-scroll-proportion="0.0" vertical-offset="132" max-vertical-offset="902">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="caf.css" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/caf/css/caf.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="89" column="0" selection-start="1229" selection-end="1717" vertical-scroll-proportion="-29.264479" vertical-offset="17117" max-vertical-offset="24442">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/caf/caf.js" />
+        <option value="$PROJECT_DIR$/caf/js/index.html" />
+        <option value="$PROJECT_DIR$/caf/js/index.js" />
+        <option value="$PROJECT_DIR$/caf/index.html" />
+        <option value="$PROJECT_DIR$/caf/js/caf.js" />
+        <option value="$PROJECT_DIR$/caf/css/caf.css" />
+      </list>
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="744" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="css" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="options.lastSelected" value="web.server" />
+    <property name="DefaultHtmlFileTemplate" value="Html5" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+  </component>
+  <component name="PublishConfig">
+    <servers>
+      <server id="46d8b6f0-8efb-4534-83d3-75430f036b97">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </server>
+    </servers>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\libs" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\css" />
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\js" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a72189fa-a0b0-4c33-b77a-b682eb6a4518" name="Default" comment="" />
+      <created>1404426647631</created>
+      <updated>1404426647631</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3294893" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24963397" sideWeight="0.6705107" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/caf/libs/underscore.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="316" column="14" selection-start="11282" selection-end="11282" vertical-scroll-proportion="0.28316832" vertical-offset="3003" max-vertical-offset="12034">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/libs/iscroll.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2750">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/js/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="49" selection-start="921" selection-end="935" vertical-scroll-proportion="0.0" vertical-offset="132" max-vertical-offset="902">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="84" selection-start="1080" selection-end="1080" vertical-scroll-proportion="-2.8387096" vertical-offset="374" max-vertical-offset="1782">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="97" selection-start="755" selection-end="755" vertical-scroll-proportion="0.0" vertical-offset="446" max-vertical-offset="8800">
+          <folding>
+            <element signature="e#0#119#0" expanded="true" />
+            <element signature="e#175#199#0" expanded="true" />
+            <element signature="e#225#257#0" expanded="true" />
+            <element signature="e#1007#1075#0" expanded="true" />
+            <element signature="e#1109#1199#0" expanded="true" />
+            <element signature="e#1238#1317#0" expanded="true" />
+            <element signature="e#1356#1463#0" expanded="true" />
+            <element signature="e#1505#1685#0" expanded="true" />
+            <element signature="e#1738#1893#0" expanded="true" />
+            <element signature="e#1932#2008#0" expanded="true" />
+            <element signature="e#2017#2042#0" expanded="true" />
+            <element signature="e#2159#2202#0" expanded="true" />
+            <element signature="e#2234#2272#0" expanded="true" />
+            <element signature="e#2304#2347#0" expanded="true" />
+            <element signature="e#2760#6898#0" expanded="true" />
+            <element signature="e#4473#5041#0" expanded="true" />
+            <element signature="e#5103#5368#0" expanded="true" />
+            <element signature="e#5429#6186#0" expanded="true" />
+            <element signature="e#6938#7172#0" expanded="true" />
+            <element signature="e#7212#7256#0" expanded="true" />
+            <element signature="e#7293#8817#0" expanded="true" />
+            <element signature="e#8823#8883#0" expanded="true" />
+            <element signature="e#8908#11669#0" expanded="true" />
+            <element signature="e#9719#9806#0" expanded="true" />
+            <element signature="e#9848#9937#0" expanded="true" />
+            <element signature="e#9991#10160#0" expanded="true" />
+            <element signature="e#10211#10290#0" expanded="true" />
+            <element signature="e#10347#10432#0" expanded="true" />
+            <element signature="e#10474#10592#0" expanded="true" />
+            <element signature="e#10631#10698#0" expanded="true" />
+            <element signature="e#10732#10844#0" expanded="true" />
+            <element signature="e#10879#10992#0" expanded="true" />
+            <element signature="e#11026#11138#0" expanded="true" />
+            <element signature="e#11180#11260#0" expanded="true" />
+            <element signature="e#11301#11337#0" expanded="true" />
+            <element signature="e#11373#11496#0" expanded="true" />
+            <element signature="e#11534#11571#0" expanded="true" />
+            <element signature="e#11709#11747#0" expanded="true" />
+            <element signature="e#11809#12053#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/css/caf.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="0" selection-start="1229" selection-end="1717" vertical-scroll-proportion="-29.264479" vertical-offset="17117" max-vertical-offset="24442">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+

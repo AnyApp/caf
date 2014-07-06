@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <!--<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" >
+    <!-- CSS Includes -->
+    <link rel="stylesheet" type="text/css" href="fonts/stylesheet.css"  charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="css/caf.css" />
+
+    <title>עליתי על טרמפ</title>
+</head>
+<body ontouchstart="" class="rtl">
+<div class="app_container">
+    <div id="header" class="header bgDarkCyan textCenter hp45">
+        <div id="title" class="headerItem absBlock50-1-2 textCenter white bold lFontSize"
+             caf-text="עליתי על טרמפ">
+        </div>
+        <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0"
+             caf-active="bgXDarkCyan"
+             caf-onclick="caf.Utilities.hideOrShow('dropMenu','fadein','fadeout',300);"
+             caf-iconly="ic_action_menu">
+            <div id="dropMenu" class="dropMenuLeft wp140 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
+                <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 w100"
+                     caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan"
+                     caf-text="הגדרות מערכת"
+                     caf-icon-right="ic_action_edit"
+                     caf-onclick="caf.log('settingsButton');">
+                </div>
+                <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 w100"
+                     caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan"
+                     caf-text="מידע נוסף"
+                     caf-icon-right="ic_action_camera"
+                     caf-onclick="caf.log('infoButton');">
+                </div>
+                <div id="dropMenuOverlay" class="dropMenuOverlay"
+                     caf-onclick="caf.Utilities.hideOrShow('dropMenu','fadein','fadeout',300);">
+                </div>
+            </div>
+
+        </div>
+        <div id="info" class="headerItem wp50 hp45 absBlock50-n-1"
+             caf-active="bgXDarkCyan"
+             caf-onclick="caf.log('info');"
+             caf-iconly="ic_action_info">
+        </div>
+        <div id="back" class="headerItem wp50 hp45 absBlock50-0-n"
+             caf-active="bgXDarkCyan"
+             caf-onclick="caf.log('back');"
+             caf-iconly="ic_action_previous_item">
+        </div>
+
+    </div>
+    <div class="content yScrollable bgLightGray top45 bottom20">
+        <ul id="start"
+            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
+            caf-active="bgXDarkBlue"
+            caf-onclick="caf.log('click');"
+            caf-text="לחצו עלי">
+        </ul>
+    </div>
+    <div class="footer bgDarkCyan bottom0 hp20 sFontSize textCenter white bold">מבית Codletech</div>
+</div>
+</body>
+<!-- JS Includes -->
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script  type="text/javascript" src="js/caf.js"></script>
+<script  type="text/javascript" src="libs/iscroll.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript">
+    app.initialize();
+</script>
