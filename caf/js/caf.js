@@ -1,16 +1,15 @@
 /**
  * CAF - Codletech Application Framework.
  * Dependencies:
- * - underscore.js
- * - fastclick.js
- * - iscroll.js
+ * - overthrow.js
  */
 var caf = {}
 caf.path = '';
 
-caf.init = function(path)
+caf.init = function(path,startPage)
 {
     caf.path = path;
+    caf.pager.moveToPage('page2');
 }
 
 caf.log = function(msg)
@@ -18,6 +17,10 @@ caf.log = function(msg)
     window.console.log(msg);
 }
 
+caf.title = function(title)
+{
+    document.getElementById('title').innerHTML = title;
+}
 
 caf.Utilities =
 {
@@ -253,10 +256,8 @@ caf.Views = {
         if ( elm.getAttribute('caf-onclick'))           view.onClick( new Function(elm.getAttribute('caf-onclick')) );
         if ( elm.getAttribute('caf-text')   )           view.text(elm.getAttribute('caf-text'));
         if ( elm.getAttribute('caf-iconly') )           view.iconOnly(elm.getAttribute('caf-iconly'));
-        if ( elm.getAttribute('caf-icon-right') )       view.iconRight(elm.getAttribute('caf-icon-right'));
-        if ( elm.getAttribute('caf-icon-left') )        view.iconLeft(elm.getAttribute('caf-icon-left'));
-        if ( elm.getAttribute('caf-xscroll'))           view.xScrollable();
-        if ( elm.getAttribute('caf-yscroll'))           view.yScrollable();
+        if ( elm.getAttribute('caf-icon-right') )       view.iconRight(elm.getAttribute('caf-icon-right'),elm.getAttribute('caf-icon-size') );
+        if ( elm.getAttribute('caf-icon-left') )        view.iconLeft(elm.getAttribute('caf-icon-left'),elm.getAttribute('caf-icon-size') );
 
         var result = view.build();
         // Not a CAF View.
@@ -349,19 +350,16 @@ caf.View = function(id)
             this.mIconName = name;
             return this;
         },
-        iconRight: function(name){
-            this.mClass += ' iconRight ';
+        iconRight: function(name,size){
+            size = size || 'm';
+            this.mClass += ' '+size+'IconRight ';
             this.mIconName = name;
             return this;
         },
-        iconLeft: function(name){
-            this.mClass += ' iconLeft ';
+        iconLeft: function(name,size){
+            size = size || 'm';
+            this.mClass += ' '+size+'IconLeft ';
             this.mIconName = name;
-            return this;
-        },
-        yScrollable: function()
-        {
-            this.mClass += ' yScrollable ';
             return this;
         },
         addElement: function()
@@ -405,4 +403,106 @@ caf.getElementsByAttribute = function(attribute, context)
     }
 
     return nodeArray;
+}
+
+
+
+caf.pager = {
+    firstLoad: true,
+    historyStack: new Array(),
+    currentPage: "",
+
+
+    insertPageToStack: function(pageId) {
+        for (var i=this.historyStack.length-1; i>=0; i--) {
+            if (this.historyStack[i] === pageId) {
+                this.historyStack.splice(i, 1);
+                // break;       //<-- Uncomment  if only the first term has to be removed
+            }
+        }
+        this.historyStack.push(pageId);
+    },
+    restructure: function()
+    {
+        for (var i=this.historyStack.length-1; i>=0; i--) {
+            document.getElementById(this.historyStack[i]).style.zIndex = (i+1)*10;
+        }
+    },
+    /**
+     * move to page.
+     */
+    moveToPage: function(toPageId,inAnim,outAnim)
+    {
+        var lastPageId = this.currentPage;
+        var lastPageDiv = document.getElementById(lastPageId);
+
+        //Replace current page.
+        this.currentPage = toPageId;
+        this.insertPageToStack(toPageId);
+        this.restructure();
+        var toPageDiv = document.getElementById(toPageId);
+
+        if (caf.Utilities.isEmpty(lastPageId))
+        {
+            caf.pager.onLoadPage(toPageDiv);
+            return;
+        }
+
+
+        caf.Utilities.addClass(toPageDiv,'hidden');
+        toPageDiv.clientHeight;
+        caf.Utilities.removeClass(toPageDiv,'hidden');
+        caf.Utilities.addClass(toPageDiv,'fadein');
+        caf.pager.onLoadPage(toPageDiv);
+        window.setTimeout(function(){
+            caf.Utilities.removeClass(toPageDiv,'fadein');
+
+        },300);
+        //caf.Utilities.addClass(lastPageDiv,'fadeout');
+
+
+    },
+
+    moveBack: function()
+    {
+        if (this.historyStack.length <= 1)
+        {
+            // TODO: Ask to leave app.
+            return;
+        }
+
+        //Remove last page from the history.
+        var toRemovePageId = this.historyStack.pop();
+        var toPageId = this.historyStack.pop();
+
+        //Replace current page.
+        this.currentPage = toPageId;
+        this.insertPageToStack(toPageId);
+        this.restructure();
+
+        var lastPageDiv = document.getElementById(toRemovePageId);
+        var toPageDiv = document.getElementById(toPageId);
+
+        caf.Utilities.addClass(lastPageDiv,'fadeout');
+        //lastPageDiv.clientHeight;
+        //caf.Utilities.removeClass(toPageDiv,'hidden');
+        //caf.Utilities.addClass(toPageDiv,'fadein');
+        caf.pager.onLoadPage(toPageDiv);
+        window.setTimeout(function(){
+            caf.Utilities.removeClass(lastPageDiv,'fadeout');
+            lastPageDiv.style.zIndex = "";
+        },300);
+        //caf.Utilities.addClass(lastPageDiv,'fadeout');
+
+
+    },
+    onLoadPage: function(pageElement)
+    {
+        if ( pageElement.getAttribute('caf-page-load')  )
+        {
+            var onLoad = new Function(pageElement.getAttribute('caf-page-load'));
+            onLoad();
+        }
+    }
+
 }

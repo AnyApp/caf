@@ -25,7 +25,12 @@ li{
     padding: 0;
     text-align: center;
 }
-
+/* Overthrow CSS:
+   Enable overflow: auto on elements with overthrow class when html element has overthrow class too */
+.overthrow-enabled .overthrow {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
 /* End Fixes */
 
 /* Layout*/
@@ -54,13 +59,13 @@ li{
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
-.dropMenuLeft{
+.dropMenuRight {
     position: absolute;
     z-index: 10000;
     right: 0;
     top: 0;
 }
-.dropMenuRight{
+.dropMenuLeft {
     position: absolute;
     z-index: 10000;
     left: 0;
@@ -77,8 +82,21 @@ li{
 }
 /* End Layout*/
 
+/* Page Manager */
+.page{
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+.currentPage{
+
+}
+
+/* End Page Manager */
+
 /* Animations */
 .fadein{
+    -webkit-transform: translate3d(0,0,0);
     -webkit-transition: opacity 0.3s ease-in-out;
     -moz-transition: opacity 0.3s ease-in-out;
     -ms-transition: opacity 0.3s ease-in-out;
@@ -87,6 +105,7 @@ li{
     opacity: 1;
 }
 .fadeout{
+    -webkit-transform: translate3d(0,0,0);
     -webkit-transition: opacity 0.3s ease-in-out;
     -moz-transition: opacity 0.3s ease-in-out;
     -ms-transition: opacity 0.3s ease-in-out;
@@ -240,17 +259,53 @@ li{
     background-size: 75%;
     background-position: 50% 50%;
 }
-.iconRight{
+.sIconRight{
+    background-repeat: no-repeat;
+    background-size: 19px;
+    background-position: 99% 50%;
+    padding-right: 30px;
+}
+.mIconRight{
     background-repeat: no-repeat;
     background-size: 27px;
     background-position: 99% 50%;
-    padding-right: 38px;
+    padding-right: 40px;
 }
-.iconLeft{
+.lIconRight{
+    background-repeat: no-repeat;
+    background-size: 33px;
+    background-position: 99% 50%;
+    padding-right: 45px;
+}
+.xlIconRight{
+    background-repeat: no-repeat;
+    background-size: 43px;
+    background-position: 99% 50%;
+    padding-right: 55px;
+}
+.sIconLeft{
+    background-repeat: no-repeat;
+    background-size: 19px;
+    background-position: 1% 50%;
+    padding-left: 30px;
+}
+.mIconLeft{
     background-repeat: no-repeat;
     background-size: 27px;
     background-position: 1% 50%;
-    padding-right: 38px;
+    padding-left: 40px;
+}
+.lIconLeft{
+    background-repeat: no-repeat;
+    background-size: 33px;
+    background-position: 1% 50%;
+    padding-left: 45px;
+}
+.xlIconLeft{
+    background-repeat: no-repeat;
+    background-size: 43px;
+    background-position: 1% 50%;
+    padding-left: 55px;
 }
 /* End Icons */
 
