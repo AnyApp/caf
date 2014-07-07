@@ -12,160 +12,139 @@
     <title>עליתי על טרמפ</title>
 </head>
 <body ontouchstart="" class="rtl">
-<div class="app_container">
+<div id="app-container" class="app_container"
+        pages="['page-main','page-buttons','page-tabs']">
     <div id="header" class="header bgDarkCyan textCenter hp45">
-        <div id="title" class="headerItem absBlock50-1-2 textCenter white bold lFontSize"
-             >
-        </div>
-        <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0"
-             caf-active="bgXDarkCyan"
-             caf-onclick="caf.Utilities.hideOrShow('dropMenu','fadein','fadeout',300);"
-             caf-iconly="ic_action_menu">
+        <div id="title" class="headerItem absBlock50-2-2 textCenter white bold mFontSize"></div>
+        <div id="menu" class="headerItem wp50 hp45 absBlock50-n-1" caf-active="bgXDarkCyan"
+             caf-iconly="ic_action_overflow"
+             caf-drop-menu-container="dropMenu">
             <div id="dropMenu" class="dropMenuRight wp150 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
-                <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp110"
-                     caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan"
-                     caf-text="הגדרות מערכת"
-                     caf-icon-right="ic_action_edit"
-                     caf-onclick="caf.log('settingsButton');">
+                <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m"
+                     caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
                 </div>
-                <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp110"
-                     caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan"
-                     caf-text="מידע נוסף"
-                     caf-icon-right="ic_action_camera"
-                     caf-icon-size="m"
-                     caf-onclick="caf.log('infoButton');">
+                <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m"
+                     caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                </div>
+                <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m"
+                     caf-drop-menu-container="dropMenu" caf-text="information" caf-onclick="caf.log('infoButton');">
+                </div>
+                <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
+                     caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m"
+                     caf-drop-menu-container="dropMenu" caf-text="exit" caf-to-page="page2">
                 </div>
                 <div id="dropMenuOverlay" class="dropMenuOverlay"
-                     caf-onclick="caf.Utilities.hideOrShow('dropMenu','fadein','fadeout',300);">
+                     caf-drop-menu-overlay-of="dropMenu">
                 </div>
             </div>
-
         </div>
-        <div id="info" class="headerItem wp50 hp45 absBlock50-n-1"
+        <div id="info" class="headerItem wp50 hp45 absBlock50-n-0"
              caf-active="bgXDarkCyan"
              caf-onclick="caf.log('info');"
-             caf-iconly="ic_action_info">
+             caf-iconly="ic_action_menu">
         </div>
         <div id="back" class="headerItem wp50 hp45 absBlock50-0-n"
              caf-active="bgXDarkCyan"
-             caf-onclick="caf.pager.moveBack();"
+             caf-to-page="move-back"
              caf-iconly="ic_action_previous_item">
+        </div>
+    </div>
+    <div id="page-main" class="content bgLightGray top45 bottom20"
+         caf-page-load="caf.title('CAF Showcase');">
+        <div id="main-btn-to-buttons"
+             class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
+             caf-active="bgXDarkBlue"
+             caf-to-page="page-buttons"
+             caf-text="Buttons">
+        </div>
+        <div id="main-btn-to-tabs"
+             class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
+             caf-active="bgXDarkBlue"
+             caf-to-page="page-tabs"
+             caf-text="Tabs">
+        </div>
+    </div>
+    <div id="page-buttons" class="content overthrow bgLightBrown top45 bottom20"
+         caf-page-load="caf.title('CAF Buttons');">
+        <div id="start55"
+            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
+            caf-active="bgXDarkBlue"
+            caf-to-page="page1"
+            caf-text="page 1">
+        </div>
+        <div id="start56"
+            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
+            caf-active="bgXDarkBlue"
+            caf-to-page="page3"
+            caf-text="page 3">
+        </div>
+        <div id="start66"
+             caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
+             caf-active="bgXDarkBlue"
+             caf-to-page="page4"
+             caf-text="page 4">
         </div>
 
     </div>
-    <div id="page3" class="content overthrow bgLightPurple top45 bottom20"
-            caf-page-load="caf.title('Page 3');">
-        <ul id="start58"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page1');"
-            caf-text="page 1">
-        </ul>
-        <ul id="start59"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page2');"
-            caf-text="page 2">
-        </ul>
+    <div id="page-tabs" class="content bgLightPurple top45 bottom20"
+         caf-page-load="caf.title('CAF Tabs');">
+        <div id="btab1"
+             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
+             caf-active="bgXDarkRed"
+             caf-hold="bgXDarkGray"
+             caf-active-remove="bgDarkRed"
+             caf-to-tab="tab1"
+             caf-tab-container="tabContainer"
+             caf-text="go tab 1">
+        </div>
+        <div id="btab2"
+             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
+             caf-active="bgXDarkRed"
+             caf-hold="bgXDarkGray"
+             caf-active-remove="bgDarkRed"
+             caf-to-tab="tab2"
+             caf-tab-container="tabContainer"
+             caf-text="go tab 2">
+        </div>
+        <div id="btab3"
+             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
+             caf-active="bgXDarkRed"
+             caf-hold="bgXDarkGray"
+             caf-active-remove="bgDarkRed"
+             caf-to-tab="tab3"
+             caf-tab-container="tabContainer"
+             caf-text="go tab 3">
+        </div>
+        <div id="tabContainer" class="overthrow tabContainer"
+             caf-tabs="['tab1','tab2','tab3']"
+             caf-current-tab="tab1">
+            <div id="tab1" class="overthrow tab top60 bgWhite currentTab"
+                 caf-related-button="btab1">
+                <div id="tab1elm"
+                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
+                     caf-text="tab 1">
+                </div>
+            </div>
+            <div id="tab2" class="overthrow tab top60 bgWhite"
+                 caf-related-button="btab2">
+                <div id="tab2elm"
+                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
+                     caf-text="tab 2">
+                </div>
+            </div>
+            <div id="tab3" class="overthrow tab top60 bgWhite"
+                 caf-related-button="btab3">
+                <div id="tab3elm"
+                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
+                     caf-text="tab 3">
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="page2" class="content overthrow bgLightBrown top45 bottom20"
-         caf-page-load="caf.title('Page 2');">
-        <ul id="start55"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page1');"
-            caf-text="page 1">
-        </ul>
-        <ul id="start56"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page3');"
-            caf-text="page 3">
-        </ul>
-    </div>
-    <div id="page1" class="content bgLightGray top45 bottom20"
-         caf-page-load="caf.title('Page 1');">
-        <ul id="start"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page2');"
-            caf-text="page 2">
-        </ul>
-        <ul id="start1"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.pager.moveToPage('page3');"
-            caf-text="page 3">
-        </ul>
-        <ul id="start2"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start3"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start4"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start5"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start6"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start7"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start8"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start9"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start10"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start11"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-        <ul id="start12"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-onclick="caf.log('click');"
-            caf-text="לחצו עלי">
-        </ul>
-    </div>
+
     <div class="footer bgDarkCyan bottom0 hp20 sFontSize textCenter white bold">מבית Codletech</div>
 </div>
 </body>

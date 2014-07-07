@@ -6,10 +6,9 @@
 var caf = {}
 caf.path = '';
 
-caf.init = function(path,startPage)
+caf.init = function(path)
 {
     caf.path = path;
-    caf.pager.moveToPage('page2');
 }
 
 caf.log = function(msg)
@@ -49,7 +48,7 @@ caf.Utilities =
     },
     isEmpty: function(obj)
     {
-        return obj == undefined || obj == null || obj == '';
+        return obj == undefined || obj == null || obj == '' || obj.toString()=='';
     },
     getElementDef: function(elm){
         var str = elm.outerHTML;
@@ -127,7 +126,8 @@ caf.Views = {
             (!caf.Utilities.isEmpty(view.mClass))||
             (!caf.Utilities.isEmpty(view.mIconName))||
             (!caf.Utilities.isEmpty(view.mActiveClass))||
-            (!caf.Utilities.isEmpty(view.mOnClickFunction));
+            (!caf.Utilities.isEmpty(view.mIconName))||
+            (!caf.Utilities.isEmpty(view.mOnClickFunctions));
         if (!isCAF)
         {
             return false;
@@ -149,8 +149,13 @@ caf.Views = {
         }
 
         // Handle Touch only if needed.
-        if ( !caf.Utilities.isEmpty(view.mOnClickFunction))
+        if ( !caf.Utilities.isEmpty(view.mOnClickFunctions) || !caf.Utilities.isEmpty(view.mActiveClass))
         {
+            view.mOnClickFunctions = !caf.Utilities.isEmpty(view.mOnClickFunctions) ?
+                view.mOnClickFunctions : function(){};
+            view.mActiveClass = !caf.Utilities.isEmpty(view.mActiveClass) ?
+                view.mActiveClass : '';
+
             //Unbind
             caf.Utilities.unbindEvent(view.mElement,'touchstart',view.mOnTouchStartEvent);
             caf.Utilities.unbindEvent(view.mElement,'mousedown',view.mOnTouchStartEvent);
@@ -193,13 +198,17 @@ caf.Views = {
                 var boxSize = 15;
                 if (diffX<boxSize && diffY<boxSize && caf.Views.canClick())
                 {
-                    view.mOnClickFunction();
+                    for (var iFunc in view.mOnClickFunctions)
+                    {
+                        view.mOnClickFunctions[iFunc]();
+                    }
+
                 }
                 // Reset
-                view.touchData.startX = 0;
-                view.touchData.startY = 0;
-                view.touchData.lastX = 0;
-                view.touchData.lastY = 0;
+                view.touchData.startX = -100000;
+                view.touchData.startY = -100000;
+                view.touchData.lastX = -200000;
+                view.touchData.lastY = -200000;
                 caf.Utilities.removeClass(view.mElement,view.mActiveClass);
                 caf.Utilities.addClass(view.mElement,view.mActiveClassRemove);
 
@@ -250,14 +259,27 @@ caf.Views = {
             view = caf.View(elm.id);
         }
 
+        view.clear();
         if ( elm.getAttribute('caf-class')  )           view.class(elm.getAttribute('caf-class'));
         if ( elm.getAttribute('caf-active') )           view.activeClass(elm.getAttribute('caf-active'));
         if ( elm.getAttribute('caf-active-remove') )    view.activeClassRemove(elm.getAttribute('caf-active-remove'));
         if ( elm.getAttribute('caf-onclick'))           view.onClick( new Function(elm.getAttribute('caf-onclick')) );
+        if ( elm.getAttribute('caf-to-page'))           view.onClick( function() {caf.pager.moveToPage(elm.getAttribute('caf-to-page')); } );
+        if ( elm.getAttribute('caf-to-tab')
+            && elm.getAttribute('caf-tab-container'))   view.onClick( function() {caf.pager.moveToTab(elm.getAttribute('caf-to-tab'),elm.getAttribute('caf-tab-container')); } );
+        if ( elm.getAttribute('caf-drop-menu-overlay-of'))   view.onClick( function() {caf.Utilities.hideOrShow(elm.getAttribute('caf-drop-menu-overlay-of'),'fadein','fadeout',300);; } );
+        if ( elm.getAttribute('caf-drop-menu-container')) view.onClick( function() {caf.Utilities.hideOrShow(elm.getAttribute('caf-drop-menu-container'),'fadein','fadeout',300);; } );
         if ( elm.getAttribute('caf-text')   )           view.text(elm.getAttribute('caf-text'));
         if ( elm.getAttribute('caf-iconly') )           view.iconOnly(elm.getAttribute('caf-iconly'));
         if ( elm.getAttribute('caf-icon-right') )       view.iconRight(elm.getAttribute('caf-icon-right'),elm.getAttribute('caf-icon-size') );
         if ( elm.getAttribute('caf-icon-left') )        view.iconLeft(elm.getAttribute('caf-icon-left'),elm.getAttribute('caf-icon-size') );
+
+        // Move to tab.
+        if ( elm.getAttribute('caf-current-tab') )
+        {
+            caf.log(elm.getAttribute('caf-current-tab'));
+            caf.pager.moveToTab(elm.getAttribute('caf-current-tab'),elm.id,true);
+        }
 
         var result = view.build();
         // Not a CAF View.
@@ -296,16 +318,36 @@ caf.View = function(id)
         mActiveClass: '',
         mActiveClassRemove: '',
         mIconName:'',
-        mOnClickFunction: null,
+        mOnClickFunctions: Array(),
         mOnClickEvent: null,
         mOnTouchStartEvent: null,
         mOnTouchEndEvent: null,
         mOnTouchMoveEvent: null,
         touchData: {
-            startX:0,
-            startY:0,
-            lastX:0,
-            lastY:0
+            startX:-100000,
+            startY:-100000,
+            lastX:-200000,
+            lastY:-200000
+        },
+        clear: function()
+        {
+            this.mElementString='',
+            this.mText= '',
+            this.mClass= '',
+            this.mActiveClass= '',
+            this.mActiveClassRemove= '',
+            this.mIconName='',
+            this.mOnClickFunctions= Array(),
+            this.mOnClickEvent= null,
+            this.mOnTouchStartEvent= null,
+            this.mOnTouchEndEvent= null,
+            this.mOnTouchMoveEvent= null,
+            this.touchData= {
+                startX:-100000,
+                startY:-100000,
+                lastX:-200000,
+                lastY:-200000
+        }
         },
         needUpdate: function(elm)
         {
@@ -337,7 +379,7 @@ caf.View = function(id)
         onClick: function(func)
         {
             this.mClass += ' pointer ';
-            this.mOnClickFunction = func;
+            this.mOnClickFunctions.push(func);
             return this;
         },
         text: function(text)
@@ -411,8 +453,15 @@ caf.pager = {
     firstLoad: true,
     historyStack: new Array(),
     currentPage: "",
+    mainPage: '',
+    backButtonId: '',
 
-
+    init: function(mainPage,backButtonId)
+    {
+        this.mainPage = mainPage;
+        this.backButtonId = backButtonId;
+        this.moveToPage(mainPage);
+    },
     insertPageToStack: function(pageId) {
         for (var i=this.historyStack.length-1; i>=0; i--) {
             if (this.historyStack[i] === pageId) {
@@ -422,19 +471,105 @@ caf.pager = {
         }
         this.historyStack.push(pageId);
     },
+    /**
+     * Restructure that pages z-index as their position in the history.
+     * Recent page equals greater z-index.
+     */
     restructure: function()
     {
         for (var i=this.historyStack.length-1; i>=0; i--) {
             document.getElementById(this.historyStack[i]).style.zIndex = (i+1)*10;
         }
     },
+    moveToTab: function(tabId,tabContainerId,force)
+    {
+        // Get container.
+        var tabContainer = document.getElementById(tabContainerId);
+        // Current Tab.
+        var currentTabId = tabContainer.getAttribute('caf-current-tab');
+        // Return if already in tab.
+        if (currentTabId == tabId && !force) return;
+
+        var currentTab = document.getElementById(currentTabId);
+
+        // Get Tabs.
+        var tabs = eval(tabContainer.getAttribute('caf-tabs'));
+        // Restructure z-indexes.
+        for (var iTab in tabs)
+        {
+            var tab = document.getElementById(tabs[iTab]);
+            caf.Utilities.removeClass(tab,'currentTab');
+            caf.Utilities.removeClass(tab,'lastTab');
+            // Remove hold mark.
+            this.removeHoldClass(tab.getAttribute('caf-related-button'));
+        }
+        caf.Utilities.addClass(currentTab,'lastTab');
+
+
+        // Set new current tab.
+        tabContainer.setAttribute('caf-current-tab',tabId);
+
+        var toShowTab = document.getElementById(tabId);
+
+        caf.Utilities.addClass(toShowTab,'currentTab');
+        caf.Utilities.addClass(toShowTab,'hidden');
+        toShowTab.clientHeight;
+        caf.Utilities.removeClass(toShowTab,'hidden');
+        caf.Utilities.addClass(toShowTab,'fadein');
+        // on load page.
+        caf.pager.onLoadPage(toShowTab);
+
+        window.setTimeout(function(){
+            caf.Utilities.removeClass(toShowTab,'fadein');
+
+        },300);
+
+        // Mark button as hold.
+        this.addHoldClass(toShowTab.getAttribute('caf-related-button'));
+
+    },
+    addHoldClass: function(tabButtonId)
+    {
+        if (!caf.Utilities.isEmpty(tabButtonId))
+        {
+            var tabButton = document.getElementById(tabButtonId);
+            var holdClass = tabButton.getAttribute('caf-hold');
+            if (!caf.Utilities.isEmpty(holdClass))
+            {
+                caf.Utilities.addClass(tabButton,holdClass);
+            }
+        }
+    },
+    removeHoldClass: function(tabButtonId)
+    {
+        if (!caf.Utilities.isEmpty(tabButtonId))
+        {
+            var tabButton = document.getElementById(tabButtonId);
+            var holdClass = tabButton.getAttribute('caf-hold');
+            if (!caf.Utilities.isEmpty(holdClass))
+            {
+                caf.Utilities.removeClass(tabButton,holdClass);
+            }
+        }
+    },
     /**
      * move to page.
      */
-    moveToPage: function(toPageId,inAnim,outAnim)
+    moveToPage: function(toPageId,isRealPage,inAnim,outAnim)
     {
+        // Check if need to move back.
+        if (toPageId == 'move-back')
+        {
+            this.moveBack();
+            return;
+        }
+
+        if (this.currentPage == toPageId)
+        {
+            return;
+        }
+
         var lastPageId = this.currentPage;
-        var lastPageDiv = document.getElementById(lastPageId);
 
         //Replace current page.
         this.currentPage = toPageId;
@@ -444,7 +579,10 @@ caf.pager = {
 
         if (caf.Utilities.isEmpty(lastPageId))
         {
+            // on load page.
             caf.pager.onLoadPage(toPageDiv);
+            // Hide back button if needed.
+            this.checkAndChangeBackButtonState();
             return;
         }
 
@@ -453,16 +591,17 @@ caf.pager = {
         toPageDiv.clientHeight;
         caf.Utilities.removeClass(toPageDiv,'hidden');
         caf.Utilities.addClass(toPageDiv,'fadein');
+        // on load page.
         caf.pager.onLoadPage(toPageDiv);
+        // Hide back button if needed.
+        this.checkAndChangeBackButtonState();
+
         window.setTimeout(function(){
             caf.Utilities.removeClass(toPageDiv,'fadein');
 
         },300);
-        //caf.Utilities.addClass(lastPageDiv,'fadeout');
-
 
     },
-
     moveBack: function()
     {
         if (this.historyStack.length <= 1)
@@ -484,15 +623,15 @@ caf.pager = {
         var toPageDiv = document.getElementById(toPageId);
 
         caf.Utilities.addClass(lastPageDiv,'fadeout');
-        //lastPageDiv.clientHeight;
-        //caf.Utilities.removeClass(toPageDiv,'hidden');
-        //caf.Utilities.addClass(toPageDiv,'fadein');
+        // on load page.
         caf.pager.onLoadPage(toPageDiv);
+        // Hide back button if needed.
+        this.checkAndChangeBackButtonState();
+
         window.setTimeout(function(){
             caf.Utilities.removeClass(lastPageDiv,'fadeout');
-            lastPageDiv.style.zIndex = "";
+            lastPageDiv.style.zIndex = 0;
         },300);
-        //caf.Utilities.addClass(lastPageDiv,'fadeout');
 
 
     },
@@ -502,6 +641,19 @@ caf.pager = {
         {
             var onLoad = new Function(pageElement.getAttribute('caf-page-load'));
             onLoad();
+        }
+    },
+    checkAndChangeBackButtonState:function()
+    {
+        if (caf.Utilities.isEmpty(this.backButtonId)) return;
+
+        if (this.currentPage == this.mainPage)
+        {
+            caf.Utilities.addClass(document.getElementById(this.backButtonId),'hidden');
+        }
+        else
+        {
+            caf.Utilities.removeClass(document.getElementById(this.backButtonId),'hidden');
         }
     }
 

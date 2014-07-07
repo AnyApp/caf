@@ -3,6 +3,7 @@ var app =
     initialize: function()
     {
         caf.init('');
+        caf.pager.init('page-main','back');
         caf.Views.rebuildAll();
         /*
         caf.View('start').text('לחץ עלי').activeClass('bgXDarkBlue')

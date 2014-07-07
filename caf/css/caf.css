@@ -91,7 +91,22 @@ li{
 .currentPage{
 
 }
+.currentTab{
+    z-index: 10;
+}
+.lastTab{
+    z-index: 5;
+}
+.tabContainer{
 
+}
+.tab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
 /* End Page Manager */
 
 /* Animations */
