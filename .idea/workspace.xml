@@ -23,69 +23,140 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="45" selection-start="700" selection-end="757" vertical-scroll-proportion="0.3628692" vertical-offset="136" max-vertical-offset="836">
+            <state line="207" column="0" selection-start="12322" selection-end="12322" vertical-scroll-proportion="-2.9550562" vertical-offset="4291" max-vertical-offset="4796">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="caf.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="769" column="0" selection-start="0" selection-end="27127" vertical-scroll-proportion="0.6950495" vertical-offset="16567" max-vertical-offset="18216">
               <folding>
-                <element signature="tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-                <element signature="tag#div#1;tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-                <element signature="tag#div#0;tag#div#1;tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-                <element signature="tag#div#1;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-                <element signature="tag#div#2;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-                <element signature="tag#div#3;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
+                <element signature="e#0#84#0" expanded="true" />
+                <element signature="e#140#164#0" expanded="true" />
+                <element signature="e#190#222#0" expanded="true" />
+                <element signature="e#300#927#0" expanded="true" />
+                <element signature="e#960#1050#0" expanded="true" />
+                <element signature="e#1084#1174#0" expanded="true" />
+                <element signature="e#1213#1292#0" expanded="true" />
+                <element signature="e#1331#1434#0" expanded="true" />
+                <element signature="e#1476#1652#0" expanded="true" />
+                <element signature="e#1705#1852#0" expanded="true" />
+                <element signature="e#1891#1967#0" expanded="true" />
+                <element signature="e#2000#2374#0" expanded="true" />
+                <element signature="e#2380#2432#0" expanded="true" />
+                <element signature="e#2455#2549#0" expanded="true" />
+                <element signature="e#2576#2648#0" expanded="true" />
+                <element signature="e#2654#2752#0" expanded="true" />
+                <element signature="e#2783#2907#0" expanded="true" />
+                <element signature="e#2913#3051#0" expanded="true" />
+                <element signature="e#3086#3294#0" expanded="true" />
+                <element signature="e#3299#3317#0" expanded="true" />
+                <element signature="e#3500#3543#0" expanded="true" />
+                <element signature="e#3575#3613#0" expanded="true" />
+                <element signature="e#3645#3688#0" expanded="true" />
+                <element signature="e#3694#3738#0" expanded="true" />
+                <element signature="e#3767#3873#0" expanded="true" />
+                <element signature="e#3879#3921#0" expanded="true" />
+                <element signature="e#3951#4161#0" expanded="true" />
+                <element signature="e#4167#4322#0" expanded="true" />
+                <element signature="e#4357#8973#0" expanded="true" />
+                <element signature="e#6346#6988#0" expanded="true" />
+                <element signature="e#7050#7311#0" expanded="true" />
+                <element signature="e#7372#8261#0" expanded="true" />
+                <element signature="e#8979#9179#0" expanded="true" />
+                <element signature="e#9215#9443#0" expanded="true" />
+                <element signature="e#9483#9527#0" expanded="true" />
+                <element signature="e#9533#9607#0" expanded="true" />
+                <element signature="e#9640#13143#0" expanded="true" />
+                <element signature="e#12565#12726#0" expanded="true" />
+                <element signature="e#13148#13208#0" expanded="true" />
+                <element signature="e#13236#16487#0" expanded="true" />
+                <element signature="e#14094#14723#0" expanded="true" />
+                <element signature="e#14767#14850#0" expanded="true" />
+                <element signature="e#14892#14977#0" expanded="true" />
+                <element signature="e#15028#15107#0" expanded="true" />
+                <element signature="e#15164#15249#0" expanded="true" />
+                <element signature="e#15291#15414#0" expanded="true" />
+                <element signature="e#15453#15520#0" expanded="true" />
+                <element signature="e#15554#15666#0" expanded="true" />
+                <element signature="e#15706#15859#0" expanded="true" />
+                <element signature="e#15898#16050#0" expanded="true" />
+                <element signature="e#16104#16161#0" expanded="true" />
+                <element signature="e#16197#16317#0" expanded="true" />
+                <element signature="e#16355#16392#0" expanded="true" />
+                <element signature="e#16489#16561#0" expanded="true" />
+                <element signature="e#16593#16652#0" expanded="true" />
+                <element signature="e#16766#17136#0" expanded="true" />
+                <element signature="e#17197#17320#0" expanded="true" />
+                <element signature="e#17521#17639#0" expanded="true" />
+                <element signature="e#17681#18001#0" expanded="true" />
+                <element signature="e#18007#18133#0" expanded="true" />
+                <element signature="e#18166#18326#0" expanded="true" />
+                <element signature="e#18384#19913#0" expanded="true" />
+                <element signature="e#19727#19794#0" expanded="true" />
+                <element signature="e#19959#20293#0" expanded="true" />
+                <element signature="e#20342#20679#0" expanded="true" />
+                <element signature="e#20685#20717#0" expanded="true" />
+                <element signature="e#20783#21975#0" expanded="true" />
+                <element signature="e#21895#21962#0" expanded="true" />
+                <element signature="e#22006#22911#0" expanded="true" />
+                <element signature="e#22786#22897#0" expanded="true" />
+                <element signature="e#22955#23144#0" expanded="true" />
+                <element signature="e#23195#23534#0" expanded="true" />
+                <element signature="e#23541#23562#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="caf.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+      <file leaf-file-name="overthrow.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/libs/overthrow.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="619" column="25" selection-start="19275" selection-end="19275" vertical-scroll-proportion="-3.6551723" vertical-offset="1988" max-vertical-offset="2838">
+            <state line="298" column="6" selection-start="12195" selection-end="12195" vertical-scroll-proportion="0.0" vertical-offset="6389" max-vertical-offset="6952">
               <folding>
-                <element signature="e#329#2086#0" expanded="false" />
-                <element signature="e#490#631#0" expanded="false" />
-                <element signature="e#653#1021#0" expanded="false" />
-                <element signature="e#709#826#0" expanded="false" />
-                <element signature="e#856#925#0" expanded="false" />
-                <element signature="e#1628#1754#0" expanded="false" />
-                <element signature="e#1897#1962#0" expanded="false" />
-                <element signature="e#2500#2552#0" expanded="false" />
-                <element signature="e#2693#2771#0" expanded="false" />
-                <element signature="e#3205#3242#0" expanded="false" />
-                <element signature="e#3319#3380#0" expanded="false" />
-                <element signature="e#3524#3667#0" expanded="false" />
-                <element signature="e#3823#7448#0" expanded="false" />
-                <element signature="e#6192#6375#0" expanded="false" />
-                <element signature="e#6276#6356#0" expanded="false" />
-                <element signature="e#7675#7722#0" expanded="false" />
-                <element signature="e#7989#8164#0" expanded="false" />
-                <element signature="e#8115#8154#0" expanded="false" />
-                <element signature="e#8186#8234#0" expanded="false" />
-                <element signature="e#10005#10156#0" expanded="false" />
-                <element signature="e#10255#10301#0" expanded="false" />
-                <element signature="e#10549#10682#0" expanded="false" />
-                <element signature="e#10703#13689#0" expanded="false" />
-                <element signature="e#11073#11193#0" expanded="false" />
-                <element signature="e#11668#11804#0" expanded="false" />
-                <element signature="e#12208#12264#0" expanded="false" />
-                <element signature="e#14067#14140#0" expanded="false" />
-                <element signature="e#14563#14777#0" expanded="false" />
-                <element signature="e#14614#14767#0" expanded="false" />
-                <element signature="e#14988#15148#0" expanded="true" />
-                <element signature="e#15713#16001#0" expanded="false" />
-                <element signature="e#16853#17134#0" expanded="false" />
-                <element signature="e#17048#17124#0" expanded="false" />
-                <element signature="e#17248#17532#0" expanded="false" />
-                <element signature="e#17443#17522#0" expanded="false" />
-                <element signature="e#17728#17788#0" expanded="false" />
-                <element signature="e#18171#18369#0" expanded="false" />
-                <element signature="e#18919#18989#0" expanded="false" />
-                <element signature="e#19649#19764#0" expanded="true" />
-                <element signature="e#19890#20005#0" expanded="false" />
-                <element signature="e#20182#20282#0" expanded="false" />
-                <element signature="e#20304#20407#0" expanded="false" />
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#189#4176#0" expanded="true" />
+                <element signature="e#1283#3174#0" expanded="true" />
+                <element signature="e#3310#3452#0" expanded="true" />
+                <element signature="e#3492#3581#0" expanded="true" />
+                <element signature="e#3658#3890#0" expanded="true" />
+                <element signature="e#4052#4087#0" expanded="true" />
+                <element signature="e#4956#5112#0" expanded="true" />
+                <element signature="e#5187#12194#0" expanded="true" />
+                <element signature="e#5552#5868#0" expanded="true" />
+                <element signature="e#6570#6649#0" expanded="true" />
+                <element signature="e#6693#6774#0" expanded="true" />
+                <element signature="e#7185#7414#0" expanded="true" />
+                <element signature="e#7593#8223#0" expanded="true" />
+                <element signature="e#8467#12073#0" expanded="true" />
+                <element signature="e#9456#11438#0" expanded="true" />
+                <element signature="e#11516#11925#0" expanded="true" />
+                <element signature="e#11663#11741#0" expanded="true" />
+                <element signature="e#12417#12462#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="idangerous.swiper.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/libs/idangerous.swiper.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1609" column="27" selection-start="60576" selection-end="60576" vertical-scroll-proportion="-2.5172415" vertical-offset="13098" max-vertical-offset="23298">
+              <folding>
+                <element signature="e#50733#57626#0" expanded="true" />
+                <element signature="e#62324#62703#0" expanded="true" />
+                <element signature="e#67401#68456#0" expanded="true" />
+                <element signature="e#71436#72302#0" expanded="true" />
+                <element signature="e#72366#75013#0" expanded="true" />
+                <element signature="e#72525#73607#0" expanded="true" />
+                <element signature="e#94216#96972#0" expanded="true" />
+                <element signature="e#101386#102574#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -94,7 +165,7 @@
       <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="5" column="33" selection-start="100" selection-end="100" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="924">
+            <state line="9" column="19" selection-start="171" selection-end="171" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="946">
               <folding />
             </state>
           </provider>
@@ -103,8 +174,21 @@
       <file leaf-file-name="caf.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/css/caf.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="107" column="13" selection-start="1774" selection-end="1774" vertical-scroll-proportion="-7.948276" vertical-offset="1893" max-vertical-offset="26092">
+            <state line="51" column="0" selection-start="1093" selection-end="1093" vertical-scroll-proportion="0.0" vertical-offset="625" max-vertical-offset="38588">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="14-different-widths.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../Swiper-master/demos/14-different-widths.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="50" selection-start="1614" selection-end="1614" vertical-scroll-proportion="-45.419353" vertical-offset="396" max-vertical-offset="2420">
+              <folding>
+                <element signature="n#style#0;n#div#3;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#4;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#5;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -124,8 +208,12 @@
         <option value="$PROJECT_DIR$/caf/libs/overthrow-polyfill.js" />
         <option value="$PROJECT_DIR$/caf/libs/overthrow-init.js" />
         <option value="$PROJECT_DIR$/caf/libs/overthrow-detect.js" />
+        <option value="$PROJECT_DIR$/../app/lib/onsen/js/onsenui_all.js" />
+        <option value="$PROJECT_DIR$/../Swiper-master/demos/14-different-widths.html" />
+        <option value="$PROJECT_DIR$/caf/libs/idangerous.swiper.js" />
         <option value="$PROJECT_DIR$/caf/css/caf.css" />
         <option value="$PROJECT_DIR$/caf/js/index.js" />
+        <option value="$PROJECT_DIR$/caf/libs/overthrow.js" />
         <option value="$PROJECT_DIR$/caf/index.html" />
         <option value="$PROJECT_DIR$/caf/js/caf.js" />
       </list>
@@ -266,10 +354,12 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf" />
       <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\libs" />
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\css" />
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\libs" />
       <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\css" />
       <recent name="D:\Dvir Cohen\Programming\Web Development\CAF\caf\js" />
     </key>
@@ -351,62 +441,13 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/caf/libs/underscore.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="316" column="14" selection-start="11282" selection-end="11282" vertical-scroll-proportion="0.28316832" vertical-offset="3003" max-vertical-offset="12034">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/libs/iscroll.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2750">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/DOMCore.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="133" column="0" selection-start="2661" selection-end="2661" vertical-scroll-proportion="0.33333334" vertical-offset="1150" max-vertical-offset="10164">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/libs/overthrow.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="40" selection-start="4245" selection-end="4253" vertical-scroll-proportion="0.33267328" vertical-offset="1922" max-vertical-offset="6952">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <element signature="e#189#4200#0" expanded="true" />
-            <element signature="e#1288#3188#0" expanded="true" />
-            <element signature="e#3324#3466#0" expanded="true" />
-            <element signature="e#3506#3595#0" expanded="true" />
-            <element signature="e#3672#3907#0" expanded="true" />
-            <element signature="e#4070#4107#0" expanded="true" />
-            <element signature="e#4405#12222#0" expanded="true" />
-            <element signature="e#4980#5136#0" expanded="true" />
-            <element signature="e#5211#12218#0" expanded="true" />
-            <element signature="e#5576#5892#0" expanded="true" />
-            <element signature="e#6594#6673#0" expanded="true" />
-            <element signature="e#6717#6798#0" expanded="true" />
-            <element signature="e#7209#7438#0" expanded="true" />
-            <element signature="e#7617#8247#0" expanded="true" />
-            <element signature="e#8491#12097#0" expanded="true" />
-            <element signature="e#9480#11462#0" expanded="true" />
-            <element signature="e#11540#11949#0" expanded="true" />
-            <element signature="e#11687#11765#0" expanded="true" />
-            <element signature="e#12441#12486#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/css/caf.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="107" column="13" selection-start="1774" selection-end="1774" vertical-scroll-proportion="-7.948276" vertical-offset="1893" max-vertical-offset="26092">
           <folding />
         </state>
       </provider>
@@ -418,73 +459,190 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/js/index.js">
+    <entry file="file://$USER_HOME$/AppData/Local/Temp/scp13143/domains/codletech.net/public_html/imonaride/dbConnection.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="33" selection-start="100" selection-end="100" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="924">
+        <state line="5" column="23" selection-start="90" selection-end="98" vertical-scroll-proportion="0.20183486" vertical-offset="0" max-vertical-offset="545">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+    <entry file="file://$PROJECT_DIR$/caf/css/slidingview.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="619" column="25" selection-start="19275" selection-end="19275" vertical-scroll-proportion="-3.6551723" vertical-offset="1988" max-vertical-offset="2838">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1936">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/css/viewnavigator.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5192">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../triceam-app-UI-3e86369/samples/03 - slidingView/02 - view navigators/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="102" column="39" selection-start="3361" selection-end="3380" vertical-scroll-proportion="1.1654135" vertical-offset="1206" max-vertical-offset="2090">
           <folding>
-            <element signature="e#329#2086#0" expanded="false" />
-            <element signature="e#490#631#0" expanded="false" />
-            <element signature="e#653#1021#0" expanded="false" />
-            <element signature="e#709#826#0" expanded="false" />
-            <element signature="e#856#925#0" expanded="false" />
-            <element signature="e#1628#1754#0" expanded="false" />
-            <element signature="e#1897#1962#0" expanded="false" />
-            <element signature="e#2500#2552#0" expanded="false" />
-            <element signature="e#2693#2771#0" expanded="false" />
-            <element signature="e#3205#3242#0" expanded="false" />
-            <element signature="e#3319#3380#0" expanded="false" />
-            <element signature="e#3524#3667#0" expanded="false" />
-            <element signature="e#3823#7448#0" expanded="false" />
-            <element signature="e#6192#6375#0" expanded="false" />
-            <element signature="e#6276#6356#0" expanded="false" />
-            <element signature="e#7675#7722#0" expanded="false" />
-            <element signature="e#7989#8164#0" expanded="false" />
-            <element signature="e#8115#8154#0" expanded="false" />
-            <element signature="e#8186#8234#0" expanded="false" />
-            <element signature="e#10005#10156#0" expanded="false" />
-            <element signature="e#10255#10301#0" expanded="false" />
-            <element signature="e#10549#10682#0" expanded="false" />
-            <element signature="e#10703#13689#0" expanded="false" />
-            <element signature="e#11073#11193#0" expanded="false" />
-            <element signature="e#11668#11804#0" expanded="false" />
-            <element signature="e#12208#12264#0" expanded="false" />
-            <element signature="e#14067#14140#0" expanded="false" />
-            <element signature="e#14563#14777#0" expanded="false" />
-            <element signature="e#14614#14767#0" expanded="false" />
-            <element signature="e#14988#15148#0" expanded="true" />
-            <element signature="e#15713#16001#0" expanded="false" />
-            <element signature="e#16853#17134#0" expanded="false" />
-            <element signature="e#17048#17124#0" expanded="false" />
-            <element signature="e#17248#17532#0" expanded="false" />
-            <element signature="e#17443#17522#0" expanded="false" />
-            <element signature="e#17728#17788#0" expanded="false" />
-            <element signature="e#18171#18369#0" expanded="false" />
-            <element signature="e#18919#18989#0" expanded="false" />
-            <element signature="e#19649#19764#0" expanded="true" />
-            <element signature="e#19890#20005#0" expanded="false" />
-            <element signature="e#20182#20282#0" expanded="false" />
-            <element signature="e#20304#20407#0" expanded="false" />
+            <element signature="e#966#1452#0" expanded="false" />
+            <element signature="e#1484#1625#0" expanded="false" />
+            <element signature="e#2060#2562#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Swiper-master/demos/14-different-widths.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="50" selection-start="1614" selection-end="1614" vertical-scroll-proportion="-45.419353" vertical-offset="396" max-vertical-offset="2420">
+          <folding>
+            <element signature="n#style#0;n#div#3;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#4;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#5;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/css/caf.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="51" column="0" selection-start="1093" selection-end="1093" vertical-scroll-proportion="0.0" vertical-offset="625" max-vertical-offset="38588">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/js/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="19" selection-start="171" selection-end="171" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="946">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/libs/idangerous.swiper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1609" column="27" selection-start="60576" selection-end="60576" vertical-scroll-proportion="-2.5172415" vertical-offset="13098" max-vertical-offset="23298">
+          <folding>
+            <element signature="e#50733#57626#0" expanded="true" />
+            <element signature="e#62324#62703#0" expanded="true" />
+            <element signature="e#67401#68456#0" expanded="true" />
+            <element signature="e#71436#72302#0" expanded="true" />
+            <element signature="e#72366#75013#0" expanded="true" />
+            <element signature="e#72525#73607#0" expanded="true" />
+            <element signature="e#94216#96972#0" expanded="true" />
+            <element signature="e#101386#102574#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/libs/overthrow.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="298" column="6" selection-start="12195" selection-end="12195" vertical-scroll-proportion="0.0" vertical-offset="6389" max-vertical-offset="6952">
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#189#4176#0" expanded="true" />
+            <element signature="e#1283#3174#0" expanded="true" />
+            <element signature="e#3310#3452#0" expanded="true" />
+            <element signature="e#3492#3581#0" expanded="true" />
+            <element signature="e#3658#3890#0" expanded="true" />
+            <element signature="e#4052#4087#0" expanded="true" />
+            <element signature="e#4956#5112#0" expanded="true" />
+            <element signature="e#5187#12194#0" expanded="true" />
+            <element signature="e#5552#5868#0" expanded="true" />
+            <element signature="e#6570#6649#0" expanded="true" />
+            <element signature="e#6693#6774#0" expanded="true" />
+            <element signature="e#7185#7414#0" expanded="true" />
+            <element signature="e#7593#8223#0" expanded="true" />
+            <element signature="e#8467#12073#0" expanded="true" />
+            <element signature="e#9456#11438#0" expanded="true" />
+            <element signature="e#11516#11925#0" expanded="true" />
+            <element signature="e#11663#11741#0" expanded="true" />
+            <element signature="e#12417#12462#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/caf/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="45" selection-start="700" selection-end="757" vertical-scroll-proportion="0.3628692" vertical-offset="136" max-vertical-offset="836">
+        <state line="207" column="0" selection-start="12322" selection-end="12322" vertical-scroll-proportion="-2.9550562" vertical-offset="4291" max-vertical-offset="4796">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/js/caf.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="769" column="0" selection-start="0" selection-end="27127" vertical-scroll-proportion="0.6950495" vertical-offset="16567" max-vertical-offset="18216">
           <folding>
-            <element signature="tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-            <element signature="tag#div#1;tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-            <element signature="tag#div#0;tag#div#1;tag#div#0;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-            <element signature="tag#div#1;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-            <element signature="tag#div#2;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
-            <element signature="tag#div#3;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
+            <element signature="e#0#84#0" expanded="true" />
+            <element signature="e#140#164#0" expanded="true" />
+            <element signature="e#190#222#0" expanded="true" />
+            <element signature="e#300#927#0" expanded="true" />
+            <element signature="e#960#1050#0" expanded="true" />
+            <element signature="e#1084#1174#0" expanded="true" />
+            <element signature="e#1213#1292#0" expanded="true" />
+            <element signature="e#1331#1434#0" expanded="true" />
+            <element signature="e#1476#1652#0" expanded="true" />
+            <element signature="e#1705#1852#0" expanded="true" />
+            <element signature="e#1891#1967#0" expanded="true" />
+            <element signature="e#2000#2374#0" expanded="true" />
+            <element signature="e#2380#2432#0" expanded="true" />
+            <element signature="e#2455#2549#0" expanded="true" />
+            <element signature="e#2576#2648#0" expanded="true" />
+            <element signature="e#2654#2752#0" expanded="true" />
+            <element signature="e#2783#2907#0" expanded="true" />
+            <element signature="e#2913#3051#0" expanded="true" />
+            <element signature="e#3086#3294#0" expanded="true" />
+            <element signature="e#3299#3317#0" expanded="true" />
+            <element signature="e#3500#3543#0" expanded="true" />
+            <element signature="e#3575#3613#0" expanded="true" />
+            <element signature="e#3645#3688#0" expanded="true" />
+            <element signature="e#3694#3738#0" expanded="true" />
+            <element signature="e#3767#3873#0" expanded="true" />
+            <element signature="e#3879#3921#0" expanded="true" />
+            <element signature="e#3951#4161#0" expanded="true" />
+            <element signature="e#4167#4322#0" expanded="true" />
+            <element signature="e#4357#8973#0" expanded="true" />
+            <element signature="e#6346#6988#0" expanded="true" />
+            <element signature="e#7050#7311#0" expanded="true" />
+            <element signature="e#7372#8261#0" expanded="true" />
+            <element signature="e#8979#9179#0" expanded="true" />
+            <element signature="e#9215#9443#0" expanded="true" />
+            <element signature="e#9483#9527#0" expanded="true" />
+            <element signature="e#9533#9607#0" expanded="true" />
+            <element signature="e#9640#13143#0" expanded="true" />
+            <element signature="e#12565#12726#0" expanded="true" />
+            <element signature="e#13148#13208#0" expanded="true" />
+            <element signature="e#13236#16487#0" expanded="true" />
+            <element signature="e#14094#14723#0" expanded="true" />
+            <element signature="e#14767#14850#0" expanded="true" />
+            <element signature="e#14892#14977#0" expanded="true" />
+            <element signature="e#15028#15107#0" expanded="true" />
+            <element signature="e#15164#15249#0" expanded="true" />
+            <element signature="e#15291#15414#0" expanded="true" />
+            <element signature="e#15453#15520#0" expanded="true" />
+            <element signature="e#15554#15666#0" expanded="true" />
+            <element signature="e#15706#15859#0" expanded="true" />
+            <element signature="e#15898#16050#0" expanded="true" />
+            <element signature="e#16104#16161#0" expanded="true" />
+            <element signature="e#16197#16317#0" expanded="true" />
+            <element signature="e#16355#16392#0" expanded="true" />
+            <element signature="e#16489#16561#0" expanded="true" />
+            <element signature="e#16593#16652#0" expanded="true" />
+            <element signature="e#16766#17136#0" expanded="true" />
+            <element signature="e#17197#17320#0" expanded="true" />
+            <element signature="e#17521#17639#0" expanded="true" />
+            <element signature="e#17681#18001#0" expanded="true" />
+            <element signature="e#18007#18133#0" expanded="true" />
+            <element signature="e#18166#18326#0" expanded="true" />
+            <element signature="e#18384#19913#0" expanded="true" />
+            <element signature="e#19727#19794#0" expanded="true" />
+            <element signature="e#19959#20293#0" expanded="true" />
+            <element signature="e#20342#20679#0" expanded="true" />
+            <element signature="e#20685#20717#0" expanded="true" />
+            <element signature="e#20783#21975#0" expanded="true" />
+            <element signature="e#21895#21962#0" expanded="true" />
+            <element signature="e#22006#22911#0" expanded="true" />
+            <element signature="e#22786#22897#0" expanded="true" />
+            <element signature="e#22955#23144#0" expanded="true" />
+            <element signature="e#23195#23534#0" expanded="true" />
+            <element signature="e#23541#23562#0" expanded="true" />
           </folding>
         </state>
       </provider>

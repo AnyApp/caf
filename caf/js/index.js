@@ -4,7 +4,8 @@ var app =
     {
         caf.init('');
         caf.pager.init('page-main','back');
-        caf.Views.rebuildAll();
+        caf.ui.rebuildAll();
+
         /*
         caf.View('start').text('לחץ עלי').activeClass('bgXDarkBlue')
             .class('mt6 marginCentered textCenter bgDarkBlue w60 hp50 xsRounded xxlFontSize white bold')

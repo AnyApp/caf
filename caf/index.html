@@ -8,150 +8,204 @@
     <!-- CSS Includes -->
     <link rel="stylesheet" type="text/css" href="fonts/stylesheet.css"  charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="css/caf.css" />
+    <link rel="stylesheet" type="text/css" href="css/idangerous.swiper.css" />
 
     <title>עליתי על טרמפ</title>
 </head>
 <body ontouchstart="" class="rtl">
-<div id="app-container" class="app_container"
-        pages="['page-main','page-buttons','page-tabs']">
-    <div id="header" class="header bgDarkCyan textCenter hp45">
-        <div id="title" class="headerItem absBlock50-2-2 textCenter white bold mFontSize"></div>
-        <div id="menu" class="headerItem wp50 hp45 absBlock50-n-1" caf-active="bgXDarkCyan"
-             caf-iconly="ic_action_overflow"
-             caf-drop-menu-container="dropMenu">
-            <div id="dropMenu" class="dropMenuRight wp150 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
-                <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m"
-                     caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
+<div id="app-container" class="app_container ltr"
+        pages="['page-main','page-buttons','page-tabs']"
+        caf-side-menu-container="side-menu-swiper"
+        caf-side-menu-position="left">
+    <div class="swiper-container ltr" id="side-menu-swiper" >
+        <div class="swiper-wrapper side-menu-swiper-wrapper">
+            <div id="side-menu-view" class="swiper-slide sideMenu overthrow  textCenter bgXXXDarkBlue">
+                <div id="side-menu-button-main"
+                     class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold borderBox borderBottom1p bcXXDarkBlue"
+                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                     caf-to-page="page-main"
+                     caf-side-menu-switch="side-menu-swiper"
+                     caf-text="To Page Main">
                 </div>
-                <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m"
-                     caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                <div id="side-menu-button-tabs"
+                     class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold borderBox borderBottom1p bcXXDarkBlue"
+                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                     caf-to-page="page-tabs"
+                     caf-side-menu-switch="side-menu-swiper"
+                     caf-text="To Page Tabs">
                 </div>
-                <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m"
-                     caf-drop-menu-container="dropMenu" caf-text="information" caf-onclick="caf.log('infoButton');">
+                <div id="side-menu-button-buttons"
+                     class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold borderBox borderBottom1p bcXXDarkBlue"
+                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                     caf-to-page="page-buttons"
+                     caf-side-menu-switch="side-menu-swiper"
+                     caf-text="To Page Buttons">
                 </div>
-                <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
-                     caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m"
-                     caf-drop-menu-container="dropMenu" caf-text="exit" caf-to-page="page2">
+                <div id="side-menu-button-facebook"
+                     class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold borderBox borderBottom1p bcXXDarkBlue"
+                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                     caf-to-url="https://www.facebook.com/"
+                     caf-side-menu-switch="side-menu-swiper"
+                     caf-text="Out-Of-App Link">
                 </div>
-                <div id="dropMenuOverlay" class="dropMenuOverlay"
-                     caf-drop-menu-overlay-of="dropMenu">
-                </div>
-            </div>
-        </div>
-        <div id="info" class="headerItem wp50 hp45 absBlock50-n-0"
-             caf-active="bgXDarkCyan"
-             caf-onclick="caf.log('info');"
-             caf-iconly="ic_action_menu">
-        </div>
-        <div id="back" class="headerItem wp50 hp45 absBlock50-0-n"
-             caf-active="bgXDarkCyan"
-             caf-to-page="move-back"
-             caf-iconly="ic_action_previous_item">
-        </div>
-    </div>
-    <div id="page-main" class="content bgLightGray top45 bottom20"
-         caf-page-load="caf.title('CAF Showcase');">
-        <div id="main-btn-to-buttons"
-             class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
-             caf-active="bgXDarkBlue"
-             caf-to-page="page-buttons"
-             caf-text="Buttons">
-        </div>
-        <div id="main-btn-to-tabs"
-             class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
-             caf-active="bgXDarkBlue"
-             caf-to-page="page-tabs"
-             caf-text="Tabs">
-        </div>
-    </div>
-    <div id="page-buttons" class="content overthrow bgLightBrown top45 bottom20"
-         caf-page-load="caf.title('CAF Buttons');">
-        <div id="start55"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-to-page="page1"
-            caf-text="page 1">
-        </div>
-        <div id="start56"
-            caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
-            caf-active="bgXDarkBlue"
-            caf-to-page="page3"
-            caf-text="page 3">
-        </div>
-        <div id="start66"
-             caf-class="mt6 marginCentered textCenter bgDarkBlue w80 hp50 xsRounded xxlFontSize white bold"
-             caf-active="bgXDarkBlue"
-             caf-to-page="page4"
-             caf-text="page 4">
-        </div>
 
-    </div>
-    <div id="page-tabs" class="content bgLightPurple top45 bottom20"
-         caf-page-load="caf.title('CAF Tabs');">
-        <div id="btab1"
-             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
-             caf-active="bgXDarkRed"
-             caf-hold="bgXDarkGray"
-             caf-active-remove="bgDarkRed"
-             caf-to-tab="tab1"
-             caf-tab-container="tabContainer"
-             caf-text="go tab 1">
-        </div>
-        <div id="btab2"
-             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
-             caf-active="bgXDarkRed"
-             caf-hold="bgXDarkGray"
-             caf-active-remove="bgDarkRed"
-             caf-to-tab="tab2"
-             caf-tab-container="tabContainer"
-             caf-text="go tab 2">
-        </div>
-        <div id="btab3"
-             caf-class="mt6 marginCentered textCenter inlineBlock bgDarkRed w30 hp50 xsRounded lFontSize white bold"
-             caf-active="bgXDarkRed"
-             caf-hold="bgXDarkGray"
-             caf-active-remove="bgDarkRed"
-             caf-to-tab="tab3"
-             caf-tab-container="tabContainer"
-             caf-text="go tab 3">
-        </div>
-        <div id="tabContainer" class="overthrow tabContainer"
-             caf-tabs="['tab1','tab2','tab3']"
-             caf-current-tab="tab1">
-            <div id="tab1" class="overthrow tab top60 bgWhite currentTab"
-                 caf-related-button="btab1">
-                <div id="tab1elm"
-                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
-                     caf-text="tab 1">
-                </div>
             </div>
-            <div id="tab2" class="overthrow tab top60 bgWhite"
-                 caf-related-button="btab2">
-                <div id="tab2elm"
-                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
-                     caf-text="tab 2">
+            <div id="main-view" class="swiper-slide appMainView">
+                <div id="header" class="header bgXXDarkCyan textCenter hp45">
+                    <div id="title" class="headerItem absBlock50-2-2 textCenter white bold mFontSize"></div>
+                    <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0" caf-active="bgXDarkCyan"
+                         caf-iconly="ic_action_overflow"
+                         caf-drop-menu-container="dropMenu">
+                        <div id="dropMenu" class="dropMenuRight wp150 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
+                            <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m" caf-stop-propagation="true"
+                                 caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
+                            </div>
+                            <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m" caf-stop-propagation="true"
+                                 caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                            </div>
+                            <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
+                                 caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
+                            </div>
+                            <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
+                                 caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                            </div>
+                            <div id="dropMenuOverlay" class="dropMenuOverlay"
+                                 caf-drop-menu-overlay-of="dropMenu"  caf-stop-propagation="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="side-menu" class="headerItem wp50 hp45 absBlock50-0-n"
+                         caf-active="bgXDarkCyan"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-iconly="ic_action_menu">
+                    </div>
+                    <div id="back" class="headerItem wp50 hp45 absBlock50-1-n"
+                         caf-active="bgXDarkCyan"
+                         caf-to-page="move-back"
+                         caf-iconly="ic_action_previous_item">
+                    </div>
                 </div>
-            </div>
-            <div id="tab3" class="overthrow tab top60 bgWhite"
-                 caf-related-button="btab3">
-                <div id="tab3elm"
-                     caf-class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded xxlFontSize white bold"
-                     caf-text="tab 3">
+                <div id="page-main" class="content bgWhite top45 bottom20"
+                     caf-page-load="caf.ui.title('CAF Showcase');">
+                    <div id="main-btn-to-buttons"
+                         class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkBlue"
+                         caf-to-page="page-buttons"
+                         caf-text="Buttons">
+                    </div>
+                    <div id="main-btn-to-tabs"
+                         class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkBlue"
+                         caf-to-page="page-tabs"
+                         caf-text="Tabs">
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
+                <div id="page-buttons" class="content overthrow bgWhite top45 bottom20"
+                     caf-page-load="caf.ui.title('CAF Buttons');">
+                    <div id="button1"
+                         class="mt8 marginCentered textCenter bgDarkBlue w50 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkBlue"
+                         caf-to-page="page-main"
+                         caf-text="To Page Main">
+                    </div>
+                    <div id="facebookButton"
+                         class="pl24 mt8 marginCentered textLeft bgDarkPurple w50 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXXDarkPurple" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-url="https://www.facebook.com/"
+                         caf-text="Out-Of-App Link">
+                    </div>
+                    <div id="button2"
+                        class="mt14 marginCentered textCenter bgDarkGray w70 hp60 xsRounded lFontSize white bold"
+                        caf-active="bgXDarkGray"
+                        caf-to-page="page-tabs"
+                        caf-text="To Page Tabs">
+                    </div>
+                    <div id="button3"
+                         class="mt20 marginCentered textCenter bgDarkRed w90 hp120 sRounded xxlFontSize white bold"
+                         caf-active="bgXDarkRed"
+                         caf-to-page="page-buttons"
+                         caf-text="To Page Buttons">
+                    </div>
 
-    <div class="footer bgDarkCyan bottom0 hp20 sFontSize textCenter white bold">מבית Codletech</div>
+                </div>
+                <div id="page-tabs" class="content bgWhite top45 bottom20"
+                     caf-page-load="caf.ui.title('CAF Tabs');">
+                        <div class="tabsButtonsContainer hp40 smFontSize white bold bgDarkCyan">
+                        <div id="btab1"
+                             class="marginCentered textCenter inlineBlock  w30"
+                             caf-active="bgXXXDarkCyan"
+                             caf-hold="bgXDarkCyan"
+                             caf-active-remove=""
+                             caf-to-tab="tab1"
+                             caf-tab-container="tabContainer"
+                             caf-text="go tab 1">
+                        </div>
+                        <div id="btab2"
+                             class="marginCentered textCenter inlineBlock  w30"
+                             caf-active="bgXXXDarkCyan"
+                             caf-hold="bgXDarkCyan"
+                             caf-active-remove=""
+                             caf-to-tab="tab2"
+                             caf-tab-container="tabContainer"
+                             caf-text="go tab 2">
+                        </div>
+                        <div id="btab3"
+                             class="marginCentered textCenter inlineBlock  w30"
+                             caf-active="bgXXXDarkCyan"
+                             caf-hold="bgXDarkCyan"
+                             caf-active-remove=""
+                             caf-to-tab="tab3"
+                             caf-tab-container="tabContainer"
+                             caf-text="go tab 3">
+                        </div>
+                    </div>
+                    <div id="tabContainer" class="overthrow tabContainer mFontSize"
+                         caf-tabs="['tab1','tab2','tab3']"
+                         caf-current-tab="tab1">
+                         <!--swiper-container="tabs-swiper" num-slides="3"-->
+                        <div id="tab1" class="swiper-slide overthrow tab top60 bgWhite currentTab"
+                         caf-related-button="btab1">
+                            <div id="tab1elm1"
+                                 class="mt6 marginCentered textCenter bgDarkBlue w20 hp40 xsRounded white bold"
+                                 caf-text="tab 1">
+                            </div>
+                            <div id="tab1elm2"
+                                 class="mt6 marginCentered textCenter bgDarkPink w40 hp50 xsRounded white bold"
+                                 caf-text="tab 1">
+                            </div>
+                        </div>
+                        <div id="tab2" class="swiper-slide overthrow tab top60 bgWhite"
+                             caf-related-button="btab2">
+                            <div id="tab2elm"
+                                 class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded white bold"
+                                 caf-text="tab 2">
+                            </div>
+                        </div>
+                        <div id="tab3" class="swiper-slide overthrow tab top60 bgWhite"
+                             caf-related-button="btab3">
+                            <div id="tab3elm"
+                                 class="mt6 marginCentered textCenter bgDarkBrown w80 hp130 xsRounded xxlFontSize white bold"
+                                 caf-text="tab 3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer bgXXDarkCyan bottom0 hp20 sFontSize textCenter white bold">From Codletech</div>
+            </div>
+
+        </div>
+    </div>
 </div>
 </body>
 <!-- JS Includes -->
 <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
 <script type="text/javascript" src="js/caf.js"></script>
-<script type="text/javascript" src="libs/overthrow.js"></script>
+<script type="text/javascript" src="libs/idangerous.swiper.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript">
     app.initialize();
