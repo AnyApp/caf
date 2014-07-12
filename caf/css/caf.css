@@ -203,6 +203,9 @@ li{
 .bold{
     font-weight: bold;
 }
+.italic{
+    font-style: italic;
+}
 .white{
     color: #ffffff;
 }
@@ -1411,7 +1414,14 @@ li{
 /* Margins */
 
 .marginCentered{
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+.marginRighted {
+    margin-left: auto;
+}
+.marginLefted {
+    margin-right: auto;
 }
 
 .mt0{

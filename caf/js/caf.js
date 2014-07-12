@@ -9,6 +9,7 @@ caf.path = '';
 caf.init = function(path)
 {
     caf.path = path;
+    caf.ui.attributes.initAttributes();
 }
 
 caf.log = function(msg)
@@ -45,6 +46,10 @@ caf.utils =
     isEmpty: function(obj)
     {
         return obj == undefined || obj == null || obj == '' || obj.toString()=='';
+    },
+    isString: function(variable)
+    {
+        return (typeof variable == 'string' || variable instanceof String);
     },
     getElementDef: function(elm){
         var str = elm.outerHTML;
@@ -335,46 +340,8 @@ caf.ui = {
         }
 
         view.clear();
-        if ( elm.getAttribute('caf-active') )               view.activeClass(elm.getAttribute('caf-active'));
-        if ( elm.getAttribute('caf-active-remove') )        view.activeClassRemove(elm.getAttribute('caf-active-remove'));
-        if ( elm.getAttribute('caf-onclick'))               view.onClick( new Function(elm.getAttribute('caf-onclick')) );
-        if ( elm.getAttribute('caf-to-url'))                view.onClick( function(){caf.utils.openURL(elm.getAttribute('caf-to-url'));} );
-        if ( elm.getAttribute('caf-to-page'))               view.onClick( function() {caf.pager.moveToPage(elm.getAttribute('caf-to-page')); } );
-        if ( elm.getAttribute('caf-to-tab')
-            && elm.getAttribute('caf-tab-container'))       view.onClick( function() {caf.pager.moveToTab(elm.getAttribute('caf-to-tab'),elm.getAttribute('caf-tab-container')); } );
-        if ( elm.getAttribute('caf-drop-menu-overlay-of'))  view.onClick( function() {caf.utils.hideOrShow(elm.getAttribute('caf-drop-menu-overlay-of'),'fadein','fadeout',300);; } );
-        if ( elm.getAttribute('caf-drop-menu-container'))   view.onClick( function() {caf.utils.hideOrShow(elm.getAttribute('caf-drop-menu-container'),'fadein','fadeout',300);; } );
-        if ( elm.getAttribute('caf-text')   )               view.text(elm.getAttribute('caf-text'));
-        if ( elm.getAttribute('caf-iconly') )               view.iconOnly(elm.getAttribute('caf-iconly'));
-        if ( elm.getAttribute('caf-icon-right') )           view.iconRight(elm.getAttribute('caf-icon-right'),elm.getAttribute('caf-icon-size') );
-        if ( elm.getAttribute('caf-icon-left') )            view.iconLeft(elm.getAttribute('caf-icon-left'),elm.getAttribute('caf-icon-size') );
-        if ( elm.getAttribute('caf-stop-propagation') )     view.doStopPropagation(eval(elm.getAttribute('caf-stop-propagation')));
-        // Init Side Menu Swiper.
-        if ( elm.getAttribute('caf-side-menu-container') && elm.getAttribute('caf-side-menu-position'))
-        {
-            caf.ui.swipers.initSideMenu(elm.getAttribute('caf-side-menu-container'),elm.getAttribute('caf-side-menu-position'));
-        }
-        if ( elm.getAttribute('swiper-container'))
-        {
-            caf.ui.swipers.initSwiper(elm.getAttribute('swiper-container'),elm.getAttribute('num-slides'));
-        }
 
-        // Switch menu ( Hide / Show).
-        if ( elm.getAttribute('caf-side-menu-switch'))
-        {
-            var swiperName = elm.getAttribute('caf-side-menu-switch');
-            view.onClick( function(){
-                var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
-                currentSwiper.swipeTo((currentSwiper.activeIndex+1)%2 );
-            } );
-        }
-
-        // Move to tab.
-        if ( elm.getAttribute('caf-current-tab') )
-        {
-            caf.log('Moved To Tab: '+elm.getAttribute('caf-current-tab'));
-            caf.pager.moveToTab(elm.getAttribute('caf-current-tab'),elm.id,true);
-        }
+        view.applyAttributes();
 
         var result = view.build();
         // Not a CAF View.
@@ -382,6 +349,116 @@ caf.ui = {
         {
             this.removeView(view);
         }
+    }
+
+}
+
+/**
+ * Handler for the attributes that CAF supporting.
+ */
+caf.ui.attributes =
+{
+    list: Array(),
+    addAttr: function(elmAttributes,handler)
+    {
+        this.list.push({
+            elmAttributes: elmAttributes,
+            handler: handler
+        });
+    },
+    /**
+     * Apply attributes on view.
+     * @param view
+     */
+    applyAttributes: function(view)
+    {
+        var elm = view.mElement;
+        // Apply each attribute.
+        for (var iAttribute in this.list)
+        {
+            var attribute = this.list[iAttribute];
+            // Init Arguments array
+            var args = {
+                view: view
+            };
+            var missingArgument = false;
+            for (var iArg in attribute.elmAttributes)
+            {
+                var attrName = attribute.elmAttributes[iArg];
+                var attrValue = elm.getAttribute(attrName);
+                // Missing Argument.
+                if (caf.utils.isEmpty(attrValue))
+                {
+                    missingArgument = true;
+                    break;
+                }
+                args[attrName] = attrValue;
+            }
+            // Skip.
+            if (missingArgument) continue;
+            // Apply Attribute
+            attribute.handler(args);
+        }
+    },
+    initAttributes: function()
+    {
+        this.addAttr(['caf-active'],function(args){
+            args.view.activeClass(args['caf-active']);
+        });
+        this.addAttr(['caf-active-remove'],function(args){
+            args.view.activeClassRemove(args['caf-active-remove']);
+        });
+        this.addAttr(['caf-onclick'],function(args){
+            args.view.onClick( new Function(args['caf-onclick']));
+        });
+        this.addAttr(['to-url'],function(args){
+            args.view.onClick( function(){caf.utils.openURL(args['caf-to-url']);} );
+        });
+        this.addAttr(['caf-to-page'],function(args){
+            args.view.onClick( function() {caf.pager.moveToPage(args['caf-to-page']); } );
+        });
+        this.addAttr(['caf-to-tab','caf-tab-container'],function(args){
+            args.view.onClick( function() {caf.pager.moveToTab(args['caf-to-tab'],args['caf-tab-container']); } );
+        });
+        this.addAttr(['caf-drop-menu-overlay-of'],function(args){
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein','fadeout',300);; } );
+        });
+        this.addAttr(['caf-drop-menu-container'],function(args){
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-container'],'fadein','fadeout',300);; } );
+        });
+        this.addAttr(['caf-text'],function(args){
+            args.view.text(args['caf-text']);
+        });
+        this.addAttr(['caf-iconly'],function(args){
+            args.view.iconOnly(args['caf-iconly']);
+        });
+        this.addAttr(['caf-icon-right'],function(args){
+            args.view.iconRight(args['caf-icon-right'],args['caf-icon-size'] );
+        });
+        this.addAttr(['caf-icon-left'],function(args){
+            args.view.iconLeft(args['caf-icon-left'],args['caf-icon-size'] );
+        });
+        this.addAttr(['caf-stop-propagation'],function(args){
+            args.view.doStopPropagation(eval(args['caf-stop-propagation']));
+        });
+        this.addAttr(['caf-side-menu-container','caf-side-menu-position'],function(args){
+            caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
+        });
+        this.addAttr(['swiper-container'],function(args){
+            caf.ui.swipers.initSwiper(args['swiper-container'],args['num-slides']);
+        });
+        this.addAttr(['caf-side-menu-switch'],function(args){
+            var swiperName = args['caf-side-menu-switch'];
+            args.view.onClick( function(){
+                var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
+                currentSwiper.swipeTo((currentSwiper.activeIndex+1)%2 );
+            } );
+        });
+        this.addAttr(['caf-current-tab'],function(args){
+            caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
+        });
+
+
     }
 
 }
@@ -504,6 +581,10 @@ caf.ui.view = function(id)
         refresh: function()
         {
             this.build();
+        },
+        applyAttributes: function()
+        {
+            caf.ui.attributes.applyAttributes(this);
         }
     };
 
@@ -545,6 +626,100 @@ caf.ui.swipers =
 
 caf.ui.forms =
 {
+    map: {},
+    validators:
+    {
+
+    },
+    prepareFunctions:
+    {
+
+    },
+    createForm: function(name,onSubmit)
+    {
+        this.map[name] =
+        {
+            name: name,
+            inputs: {},
+            onSubmit: onSubmit || function(){},
+            clear: function()
+            {
+                caf.ui.forms.clearForm(this.name);
+            },
+            addInput: function(id,type)
+            {
+                caf.ui.forms.addInput(this.name,id,type);
+            },
+            values: function()
+            {
+                var values = {};
+                for (var iInput in this.inputs)
+                {
+                    // Get value and validate.
+                    var input = this.inputs[iInput];
+                    var name = input.name;
+                    var value = input.value();
+                    var validationResult = input.validator(value);
+                    // Validation Failed!
+                    if (!validationResult)
+                    {
+                        // Show Message.
+                        caf.ui.popups.showErrorMessage(validationResult.title,validationResult.msg);
+                        return null; // Return empty result.
+                    }
+                    // Add value to result values.
+                    values[name] = value;
+                }
+                return values;
+            }
+        }
+    },
+    clearForm: function(name)
+    {
+        var form = this.map[name];
+        for (var iInput in form.inputs)
+        {
+            form.inputs[iInput].clear();
+        }
+    },
+    addInput: function(formName,inputId,inputName,type,validator,prepare)
+    {
+        this.map[formName].inputs[inputId] = this.createInput(inputId,inputName,type,validator,prepare);
+    },
+    /**
+     *
+     * @param id - id in the DOM.
+     * @param type - type of the input
+     * @param validator - name of validator function or ( function(value) { return isValid; } )
+     * @param prepare - name of prepare function or ( function(value) { return preparedValue; } )
+     * @returns {{id: *,name: *, type: *, validator: Function, prepare: Function, value: Function}}
+     */
+    createInput: function(id,name,type,validator,prepare)
+    {
+        // Prepare & Validator.
+        validator = caf.utils.isEmpty(validator)?
+            function(value) { return {isValid: true, msg:'', title:''}; } :
+            (caf.utils.isString(validator)) ?
+            caf.ui.forms.validators[type] :
+            validator;
+        prepare = caf.utils.isEmpty(prepare)?
+            function(value) { return value; } :
+            (caf.utils.isString(prepare)) ?
+            caf.ui.forms.prepareFunctions[type] :
+            prepare;
+
+        return {
+            id: id,
+            name: name,
+            type: type,
+            validator: validator,
+            prepare:prepare,
+            value: function()
+            {
+                return this.prepare(document.getElementById(this.id).value);
+            }
+        };
+    }
 
 }
 
@@ -761,62 +936,16 @@ caf.pager = {
 }
 
 
-
 /**
- * Overthrow.
+ * Libraries
  */
+
+// Overthrow.
 var doc=this.document,docElem=doc.documentElement,enabledClassName="overthrow-enabled",canBeFilledWithPoly="ontouchmove" in doc,nativeOverflow="WebkitOverflowScrolling" in docElem.style||"msOverflowStyle" in docElem.style||(!canBeFilledWithPoly&&this.screen.width>800)||(function(){var b=this.navigator.userAgent,a=b.match(/AppleWebKit\/([0-9]+)/),d=a&&a[1],c=a&&d>=534;return(b.match(/Android ([0-9]+)/)&&RegExp.$1>=3&&c||b.match(/ Version\/([0-9]+)/)&&RegExp.$1>=0&&this.blackberry&&c||b.indexOf("PlayBook")>-1&&c&&!b.indexOf("Android 2")===-1||b.match(/Firefox\/([0-9]+)/)&&RegExp.$1>=4||b.match(/wOSBrowser\/([0-9]+)/)&&RegExp.$1>=233&&c||b.match(/NokiaBrowser\/([0-9\.]+)/)&&parseFloat(RegExp.$1)===7.3&&a&&d>=533)})();caf.overthrow={};caf.overthrow.enabledClassName=enabledClassName;caf.overthrow.addClass=function(){if(docElem.className.indexOf(caf.overthrow.enabledClassName)===-1){docElem.className+=" "+caf.overthrow.enabledClassName}};caf.overthrow.removeClass=function(){docElem.className=docElem.className.replace(caf.overthrow.enabledClassName,"")};caf.overthrow.set=function(){if(nativeOverflow){caf.overthrow.addClass()}};caf.overthrow.canBeFilledWithPoly=canBeFilledWithPoly;caf.overthrow.forget=function(){caf.overthrow.removeClass()};caf.overthrow.support=nativeOverflow?"native":"none";caf.overthrow.scrollIndicatorClassName="overthrow";var doc=this.document,docElem=doc.documentElement,nativeOverflow=caf.overthrow.support==="native",canBeFilledWithPoly=caf.overthrow.canBeFilledWithPoly,configure=caf.overthrow.configure,set=caf.overthrow.set,forget=caf.overthrow.forget,scrollIndicatorClassName=caf.overthrow.scrollIndicatorClassName;caf.overthrow.closest=function(b,a){return !a&&b.className&&b.className.indexOf(scrollIndicatorClassName)>-1&&b||caf.overthrow.closest(b.parentNode)};var enabled=false;caf.overthrow.set=function(){set();if(enabled||nativeOverflow||!canBeFilledWithPoly){return}caf.overthrow.addClass();enabled=true;caf.overthrow.support="polyfilled";caf.overthrow.forget=function(){forget();enabled=false;if(doc.removeEventListener){doc.removeEventListener("touchstart",b,false)}};var d,h=[],a=[],g,j,i=function(){h=[];g=null},e=function(){a=[];j=null},f,c=function(n){f=d.querySelectorAll("textarea, input");for(var m=0,l=f.length;m<l;m++){f[m].style.pointerEvents=n}},k=function(m,n){if(doc.createEvent){var o=(!n||n===undefined)&&d.parentNode||d.touchchild||d,l;if(o!==d){l=doc.createEvent("HTMLEvents");l.initEvent("touchend",true,true);d.dispatchEvent(l);o.touchchild=d;d=o;o.dispatchEvent(m)}}},b=function(t){if(caf.overthrow.intercept){caf.overthrow.intercept()}i();e();d=caf.overthrow.closest(t.target);if(!d||d===docElem||t.touches.length>1){return}c("none");var u=t,l=d.scrollTop,p=d.scrollLeft,v=d.offsetHeight,m=d.offsetWidth,q=t.touches[0].pageY,s=t.touches[0].pageX,w=d.scrollHeight,r=d.scrollWidth,n=function(A){var x=l+q-A.touches[0].pageY,y=p+s-A.touches[0].pageX,B=x>=(h.length?h[0]:0),z=y>=(a.length?a[0]:0);if((x>0&&x<w-v)||(y>0&&y<r-m)){A.preventDefault()}else{k(u)}if(g&&B!==g){i()}if(j&&z!==j){e()}g=B;j=z;d.scrollTop=x;d.scrollLeft=y;h.unshift(x);a.unshift(y);if(h.length>3){h.pop()}if(a.length>3){a.pop()}},o=function(x){c("auto");setTimeout(function(){c("none")},450);d.removeEventListener("touchmove",n,false);d.removeEventListener("touchend",o,false)};d.addEventListener("touchmove",n,false);d.addEventListener("touchend",o,false)};doc.addEventListener("touchstart",b,false)};caf.overthrow.set();
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Libraries.
-// Idangerous Swiper
-// Overthrow
 
 
