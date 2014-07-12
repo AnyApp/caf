@@ -3,6 +3,23 @@ body{
     font-family: 'Alef','HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
     overflow: hidden;
 }
+div{
+
+}
+input {
+    margin: 0;
+    font: -webkit-small-control;
+    color: #444444;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: block;
+    text-align: start;
+    border: 1px solid #999999;
+    box-sizing: border-box;
+}
 .app_container{
     position: absolute;
     left: 0;

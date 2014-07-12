@@ -218,30 +218,27 @@
                     </div>
                 </div>
                 <div id="page-form" class="content overthrow bgWhite top45 bottom20"
-                     caf-page-load="caf.ui.title('CAF Form');">
-                    <div id="button1"
-                         class="mt8 marginCentered textCenter bgDarkBlue w50 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkBlue"
-                         caf-to-page="page-main"
-                         caf-text="To Page Main">
+                    caf-page-load="caf.ui.title('CAF Form');"
+                    caf-form="example-form" caf-form-on-submit="caf.ui.forms.logValues">
+                    <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w50 hp40 xsRounded mFontSize bold"
+                           id="form-page-name-input" caf-form-input="example-form"
+                           caf-form-input-name="name-input" caf-form-input-type="text"
+                           caf-form-input-validator="no-check" caf-form-input-prepare="same"/>
+                    <input type="text" class="mt8 marginCentered textLeft w50 hp40 xsRounded mFontSize bold"
+                           id="form-page-phone-input" caf-form-input="example-form"
+                           caf-form-input-name="phone-input" caf-form-input-type="text"
+                           caf-form-input-validator="no-check" caf-form-input-prepare="same"/>
+                    <div id="form-page-submit"
+                         class="mt8 marginCentered textCenter bgDarkGreen w50 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkGreen"
+                         caf-text="Save"
+                         caf-form-submit-button="example-form">
                     </div>
-                    <div id="facebookButton"
-                         class="pl24 mt8 marginCentered textLeft bgDarkPurple w50 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXXDarkPurple" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-url="https://www.facebook.com/"
-                         caf-text="Out-Of-App Link">
-                    </div>
-                    <div id="button2"
-                         class="mt14 marginCentered textCenter bgDarkGray w70 hp60 xsRounded lFontSize white bold"
-                         caf-active="bgXDarkGray"
-                         caf-to-page="page-tabs"
-                         caf-text="To Page Tabs">
-                    </div>
-                    <div id="button3"
-                         class="mt20 marginCentered textCenter bgDarkRed w90 hp120 sRounded xxlFontSize white bold"
-                         caf-active="bgXDarkRed"
-                         caf-to-page="page-buttons"
-                         caf-text="To Page Buttons">
+                    <div id="form-page-clear"
+                         class="mt8 marginCentered textCenter bgDarkBrown w50 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkBrown"
+                         caf-text="Clear"
+                         caf-form-clear-button="example-form">
                     </div>
 
                 </div>

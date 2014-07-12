@@ -10,6 +10,7 @@ caf.init = function(path)
 {
     caf.path = path;
     caf.ui.attributes.initAttributes();
+    caf.ui.forms.init();
 }
 
 caf.log = function(msg)
@@ -49,7 +50,12 @@ caf.utils =
     },
     isString: function(variable)
     {
-        return (typeof variable == 'string' || variable instanceof String);
+        return (typeof variable == 'string' || variable instanceof String)
+            && variable.trim().indexOf("function")!=0;
+    },
+    isStringFunction: function(variable)
+    {
+        return variable.trim().indexOf("function")==0;
     },
     getElementDef: function(elm){
         var str = elm.outerHTML;
@@ -457,7 +463,24 @@ caf.ui.attributes =
         this.addAttr(['caf-current-tab'],function(args){
             caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
         });
-
+        this.addAttr(['caf-form','caf-form-on-submit'],function(args){
+            caf.ui.forms.createForm(args['caf-form'],eval(args['caf-form-on-submit']));
+        });
+        this.addAttr(['caf-form-submit-button'],function(args){
+            var formName = args['caf-form-submit-button'];
+            args.view.onClick( function(){caf.ui.forms.submitForm(formName);} );
+        });
+        this.addAttr(['caf-form-clear-button'],function(args){
+            var formName = args['caf-form-clear-button'];
+            args.view.onClick( function(){caf.ui.forms.clearForm(formName);} );
+        });
+        this.addAttr(['caf-form-input','caf-form-input-name','caf-form-input-type',
+            'caf-form-input-validator','caf-form-input-prepare'],function(args){
+            // Create input.
+            caf.ui.forms.addInput(args['caf-form-input'],args.view.id,args['caf-form-input-name'],
+                args['caf-form-input-type'],args['caf-form-input-validator'],
+                args['caf-form-input-prepare'])
+        });
 
     }
 
@@ -627,13 +650,12 @@ caf.ui.swipers =
 caf.ui.forms =
 {
     map: {},
-    validators:
+    validators:{},
+    prepares:{},
+    init: function()
     {
-
-    },
-    prepareFunctions:
-    {
-
+        this.initValidators();
+        this.initPrepares();
     },
     createForm: function(name,onSubmit)
     {
@@ -652,27 +674,32 @@ caf.ui.forms =
             },
             values: function()
             {
-                var values = {};
-                for (var iInput in this.inputs)
-                {
-                    // Get value and validate.
-                    var input = this.inputs[iInput];
-                    var name = input.name;
-                    var value = input.value();
-                    var validationResult = input.validator(value);
-                    // Validation Failed!
-                    if (!validationResult)
-                    {
-                        // Show Message.
-                        caf.ui.popups.showErrorMessage(validationResult.title,validationResult.msg);
-                        return null; // Return empty result.
-                    }
-                    // Add value to result values.
-                    values[name] = value;
-                }
-                return values;
+                return caf.ui.forms.formValues(this.name);
             }
         }
+    },
+    formValues: function(name)
+    {
+        var form = this.map[name];
+        var values = {};
+        for (var iInput in form.inputs)
+        {
+            // Get value and validate.
+            var input = form.inputs[iInput];
+            var name = input.name;
+            var value = input.value();
+            var validationResult = input.validator(value);
+            // Validation Failed!
+            if (!validationResult.isValid)
+            {
+                // Show Message.
+                caf.ui.popups.showErrorMessage(validationResult.title,validationResult.msg);
+                return null; // Return empty result.
+            }
+            // Add value to result values.
+            values[name] = value;
+        }
+        return values;
     },
     clearForm: function(name)
     {
@@ -698,15 +725,15 @@ caf.ui.forms =
     {
         // Prepare & Validator.
         validator = caf.utils.isEmpty(validator)?
-            function(value) { return {isValid: true, msg:'', title:''}; } :
-            (caf.utils.isString(validator)) ?
-            caf.ui.forms.validators[type] :
-            validator;
+            this.validators['no-check'] :
+            (caf.utils.isString(validator) && !caf.utils.isStringFunction(validator) ) ?
+            caf.ui.forms.validators[validator] :
+            new Function(validator);
         prepare = caf.utils.isEmpty(prepare)?
-            function(value) { return value; } :
-            (caf.utils.isString(prepare)) ?
-            caf.ui.forms.prepareFunctions[type] :
-            prepare;
+            this.prepares['same'] :
+            (caf.utils.isString(prepare) && !caf.utils.isStringFunction(prepare) ) ?
+            caf.ui.forms.prepares[prepare] :
+            new Function(prepare);
 
         return {
             id: id,
@@ -717,12 +744,59 @@ caf.ui.forms =
             value: function()
             {
                 return this.prepare(document.getElementById(this.id).value);
+            },
+            clear: function()
+            {
+                document.getElementById(this.id).value = '';
+                document.getElementById(this.id).setAttribute('value','');
             }
         };
+    },
+    submitForm: function(name)
+    {
+        var form = this.map[name];
+        // Retreive the values from the form.
+        var values = form.values();
+        // Check if the was validation error.
+        if (values == null)     return;
+        // Run onSubmit with the values.
+        form.onSubmit(values);
+    },
+    addValidator: function(name,validate,errorTitle,errorMsg)
+    {
+        this.validators[name] =
+            function(value)
+            {
+                if (validate(value))    return {isValid: true, msg:'', title:''};
+                else                    return {isValid: false, msg:errorMsg, title:errorTitle};
+            };
+    },
+    initValidators: function()
+    {
+        this.addValidator('no-check',function(value){return true;},'','');
+        this.addValidator('check',function(value){return false;},'wow','error');
+    },
+    addPrepare: function(name,prepare)
+    {
+        this.prepares[name] = prepare;
+    },
+    initPrepares: function()
+    {
+        this.addPrepare('same',function(value){return value;});
+    },
+    logValues: function(values)
+    {
+        caf.log(values);
     }
 
 }
 
+caf.ui.popups =
+{
+    showErrorMessage: function(title,msg){
+        caf.log("Title: "+title+", Message: "+msg);
+    }
+}
 
 caf.pager = {
     firstLoad: true,
