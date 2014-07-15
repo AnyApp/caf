@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="css/caf.css" />
     <link rel="stylesheet" type="text/css" href="css/idangerous.swiper.css" />
 
-    <title>עליתי על טרמפ</title>
+    <title>CAF</title>
 </head>
 <body ontouchstart="" class="rtl">
 <div id="app-container" class="app_container ltr"
@@ -103,19 +103,19 @@
                 <div id="page-main" class="overthrow content bgWhite top45 bottom20"
                      caf-page-load="caf.ui.title('CAF Showcase');">
                     <div id="main-btn-to-buttons"
-                         class="mt6 marginCentered textCenter bgDarkBlue w60 hp40 xsRounded mFontSize white bold"
+                         class="mt6 marginCentered textCenter bgDarkBlue w85 hp40 xsRounded mFontSize white bold"
                          caf-active="bgXDarkBlue"
                          caf-to-page="page-buttons"
                          caf-text="Buttons">
                     </div>
                     <div id="main-btn-to-tabs"
-                         class="mt6 marginCentered textCenter bgDarkPurple w60 hp40 xsRounded mFontSize white bold"
+                         class="mt6 marginCentered textCenter bgDarkPurple w85 hp40 xsRounded mFontSize white bold"
                          caf-active="bgXDarkPurple"
                          caf-to-page="page-tabs"
                          caf-text="Tabs">
                     </div>
                     <div id="main-btn-to-form"
-                         class="mt6 marginCentered textCenter bgDarkRed w60 hp40 xsRounded mFontSize white bold"
+                         class="mt6 marginCentered textCenter bgDarkRed w85 hp40 xsRounded mFontSize white bold"
                          caf-active="bgXDarkRed"
                          caf-to-page="page-form"
                          caf-text="Form">
@@ -219,23 +219,33 @@
                 </div>
                 <div id="page-form" class="content overthrow bgWhite top45 bottom20"
                     caf-page-load="caf.ui.title('CAF Form');"
-                    caf-form="example-form" caf-form-on-submit="caf.ui.forms.logValues">
-                    <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w50 hp40 xsRounded mFontSize bold"
+                    caf-form="example-form" caf-form-on-submit="caf.ui.forms.logValues"
+                        caf-form-send-to-url="http://codletech.net/caf/caf.php"
+                        caf-form-send-to-url-callback="caf.log(values);">
+                    <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w85 hp40 xsRounded mFontSize bold"
+                           placeholder="Full Name"
                            id="form-page-name-input" caf-form-input="example-form"
                            caf-form-input-name="name-input" caf-form-input-type="text"
-                           caf-form-input-validator="no-check" caf-form-input-prepare="same"/>
-                    <input type="text" class="mt8 marginCentered textLeft w50 hp40 xsRounded mFontSize bold"
+                           caf-form-input-validator="['not-empty']" caf-form-input-prepare="['same']"/>
+                    <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w85 hp40 xsRounded mFontSize bold"
+                           placeholder="Phone Number"
                            id="form-page-phone-input" caf-form-input="example-form"
                            caf-form-input-name="phone-input" caf-form-input-type="text"
-                           caf-form-input-validator="no-check" caf-form-input-prepare="same"/>
+                           caf-form-input-validator="['not-empty']" caf-form-input-prepare="['same','numbers-only']"/>
                     <div id="form-page-submit"
-                         class="mt8 marginCentered textCenter bgDarkGreen w50 hp40 xsRounded mFontSize white bold"
+                         class="mt8 marginCentered textCenter bgDarkGreen w85 hp40 xsRounded mFontSize white bold"
                          caf-active="bgXDarkGreen"
                          caf-text="Save"
                          caf-form-submit-button="example-form">
                     </div>
+                    <div id="form-page-submit-to-url"
+                         class="mt8 marginCentered textCenter bgDarkPurple w85 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkPurple"
+                         caf-text="Send To URL"
+                         caf-form-send-to-url-button="example-form">
+                    </div>
                     <div id="form-page-clear"
-                         class="mt8 marginCentered textCenter bgDarkBrown w50 hp40 xsRounded mFontSize white bold"
+                         class="mt8 marginCentered textCenter bgDarkBrown w85 hp40 xsRounded mFontSize white bold"
                          caf-active="bgXDarkBrown"
                          caf-text="Clear"
                          caf-form-clear-button="example-form">
