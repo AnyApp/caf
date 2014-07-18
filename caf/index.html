@@ -64,24 +64,24 @@
                          caf-iconly="ic_action_overflow"
                          caf-drop-menu-container="dropMenu">
                         <div id="dropMenu" class="dropMenuRight wp150 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
-                            <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
+                            <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp150" caf-active="bgXDarkGray"
                                  caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m" caf-stop-propagation="true"
                                  caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
                             </div>
-                            <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp110" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m" caf-stop-propagation="true"
+                            <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp150" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="s" caf-stop-propagation="true"
                                  caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
                             </div>
-                            <div id="dropMenuButtonForms" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
+                            <div id="dropMenuButtonForms" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
                                  caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
                                  caf-drop-menu-container="dropMenu" caf-text="Form" caf-to-page="page-form">
                             </div>
-                            <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
+                            <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="l" caf-stop-propagation="true"
                                  caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
                             </div>
-                            <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp110 textLeft" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
+                            <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
+                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="xl" caf-stop-propagation="true"
                                  caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
                             </div>
                             <div id="dropMenuOverlay" class="dropMenuOverlay"
@@ -221,7 +221,7 @@
                     caf-page-load="caf.ui.title('CAF Form');"
                     caf-form="example-form" caf-form-on-submit="caf.ui.forms.logValues"
                         caf-form-send-to-url="http://codletech.net/caf/caf.php"
-                        caf-form-send-to-url-callback="caf.log(values);">
+                        caf-form-send-to-url-callback="(function(values){caf.log(values);})">
                     <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w85 hp40 xsRounded mFontSize bold"
                            placeholder="Full Name"
                            id="form-page-name-input" caf-form-input="example-form"
@@ -233,8 +233,8 @@
                            caf-form-input-name="phone-input" caf-form-input-type="text"
                            caf-form-input-validator="['not-empty']" caf-form-input-prepare="['same','numbers-only']"/>
                     <div id="form-page-submit"
-                         class="mt8 marginCentered textCenter bgDarkGreen w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkGreen"
+                         class="mt8 marginCentered textCenter bgDarkCyan w85 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkCyan"
                          caf-text="Save"
                          caf-form-submit-button="example-form">
                     </div>
@@ -243,6 +243,12 @@
                          caf-active="bgXDarkPurple"
                          caf-text="Send To URL"
                          caf-form-send-to-url-button="example-form">
+                    </div>
+                    <div id="form-page-save-to-local-storage"
+                         class="mt8 marginCentered textCenter bgDarkPink w85 hp40 xsRounded mFontSize white bold"
+                         caf-active="bgXDarkPink"
+                         caf-text="Save To Local Storage"
+                         caf-form-save-to-local-storage-button="example-form">
                     </div>
                     <div id="form-page-clear"
                          class="mt8 marginCentered textCenter bgDarkBrown w85 hp40 xsRounded mFontSize white bold"

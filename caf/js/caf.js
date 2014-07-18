@@ -417,7 +417,7 @@ caf.ui.attributes =
         this.addAttr(['caf-onclick'],function(args){
             args.view.onClick( new Function(args['caf-onclick']));
         });
-        this.addAttr(['to-url'],function(args){
+        this.addAttr(['caf-to-url'],function(args){
             args.view.onClick( function(){caf.utils.openURL(args['caf-to-url']);} );
         });
         this.addAttr(['caf-to-page'],function(args){
@@ -438,10 +438,10 @@ caf.ui.attributes =
         this.addAttr(['caf-iconly'],function(args){
             args.view.iconOnly(args['caf-iconly']);
         });
-        this.addAttr(['caf-icon-right'],function(args){
+        this.addAttr(['caf-icon-right','caf-icon-size'],function(args){
             args.view.iconRight(args['caf-icon-right'],args['caf-icon-size'] );
         });
-        this.addAttr(['caf-icon-left'],function(args){
+        this.addAttr(['caf-icon-left','caf-icon-size'],function(args){
             args.view.iconLeft(args['caf-icon-left'],args['caf-icon-size'] );
         });
         this.addAttr(['caf-stop-propagation'],function(args){
@@ -450,7 +450,7 @@ caf.ui.attributes =
         this.addAttr(['caf-side-menu-container','caf-side-menu-position'],function(args){
             caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
         });
-        this.addAttr(['swiper-container'],function(args){
+        this.addAttr(['caf-swiper-container'],function(args){
             caf.ui.swipers.initSwiper(args['swiper-container'],args['num-slides']);
         });
         this.addAttr(['caf-side-menu-switch'],function(args){
@@ -463,14 +463,17 @@ caf.ui.attributes =
         this.addAttr(['caf-current-tab'],function(args){
             caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
         });
+        this.addAttr(['caf-form'],function(args){
+            caf.ui.forms.createForm(args['caf-form']);
+        });
         this.addAttr(['caf-form','caf-form-on-submit'],function(args){
-            caf.ui.forms.createForm(args['caf-form'],eval(args['caf-form-on-submit']));
+            caf.ui.forms.setFormOnSubmit(args['caf-form'],eval(args['caf-form-on-submit']));
         });
         this.addAttr(['caf-form','caf-form-send-to-url'],function(args){
             caf.ui.forms.setFormSaveToUrl(args['caf-form'],args['caf-form-send-to-url']);
         });
         this.addAttr(['caf-form','caf-form-send-to-url-callback'],function(args){
-            var callback = new Function('values',args['caf-form-send-to-url-callback']);
+            var callback = eval(args['caf-form-send-to-url-callback']);
             caf.ui.forms.setFormSaveToUrlCallback(args['caf-form'],callback);
         });
         this.addAttr(['caf-form-submit-button'],function(args){
@@ -480,6 +483,10 @@ caf.ui.attributes =
         this.addAttr(['caf-form-send-to-url-button'],function(args){
             var formName = args['caf-form-send-to-url-button'];
             args.view.onClick( function(){caf.ui.forms.sendFormToUrl(formName);} );
+        });
+        this.addAttr(['caf-form-save-to-local-storage-button'],function(args){
+            var formName = args['caf-form-save-to-local-storage-button'];
+            args.view.onClick( function(){caf.ui.forms.saveFormToLocalStorage(formName);} );
         });
         this.addAttr(['caf-form-clear-button'],function(args){
             var formName = args['caf-form-clear-button'];
@@ -592,13 +599,13 @@ caf.ui.view = function(id)
         },
         iconRight: function(name,size){
             size = size || 'm';
-            this.mClass += ' '+size+'IconRight ';
+            this.mClass += ' '+size+'IconRight borderBox';
             this.mIconName = name;
             return this;
         },
         iconLeft: function(name,size){
             size = size || 'm';
-            this.mClass += ' '+size+'IconLeft ';
+            this.mClass += ' '+size+'IconLeft borderBox';
             this.mIconName = name;
             return this;
         },
@@ -669,7 +676,7 @@ caf.ui.forms =
         this.initValidators();
         this.initPrepares();
     },
-    createForm: function(name,onSubmit)
+    createForm: function(name)
     {
         this.map[name] =
         {
@@ -677,7 +684,7 @@ caf.ui.forms =
             name: name,
             saveToUrl: '',
             saveToUrlCallback: function(values){},
-            onSubmit: onSubmit || function(){},
+            onSubmit: function(){},
             clear: function()
             {
                 caf.ui.forms.clearForm(this.name);
@@ -691,6 +698,10 @@ caf.ui.forms =
                 return caf.ui.forms.formValues(this.name);
             }
         }
+    },
+    setFormOnSubmit: function(name,onSubmit)
+    {
+        this.map[name].onSubmit = onSubmit;
     },
     setFormSaveToUrl: function(name,url)
     {
@@ -782,7 +793,7 @@ caf.ui.forms =
     submitForm: function(name)
     {
         var form = this.map[name];
-        // Retreive the values from the form.
+        // Retrieve the values from the form.
         var values = form.values();
         // Check if the was validation error.
         if (values == null)     return;
@@ -792,12 +803,25 @@ caf.ui.forms =
     sendFormToUrl: function(name)
     {
         var form = this.map[name];
-        // Retreive the values from the form.
+        // Retrieve the values from the form.
         var values = form.values();
         // Check if the was validation error.
         if (values == null)     return;
-        // Run onSubmit with the values.
+        // Run sendToServer with the values.
         caf.net.sendToServer(form.saveToUrl,values,form.saveToUrlCallback);
+    },
+    saveFormToLocalStorage: function(name)
+    {
+        var form = this.map[name];
+        // Retrieve the values from the form.
+        var values = form.values();
+        // Check if the was validation error.
+        if (values == null)     return;
+        // save each value to the local storage.
+        for (var key in values)
+        {
+            caf.localStorage.save(key, values[key]);
+        }
     },
     addValidator: function(name,validate,errorTitle,errorMsg)
     {
@@ -861,6 +885,24 @@ caf.net =
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xmlhttp.send(JSON.stringify(data));
+    }
+}
+
+caf.localStorage =
+{
+    save: function(key,value)
+    {
+        window.localStorage.setItem(key,value);
+    },
+    get: function(key)
+    {
+        var value = window.localStorage.getItem(key);
+        if (caf.utils.isEmpty(value)) return null;
+        return value;
+    },
+    empty: function(key)
+    {
+        return caf.utils.isEmpty(window.localStorage.getItem(key));
     }
 }
 
