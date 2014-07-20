@@ -48,6 +48,28 @@ caf.ui = {
         }
         return false;
     },
+    /* Animate view with fade in or out */
+    fadeIn: function(elm,time,onEnter)
+    {
+        onEnter = onEnter || function(){};
+        caf.utils.addClass(elm,'hidden');
+        var clientHeight = elm.clientHeight;
+        caf.utils.removeClass(elm,'hidden');
+        caf.utils.addClass(elm,'fadein'+time);
+        window.setTimeout(function(){
+            caf.utils.removeClass(elm,'fadein'+time);
+            onEnter();
+        },time);
+    },
+    fadeOut: function(elm,time,onOut)
+    {
+        onOut = onOut || function(){};
+        caf.utils.addClass(elm,'fadeout'+time);
+        window.setTimeout(function(){
+            caf.utils.removeClass(elm,'fadeout'+time);
+            onOut();
+        },time);
+    },
     /**
      * Check that the element has caf attributes.
      * Add to the view all the caf capabilities.

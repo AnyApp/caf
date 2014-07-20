@@ -139,20 +139,13 @@ caf.pager = {
             return;
         }
 
+        caf.ui.fadeIn(toPageDiv,300);
 
-        caf.utils.addClass(toPageDiv,'hidden');
-        var clientHeight = toPageDiv.clientHeight;
-        caf.utils.removeClass(toPageDiv,'hidden');
-        caf.utils.addClass(toPageDiv,'fadein');
         // on load page.
         caf.pager.onLoadPage(toPageDiv);
         // Hide back button if needed.
         this.checkAndChangeBackButtonState();
 
-        window.setTimeout(function(){
-            caf.utils.removeClass(toPageDiv,'fadein');
-
-        },300);
 
     },
     moveBack: function()
@@ -175,17 +168,14 @@ caf.pager = {
         var lastPageDiv = document.getElementById(toRemovePageId);
         var toPageDiv = document.getElementById(toPageId);
 
-        caf.utils.addClass(lastPageDiv,'fadeout');
+        caf.ui.fadeOut(lastPageDiv,300,function() { lastPageDiv.style.zIndex = 0;});
+
         // on load page.
         caf.pager.onLoadPage(toPageDiv);
         // Hide back button if needed.
 
         this.checkAndChangeBackButtonState();
 
-        window.setTimeout(function(){
-            caf.utils.removeClass(lastPageDiv,'fadeout');
-            lastPageDiv.style.zIndex = 0;
-        },300);
 
 
     },

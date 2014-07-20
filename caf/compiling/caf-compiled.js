@@ -214,6 +214,28 @@ caf.ui = {
         }
         return false;
     },
+    /* Animate view with fade in or out */
+    fadeIn: function(elm,time,onEnter)
+    {
+        onEnter = onEnter || function(){};
+        caf.utils.addClass(elm,'hidden');
+        var clientHeight = elm.clientHeight;
+        caf.utils.removeClass(elm,'hidden');
+        caf.utils.addClass(elm,'fadein'+time);
+        window.setTimeout(function(){
+            caf.utils.removeClass(elm,'fadein'+time);
+            onEnter();
+        },time);
+    },
+    fadeOut: function(elm,time,onOut)
+    {
+        onOut = onOut || function(){};
+        caf.utils.addClass(elm,'fadeout'+time);
+        window.setTimeout(function(){
+            caf.utils.removeClass(elm,'fadeout'+time);
+            onOut();
+        },time);
+    },
     /**
      * Check that the element has caf attributes.
      * Add to the view all the caf capabilities.
@@ -883,9 +905,35 @@ caf.ui.forms =
 
 caf.ui.dialogs =
 {
+
+    dialogTitle: function(title)
+    {
+        return '<div class="dialogTitle hp40 bold white textCenter mFontSize bgXDarkBlue">'+title+'</div>';
+    },
+    dialogContent: function(content)
+    {
+        return '<div class="dialogContent pt10 pb10 pr10 pl10 borderBox textCenter bold sFontSize bgWhite">'+content+'</div>';
+    },
     showErrorMessage: function(title,msg){
         caf.log("Title: "+title+", Message: "+msg);
-
+        var modal = picoModal({
+            content: this.dialogTitle(title)+this.dialogContent(msg),
+            closeButton: false,
+            overlayStyles: {
+                backgroundColor: "#000",
+                opacity: 0.3
+            },
+            width: 'empty'
+        })
+        .afterClose(function (modal) { modal.destroy(); })
+        .afterShow(function(modal){
+            caf.ui.fadeIn(modal.modalElem(),500);
+        })
+        .beforeClose(function(modal, event) {
+            event.preventDefault();
+            caf.ui.fadeOut(modal.modalElem(), 200, function() { modal.destroy(); });
+        })
+        .show();
     }
 }
 caf.net =
@@ -1076,20 +1124,13 @@ caf.pager = {
             return;
         }
 
+        caf.ui.fadeIn(toPageDiv,300);
 
-        caf.utils.addClass(toPageDiv,'hidden');
-        var clientHeight = toPageDiv.clientHeight;
-        caf.utils.removeClass(toPageDiv,'hidden');
-        caf.utils.addClass(toPageDiv,'fadein');
         // on load page.
         caf.pager.onLoadPage(toPageDiv);
         // Hide back button if needed.
         this.checkAndChangeBackButtonState();
 
-        window.setTimeout(function(){
-            caf.utils.removeClass(toPageDiv,'fadein');
-
-        },300);
 
     },
     moveBack: function()
@@ -1112,17 +1153,14 @@ caf.pager = {
         var lastPageDiv = document.getElementById(toRemovePageId);
         var toPageDiv = document.getElementById(toPageId);
 
-        caf.utils.addClass(lastPageDiv,'fadeout');
+        caf.ui.fadeOut(lastPageDiv,300,function() { lastPageDiv.style.zIndex = 0;});
+
         // on load page.
         caf.pager.onLoadPage(toPageDiv);
         // Hide back button if needed.
 
         this.checkAndChangeBackButtonState();
 
-        window.setTimeout(function(){
-            caf.utils.removeClass(lastPageDiv,'fadeout');
-            lastPageDiv.style.zIndex = 0;
-        },300);
 
 
     },
