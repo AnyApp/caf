@@ -1,6 +1,6 @@
 caf.net =
 {
-    sendToServer: function(url,data,callback)
+    send: function(url,data,callback)
     {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function()
@@ -21,6 +21,10 @@ caf.net =
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xmlhttp.send(JSON.stringify(data));
+    },
+    request: function(url,data,callback)
+    {
+        this.send(url,data,callback);
     }
 }
 

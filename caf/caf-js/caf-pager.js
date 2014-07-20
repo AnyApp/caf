@@ -5,11 +5,15 @@ caf.pager = {
     mainPage: '',
     backButtonId: '',
 
-    init: function(mainPage,backButtonId)
+    setMainPage: function(mainPage)
     {
         this.mainPage = mainPage;
-        this.backButtonId = backButtonId;
         this.moveToPage(mainPage);
+    },
+    setBackButton: function(backButtonId)
+    {
+        this.backButtonId = backButtonId;
+        this.checkAndChangeBackButtonState();
     },
     insertPageToStack: function(pageId) {
         for (var i=this.historyStack.length-1; i>=0; i--) {

@@ -139,8 +139,8 @@ caf.ui.forms =
         var values = form.values();
         // Check if the was validation error.
         if (values == null)     return;
-        // Run sendToServer with the values.
-        caf.net.sendToServer(form.saveToUrl,values,form.saveToUrlCallback);
+        // Run send with the values.
+        caf.net.send(form.saveToUrl,values,form.saveToUrlCallback);
     },
     saveFormToLocalStorage: function(name)
     {

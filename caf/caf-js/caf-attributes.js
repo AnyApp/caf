@@ -138,6 +138,13 @@ caf.ui.attributes =
                 args['caf-form-input-type'],args['caf-form-input-validator'],
                 args['caf-form-input-prepare'])
         });
+        this.addAttr(['caf-main-page'],function(args){
+            caf.pager.setMainPage(args['caf-main-page']);
+        });
+        this.addAttr(['caf-back-button'],function(args){
+            caf.pager.setBackButton(args['caf-back-button']);
+        });
+
 
     }
 

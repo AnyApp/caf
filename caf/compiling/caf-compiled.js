@@ -527,6 +527,13 @@ caf.ui.attributes =
                 args['caf-form-input-type'],args['caf-form-input-validator'],
                 args['caf-form-input-prepare'])
         });
+        this.addAttr(['caf-main-page'],function(args){
+            caf.pager.setMainPage(args['caf-main-page']);
+        });
+        this.addAttr(['caf-back-button'],function(args){
+            caf.pager.setBackButton(args['caf-back-button']);
+        });
+
 
     }
 
@@ -826,8 +833,8 @@ caf.ui.forms =
         var values = form.values();
         // Check if the was validation error.
         if (values == null)     return;
-        // Run sendToServer with the values.
-        caf.net.sendToServer(form.saveToUrl,values,form.saveToUrlCallback);
+        // Run send with the values.
+        caf.net.send(form.saveToUrl,values,form.saveToUrlCallback);
     },
     saveFormToLocalStorage: function(name)
     {
@@ -878,11 +885,12 @@ caf.ui.dialogs =
 {
     showErrorMessage: function(title,msg){
         caf.log("Title: "+title+", Message: "+msg);
+
     }
 }
 caf.net =
 {
-    sendToServer: function(url,data,callback)
+    send: function(url,data,callback)
     {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function()
@@ -903,6 +911,10 @@ caf.net =
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xmlhttp.send(JSON.stringify(data));
+    },
+    request: function(url,data,callback)
+    {
+        this.send(url,data,callback);
     }
 }
 
@@ -930,11 +942,15 @@ caf.pager = {
     mainPage: '',
     backButtonId: '',
 
-    init: function(mainPage,backButtonId)
+    setMainPage: function(mainPage)
     {
         this.mainPage = mainPage;
-        this.backButtonId = backButtonId;
         this.moveToPage(mainPage);
+    },
+    setBackButton: function(backButtonId)
+    {
+        this.backButtonId = backButtonId;
+        this.checkAndChangeBackButtonState();
     },
     insertPageToStack: function(pageId) {
         for (var i=this.historyStack.length-1; i>=0; i--) {
