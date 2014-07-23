@@ -882,6 +882,174 @@ li{
 
 /* End Border Colors */
 
+/* Text Colors */
+.cGreen{
+    color: #009b54;
+}
+.cLightGreen{
+    color: #00ab60;
+}
+.cDarkGreen{
+    color: #008845;
+}
+.cXDarkGreen{
+    color: #007339;
+}
+.cXXDarkGreen{
+    color: #005c2e;
+}
+.cXXXDarkGreen{
+    color: #004623;
+}
+.cCyan{
+    color: #0fb081;
+}
+.cLightCyan{
+    color: #0fce97;
+}
+.cDarkCyan{
+    color: #0f8967;
+}
+.cXDarkCyan{
+    color: #0d624a;
+}
+.cXXDarkCyan{
+    color: #0a4f3b;
+}
+.cXXXDarkCyan{
+    color: #073628;
+}
+.cBlue{
+    color: #2e54ae;
+}
+.cLightBlue{
+    color: #335bc9;
+}
+.cDarkBlue{
+    color: #224081;
+}
+.cXDarkBlue{
+    color: #172e5c;
+}
+.cXXDarkBlue{
+    color: #112142;
+}
+.cXXXDarkBlue{
+    color: #0d172e;
+}
+.cBrown{
+    color: #b05a2b;
+}
+.cLightBrown{
+    color: #cf6e2f;
+}
+.cDarkBrown{
+    color: #8f4b22;
+}
+.cXDarkBrown{
+    color: #613019;
+}
+.cXXDarkBrown{
+    color: #4a2514;
+}
+.cXXXDarkBrown{
+    color: #381c0f;
+}
+.cRed{
+    color: #ae0014;
+}
+.cLightRed{
+    color: #ca0014;
+}
+.cDarkRed{
+    color: #8e0011;
+}
+.cXDarkRed{
+    color: #68000f;
+}
+.cXXDarkRed{
+    color: #4f000c;
+}
+.cXXXDarkRed{
+    color: #38000a;
+}
+.cPink{
+    color: #b10059;
+}
+.cLightPink{
+    color: #d40070;
+}
+.cDarkPink{
+    color: #97004c;
+}
+.cXDarkPink{
+    color: #710038;
+}
+.cXXDarkPink{
+    color: #55002a;
+}
+.cXXXDarkPink{
+    color: #3f001f;
+}
+.cPurple{
+    color: #8400a2;
+}
+.cLightPurple{
+    color: #9c00bf;
+}
+.cDarkPurple{
+    color: #630079;
+}
+.cXDarkPurple{
+    color: #460058;
+}
+.cXXDarkPurple{
+    color: #320041;
+}
+.cXXXDarkPurple{
+    color: #24002f;
+}
+.cBlack{
+    color: #000000;
+}
+.cXXXLightGray{
+    color: #bababa;
+}
+.cXXLightGray{
+    color: #a2a2a2;
+}
+.cXLightGray{
+    color: #767676;
+}
+.cLightGray{
+    color: #636363;
+}
+.cGray{
+    color: #5e5e5e;
+}
+.cDarkGray{
+    color: #505050;
+}
+.cXDarkGray{
+    color: #414141;
+}
+.cXXDarkGray{
+    color: #232323;
+}
+.cWhite{
+    color: #ffffff;
+}
+.cSmokeWhite{
+    color: #cdcdcd;
+}
+.cLightSmokeWhite{
+    color: #e2e2e2;
+}
+.cDarkSmokeWhite{
+    color: #c3c3c3;
+}
+
+/* End Text Colors */
 
 /* Heights */
 .hp1{

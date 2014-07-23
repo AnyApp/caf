@@ -6,6 +6,8 @@
     right: 10% !important;
     top: 50px !important;
     max-height: 80%;
+    max-width: 400px;
+    margin: 0 auto;
     padding: 0px !important;
     border-top-left-radius: 0px !important;
     border-top-right-radius: 0px !important;

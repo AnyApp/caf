@@ -18,6 +18,7 @@ caf.ui.attributes =
     applyAttributes: function(view)
     {
         var elm = view.mElement;
+        var updated = false;
         // Apply each attribute.
         for (var iAttribute in this.list)
         {
@@ -27,6 +28,7 @@ caf.ui.attributes =
                 view: view
             };
             var missingArgument = false;
+            var attributes = {};
             for (var iArg in attribute.elmAttributes)
             {
                 var attrName = attribute.elmAttributes[iArg];
@@ -37,13 +39,23 @@ caf.ui.attributes =
                     missingArgument = true;
                     break;
                 }
+                attributes[attrName] = attrValue;
                 args[attrName] = attrValue;
             }
-            // Skip.
+            // Skip - missing argument.
             if (missingArgument) continue;
+            // Skip - Attributes haven't changed.
+            if (!view.hasAttributesChanged(attributes)) continue;
+
+            updated = true;
+
+            //Add attributes to the View.
+            view.setAttributes(attributes);
             // Apply Attribute
             attribute.handler(args);
         }
+
+        return updated;
     },
     initAttributes: function()
     {
@@ -54,7 +66,7 @@ caf.ui.attributes =
             args.view.activeClassRemove(args['caf-active-remove']);
         });
         this.addAttr(['caf-onclick'],function(args){
-            args.view.onClick( new Function(args['caf-onclick']));
+            args.view.onClick( eval(args['caf-onclick']));
         });
         this.addAttr(['caf-to-url'],function(args){
             args.view.onClick( function(){caf.utils.openURL(args['caf-to-url']);} );
@@ -66,10 +78,10 @@ caf.ui.attributes =
             args.view.onClick( function() {caf.pager.moveToTab(args['caf-to-tab'],args['caf-tab-container']); } );
         });
         this.addAttr(['caf-drop-menu-overlay-of'],function(args){
-            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein','fadeout',300);; } );
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
         });
         this.addAttr(['caf-drop-menu-container'],function(args){
-            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-container'],'fadein','fadeout',300);; } );
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-container'],'fadein300','fadeout300',300); } );
         });
         this.addAttr(['caf-text'],function(args){
             args.view.text(args['caf-text']);
@@ -96,6 +108,8 @@ caf.ui.attributes =
             var swiperName = args['caf-side-menu-switch'];
             args.view.onClick( function(){
                 var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
+                caf.log('swiping... '+swiperName+' Current: '+currentSwiper.activeIndex);
+                caf.log(currentSwiper);
                 currentSwiper.swipeTo((currentSwiper.activeIndex+1)%2 );
             } );
         });

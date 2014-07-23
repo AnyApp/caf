@@ -191,6 +191,18 @@ caf.ui = {
     removeView: function(view){
         delete this.views[view.id];
     },
+    removeViewIfNotExist: function(view){
+        if (caf.utils.isEmpty(document.getElementById(view.id)) )
+        {
+            delete this.views[view.id];
+        }
+    },
+    removeNotExistingViews: function(){
+        for (var iView in this.views)
+        {
+            this.removeViewIfNotExist(this.views[iView]);
+        }
+    },
     /**
      * Rebuild all cached views.
      */
@@ -244,17 +256,6 @@ caf.ui = {
      */
     buildView: function(view)
     {
-        var isCAF= (!caf.utils.isEmpty(view.mText))||
-            (!caf.utils.isEmpty(view.mClass))||
-            (!caf.utils.isEmpty(view.mIconName))||
-            (!caf.utils.isEmpty(view.mActiveClass))||
-            (!caf.utils.isEmpty(view.mIconName))||
-            (!caf.utils.isEmpty(view.mOnClickFunctions));
-        if (!isCAF)
-        {
-            return false;
-        }
-
         //Set Text
         if (!caf.utils.isEmpty(view.mText))
         {
@@ -293,6 +294,9 @@ caf.ui = {
             // Create events.
             view.mOnTouchStartEvent = function(e)
             {
+                var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
+                if (isRightClick) return false;
+
                 e.preventDefault();
                 if (view.mDoStopPropogation)
                 {
@@ -319,10 +323,11 @@ caf.ui = {
             view.mOnTouchEndEvent = function(e)
             {
                 e.preventDefault();
+
                 var diffX = Math.abs(view.touchData.lastX-view.touchData.startX);
                 var diffY = Math.abs(view.touchData.lastY-view.touchData.startY);
                 var boxSize = 15;
-                if (diffX<boxSize && diffY<boxSize && caf.ui.canClick())
+                if (diffX<boxSize && diffY<boxSize && caf.ui.canClick() && e.type!='mouseout')
                 {
                     for (var iFunc in view.mOnClickFunctions)
                     {
@@ -361,6 +366,11 @@ caf.ui = {
      */
     rebuildAll: function(root)
     {
+        var start = new Date().getTime();
+
+        /* Remove not exist elements. */
+        this.removeNotExistingViews();
+
         var nodeList = (root ||document).getElementsByTagName('*');
         //var nodeArray = [];
 
@@ -368,7 +378,13 @@ caf.ui = {
             this.scanView(node);
         }
 
+        caf.log( ((new Date()).getTime() - start) /1000);
+        //alert(((new Date()).getTime() - start) /1000);
         return true;
+    },
+    rebuildFrom: function(root)
+    {
+        return this.rebuildAll(root);
     },
     rebuildViewById: function(id)
     {
@@ -380,30 +396,30 @@ caf.ui = {
      */
     scanView: function(elm)
     {
+        var isCAF= caf.utils.getElementDef(elm).indexOf("caf-")>0;
+        if (!isCAF)
+        {
+            return false;
+        }
+
         var view;
         if (!caf.utils.isEmpty(elm.id) && !caf.utils.isEmpty(this.views[elm.id]))
         {
             view = this.views[elm.id];
-            // Check for changes.
-            if (!view.needUpdate(elm))
-            {
-                return;
-            }
         }
         else
         {
             view = caf.ui.view(elm.id);
         }
 
-        view.clear();
+        var needRebuild = view.applyAttributes();
 
-        view.applyAttributes();
+        //view.clear();
 
-        var result = view.build();
-        // Not a CAF View.
-        if (result==false)
+        if (needRebuild)
         {
-            this.removeView(view);
+            view.build();
+            caf.log(elm.id);
         }
     }
 
@@ -429,6 +445,7 @@ caf.ui.attributes =
     applyAttributes: function(view)
     {
         var elm = view.mElement;
+        var updated = false;
         // Apply each attribute.
         for (var iAttribute in this.list)
         {
@@ -438,6 +455,7 @@ caf.ui.attributes =
                 view: view
             };
             var missingArgument = false;
+            var attributes = {};
             for (var iArg in attribute.elmAttributes)
             {
                 var attrName = attribute.elmAttributes[iArg];
@@ -448,13 +466,23 @@ caf.ui.attributes =
                     missingArgument = true;
                     break;
                 }
+                attributes[attrName] = attrValue;
                 args[attrName] = attrValue;
             }
-            // Skip.
+            // Skip - missing argument.
             if (missingArgument) continue;
+            // Skip - Attributes haven't changed.
+            if (!view.hasAttributesChanged(attributes)) continue;
+
+            updated = true;
+
+            //Add attributes to the View.
+            view.setAttributes(attributes);
             // Apply Attribute
             attribute.handler(args);
         }
+
+        return updated;
     },
     initAttributes: function()
     {
@@ -465,7 +493,7 @@ caf.ui.attributes =
             args.view.activeClassRemove(args['caf-active-remove']);
         });
         this.addAttr(['caf-onclick'],function(args){
-            args.view.onClick( new Function(args['caf-onclick']));
+            args.view.onClick( eval(args['caf-onclick']));
         });
         this.addAttr(['caf-to-url'],function(args){
             args.view.onClick( function(){caf.utils.openURL(args['caf-to-url']);} );
@@ -477,10 +505,10 @@ caf.ui.attributes =
             args.view.onClick( function() {caf.pager.moveToTab(args['caf-to-tab'],args['caf-tab-container']); } );
         });
         this.addAttr(['caf-drop-menu-overlay-of'],function(args){
-            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein','fadeout',300);; } );
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
         });
         this.addAttr(['caf-drop-menu-container'],function(args){
-            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-container'],'fadein','fadeout',300);; } );
+            args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-container'],'fadein300','fadeout300',300); } );
         });
         this.addAttr(['caf-text'],function(args){
             args.view.text(args['caf-text']);
@@ -507,6 +535,8 @@ caf.ui.attributes =
             var swiperName = args['caf-side-menu-switch'];
             args.view.onClick( function(){
                 var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
+                caf.log('swiping... '+swiperName+' Current: '+currentSwiper.activeIndex);
+                caf.log(currentSwiper);
                 currentSwiper.swipeTo((currentSwiper.activeIndex+1)%2 );
             } );
         });
@@ -593,6 +623,7 @@ caf.ui.view = function(id)
         mOnTouchEndEvent: null,
         mOnTouchMoveEvent: null,
         mDoStopPropogation: false,
+        mAttributes: {},
         touchData: {
             startX:-100000,
             startY:-100000,
@@ -602,31 +633,50 @@ caf.ui.view = function(id)
         clear: function()
         {
             this.mElementString='',
-                this.mText= '',
-                this.mClass= '',
-                this.mActiveClass= '',
-                this.mActiveClassRemove= '',
-                this.mIconName='',
-                this.mOnClickFunctions= Array(),
-                this.mOnClickEvent= null,
-                this.mOnTouchStartEvent= null,
-                this.mOnTouchEndEvent= null,
-                this.mOnTouchMoveEvent= null,
-                this.mDoStopPropogation= false,
-                this.touchData= {
-                    startX:-100000,
-                    startY:-100000,
-                    lastX:-200000,
-                    lastY:-200000
-                }
+            this.mText= '',
+            this.mClass= '',
+            this.mActiveClass= '',
+            this.mActiveClassRemove= '',
+            this.mIconName='',
+            this.mOnClickFunctions= Array(),
+            this.mOnClickEvent= null,
+            this.mOnTouchStartEvent= null,
+            this.mOnTouchEndEvent= null,
+            this.mOnTouchMoveEvent= null,
+            this.mDoStopPropogation= false,
+            this.mAttributes = {},
+            this.touchData= {
+                startX:-100000,
+                startY:-100000,
+                lastX:-200000,
+                lastY:-200000
+            }
         },
-        needUpdate: function(elm)
+        setAttribute: function(name,value)
         {
-            return this.mElementString != caf.utils.getElementDef(elm);
+            this.mAttributes[name] = value;
         },
-        cacheElement:function()
+        setAttributes: function(attributes)
         {
-            this.mElementString = caf.utils.getElementDef(this.mElement);
+            for ( var name in attributes)
+            {
+                this.setAttribute(name,attributes[name]);
+            }
+        },
+        getAttribute: function(attribute)
+        {
+            return this.mAttributes[attribute];
+        },
+        hasAttributesChanged: function(attributes)
+        {
+            var changed = false;
+            for ( var name in attributes)
+            {
+                var lastValue = this.getAttribute(name);
+                var currentValue = attributes[name];
+                changed = changed || lastValue != currentValue;
+            }
+            return changed;
         },
         activeClass: function(className)
         {
@@ -673,7 +723,6 @@ caf.ui.view = function(id)
         build: function()
         {
             var result = caf.ui.buildView(this);
-            this.cacheElement();
             return result;
         },
         refresh: function()
@@ -682,7 +731,7 @@ caf.ui.view = function(id)
         },
         applyAttributes: function()
         {
-            caf.ui.attributes.applyAttributes(this);
+            return caf.ui.attributes.applyAttributes(this);
         }
     };
 
@@ -776,8 +825,16 @@ caf.ui.forms =
                 // Validation Failed!
                 if (!validationResult.isValid)
                 {
+                    // Dialog Color Showcase.
+                    //TODO Remove
+                    var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
+                    var color = colors[Math.floor(Math.random() * colors.length)];
                     // Show Message.
-                    caf.ui.dialogs.showErrorMessage(validationResult.title,validationResult.msg);
+                    caf.ui.dialogs.show({ title: validationResult.title,content:validationResult.msg,
+                        closeText:'Close',closeCallback:function(){caf.log('Closed..')},
+                        confirmText:'Confirm',confirmCallback:function(){caf.log('Confirmed..')},
+                        extraText:'Extra',extraCallback:function(){caf.log('Extra..')},
+                        color:color});
                     return null; // Return empty result.
                 }
             }
@@ -905,19 +962,58 @@ caf.ui.forms =
 
 caf.ui.dialogs =
 {
-
+    dialog:
+    {
+        callbacks: {},
+        callOnCloseCallback: true,
+        closeCallback: function(){},
+        modal: null
+    },
     dialogTitle: function(title)
     {
-        return '<div class="dialogTitle hp40 bold white textCenter mFontSize bgXDarkBlue">'+title+'</div>';
+        return '<div class="dialogTitle hp40 bold white textCenter mFontSize bgDark'+this.dialog.color+'">'+title+'</div>';
     },
     dialogContent: function(content)
     {
         return '<div class="dialogContent pt10 pb10 pr10 pl10 borderBox textCenter bold sFontSize bgWhite">'+content+'</div>';
     },
-    showErrorMessage: function(title,msg){
-        caf.log("Title: "+title+", Message: "+msg);
-        var modal = picoModal({
-            content: this.dialogTitle(title)+this.dialogContent(msg),
+    dialogButton: function(id,text,callback)
+    {
+        var color =this.dialog.color;
+
+        if (caf.utils.isEmpty(text)) return "";
+        var bCallback = caf.utils.isEmpty(callback) ? function(){caf.ui.dialogs.dialog.modal.close();} :
+            function() {
+                caf.ui.dialogs.dialog.callOnCloseCallback = false;
+                callback();
+                caf.ui.dialogs.dialog.modal.close();
+            };
+        this.dialog.callbacks[id] = bCallback;
+        return '<div id="'+id+
+            '" class="pt10 pb10 pr10 pl10 borderBox textCenter cDark'+color+' bold sFontSize borderTop1p bcDark'+color+'" '+
+            'caf-active="bgDark'+color+' white"'+
+            'caf-active-remove="cDark'+color+'" '+
+            'caf-onclick="(function(){caf.ui.dialogs.dialog.callbacks[\''+id+'\']();})" caf-text="'+text+'"></div>';
+    },
+    show: function(options){
+        var title           = options.title || "";
+        var content         = options.content || "";
+        var closeText       = options.closeText || "";
+        var closeCallback   = options.closeCallback || function(){};
+        var confirmText     = options.confirmText || "";
+        var confirmCallback   = options.confirmCallback || function(){};
+        var extraText     = options.extraText || "";
+        var extraCallback   = options.extraCallback || function(){};
+
+        this.dialog.color = options.color || 'Blue';
+        this.dialog.callbacks = {};
+        this.dialog.closeCallback = closeCallback;
+        caf.ui.dialogs.dialog.callOnCloseCallback = true;
+        this.dialog.modal = picoModal({
+            content: this.dialogTitle(title)+this.dialogContent(content)+
+                        this.dialogButton('dialogConfirmButton',confirmText,confirmCallback)+
+                        this.dialogButton('dialogCloseButton',closeText,closeCallback)+
+                        this.dialogButton('dialogExtraButton',extraText,extraCallback),
             closeButton: false,
             overlayStyles: {
                 backgroundColor: "#000",
@@ -925,13 +1021,21 @@ caf.ui.dialogs =
             },
             width: 'empty'
         })
-        .afterClose(function (modal) { modal.destroy(); })
+        //.afterClose(function (modal) { caf.log('hi'); modal.destroy(); caf.log(document.getElementById('dialogButton1'));document.clientHeight; caf.ui.rebuildAll(); })
         .afterShow(function(modal){
             caf.ui.fadeIn(modal.modalElem(),500);
+            caf.ui.rebuildAll();
         })
         .beforeClose(function(modal, event) {
             event.preventDefault();
-            caf.ui.fadeOut(modal.modalElem(), 200, function() { modal.destroy(); });
+            caf.ui.fadeOut(modal.modalElem(), 200, function() {
+                modal.destroy();
+                caf.ui.rebuildAll();
+                if (caf.ui.dialogs.dialog.callOnCloseCallback)
+                {
+                    caf.ui.dialogs.dialog.closeCallback();
+                }
+            });
         })
         .show();
     }
@@ -1053,12 +1157,12 @@ caf.pager = {
         caf.utils.addClass(toShowTab,'hidden');
         var clientHeight = toShowTab.clientHeight;
         caf.utils.removeClass(toShowTab,'hidden');
-        caf.utils.addClass(toShowTab,'fadein');
+        caf.utils.addClass(toShowTab,'fadein300');
         // on load page.
         caf.pager.onLoadPage(toShowTab);
 
         window.setTimeout(function(){
-            caf.utils.removeClass(toShowTab,'fadein');
+            caf.utils.removeClass(toShowTab,'fadein300');
 
         },300);
 

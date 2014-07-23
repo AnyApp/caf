@@ -30,6 +30,7 @@ caf.ui.view = function(id)
         mOnTouchEndEvent: null,
         mOnTouchMoveEvent: null,
         mDoStopPropogation: false,
+        mAttributes: {},
         touchData: {
             startX:-100000,
             startY:-100000,
@@ -39,31 +40,50 @@ caf.ui.view = function(id)
         clear: function()
         {
             this.mElementString='',
-                this.mText= '',
-                this.mClass= '',
-                this.mActiveClass= '',
-                this.mActiveClassRemove= '',
-                this.mIconName='',
-                this.mOnClickFunctions= Array(),
-                this.mOnClickEvent= null,
-                this.mOnTouchStartEvent= null,
-                this.mOnTouchEndEvent= null,
-                this.mOnTouchMoveEvent= null,
-                this.mDoStopPropogation= false,
-                this.touchData= {
-                    startX:-100000,
-                    startY:-100000,
-                    lastX:-200000,
-                    lastY:-200000
-                }
+            this.mText= '',
+            this.mClass= '',
+            this.mActiveClass= '',
+            this.mActiveClassRemove= '',
+            this.mIconName='',
+            this.mOnClickFunctions= Array(),
+            this.mOnClickEvent= null,
+            this.mOnTouchStartEvent= null,
+            this.mOnTouchEndEvent= null,
+            this.mOnTouchMoveEvent= null,
+            this.mDoStopPropogation= false,
+            this.mAttributes = {},
+            this.touchData= {
+                startX:-100000,
+                startY:-100000,
+                lastX:-200000,
+                lastY:-200000
+            }
         },
-        needUpdate: function(elm)
+        setAttribute: function(name,value)
         {
-            return this.mElementString != caf.utils.getElementDef(elm);
+            this.mAttributes[name] = value;
         },
-        cacheElement:function()
+        setAttributes: function(attributes)
         {
-            this.mElementString = caf.utils.getElementDef(this.mElement);
+            for ( var name in attributes)
+            {
+                this.setAttribute(name,attributes[name]);
+            }
+        },
+        getAttribute: function(attribute)
+        {
+            return this.mAttributes[attribute];
+        },
+        hasAttributesChanged: function(attributes)
+        {
+            var changed = false;
+            for ( var name in attributes)
+            {
+                var lastValue = this.getAttribute(name);
+                var currentValue = attributes[name];
+                changed = changed || lastValue != currentValue;
+            }
+            return changed;
         },
         activeClass: function(className)
         {
@@ -110,7 +130,6 @@ caf.ui.view = function(id)
         build: function()
         {
             var result = caf.ui.buildView(this);
-            this.cacheElement();
             return result;
         },
         refresh: function()
@@ -119,7 +138,7 @@ caf.ui.view = function(id)
         },
         applyAttributes: function()
         {
-            caf.ui.attributes.applyAttributes(this);
+            return caf.ui.attributes.applyAttributes(this);
         }
     };
 

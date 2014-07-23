@@ -60,8 +60,16 @@ caf.ui.forms =
                 // Validation Failed!
                 if (!validationResult.isValid)
                 {
+                    // Dialog Color Showcase.
+                    //TODO Remove
+                    var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
+                    var color = colors[Math.floor(Math.random() * colors.length)];
                     // Show Message.
-                    caf.ui.dialogs.showErrorMessage(validationResult.title,validationResult.msg);
+                    caf.ui.dialogs.show({ title: validationResult.title,content:validationResult.msg,
+                        closeText:'Close',closeCallback:function(){caf.log('Closed..')},
+                        confirmText:'Confirm',confirmCallback:function(){caf.log('Confirmed..')},
+                        extraText:'Extra',extraCallback:function(){caf.log('Extra..')},
+                        color:color});
                     return null; // Return empty result.
                 }
             }

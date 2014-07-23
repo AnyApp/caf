@@ -68,12 +68,12 @@ caf.pager = {
         caf.utils.addClass(toShowTab,'hidden');
         var clientHeight = toShowTab.clientHeight;
         caf.utils.removeClass(toShowTab,'hidden');
-        caf.utils.addClass(toShowTab,'fadein');
+        caf.utils.addClass(toShowTab,'fadein300');
         // on load page.
         caf.pager.onLoadPage(toShowTab);
 
         window.setTimeout(function(){
-            caf.utils.removeClass(toShowTab,'fadein');
+            caf.utils.removeClass(toShowTab,'fadein300');
 
         },300);
 

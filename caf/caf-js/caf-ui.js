@@ -25,6 +25,18 @@ caf.ui = {
     removeView: function(view){
         delete this.views[view.id];
     },
+    removeViewIfNotExist: function(view){
+        if (caf.utils.isEmpty(document.getElementById(view.id)) )
+        {
+            delete this.views[view.id];
+        }
+    },
+    removeNotExistingViews: function(){
+        for (var iView in this.views)
+        {
+            this.removeViewIfNotExist(this.views[iView]);
+        }
+    },
     /**
      * Rebuild all cached views.
      */
@@ -78,17 +90,6 @@ caf.ui = {
      */
     buildView: function(view)
     {
-        var isCAF= (!caf.utils.isEmpty(view.mText))||
-            (!caf.utils.isEmpty(view.mClass))||
-            (!caf.utils.isEmpty(view.mIconName))||
-            (!caf.utils.isEmpty(view.mActiveClass))||
-            (!caf.utils.isEmpty(view.mIconName))||
-            (!caf.utils.isEmpty(view.mOnClickFunctions));
-        if (!isCAF)
-        {
-            return false;
-        }
-
         //Set Text
         if (!caf.utils.isEmpty(view.mText))
         {
@@ -127,6 +128,9 @@ caf.ui = {
             // Create events.
             view.mOnTouchStartEvent = function(e)
             {
+                var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
+                if (isRightClick) return false;
+
                 e.preventDefault();
                 if (view.mDoStopPropogation)
                 {
@@ -153,10 +157,11 @@ caf.ui = {
             view.mOnTouchEndEvent = function(e)
             {
                 e.preventDefault();
+
                 var diffX = Math.abs(view.touchData.lastX-view.touchData.startX);
                 var diffY = Math.abs(view.touchData.lastY-view.touchData.startY);
                 var boxSize = 15;
-                if (diffX<boxSize && diffY<boxSize && caf.ui.canClick())
+                if (diffX<boxSize && diffY<boxSize && caf.ui.canClick() && e.type!='mouseout')
                 {
                     for (var iFunc in view.mOnClickFunctions)
                     {
@@ -195,6 +200,11 @@ caf.ui = {
      */
     rebuildAll: function(root)
     {
+        var start = new Date().getTime();
+
+        /* Remove not exist elements. */
+        this.removeNotExistingViews();
+
         var nodeList = (root ||document).getElementsByTagName('*');
         //var nodeArray = [];
 
@@ -202,7 +212,13 @@ caf.ui = {
             this.scanView(node);
         }
 
+        caf.log( ((new Date()).getTime() - start) /1000);
+        //alert(((new Date()).getTime() - start) /1000);
         return true;
+    },
+    rebuildFrom: function(root)
+    {
+        return this.rebuildAll(root);
     },
     rebuildViewById: function(id)
     {
@@ -214,30 +230,30 @@ caf.ui = {
      */
     scanView: function(elm)
     {
+        var isCAF= caf.utils.getElementDef(elm).indexOf("caf-")>0;
+        if (!isCAF)
+        {
+            return false;
+        }
+
         var view;
         if (!caf.utils.isEmpty(elm.id) && !caf.utils.isEmpty(this.views[elm.id]))
         {
             view = this.views[elm.id];
-            // Check for changes.
-            if (!view.needUpdate(elm))
-            {
-                return;
-            }
         }
         else
         {
             view = caf.ui.view(elm.id);
         }
 
-        view.clear();
+        var needRebuild = view.applyAttributes();
 
-        view.applyAttributes();
+        //view.clear();
 
-        var result = view.build();
-        // Not a CAF View.
-        if (result==false)
+        if (needRebuild)
         {
-            this.removeView(view);
+            view.build();
+            caf.log(elm.id);
         }
     }
 
