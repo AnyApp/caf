@@ -70,11 +70,12 @@ li{
 }
 
 .sideMenu{
-    width: 43%;
+    position: absolute;
     z-index: 1000000;
 }
 .appMainView{
-    width: 55%;
+    position: absolute;
+    z-index: 10000000;
 }
 .header {
     position: absolute;

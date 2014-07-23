@@ -108,9 +108,7 @@ caf.ui.attributes =
             var swiperName = args['caf-side-menu-switch'];
             args.view.onClick( function(){
                 var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
-                caf.log('swiping... '+swiperName+' Current: '+currentSwiper.activeIndex);
-                caf.log(currentSwiper);
-                currentSwiper.swipeTo((currentSwiper.activeIndex+1)%2 );
+                caf.ui.swipers.openOrCloseSideMenu(currentSwiper);
             } );
         });
         this.addAttr(['caf-current-tab'],function(args){

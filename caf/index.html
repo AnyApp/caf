@@ -14,51 +14,52 @@
 <body ontouchstart="" class="rtl">
 <div id="app-container" class="app_container ltr"
         pages="['page-main','page-buttons','page-tabs']"
-        caf-side-menu-container="side-menu-swiper"
+        caf-side-menu-container="main-view"
         caf-side-menu-position="left"
         caf-main-page="page-main"
         caf-back-button="back">
-    <div class="swiper-container ltr" id="side-menu-swiper" >
-        <div class="swiper-wrapper side-menu-swiper-wrapper">
-            <div id="side-menu-view" class="swiper-slide sideMenu overthrow  textCenter bgXXXDarkBlue">
-                <div id="side-menu-button-main"
-                     class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                     caf-to-page="page-main"
-                     caf-side-menu-switch="side-menu-swiper"
-                     caf-text="To Page Main">
+            <div class="snap-drawers">
+                <div id="side-menu-view" class="snap-drawer snap-drawer-left overthrow  textCenter bgXXXDarkBlue">
+                    <div id="side-menu-button-main"
+                         class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
+                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-page="page-main"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-text="To Page Main">
+                    </div>
+                    <div id="side-menu-button-tabs"
+                         class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
+                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-page="page-tabs"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-text="To Page Tabs">
+                    </div>
+                    <div id="side-menu-button-buttons"
+                         class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
+                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-page="page-buttons"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-text="To Page Buttons">
+                    </div>
+                    <div id="side-menu-button-form"
+                         class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
+                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-page="page-form"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-text="To Page Form">
+                    </div>
+                    <div id="side-menu-button-facebook"
+                         class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
+                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
+                         caf-to-url="https://www.facebook.com/"
+                         caf-side-menu-switch="side-menu-swiper"
+                         caf-text="Out-Of-App Link">
+                    </div>
                 </div>
-                <div id="side-menu-button-tabs"
-                     class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                     caf-to-page="page-tabs"
-                     caf-side-menu-switch="side-menu-swiper"
-                     caf-text="To Page Tabs">
-                </div>
-                <div id="side-menu-button-buttons"
-                     class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                     caf-to-page="page-buttons"
-                     caf-side-menu-switch="side-menu-swiper"
-                     caf-text="To Page Buttons">
-                </div>
-                <div id="side-menu-button-form"
-                     class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                     caf-to-page="page-form"
-                     caf-side-menu-switch="side-menu-swiper"
-                     caf-text="To Page Form">
-                </div>
-                <div id="side-menu-button-facebook"
-                     class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                     caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                     caf-to-url="https://www.facebook.com/"
-                     caf-side-menu-switch="side-menu-swiper"
-                     caf-text="Out-Of-App Link">
-                </div>
-
+                <div class="snap-drawer snap-drawer-right"></div>
             </div>
-            <div id="main-view" class="swiper-slide appMainView">
+
+            <div id="main-view" class="snap-content">
                 <div id="header" class="header bgXXDarkCyan textCenter hp45">
                     <div id="title" class="headerItem absBlock50-2-2 textCenter white bold mFontSize"></div>
                     <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0" caf-active="bgXDarkCyan"
@@ -264,8 +265,6 @@
             </div>
 
         </div>
-    </div>
-</div>
 </body>
 <!-- JS Includes -->
 <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
