@@ -5,19 +5,27 @@ caf.ui.swipers =
     sideMenuSide: 'left',
     initSwiper: function(swiperContainerId,initialSlide,slidesPerView)
     {
-        initialSlide = caf.utils.isEmpty(initialSlide)? 0 : initialSlide;
-        slidesPerView = caf.utils.isEmpty(slidesPerView)? 'auto' : slidesPerView;
         this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,{
-            slidesPerView: slidesPerView,
             moveStartThreshold: 50,
-            initialSlide: initialSlide,
             resistance: '100%'
         });
+
+        this.mSwipers[swiperContainerId].addCallback('SlideChangeStart', function(swiper){
+            var toSlide = swiper.activeIndex;
+            var slideElement = swiper.getSlide(toSlide);
+            var tabRelatedButton = slideElement.getAttribute('caf-tab-related-button');
+            if (!caf.utils.isEmpty(tabRelatedButton))
+            {
+                caf.pager.moveToTab(tabRelatedButton,null,swiperContainerId);
+            }
+        })
+    },
+    moveSwiperToSlide: function(swiperContainerId,slide)
+    {
+        this.mSwipers[swiperContainerId].swipeTo(slide);
     },
     initSideMenu: function(swiperContainerId,position)
     {
-        //var initialSlide = position=='left'? 1:0;
-        //caf.ui.swipers.initSwiper(swiperContainerId,initialSlide)
         this.sideMenuSide = position || 'left';
 
         this.sideMenu = new Snap({
@@ -35,6 +43,10 @@ caf.ui.swipers =
             this.sideMenu.open(this.sideMenuSide);
         else
             this.sideMenu.close();
+    },
+    isSideMenuOpen: function()
+    {
+        return this.sideMenu.state().state!="closed";
     }
 
 }

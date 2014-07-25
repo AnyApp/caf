@@ -75,7 +75,15 @@ caf.ui.attributes =
             args.view.onClick( function() {caf.pager.moveToPage(args['caf-to-page']); } );
         });
         this.addAttr(['caf-to-tab','caf-tab-container'],function(args){
-            args.view.onClick( function() {caf.pager.moveToTab(args['caf-to-tab'],args['caf-tab-container']); } );
+            var tabId = args.view.id;
+            var toSlide = args['caf-to-tab'];
+            var tabContainer = args['caf-tab-container'];
+            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
+
+            if (toSlide == 0)
+            {
+                caf.pager.addHoldClass(tabId);
+            }
         });
         this.addAttr(['caf-drop-menu-overlay-of'],function(args){
             args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
@@ -101,18 +109,18 @@ caf.ui.attributes =
         this.addAttr(['caf-side-menu-container','caf-side-menu-position'],function(args){
             caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
         });
-        this.addAttr(['caf-swiper-container'],function(args){
-            caf.ui.swipers.initSwiper(args['swiper-container'],args['num-slides']);
+        this.addAttr(['caf-swipe-view'],function(args){
+            caf.ui.swipers.initSwiper(args['caf-swipe-view']);
         });
         this.addAttr(['caf-side-menu-switch'],function(args){
             var swiperName = args['caf-side-menu-switch'];
             args.view.onClick( function(){
-                var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
-                caf.ui.swipers.openOrCloseSideMenu(currentSwiper);
+                //var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
+                caf.ui.swipers.openOrCloseSideMenu('');
             } );
         });
         this.addAttr(['caf-current-tab'],function(args){
-            caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
+            //caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
         });
         this.addAttr(['caf-form'],function(args){
             caf.ui.forms.createForm(args['caf-form']);

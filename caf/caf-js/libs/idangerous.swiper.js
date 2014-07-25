@@ -1299,6 +1299,8 @@ var Swiper = function (selector, params) {
     var allowThresholdMove;
     var allowMomentumBounce = true;
     function onTouchStart(event) {
+        if (caf.ui.swipers.isSideMenuOpen()) return false;
+
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched
         if (_this.isTouched || params.onlyExternal) {
@@ -1366,6 +1368,8 @@ var Swiper = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
+        caf.log(event);
+        if (caf.ui.swipers.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         if (isTouchEvent && event.type === 'mousemove') return;
@@ -1471,14 +1475,19 @@ var Swiper = function (selector, params) {
                 }
             }
             if (params.resistance && params.resistance === '100%') {
+                var toStopPropogation = true;
                 //Resistance for Negative-Back sliding
                 if (_this.positions.current > 0 && !(params.freeMode && !params.freeModeFluid)) {
                     _this.positions.current = 0;
+                    toStopPropogation = false;
                 }
                 //Resistance for After-End Sliding
                 if (_this.positions.current < -maxWrapperPosition() && !(params.freeMode && !params.freeModeFluid)) {
                     _this.positions.current = -maxWrapperPosition();
+                    toStopPropogation = false;
                 }
+
+                if (toStopPropogation) event.stopPropagation();
             }
             //Move Slides
             if (!params.followFinger) return;
@@ -1524,6 +1533,7 @@ var Swiper = function (selector, params) {
 
             return false;
         }
+
     }
     function onTouchEnd(event) {
         //Check For scrolling

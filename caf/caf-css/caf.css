@@ -53,21 +53,6 @@ li{
 /* End Fixes */
 
 /* Layout*/
-.swiper-container {
-    width: 100%;
-    height: 100%;
-    color: #fff;
-    text-align: center;
-    direction: ltr;
-}
-.swiper-slide {
-    direction: ltr;
-    position: relative;
-    height: 100%;
-}
-.side-menu-swiper-wrapper{
-    width: 181.81818181818181818181818181818% !important;
-}
 
 .sideMenu{
     position: absolute;

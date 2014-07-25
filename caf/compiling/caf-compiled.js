@@ -29,7 +29,6 @@ caf.log = function(msg)
 
 
 
-
 /**
  * Libraries
  */
@@ -419,7 +418,7 @@ caf.ui = {
         if (needRebuild)
         {
             view.build();
-            caf.log(elm.id);
+            //caf.log(elm.id);
         }
     }
 
@@ -502,7 +501,15 @@ caf.ui.attributes =
             args.view.onClick( function() {caf.pager.moveToPage(args['caf-to-page']); } );
         });
         this.addAttr(['caf-to-tab','caf-tab-container'],function(args){
-            args.view.onClick( function() {caf.pager.moveToTab(args['caf-to-tab'],args['caf-tab-container']); } );
+            var tabId = args.view.id;
+            var toSlide = args['caf-to-tab'];
+            var tabContainer = args['caf-tab-container'];
+            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
+
+            if (toSlide == 0)
+            {
+                caf.pager.addHoldClass(tabId);
+            }
         });
         this.addAttr(['caf-drop-menu-overlay-of'],function(args){
             args.view.onClick( function() {caf.utils.hideOrShow(args['caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
@@ -528,18 +535,18 @@ caf.ui.attributes =
         this.addAttr(['caf-side-menu-container','caf-side-menu-position'],function(args){
             caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
         });
-        this.addAttr(['caf-swiper-container'],function(args){
-            caf.ui.swipers.initSwiper(args['swiper-container'],args['num-slides']);
+        this.addAttr(['caf-swipe-view'],function(args){
+            caf.ui.swipers.initSwiper(args['caf-swipe-view']);
         });
         this.addAttr(['caf-side-menu-switch'],function(args){
             var swiperName = args['caf-side-menu-switch'];
             args.view.onClick( function(){
-                var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
-                caf.ui.swipers.openOrCloseSideMenu(currentSwiper);
+                //var currentSwiper = caf.ui.swipers.mSwipers[swiperName];
+                caf.ui.swipers.openOrCloseSideMenu('');
             } );
         });
         this.addAttr(['caf-current-tab'],function(args){
-            caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
+            //caf.pager.moveToTab(args['caf-current-tab'],args.view.mElement.id,true);
         });
         this.addAttr(['caf-form'],function(args){
             caf.ui.forms.createForm(args['caf-form']);
@@ -746,19 +753,27 @@ caf.ui.swipers =
     sideMenuSide: 'left',
     initSwiper: function(swiperContainerId,initialSlide,slidesPerView)
     {
-        initialSlide = caf.utils.isEmpty(initialSlide)? 0 : initialSlide;
-        slidesPerView = caf.utils.isEmpty(slidesPerView)? 'auto' : slidesPerView;
         this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,{
-            slidesPerView: slidesPerView,
             moveStartThreshold: 50,
-            initialSlide: initialSlide,
             resistance: '100%'
         });
+
+        this.mSwipers[swiperContainerId].addCallback('SlideChangeStart', function(swiper){
+            var toSlide = swiper.activeIndex;
+            var slideElement = swiper.getSlide(toSlide);
+            var tabRelatedButton = slideElement.getAttribute('caf-tab-related-button');
+            if (!caf.utils.isEmpty(tabRelatedButton))
+            {
+                caf.pager.moveToTab(tabRelatedButton,null,swiperContainerId);
+            }
+        })
+    },
+    moveSwiperToSlide: function(swiperContainerId,slide)
+    {
+        this.mSwipers[swiperContainerId].swipeTo(slide);
     },
     initSideMenu: function(swiperContainerId,position)
     {
-        //var initialSlide = position=='left'? 1:0;
-        //caf.ui.swipers.initSwiper(swiperContainerId,initialSlide)
         this.sideMenuSide = position || 'left';
 
         this.sideMenu = new Snap({
@@ -776,6 +791,10 @@ caf.ui.swipers =
             this.sideMenu.open(this.sideMenuSide);
         else
             this.sideMenu.close();
+    },
+    isSideMenuOpen: function()
+    {
+        return this.sideMenu.state().state!="closed";
     }
 
 }
@@ -1140,51 +1159,25 @@ caf.pager = {
             document.getElementById(this.historyStack[i]).style.zIndex = (i+1)*10;
         }
     },
-    moveToTab: function(tabId,tabContainerId,force)
+    moveToTab: function(tabButtonId,toSlide,tabContainerId)
     {
         // Get container.
         var tabContainer = document.getElementById(tabContainerId);
-        // Current Tab.
-        var currentTabId = tabContainer.getAttribute('caf-current-tab');
-        // Return if already in tab.
-        if (currentTabId == tabId && !force) return;
-
-        var currentTab = document.getElementById(currentTabId);
 
         // Get Tabs.
-        var tabs = eval(tabContainer.getAttribute('caf-tabs'));
+        var tabs = eval(tabContainer.getAttribute('caf-tabs-buttons'));
         // Restructure z-indexes.
         for (var iTab in tabs)
         {
-            var tab = document.getElementById(tabs[iTab]);
-            caf.utils.removeClass(tab,'currentTab');
-            caf.utils.removeClass(tab,'lastTab');
             // Remove hold mark.
-            this.removeHoldClass(tab.getAttribute('caf-related-button'));
+            this.removeHoldClass(tabs[iTab]);
         }
-        caf.utils.addClass(currentTab,'lastTab');
 
+        this.addHoldClass(tabButtonId);
 
-        // Set new current tab.
-        tabContainer.setAttribute('caf-current-tab',tabId);
+        if (!caf.utils.isEmpty(toSlide))
+            caf.ui.swipers.moveSwiperToSlide(tabContainerId,toSlide);
 
-        var toShowTab = document.getElementById(tabId);
-
-        caf.utils.addClass(toShowTab,'currentTab');
-        caf.utils.addClass(toShowTab,'hidden');
-        var clientHeight = toShowTab.clientHeight;
-        caf.utils.removeClass(toShowTab,'hidden');
-        caf.utils.addClass(toShowTab,'fadein300');
-        // on load page.
-        caf.pager.onLoadPage(toShowTab);
-
-        window.setTimeout(function(){
-            caf.utils.removeClass(toShowTab,'fadein300');
-
-        },300);
-
-        // Mark button as hold.
-        this.addHoldClass(toShowTab.getAttribute('caf-related-button'));
 
     },
     addHoldClass: function(tabButtonId)
@@ -3183,6 +3176,8 @@ var Swiper = function (selector, params) {
     var allowThresholdMove;
     var allowMomentumBounce = true;
     function onTouchStart(event) {
+        if (caf.ui.swipers.isSideMenuOpen()) return false;
+
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched
         if (_this.isTouched || params.onlyExternal) {
@@ -3250,6 +3245,8 @@ var Swiper = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
+        caf.log(event);
+        if (caf.ui.swipers.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         if (isTouchEvent && event.type === 'mousemove') return;
@@ -3355,14 +3352,19 @@ var Swiper = function (selector, params) {
                 }
             }
             if (params.resistance && params.resistance === '100%') {
+                var toStopPropogation = true;
                 //Resistance for Negative-Back sliding
                 if (_this.positions.current > 0 && !(params.freeMode && !params.freeModeFluid)) {
                     _this.positions.current = 0;
+                    toStopPropogation = false;
                 }
                 //Resistance for After-End Sliding
                 if (_this.positions.current < -maxWrapperPosition() && !(params.freeMode && !params.freeModeFluid)) {
                     _this.positions.current = -maxWrapperPosition();
+                    toStopPropogation = false;
                 }
+
+                if (toStopPropogation) event.stopPropagation();
             }
             //Move Slides
             if (!params.followFinger) return;
@@ -3408,6 +3410,7 @@ var Swiper = function (selector, params) {
 
             return false;
         }
+
     }
     function onTouchEnd(event) {
         //Check For scrolling

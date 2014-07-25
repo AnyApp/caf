@@ -24,35 +24,35 @@
                          class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
                          caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
                          caf-to-page="page-main"
-                         caf-side-menu-switch="side-menu-swiper"
+                         caf-side-menu-switch="main-view"
                          caf-text="To Page Main">
                     </div>
                     <div id="side-menu-button-tabs"
                          class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
                          caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
                          caf-to-page="page-tabs"
-                         caf-side-menu-switch="side-menu-swiper"
+                         caf-side-menu-switch="main-view"
                          caf-text="To Page Tabs">
                     </div>
                     <div id="side-menu-button-buttons"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
                          caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
                          caf-to-page="page-buttons"
-                         caf-side-menu-switch="side-menu-swiper"
+                         caf-side-menu-switch="main-view"
                          caf-text="To Page Buttons">
                     </div>
                     <div id="side-menu-button-form"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
                          caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
                          caf-to-page="page-form"
-                         caf-side-menu-switch="side-menu-swiper"
+                         caf-side-menu-switch="main-view"
                          caf-text="To Page Form">
                     </div>
                     <div id="side-menu-button-facebook"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
                          caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
                          caf-to-url="https://www.facebook.com/"
-                         caf-side-menu-switch="side-menu-swiper"
+                         caf-side-menu-switch="main-view"
                          caf-text="Out-Of-App Link">
                     </div>
                 </div>
@@ -93,8 +93,9 @@
                     </div>
                     <div id="side-menu" class="headerItem wp50 hp45 absBlock50-0-n"
                          caf-active="bgXDarkCyan"
-                         caf-side-menu-switch="side-menu-swiper"
-                         caf-iconly="ic_action_menu">
+                         caf-side-menu-switch="main-view"
+                         caf-iconly="ic_action_menu"
+                         caf-stop-propagation="true">
                     </div>
                     <div id="back" class="headerItem wp50 hp45 absBlock50-1-n"
                          caf-active="bgXDarkCyan"
@@ -165,7 +166,7 @@
                              caf-active="bgXXXDarkCyan"
                              caf-hold="bgXDarkCyan"
                              caf-active-remove=""
-                             caf-to-tab="tab1"
+                             caf-to-tab="0"
                              caf-tab-container="tabContainer"
                              caf-text="go tab 1">
                         </div>
@@ -174,7 +175,7 @@
                              caf-active="bgXXXDarkCyan"
                              caf-hold="bgXDarkCyan"
                              caf-active-remove=""
-                             caf-to-tab="tab2"
+                             caf-to-tab="1"
                              caf-tab-container="tabContainer"
                              caf-text="go tab 2">
                         </div>
@@ -183,38 +184,46 @@
                              caf-active="bgXXXDarkCyan"
                              caf-hold="bgXDarkCyan"
                              caf-active-remove=""
-                             caf-to-tab="tab3"
+                             caf-to-tab="2"
                              caf-tab-container="tabContainer"
                              caf-text="go tab 3">
                         </div>
                     </div>
-                    <div id="tabContainer" class="overthrow tabContainer mFontSize"
-                         caf-tabs="['tab1','tab2','tab3']"
-                         caf-current-tab="tab1">
-                         <!--swiper-container="tabs-swiper" num-slides="3"-->
-                        <div id="tab1" class="swiper-slide overthrow tab top60 bgWhite currentTab"
-                         caf-related-button="btab1">
-                            <div id="tab1elm1"
-                                 class="mt6 marginCentered textCenter bgDarkBlue w20 hp40 xsRounded white bold"
-                                 caf-text="tab 1">
+                    <div id="tabContainer" class="swiper-container-fill mFontSize"
+                            caf-swipe-view="tabContainer"
+                            caf-tabs-buttons="['btab1','btab2','btab3']">
+                        <div class="swiper-wrapper">
+                            <div id="tab1" class="swiper-slide overthrow top60 bgWhite"
+                                    caf-tab-related-button="btab1">
+                                <div id="tab1elm1"
+                                     class="mt6 marginCentered textCenter bgDarkBlue w20 hp40 xsRounded white bold"
+                                     caf-text="tab 1">
+                                </div>
+                                <div id="tab1elm2"
+                                     class="mt6 marginCentered textCenter bgDarkPink w40 hp50 xsRounded white bold"
+                                     caf-text="tab 1">
+                                </div>
                             </div>
-                            <div id="tab1elm2"
-                                 class="mt6 marginCentered textCenter bgDarkPink w40 hp50 xsRounded white bold"
-                                 caf-text="tab 1">
+                            <div id="tab2" class="swiper-slide overthrow top60 bgWhite"
+                                 caf-tab-related-button="btab2">
+                                <div id="tab2elm"
+                                     class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded white bold"
+                                     caf-text="tab 2">
+                                </div>
                             </div>
-                        </div>
-                        <div id="tab2" class="swiper-slide overthrow tab top60 bgWhite"
-                             caf-related-button="btab2">
-                            <div id="tab2elm"
-                                 class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded white bold"
-                                 caf-text="tab 2">
-                            </div>
-                        </div>
-                        <div id="tab3" class="swiper-slide overthrow tab top60 bgWhite"
-                             caf-related-button="btab3">
-                            <div id="tab3elm"
-                                 class="mt6 marginCentered textCenter bgDarkBrown w80 hp130 xsRounded xxlFontSize white bold"
-                                 caf-text="tab 3">
+                            <div id="tab3" class="swiper-slide overthrow top60 bgWhite"
+                                 caf-tab-related-button="btab3">
+                                <div id="gallery-container" class="swiper-container mt20 mb20 hp195 w80 mFontSize"
+                                     caf-swipe-view="gallery-container">
+                                    <div class="swiper-wrapper">
+                                        <div id="gallery-img1" class="swiper-slide bgBlue">
+                                        </div>
+                                        <div id="gallery-img2" class="swiper-slide bgGreen">
+                                        </div>
+                                        <div id="gallery-img3" class="swiper-slide bgPurple">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -269,7 +278,6 @@
 <!-- JS Includes -->
 <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
 <script type="text/javascript" src="js/caf.min.js"></script>
-<script type="text/javascript" src="caf-js/libs/idangerous.swiper.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript">
     app.initialize();

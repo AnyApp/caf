@@ -34,51 +34,25 @@ caf.pager = {
             document.getElementById(this.historyStack[i]).style.zIndex = (i+1)*10;
         }
     },
-    moveToTab: function(tabId,tabContainerId,force)
+    moveToTab: function(tabButtonId,toSlide,tabContainerId)
     {
         // Get container.
         var tabContainer = document.getElementById(tabContainerId);
-        // Current Tab.
-        var currentTabId = tabContainer.getAttribute('caf-current-tab');
-        // Return if already in tab.
-        if (currentTabId == tabId && !force) return;
-
-        var currentTab = document.getElementById(currentTabId);
 
         // Get Tabs.
-        var tabs = eval(tabContainer.getAttribute('caf-tabs'));
+        var tabs = eval(tabContainer.getAttribute('caf-tabs-buttons'));
         // Restructure z-indexes.
         for (var iTab in tabs)
         {
-            var tab = document.getElementById(tabs[iTab]);
-            caf.utils.removeClass(tab,'currentTab');
-            caf.utils.removeClass(tab,'lastTab');
             // Remove hold mark.
-            this.removeHoldClass(tab.getAttribute('caf-related-button'));
+            this.removeHoldClass(tabs[iTab]);
         }
-        caf.utils.addClass(currentTab,'lastTab');
 
+        this.addHoldClass(tabButtonId);
 
-        // Set new current tab.
-        tabContainer.setAttribute('caf-current-tab',tabId);
+        if (!caf.utils.isEmpty(toSlide))
+            caf.ui.swipers.moveSwiperToSlide(tabContainerId,toSlide);
 
-        var toShowTab = document.getElementById(tabId);
-
-        caf.utils.addClass(toShowTab,'currentTab');
-        caf.utils.addClass(toShowTab,'hidden');
-        var clientHeight = toShowTab.clientHeight;
-        caf.utils.removeClass(toShowTab,'hidden');
-        caf.utils.addClass(toShowTab,'fadein300');
-        // on load page.
-        caf.pager.onLoadPage(toShowTab);
-
-        window.setTimeout(function(){
-            caf.utils.removeClass(toShowTab,'fadein300');
-
-        },300);
-
-        // Mark button as hold.
-        this.addHoldClass(toShowTab.getAttribute('caf-related-button'));
 
     },
     addHoldClass: function(tabButtonId)

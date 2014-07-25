@@ -253,7 +253,7 @@ caf.ui = {
         if (needRebuild)
         {
             view.build();
-            caf.log(elm.id);
+            //caf.log(elm.id);
         }
     }
 
