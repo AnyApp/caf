@@ -1306,7 +1306,7 @@ var Swiper = function (selector, params) {
         if (_this.isTouched || params.onlyExternal) {
             return false;
         }
-
+        caf.log(event.srcElement.id || event.srcElement);
         // Blur active elements
         var eventTarget = event.target || event.srcElement;
         if (document.activeElement) {
@@ -1321,7 +1321,7 @@ var Swiper = function (selector, params) {
         allowMomentumBounce = false;
         //Check For Nested Swipers
         _this.isTouched = true;
-        isTouchEvent = event.type === 'touchstart';
+        isTouchEvent = event.type === 'touchstart';// || event.type === 'mousedown';
 
         if (!isTouchEvent || event.targetTouches.length === 1) {
             _this.callPlugins('onTouchStartBegin');
@@ -1368,11 +1368,12 @@ var Swiper = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
-        caf.log(event);
+
         if (caf.ui.swipers.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
-        if (isTouchEvent && event.type === 'mousemove') return;
+        //if (isTouchEvent && event.type === 'mousemove') return;
+        //if (isTouchEvent && event.type === 'touchmove') return;
 
         var pageX = isTouchEvent ? event.targetTouches[0].pageX : (event.pageX || event.clientX);
         var pageY = isTouchEvent ? event.targetTouches[0].pageY : (event.pageY || event.clientY);

@@ -5,5 +5,6 @@ var app =
         caf.init('');
         //caf.pager.init('page-main','back');
         caf.ui.rebuildAll();
+
     }
 }

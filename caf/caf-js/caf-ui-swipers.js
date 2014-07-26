@@ -3,12 +3,19 @@ caf.ui.swipers =
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
-    initSwiper: function(swiperContainerId,initialSlide,slidesPerView)
+    initSwiper: function(swiperContainerId,pagination)
     {
-        this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,{
+        var options = {
             moveStartThreshold: 50,
             resistance: '100%'
-        });
+        };
+        if (!caf.utils.isEmpty(pagination))
+        {
+            options.pagination = '#'+pagination;
+            options.paginationClickable= true;
+        }
+
+        this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,options);
 
         this.mSwipers[swiperContainerId].addCallback('SlideChangeStart', function(swiper){
             var toSlide = swiper.activeIndex;
@@ -18,7 +25,23 @@ caf.ui.swipers =
             {
                 caf.pager.moveToTab(tabRelatedButton,null,swiperContainerId);
             }
-        })
+            window.setTimeout(function()
+            {
+                var height = document.getElementById(swiperContainerId).style.height;
+                document.getElementById(swiperContainerId).style.height = '0px';
+                document.getElementById(swiperContainerId).clientHeight;
+                document.getElementById(swiperContainerId).style.height = height;
+            },100);
+        });
+
+        // Fix Pagination disappear.
+        this.mSwipers[swiperContainerId].addCallback('SlideChangeEnd', function(swiper){
+            var height = document.getElementById(swiperContainerId).style.height;
+            document.getElementById(swiperContainerId).style.height = '0px';
+            document.getElementById(swiperContainerId).clientHeight;
+            document.getElementById(swiperContainerId).style.height = height;
+        });
+
     },
     moveSwiperToSlide: function(swiperContainerId,slide)
     {

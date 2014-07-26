@@ -536,7 +536,8 @@ caf.ui.attributes =
             caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
         });
         this.addAttr(['caf-swipe-view'],function(args){
-            caf.ui.swipers.initSwiper(args['caf-swipe-view']);
+            var pagination = args.view.mElement.getAttribute('caf-swipe-view-pagination');
+            caf.ui.swipers.initSwiper(args['caf-swipe-view'],pagination);
         });
         this.addAttr(['caf-side-menu-switch'],function(args){
             var swiperName = args['caf-side-menu-switch'];
@@ -751,12 +752,19 @@ caf.ui.swipers =
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
-    initSwiper: function(swiperContainerId,initialSlide,slidesPerView)
+    initSwiper: function(swiperContainerId,pagination)
     {
-        this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,{
+        var options = {
             moveStartThreshold: 50,
             resistance: '100%'
-        });
+        };
+        if (!caf.utils.isEmpty(pagination))
+        {
+            options.pagination = '#'+pagination;
+            options.paginationClickable= true;
+        }
+
+        this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,options);
 
         this.mSwipers[swiperContainerId].addCallback('SlideChangeStart', function(swiper){
             var toSlide = swiper.activeIndex;
@@ -766,7 +774,23 @@ caf.ui.swipers =
             {
                 caf.pager.moveToTab(tabRelatedButton,null,swiperContainerId);
             }
-        })
+            window.setTimeout(function()
+            {
+                var height = document.getElementById(swiperContainerId).style.height;
+                document.getElementById(swiperContainerId).style.height = '0px';
+                document.getElementById(swiperContainerId).clientHeight;
+                document.getElementById(swiperContainerId).style.height = height;
+            },100);
+        });
+
+        // Fix Pagination disappear.
+        this.mSwipers[swiperContainerId].addCallback('SlideChangeEnd', function(swiper){
+            var height = document.getElementById(swiperContainerId).style.height;
+            document.getElementById(swiperContainerId).style.height = '0px';
+            document.getElementById(swiperContainerId).clientHeight;
+            document.getElementById(swiperContainerId).style.height = height;
+        });
+
     },
     moveSwiperToSlide: function(swiperContainerId,slide)
     {
@@ -3183,7 +3207,7 @@ var Swiper = function (selector, params) {
         if (_this.isTouched || params.onlyExternal) {
             return false;
         }
-
+        caf.log(event.srcElement.id || event.srcElement);
         // Blur active elements
         var eventTarget = event.target || event.srcElement;
         if (document.activeElement) {
@@ -3198,7 +3222,7 @@ var Swiper = function (selector, params) {
         allowMomentumBounce = false;
         //Check For Nested Swipers
         _this.isTouched = true;
-        isTouchEvent = event.type === 'touchstart';
+        isTouchEvent = event.type === 'touchstart';// || event.type === 'mousedown';
 
         if (!isTouchEvent || event.targetTouches.length === 1) {
             _this.callPlugins('onTouchStartBegin');
@@ -3245,11 +3269,12 @@ var Swiper = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
-        caf.log(event);
+
         if (caf.ui.swipers.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
-        if (isTouchEvent && event.type === 'mousemove') return;
+        //if (isTouchEvent && event.type === 'mousemove') return;
+        //if (isTouchEvent && event.type === 'touchmove') return;
 
         var pageX = isTouchEvent ? event.targetTouches[0].pageX : (event.pageX || event.clientX);
         var pageY = isTouchEvent ? event.targetTouches[0].pageY : (event.pageY || event.clientY);

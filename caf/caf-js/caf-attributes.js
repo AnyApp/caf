@@ -110,7 +110,8 @@ caf.ui.attributes =
             caf.ui.swipers.initSideMenu(args['caf-side-menu-container'],args['caf-side-menu-position'] );
         });
         this.addAttr(['caf-swipe-view'],function(args){
-            caf.ui.swipers.initSwiper(args['caf-swipe-view']);
+            var pagination = args.view.mElement.getAttribute('caf-swipe-view-pagination');
+            caf.ui.swipers.initSwiper(args['caf-swipe-view'],pagination);
         });
         this.addAttr(['caf-side-menu-switch'],function(args){
             var swiperName = args['caf-side-menu-switch'];
