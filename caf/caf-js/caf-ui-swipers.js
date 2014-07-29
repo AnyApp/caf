@@ -3,7 +3,7 @@ caf.ui.swipers =
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
-    initSwiper: function(swiperContainerId,pagination)
+    initSwiper: function(swiperContainerId,swiperOptionsArray,pagination)
     {
         var options = {
             moveStartThreshold: 50,
@@ -14,13 +14,19 @@ caf.ui.swipers =
             options.pagination = '#'+pagination;
             options.paginationClickable= true;
         }
+        if (!caf.utils.isEmpty(swiperOptionsArray))
+        {
+            if (swiperOptionsArray.indexOf('loop')>=0)
+                options.loop=true;
+
+        }
 
         this.mSwipers[swiperContainerId] = new Swiper('#'+swiperContainerId,options);
 
         this.mSwipers[swiperContainerId].addCallback('SlideChangeStart', function(swiper){
             var toSlide = swiper.activeIndex;
             var slideElement = swiper.getSlide(toSlide);
-            var tabRelatedButton = slideElement.getAttribute('caf-tab-related-button');
+            var tabRelatedButton = slideElement.getAttribute('data-caf-tab-related-button');
             if (!caf.utils.isEmpty(tabRelatedButton))
             {
                 caf.pager.moveToTab(tabRelatedButton,null,swiperContainerId);
@@ -42,6 +48,14 @@ caf.ui.swipers =
             document.getElementById(swiperContainerId).style.height = height;
         });
 
+    },
+    next: function(swiperName)
+    {
+        this.mSwipers[swiperName].swipeNext();
+    },
+    previous: function(swiperName)
+    {
+        this.mSwipers[swiperName].swipePrev();
     },
     moveSwiperToSlide: function(swiperContainerId,slide)
     {

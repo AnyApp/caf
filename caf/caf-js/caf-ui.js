@@ -230,7 +230,7 @@ caf.ui = {
      */
     scanView: function(elm)
     {
-        var isCAF= caf.utils.getElementDef(elm).indexOf("caf-")>0;
+        var isCAF= caf.utils.getElementDef(elm).indexOf("data-caf-")>0;
         if (!isCAF)
         {
             return false;

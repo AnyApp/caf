@@ -40,7 +40,7 @@ caf.pager = {
         var tabContainer = document.getElementById(tabContainerId);
 
         // Get Tabs.
-        var tabs = eval(tabContainer.getAttribute('caf-tabs-buttons'));
+        var tabs = eval(tabContainer.getAttribute('data-caf-tabs-buttons'));
         // Restructure z-indexes.
         for (var iTab in tabs)
         {
@@ -60,7 +60,7 @@ caf.pager = {
         if (!caf.utils.isEmpty(tabButtonId))
         {
             var tabButton = document.getElementById(tabButtonId);
-            var holdClass = tabButton.getAttribute('caf-hold');
+            var holdClass = tabButton.getAttribute('data-caf-hold');
             if (!caf.utils.isEmpty(holdClass))
             {
                 caf.utils.addClass(tabButton,holdClass);
@@ -72,7 +72,7 @@ caf.pager = {
         if (!caf.utils.isEmpty(tabButtonId))
         {
             var tabButton = document.getElementById(tabButtonId);
-            var holdClass = tabButton.getAttribute('caf-hold');
+            var holdClass = tabButton.getAttribute('data-caf-hold');
             if (!caf.utils.isEmpty(holdClass))
             {
                 caf.utils.removeClass(tabButton,holdClass);
@@ -155,9 +155,9 @@ caf.pager = {
     },
     onLoadPage: function(pageElement)
     {
-        if ( pageElement.getAttribute('caf-page-load')  )
+        if ( pageElement.getAttribute('data-caf-page-load')  )
         {
-            var onLoad = new Function(pageElement.getAttribute('caf-page-load'));
+            var onLoad = new Function(pageElement.getAttribute('data-caf-page-load'));
             onLoad();
         }
     },

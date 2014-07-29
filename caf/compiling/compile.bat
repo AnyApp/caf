@@ -6,4 +6,4 @@ copy /b caf.min.js ..\js\caf.min.js
 
 cd ..\caf-css
 del ..\css\caf-all.css
-copy /b idangerous.swiper.css+snap.css+dialogs.css+caf.css ..\css\caf-all.css
+copy /b idangerous.swiper.css+snap.css+dialogs.css+utils\heights.css+utils\widths.css+utils\paddings.css+utils\absolutes.css+utils\margins.css+caf.css ..\css\caf-all.css

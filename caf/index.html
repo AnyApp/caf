@@ -14,46 +14,46 @@
 <body ontouchstart="" class="rtl">
 <div id="app-container" class="app_container ltr"
         pages="['page-main','page-buttons','page-tabs']"
-        caf-side-menu-container="main-view"
-        caf-side-menu-position="left"
-        caf-main-page="page-main"
-        caf-back-button="back">
+        data-caf-side-menu-container="main-view"
+        data-caf-side-menu-position="left"
+        data-caf-main-page="page-main"
+        data-caf-back-button="back">
             <div class="snap-drawers">
                 <div id="side-menu-view" class="snap-drawer snap-drawer-left overthrow  textCenter bgXXXDarkBlue">
                     <div id="side-menu-button-main"
                          class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-page="page-main"
-                         caf-side-menu-switch="main-view"
-                         caf-text="To Page Main">
+                         data-caf-active="bgXDarkBlue" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-page="page-main"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-text="To Page Main">
                     </div>
                     <div id="side-menu-button-tabs"
                          class="pl24 textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-page="page-tabs"
-                         caf-side-menu-switch="main-view"
-                         caf-text="To Page Tabs">
+                         data-caf-active="bgXDarkBlue" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-page="page-tabs"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-text="To Page Tabs">
                     </div>
                     <div id="side-menu-button-buttons"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-page="page-buttons"
-                         caf-side-menu-switch="main-view"
-                         caf-text="To Page Buttons">
+                         data-caf-active="bgXDarkBlue" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-page="page-buttons"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-text="To Page Buttons">
                     </div>
                     <div id="side-menu-button-form"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-page="page-form"
-                         caf-side-menu-switch="main-view"
-                         caf-text="To Page Form">
+                         data-caf-active="bgXDarkBlue" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-page="page-form"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-text="To Page Form">
                     </div>
                     <div id="side-menu-button-facebook"
                          class="pl24  textLeft w100 hp50 smFontSize whiteSmoke bold italic borderBox borderBottom1p bcXXDarkBlue"
-                         caf-active="bgXDarkBlue" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-url="https://www.facebook.com/"
-                         caf-side-menu-switch="main-view"
-                         caf-text="Out-Of-App Link">
+                         data-caf-active="bgXDarkBlue" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-url="https://www.facebook.com/"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-text="Out-Of-App Link">
                     </div>
                 </div>
                 <div class="snap-drawer snap-drawer-right"></div>
@@ -62,160 +62,162 @@
             <div id="main-view" class="snap-content">
                 <div id="header" class="header bgXXDarkCyan textCenter hp45">
                     <div id="title" class="headerItem absBlock50-2-2 textCenter white bold mFontSize"></div>
-                    <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0" caf-active="bgXDarkCyan"
-                         caf-iconly="ic_action_overflow"
-                         caf-drop-menu-container="dropMenu">
+                    <div id="menu" class="headerItem wp50 hp45 absBlock50-n-0" data-caf-active="bgXDarkCyan"
+                         data-caf-iconly="ic_action_overflow"
+                         data-caf-drop-menu-container="dropMenu">
                         <div id="dropMenu" class="dropMenuRight wp150 bcXDarkCyan border1p hidden top45 sFontSize bold white textRight">
-                            <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp150" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="m" caf-stop-propagation="true"
-                                 caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
+                            <div id="dropMenuButtonTabView" class="bgXDarkCyan hp40 wp150" data-caf-active="bgXDarkGray"
+                                 data-caf-active-remove="bgXDarkCyan" data-caf-icon-right="ic_action_edit" data-caf-icon-size="m" data-caf-stop-propagation="true"
+                                 data-caf-drop-menu-container="dropMenu" data-caf-text="Buttons" data-caf-to-page="page-buttons">
                             </div>
-                            <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp150" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-right="ic_action_edit" caf-icon-size="s" caf-stop-propagation="true"
-                                 caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                            <div id="dropMenuButtonSettings" class="bgXDarkCyan hp40 wp150" data-caf-active="bgXDarkGray"
+                                 data-caf-active-remove="bgXDarkCyan" data-caf-icon-right="ic_action_edit" data-caf-icon-size="s" data-caf-stop-propagation="true"
+                                 data-caf-drop-menu-container="dropMenu" data-caf-text="Tabs" data-caf-to-page="page-tabs">
                             </div>
-                            <div id="dropMenuButtonForms" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="m" caf-stop-propagation="true"
-                                 caf-drop-menu-container="dropMenu" caf-text="Form" caf-to-page="page-form">
+                            <div id="dropMenuButtonForms" class="bgXDarkCyan hp40 wp150 textLeft" data-caf-active="bgXDarkGray"
+                                 data-caf-active-remove="bgXDarkCyan" data-caf-icon-left="ic_action_camera" data-caf-icon-size="m" data-caf-stop-propagation="true"
+                                 data-caf-drop-menu-container="dropMenu" data-caf-text="Form" data-caf-to-page="page-form">
                             </div>
-                            <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="l" caf-stop-propagation="true"
-                                 caf-drop-menu-container="dropMenu" caf-text="Buttons" caf-to-page="page-buttons">
+                            <div id="dropMenuButtonInfo" class="bgXDarkCyan hp40 wp150 textLeft" data-caf-active="bgXDarkGray"
+                                 data-caf-active-remove="bgXDarkCyan" data-caf-icon-left="ic_action_camera" data-caf-icon-size="l" data-caf-stop-propagation="true"
+                                 data-caf-drop-menu-container="dropMenu" data-caf-text="Buttons" data-caf-to-page="page-buttons">
                             </div>
-                            <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp150 textLeft" caf-active="bgXDarkGray"
-                                 caf-active-remove="bgXDarkCyan" caf-icon-left="ic_action_camera" caf-icon-size="xl" caf-stop-propagation="true"
-                                 caf-drop-menu-container="dropMenu" caf-text="Tabs" caf-to-page="page-tabs">
+                            <div id="dropMenuButtonExit" class="bgXDarkCyan hp40 wp150 textLeft" data-caf-active="bgXDarkGray"
+                                 data-caf-active-remove="bgXDarkCyan" data-caf-icon-left="ic_action_camera" data-caf-icon-size="xl" data-caf-stop-propagation="true"
+                                 data-caf-drop-menu-container="dropMenu" data-caf-text="Tabs" data-caf-to-page="page-tabs">
                             </div>
                             <div id="dropMenuOverlay" class="dropMenuOverlay"
-                                 caf-drop-menu-overlay-of="dropMenu"  caf-stop-propagation="true">
+                                 data-caf-drop-menu-overlay-of="dropMenu"  data-caf-stop-propagation="true">
                             </div>
                         </div>
                     </div>
                     <div id="side-menu" class="headerItem wp50 hp45 absBlock50-0-n"
-                         caf-active="bgXDarkCyan"
-                         caf-side-menu-switch="main-view"
-                         caf-iconly="ic_action_menu"
-                         caf-stop-propagation="true">
+                         data-caf-active="bgXDarkCyan"
+                         data-caf-side-menu-switch="main-view"
+                         data-caf-iconly="ic_action_menu"
+                         data-caf-stop-propagation="true">
                     </div>
                     <div id="back" class="headerItem wp50 hp45 absBlock50-1-n"
-                         caf-active="bgXDarkCyan"
-                         caf-to-page="move-back"
-                         caf-iconly="ic_action_previous_item">
+                         data-caf-active="bgXDarkCyan"
+                         data-caf-to-page="move-back"
+                         data-caf-iconly="ic_action_previous_item">
                     </div>
                 </div>
                 <div id="page-main" class="overthrow content bgWhite top45 bottom20"
-                     caf-page-load="caf.ui.title('CAF Showcase');">
+                     data-caf-page-load="caf.ui.title('CAF Showcase');">
                     <div id="main-btn-to-buttons"
                          class="mt6 marginCentered textCenter bgDarkBlue w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkBlue"
-                         caf-to-page="page-buttons"
-                         caf-text="Buttons">
+                         data-caf-active="bgXDarkBlue"
+                         data-caf-to-page="page-buttons"
+                         data-caf-text="Buttons">
                     </div>
                     <div id="main-btn-to-tabs"
                          class="mt6 marginCentered textCenter bgDarkPurple w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkPurple"
-                         caf-to-page="page-tabs"
-                         caf-text="Tabs">
+                         data-caf-active="bgXDarkPurple"
+                         data-caf-to-page="page-tabs"
+                         data-caf-text="Tabs">
                     </div>
                     <div id="main-btn-to-form"
                          class="mt6 marginCentered textCenter bgDarkRed w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkRed"
-                         caf-to-page="page-form"
-                         caf-text="Form">
+                         data-caf-active="bgXDarkRed"
+                         data-caf-to-page="page-form"
+                         data-caf-text="Form">
                     </div>
                 </div>
                 <div id="page-buttons" class="content overthrow bgWhite top45 bottom20"
-                     caf-page-load="caf.ui.title('CAF Buttons');">
+                     data-caf-page-load="caf.ui.title('CAF Buttons');">
                     <div id="page-buttons-btn-to-main"
                          class="mt8 marginRighted textCenter bgDarkBlue w50 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkBlue"
-                         caf-to-page="page-main"
-                         caf-text="To Page Main">
+                         data-caf-active="bgXDarkBlue"
+                         data-caf-to-page="page-main"
+                         data-caf-text="To Page Main">
                     </div>
                     <div id="page-buttons-btn-to-form"
                          class="mt8 marginCentered textCenter bgDarkPink w60 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkPink"
-                         caf-to-page="page-form"
-                         caf-text="To Page Form">
+                         data-caf-active="bgXDarkPink"
+                         data-caf-to-page="page-form"
+                         data-caf-text="To Page Form">
                     </div>
                     <div id="page-buttons-btn-to-facebook"
-                         class="pl24 mt8 marginLefted textLeft bgDarkPurple w50 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXXDarkPurple" caf-icon-right="ic_action_forward" caf-icon-size="m"
-                         caf-to-url="https://www.facebook.com/"
-                         caf-text="Out-Of-App Link">
+                         class="pl24 mt8 marginLefted textLeft bgDarkPurple w80 hp40 xsRounded mFontSize white bold"
+                         data-caf-active="bgXXDarkPurple" data-caf-icon-right="ic_action_forward" data-caf-icon-size="m"
+                         data-caf-to-url="https://www.facebook.com/"
+                         data-caf-text="Out-Of-App Link">
                     </div>
                     <div id="page-buttons-btn-to-tabs"
                         class="mt14 marginCentered textCenter bgDarkGray w70 hp60 xsRounded lFontSize white bold"
-                        caf-active="bgXDarkGray"
-                        caf-to-page="page-tabs"
-                        caf-text="To Page Tabs">
+                        data-caf-active="bgXDarkGray"
+                        data-caf-to-page="page-tabs"
+                        data-caf-text="To Page Tabs">
                     </div>
                     <div id="page-buttons-btn-to-buttons"
                          class="mt20 marginRighted textCenter bgDarkRed w80 hp120 sRounded xxlFontSize white bold"
-                         caf-active="bgXDarkRed"
-                         caf-to-page="page-buttons"
-                         caf-text="To Page Buttons">
+                         data-caf-active="bgXDarkRed"
+                         data-caf-to-page="page-buttons"
+                         data-caf-text="To Page Buttons">
                     </div>
 
                 </div>
                 <div id="page-tabs" class="content bgWhite top45 bottom20"
-                     caf-page-load="caf.ui.title('CAF Tabs');">
+                     data-caf-page-load="caf.ui.title('CAF Tabs');">
                         <div class="tabsButtonsContainer hp40 smFontSize white bold bgDarkCyan">
                         <div id="btab1"
                              class="marginCentered textCenter inlineBlock  w30"
-                             caf-active="bgXXXDarkCyan"
-                             caf-hold="bgXDarkCyan"
-                             caf-active-remove=""
-                             caf-to-tab="0"
-                             caf-tab-container="tabContainer"
-                             caf-text="go tab 1">
+                             data-caf-active="bgXXXDarkCyan"
+                             data-caf-hold="bgXDarkCyan"
+                             data-caf-active-remove=""
+                             data-caf-to-tab="0"
+                             data-caf-tab-container="tabContainer"
+                             data-caf-text="go tab 1">
                         </div>
                         <div id="btab2"
                              class="marginCentered textCenter inlineBlock  w30"
-                             caf-active="bgXXXDarkCyan"
-                             caf-hold="bgXDarkCyan"
-                             caf-active-remove=""
-                             caf-to-tab="1"
-                             caf-tab-container="tabContainer"
-                             caf-text="go tab 2">
+                             data-caf-active="bgXXXDarkCyan"
+                             data-caf-hold="bgXDarkCyan"
+                             data-caf-active-remove=""
+                             data-caf-to-tab="1"
+                             data-caf-tab-container="tabContainer"
+                             data-caf-text="go tab 2">
                         </div>
                         <div id="btab3"
                              class="marginCentered textCenter inlineBlock  w30"
-                             caf-active="bgXXXDarkCyan"
-                             caf-hold="bgXDarkCyan"
-                             caf-active-remove=""
-                             caf-to-tab="2"
-                             caf-tab-container="tabContainer"
-                             caf-text="go tab 3">
+                             data-caf-active="bgXXXDarkCyan"
+                             data-caf-hold="bgXDarkCyan"
+                             data-caf-active-remove=""
+                             data-caf-to-tab="2"
+                             data-caf-tab-container="tabContainer"
+                             data-caf-text="go tab 3">
                         </div>
                     </div>
                     <div id="tabContainer" class="swiper-container-fill mFontSize"
-                            caf-swipe-view="tabContainer"
-                            caf-tabs-buttons="['btab1','btab2','btab3']">
+                            data-caf-swipe-view="tabContainer"
+                            data-caf-swipe-view-options=""
+                            data-caf-tabs-buttons="['btab1','btab2','btab3']">
                         <div class="swiper-wrapper">
                             <div id="tab1" class="swiper-slide overthrow top60 bgWhite"
-                                    caf-tab-related-button="btab1">
+                                    data-caf-tab-related-button="btab1">
                                 <div id="tab1elm1"
                                      class="mt6 marginCentered textCenter bgDarkBlue w20 hp40 xsRounded white bold"
-                                     caf-text="tab 1">
+                                     data-caf-text="tab 1">
                                 </div>
                                 <div id="tab1elm2"
                                      class="mt6 marginCentered textCenter bgDarkPink w40 hp50 xsRounded white bold"
-                                     caf-text="tab 1">
+                                     data-caf-text="tab 1">
                                 </div>
                             </div>
                             <div id="tab2" class="swiper-slide overthrow top60 bgWhite"
-                                 caf-tab-related-button="btab2">
+                                 data-caf-tab-related-button="btab2">
                                 <div id="tab2elm"
                                      class="mt6 marginCentered textCenter bgDarkBlue w20 hp50 xsRounded white bold"
-                                     caf-text="tab 2">
+                                     data-caf-text="tab 2">
                                 </div>
                             </div>
                             <div id="tab3" class="swiper-slide overthrow top60 bgWhite"
-                                 caf-tab-related-button="btab3">
+                                 data-caf-tab-related-button="btab3">
                                 <div id="gallery-container" class="swiper-container mt20 mb20 hp195 w80 mFontSize"
-                                     caf-swipe-view="gallery-container"
-                                     caf-swipe-view-pagination="gallery-container-pagination">
+                                     data-caf-swipe-view="gallery-container"
+                                     data-caf-swipe-view-options="['loop']"
+                                     data-caf-swipe-view-pagination="gallery-container-pagination">
                                     <div class="swiper-wrapper">
                                         <div id="gallery-img1" class="swiper-slide bgBlue">
                                         </div>
@@ -225,9 +227,14 @@
                                         </div>
                                     </div>
                                     <div id="gallery-container-pagination" class="pagination"></div>
-                                    <div id="gallery-container-next" class="pagination"
-                                         caf-iconly="ic_action_overflow"
-                                         caf-swipe-view-next="gallery-container"></div>
+                                    <div id="gallery-container-next" class="swiperNext noPadding wp35 bgBlackMask"
+                                         data-caf-active="bgXDarkBlackMask"
+                                         data-caf-iconly="ic_action_next_item"
+                                         data-caf-swipe-view-next="gallery-container"></div>
+                                    <div id="gallery-container-previous" class="swiperPrev noPadding wp35 bgBlackMask"
+                                         data-caf-active="bgXDarkBlackMask"
+                                         data-caf-iconly="ic_action_previous_item"
+                                         data-caf-swipe-view-previous="gallery-container"></div>
                                 </div>
                             </div>
 
@@ -235,43 +242,43 @@
                     </div>
                 </div>
                 <div id="page-form" class="content overthrow bgWhite top45 bottom20"
-                    caf-page-load="caf.ui.title('CAF Form');"
-                    caf-form="example-form" caf-form-on-submit="caf.ui.forms.logValues"
-                        caf-form-send-to-url="http://codletech.net/caf/caf.php"
-                        caf-form-send-to-url-callback="(function(values){caf.log(values);})">
+                    data-caf-page-load="caf.ui.title('CAF Form');"
+                    data-caf-form="example-form" data-caf-form-on-submit="caf.ui.forms.logValues"
+                        data-caf-form-send-to-url="http://codletech.net/caf/caf.php"
+                        data-caf-form-send-to-url-callback="(function(values){caf.log(values);})">
                     <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w85 hp40 xsRounded mFontSize bold"
                            placeholder="Full Name"
-                           id="form-page-name-input" caf-form-input="example-form"
-                           caf-form-input-name="name-input" caf-form-input-type="text"
-                           caf-form-input-validator="['not-empty']" caf-form-input-prepare="['same']"/>
+                           id="form-page-name-input" data-caf-form-input="example-form"
+                           data-caf-form-input-name="name-input" data-caf-form-input-type="text"
+                           data-caf-form-input-validator="['not-empty']" data-caf-form-input-prepare="['same']"/>
                     <input type="text" class="pl4 pr4 mt8 marginCentered textLeft w85 hp40 xsRounded mFontSize bold"
                            placeholder="Phone Number"
-                           id="form-page-phone-input" caf-form-input="example-form"
-                           caf-form-input-name="phone-input" caf-form-input-type="text"
-                           caf-form-input-validator="['not-empty']" caf-form-input-prepare="['same','numbers-only']"/>
+                           id="form-page-phone-input" data-caf-form-input="example-form"
+                           data-caf-form-input-name="phone-input" data-caf-form-input-type="text"
+                           data-caf-form-input-validator="['not-empty']" data-caf-form-input-prepare="['same','numbers-only']"/>
                     <div id="form-page-submit"
                          class="mt8 marginCentered textCenter bgDarkCyan w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkCyan"
-                         caf-text="Save"
-                         caf-form-submit-button="example-form">
+                         data-caf-active="bgXDarkCyan"
+                         data-caf-text="Save"
+                         data-caf-form-submit-button="example-form">
                     </div>
                     <div id="form-page-submit-to-url"
                          class="mt8 marginCentered textCenter bgDarkPurple w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkPurple"
-                         caf-text="Send To URL"
-                         caf-form-send-to-url-button="example-form">
+                         data-caf-active="bgXDarkPurple"
+                         data-caf-text="Send To URL"
+                         data-caf-form-send-to-url-button="example-form">
                     </div>
                     <div id="form-page-save-to-local-storage"
                          class="mt8 marginCentered textCenter bgDarkPink w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkPink"
-                         caf-text="Save To Local Storage"
-                         caf-form-save-to-local-storage-button="example-form">
+                         data-caf-active="bgXDarkPink"
+                         data-caf-text="Save To Local Storage"
+                         data-caf-form-save-to-local-storage-button="example-form">
                     </div>
                     <div id="form-page-clear"
                          class="mt8 marginCentered textCenter bgDarkBrown w85 hp40 xsRounded mFontSize white bold"
-                         caf-active="bgXDarkBrown"
-                         caf-text="Clear"
-                         caf-form-clear-button="example-form">
+                         data-caf-active="bgXDarkBrown"
+                         data-caf-text="Clear"
+                         data-caf-form-clear-button="example-form">
                     </div>
 
                 </div>

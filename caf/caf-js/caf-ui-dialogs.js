@@ -29,9 +29,9 @@ caf.ui.dialogs =
         this.dialog.callbacks[id] = bCallback;
         return '<div id="'+id+
             '" class="pt10 pb10 pr10 pl10 borderBox textCenter cDark'+color+' bold sFontSize borderTop1p bcDark'+color+'" '+
-            'caf-active="bgDark'+color+' white"'+
-            'caf-active-remove="cDark'+color+'" '+
-            'caf-onclick="(function(){caf.ui.dialogs.dialog.callbacks[\''+id+'\']();})" caf-text="'+text+'"></div>';
+            'data-caf-active="bgDark'+color+' white"'+
+            'data-caf-active-remove="cDark'+color+'" '+
+            'data-caf-onclick="(function(){caf.ui.dialogs.dialog.callbacks[\''+id+'\']();})" data-caf-text="'+text+'"></div>';
     },
     show: function(options){
         var title           = options.title || "";

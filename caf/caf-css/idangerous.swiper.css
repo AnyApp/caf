@@ -155,6 +155,22 @@ Pagination Styles
 }
 
 
+.swiperNext{
+    position: absolute;
+    right: 0;
+    text-align: center;
+    bottom: 0px;
+    top: 0px;
+    height: auto;
+    line-height: normal;
+}
 
-
-
+.swiperPrev{
+    position: absolute;
+    left: 0;
+    text-align: center;
+    bottom: 0px;
+    top: 0px;
+    height: auto;
+    line-height: normal;
+}
