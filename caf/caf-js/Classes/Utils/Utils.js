@@ -1,5 +1,10 @@
-caf.utils =
-{
+/**
+ * Created by dvircn on 06/08/14.
+ */
+
+var CUtils = Class({
+    $singleton: true,
+
     cleanWhitespace: function() {
         var element = document.getElementsByTagName('body')[0];
         this.cleanWhitespaceFromElement(element);
@@ -96,6 +101,7 @@ caf.utils =
             }
         }
     }
+});
 
-}
+
 

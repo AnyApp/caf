@@ -11,6 +11,7 @@ caf.init = function(path)
     caf.path = path;
     caf.ui.attributes.initAttributes();
     caf.ui.forms.init();
+    caf.utils.cleanWhitespace();
 }
 
 caf.log = function(msg)
