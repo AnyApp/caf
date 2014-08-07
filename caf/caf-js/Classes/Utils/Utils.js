@@ -32,11 +32,11 @@ var CUtils = Class({
         {
             if (!this.isEmpty(showClass))
             {
-                window.setTimeout(function(){caf.utils.addClass(elm,'hidden');},duration || 300);
+                window.setTimeout(function(){CUtils.addClass(elm,'hidden');},duration || 300);
             }
             else
             {
-                caf.utils.addClass(elm,'hidden');
+                CUtils.addClass(elm,'hidden');
             }
             this.addClass(elm,outClass);
             this.removeClass(elm,showClass);
@@ -65,17 +65,17 @@ var CUtils = Class({
     },
     addClass: function(el, name)
     {
-        if (!caf.utils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
+        if (!CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
     },
     removeClass: function(el, name)
     {
-        if (caf.utils.hasClass(el, name)) {
+        if (CUtils.hasClass(el, name)) {
             el.className=el.className.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
         }
     },
     unbindEvent: function(elm,eventName,event)
     {
-        if (!caf.utils.isEmpty(elm) && !caf.utils.isEmpty(event))
+        if (!CUtils.isEmpty(elm) && !CUtils.isEmpty(event))
         {
             elm.removeEventListener(eventName,event);
         }
@@ -85,7 +85,7 @@ var CUtils = Class({
     },
     openURL: function(url)
     {
-        if (caf.platforms.isIOS())
+        if (CPlatforms.isIOS())
         {
             window.open(url,  '_system', 'location=yes');
         }
@@ -100,6 +100,16 @@ var CUtils = Class({
                 window.open(url,  '_system', 'location=yes');
             }
         }
+    },
+    mergeJSONs: function(base,strong){
+        if (this.isEmpty(base)) return strong || {};
+        if (this.isEmpty(strong)) return base;
+
+        var merged = JSON.parse(JSON.stringify(base));
+        for (var key in strong){
+            merged[key] = strong[key];
+        }
+        return merged;
     }
 });
 

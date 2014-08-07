@@ -2,9 +2,9 @@ var app =
 {
     initialize: function()
     {
-        caf.init('');
+        //caf.init('');
         //caf.pager.init('page-main','back');
-        caf.ui.rebuildAll();
+        //caf.ui.rebuildAll();
         /*var str = "";
         var i = 0;
         while (i<=100)

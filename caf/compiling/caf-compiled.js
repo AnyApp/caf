@@ -192,6 +192,32 @@
 /**
  * Created by dvircn on 06/08/14.
  */
+var CDesign = Class({
+    $singleton: true,
+    onClick: function(elm,data){
+
+    },
+    text: function(elm,data){
+        elm.innerHTML = data.text;
+    }
+
+});
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CLogic = Class({
+    $singleton: true,
+    onClick: function(elm,data){
+
+    },
+    text: function(elm,data){
+        elm.innerHTML = data.text;
+    }
+
+
+});
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -201,7 +227,64 @@
 /**
  * Created by dvircn on 06/08/14.
  */
+var CLocalStorage = Class({
+    $singleton: true,
+    save: function(key,value){
+        window.localStorage.setItem(key,value);
+    },
+    get: function(key){
+        var value = window.localStorage.getItem(key);
+        if (CUtils.isEmpty(value)) return null;
+        return value;
+    },
+    empty: function(key){
+        return CUtils.isEmpty(window.localStorage.getItem(key));
+    }
+
+});
+
+
 /**
+ * Created by dvircn on 07/08/14.
+ */
+var CLog = Class({
+    $singleton: true,
+    log: function(data){
+        window.console.log(data);
+    }
+
+
+});
+
+
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CNetwork = Class({
+    $singleton: true,
+    send: function(url,data,callback){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function(){
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                var data = xmlhttp.responseText;
+                // If the response in JSON, Parse it.
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {}
+                if (!CUtils.isEmpty(callback)){
+                    callback(data); // callback
+                }
+            }
+        };
+        xmlhttp.open("POST", url);
+        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.send(JSON.stringify(data));
+    },
+    request: function(url,data,callback){
+        this.send(url,data,callback);
+    }
+
+});/**
  * Created by dvircn on 06/08/14.
  */
 /**
@@ -238,11 +321,11 @@ var CUtils = Class({
         {
             if (!this.isEmpty(showClass))
             {
-                window.setTimeout(function(){caf.utils.addClass(elm,'hidden');},duration || 300);
+                window.setTimeout(function(){CUtils.addClass(elm,'hidden');},duration || 300);
             }
             else
             {
-                caf.utils.addClass(elm,'hidden');
+                CUtils.addClass(elm,'hidden');
             }
             this.addClass(elm,outClass);
             this.removeClass(elm,showClass);
@@ -271,17 +354,17 @@ var CUtils = Class({
     },
     addClass: function(el, name)
     {
-        if (!caf.utils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
+        if (!CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
     },
     removeClass: function(el, name)
     {
-        if (caf.utils.hasClass(el, name)) {
+        if (CUtils.hasClass(el, name)) {
             el.className=el.className.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
         }
     },
     unbindEvent: function(elm,eventName,event)
     {
-        if (!caf.utils.isEmpty(elm) && !caf.utils.isEmpty(event))
+        if (!CUtils.isEmpty(elm) && !CUtils.isEmpty(event))
         {
             elm.removeEventListener(eventName,event);
         }
@@ -291,7 +374,7 @@ var CUtils = Class({
     },
     openURL: function(url)
     {
-        if (caf.platforms.isIOS())
+        if (CPlatforms.isIOS())
         {
             window.open(url,  '_system', 'location=yes');
         }
@@ -306,8 +389,21 @@ var CUtils = Class({
                 window.open(url,  '_system', 'location=yes');
             }
         }
+    },
+    mergeJSONs: function(base,strong){
+        if (this.isEmpty(base)) return strong || {};
+        if (this.isEmpty(strong)) return base;
+
+        var merged = JSON.parse(JSON.stringify(base));
+        for (var key in strong){
+            merged[key] = strong[key];
+        }
+        return merged;
     }
 });
+
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -331,35 +427,74 @@ var CUtils = Class({
  */
 var CObject = Class({
     $statics: {
-        CURRENT_ID:   1,
+        DEFAULT_DESIGN: {
+            width: "150px",
+            wow:" gi",
+            woke:" gi"
+        },
+        DEFAULT_LOGIC: {
+        },
+
+        CURRENT_ID:   0,
 
         generateID: function() {
             this.CURRENT_ID += 1;
             return "CObjectId_"+this.CURRENT_ID;
+        },
+        mergeWithDefaults: function(values,useClass){
+            values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
+            values.logic = CUtils.mergeJSONs(useClass.DEFAULT_LOGIC,values.logic);
         }
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CObject);
 
-        this.id         = values.id || CObject.generateID();
+        this.id         = values.id         || CObject.generateID();
         this.appId      = values.appId;
         this.uname      = values.uname;
         this.version    = values.version;
-        this.platform   = values.platform;
-        this.logic      = values.logic;
-        this.design     = values.design;
-        this.data       = values.data;
+        this.platform   = values.platform   || ['All'];
+        this.logic      = values.logic      || {};
+        this.design     = values.design     || {};
+        this.data       = values.data       || {};
     }
 
 });
 
-var x = new CObject({data:{}});
-var y = new CObject({data:{}});
+
+
 
 /**
  * Created by dvircn on 06/08/14.
  */
+
+var CLabel = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            doyou: "nom",
+            wow:"g"
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CLabel);
+
+        // Invoke parent's constructor
+        this.$class.$super.call(this, values);
+
+        // Save data.
+        this.data.text   = values.text;
+    }
+
+});
+
+var x = new CLabel({text:"dvir",design:{width:"0px",ad:"hok"}});
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -846,7 +981,7 @@ caf.ui = {
 
         if (needRebuild)
         {
-            view.build();
+            view.prepareBuild();
             //caf.log(elm.id);
         }
     }

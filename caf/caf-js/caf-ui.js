@@ -252,7 +252,7 @@ caf.ui = {
 
         if (needRebuild)
         {
-            view.build();
+            view.prepareBuild();
             //caf.log(elm.id);
         }
     }

@@ -2,27 +2,20 @@
  * Created by dvircn on 06/08/14.
  */
 var CLogic = Class({
-    $statics: {
-        CURRENT_ID:   0,
+    $singleton: true,
+    onClick: function(elm,data){
 
-        generateID: function() {
-            this.CURRENT_ID += 1;
-            return "CObjectId_"+this.CURRENT_ID;
-        }
     },
+    text: function(elm,data){
+        elm.innerHTML = data.text;
+    },
+    prepareLogic: function(object){
 
-    constructor: function(values) {
-        if (CUtils.isEmpty(values)) return;
+    },
+    applyLogic: function(object){
 
-        this.id         = values.id || CObject.generateID();
-        this.appId      = values.appId;
-        this.uname      = values.uname;
-        this.version    = values.version;
-        this.platform   = values.platform;
-        this.logic      = values.logic;
-        this.design     = values.design;
-        this.data       = values.data;
     }
+
 
 });
 
