@@ -7,7 +7,10 @@ var CLabel = Class(CObject,{
         DEFAULT_DESIGN: {
             doyou: "nom",
             wow:"g"
+        },
+        DEFAULT_LOGIC: {
         }
+
     },
 
     constructor: function(values) {
@@ -17,10 +20,15 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-
-        // Save data.
-        this.data.text   = values.text;
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(){
+        this.$class.$superp.prepareBuild.call(this);
     }
+
+
 
 });
 

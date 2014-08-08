@@ -19,15 +19,12 @@ var CUI = Class({
         CObjectsHandler.clearPreparedObjects();
         // Prepare for build.
         CObjectsHandler.getObjectById(id).prepareBuild();
-        // Build relevant Objects.
-        _.each(CObjectsHandler.getObjectsOrdered(),function(object){
-            // Check if the object need to be build.
-            if (!object.isBuildPrepared()) return;
+        // Build relevant Objects by the order of their build (Parent->Child).
+        _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
             CDesign.applyDesign(object);
         });
-
     }
 
 });

@@ -31,7 +31,7 @@ var CObjectsHandler = Class({
         _.each(objects,function(object){
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
-            if (type=="AppContainer") appContainerId = object.id; // Identify Main Object.
+            if (type=="AppContainer") this.appContainerId = object.id; // Identify Main Object.
             // Try to create object.
             try {
                 var cObject = eval("new C"+type+"()"); // Create the object.

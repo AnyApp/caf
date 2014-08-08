@@ -38,24 +38,17 @@ var CObject = Class({
         this.data       = values.data       || {};
         this.classes    = "";
         this.functions  = Array();
-        this.buildPrepared = false;
     },
 
     /**
      *  Build Object.
      */
     prepareBuild: function(){
-        this.$class.$superp.prepareBuild.call(this);
+        // Add to prepared Objects.
+        CObjectsHandler.addPreparedObject(this);
+        // Prepare Design and Logic.
         CDesign.prepareDesign(this);
         CLogic.prepareLogic(this);
-        this.buildPrepared = true;
-
-    },
-    isBuildPrepared: function(){
-        return this.buildPrepared;
-    },
-    setBuildPrepared: function(prepared){
-        this.buildPrepared = prepared;
     }
 
 
