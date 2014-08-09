@@ -28,27 +28,86 @@ var CObject = Class({
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CObject);
 
-        this.id         = values.id         || CObject.generateID();
-        this.appId      = values.appId;
-        this.uname      = values.uname;
-        this.version    = values.version;
-        this.platform   = values.platform   || ['All'];
-        this.logic      = values.logic      || {};
-        this.design     = values.design     || {};
-        this.data       = values.data       || {};
-        this.classes    = "";
-        this.functions  = Array();
+        this.id             = values.id         || CObject.generateID();
+        this.appId          = values.appId;
+        this.uname          = values.uname;
+        this.version        = values.version;
+        this.platform       = values.platform   || ['All'];
+        this.logic          = values.logic      || {};
+        this.design         = values.design     || {};
+        this.data           = values.data       || {};
+        this.classes        = "";
+        this.functions      = Array();
+        this.lastClasses    = "";
+        this.lastFunctions  = Array();
+        this.parent         = -1; // Object's Container Parent
     },
-
+    setParent: function(parentID) {
+        this.parent = parentID;
+    },
+    getParent: function() {
+        return this.parent;
+    },
+    saveLastBuild: function () {
+        this.lastClasses    = this.classes;
+        this.lastFunctions  = this.functions.slice(0); // Clone Array.
+    },
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
+    prepareBuild: function(data){
+        var view        = data['view'] || new CStringBuilder(),
+            tag         = data['tag'],
+            attributes  = data['attributes'],
+            forceDesign = data['forceDesign'],
+            tagHasInner = data['tagHasInner'];
+
+        // Check if this element is already in the DOM.
+        var isCreated = !CUtils.isEmpty(CUtils.element(this.id));
+
         // Add to prepared Objects.
         CObjectsHandler.addPreparedObject(this);
+
+        // Save old function and classes - previous build.
+        // This will prevent unnecessary build operations - better performance.
+        this.saveLastBuild();
+
         // Prepare Design and Logic.
-        CDesign.prepareDesign(this);
+        CDesign.prepareDesign(this,forceDesign);
         CLogic.prepareLogic(this);
+
+        // If already created, don't need to recreate the DOM element.
+        // Notice: If parent element isn't created, neither its children.
+        if (isCreated) return "";
+
+        // If not created, set classes last build to this build
+        // Because we will insert them directly to the DOM.
+        this.lastClasses = this.classes;
+
+        // Create element and add to the dom array.
+        // Custom tag - can be used to insert a,input..
+        tag         = CUtils.isEmpty(tag)? 'div' : tag;
+        var tagOpen = '<'+tag;
+        // Extra tag attributes. For example: 'href="http://www.web.com"'
+        attributes  = CUtils.isEmpty(attributes)? Array() : attributes;
+        // Add class attribute.
+        attributes.push('class="'+this.classes+'"');
+
+        // If tag has inner or not.
+        tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;
+
+        if (tagHasInner ===false) {
+            view.append([tagOpen,attributes,'/>'],true);
+        }
+        else {
+            // Has Inner - Wrap it.
+            view.append([tagOpen,attributes,'>'],true); // Add to beginning.
+            view.append('</'+tag+'>');      // Add to end.
+        }
+        return view;
+
+
+
     }
 
 

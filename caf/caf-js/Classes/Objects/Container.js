@@ -22,19 +22,26 @@ var CContainer = Class(CObject,{
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
-        this.$class.$superp.prepareBuild.call(this);
+    prepareBuild: function(data){
+        var content = new CStringBuilder();
         // Prepare Build each child.
         _.each(this.data.childs,function(childID){
             var object = CObjectsHandler.getObjectById(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
-                CLog.log("CContainer.prepareBuild error: Could not find element with ID: "+childID);
+                CLog.error("CContainer.prepareBuild error: Could not find element with ID: "+childID);
                 return;
             }
-            // Prepare Build Object.
-            object.prepareBuild();
+            //Set parent to this Object.
+            object.setParent(this.id);
+            // Prepare Build Object and merge with the content.
+            content.merge(object.prepareBuild(data));
         });
+
+        // Prepare this element - wrap it's children.
+        this.$class.$superp.prepareBuild.call(this,{view: content});
+
+        return content;
     }
 
 

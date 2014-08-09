@@ -281,6 +281,45 @@ var CObjectsHandler = Class({
 
 
 /**
+ * Created by dvircn on 09/08/14.
+ */
+var CTemplator = Class({
+    $singleton: true,
+
+    /**
+     * Build all objects.
+     */
+    buildAll: function(){
+        CObjectsHandler.getObjectById(CObjectsHandler.appContainerId).setParent('body');
+        this.build(CObjectsHandler.appContainerId);
+    },
+    /**
+     * Build from object.
+     * @param id : Object ID.
+     */
+    buildFromObject: function(id){
+        // Clear prepared objects.
+        CObjectsHandler.clearPreparedObjects();
+
+        // Prepare for build and get the view (If the objects aren't in the DOM).
+        var currentObject   = CObjectsHandler.getObjectById(id);
+        var viewStr         = currentObject.prepareBuild();
+
+        // Append the view to the parent in the DOM.
+        // Note: If the objects are already in the DOM, viewStr will be empty
+        //       and the DOM won't change.
+        CUtils.element(currentObject.getParent()).innerHTML += viewStr;
+
+        // Build relevant Objects by the order of their build (Parent->Child).
+        _.each(CObjectsHandler.getPreparedObjects(),function(object){
+            // Apply Logic and Design on the Object.
+            CDesign.applyDesign(object);
+            CLogic.applyLogic(object);
+        });
+    }
+
+});
+/**
  * Created by dvircn on 06/08/14.
  */
 /**
@@ -349,6 +388,36 @@ var CNetwork = Class({
 });/**
  * Created by dvircn on 06/08/14.
  */
+/**
+ * Created by dvircn on 09/08/14.
+ */
+var CStringBuilder = Class({
+    constructor: function() {
+        this.array = Array();
+    },
+
+    append: function(value,toStart){
+        var operation = toStart===true? this.array.unshift : this.array.push;
+        // String Case.
+        if( typeof value === 'string' ) value = [value];
+
+        operation.apply(this.array, value);
+    },
+
+    /**
+     *  Build String.
+     */
+    build: function(separator){
+        separator = separator || "";
+        return this.array.join(separator);
+    }
+
+
+});
+
+
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -461,6 +530,9 @@ var CUtils = Class({
             merged[key] = strong[key];
         }
         return merged;
+    },
+    element: function(id){
+        return document.getElementById(id) || null;
     }
 });
 
@@ -481,35 +553,8 @@ var CUtils = Class({
 /**
  * Created by dvircn on 06/08/14.
  */
-/**
- * Created by dvircn on 06/08/14.
- */
 var CUI = Class({
-    $singleton: true,
-
-    /**
-     * Build all objects.
-     */
-    buildAll: function(){
-        this.build(CObjectsHandler.appContainerId);
-    },
-    /**
-     * Build from object.
-     * @param id : Object ID.
-     */
-    buildFromObject: function(id){
-        // Clear prepared objects.
-        CObjectsHandler.clearPreparedObjects();
-        // Prepare for build.
-        CObjectsHandler.getObjectById(id).prepareBuild();
-        // Build relevant Objects by the order of their build (Parent->Child).
-        _.each(CObjectsHandler.getPreparedObjects(),function(object){
-            // Apply Logic and Design on the Object.
-            CLogic.applyLogic(object);
-            CDesign.applyDesign(object);
-        });
-    }
-
+    $singleton: true
 });
 
 
@@ -543,27 +588,66 @@ var CObject = Class({
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CObject);
 
-        this.id         = values.id         || CObject.generateID();
-        this.appId      = values.appId;
-        this.uname      = values.uname;
-        this.version    = values.version;
-        this.platform   = values.platform   || ['All'];
-        this.logic      = values.logic      || {};
-        this.design     = values.design     || {};
-        this.data       = values.data       || {};
-        this.classes    = "";
-        this.functions  = Array();
+        this.id             = values.id         || CObject.generateID();
+        this.appId          = values.appId;
+        this.uname          = values.uname;
+        this.version        = values.version;
+        this.platform       = values.platform   || ['All'];
+        this.logic          = values.logic      || {};
+        this.design         = values.design     || {};
+        this.data           = values.data       || {};
+        this.classes        = "";
+        this.functions      = Array();
+        this.lastClasses    = "";
+        this.lastFunctions  = Array();
+        this.parent         = -1; // Object's Container Parent
     },
-
+    setParent: function(parentID) {
+        this.parent = parentID;
+    },
+    getParent: function() {
+        return this.parent;
+    },
+    saveLastBuild: function () {
+        this.lastClasses    = this.classes;
+        this.lastFunctions  = this.functions.slice(0); // Clone Array.
+    },
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
+    prepareBuild: function(data){
+        var innerDom    = data['innerDom'],
+            tag         = data['tag'],
+            attributes  = data['attributes'],
+            tagHasInner = data['tagHasInner'];
+
+        // Check if this element is already in the DOM.
+        var isCreated = !CUtils.isEmpty(CUtils.element(this.id));
+
         // Add to prepared Objects.
         CObjectsHandler.addPreparedObject(this);
+
+        // Save old function and classes - previous build.
+        // This will prevent unnecessary build operations - better performance.
+        this.saveLastBuild();
+
         // Prepare Design and Logic.
         CDesign.prepareDesign(this);
         CLogic.prepareLogic(this);
+
+        // If already created, don't need to recreate the DOM element.
+        // Notice: If parent element isn't created, neither its children.
+        if (isCreated) return "";
+
+        // Create element and add to the dom array.
+        // Custom tag - can be used to insert a,input..
+        tag         = CUtils.isEmpty(tag)? 'div' : tag;
+        // Extra tag attributes. For example: 'href="http://www.web.com"'
+        attributes  = CUtils.isEmpty(attributes)? ' ' : ' '+attributes.join(' ');
+        // If tag has inner or not.
+        tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;
+        var viewArray = ['<',tag,attributes,'>'];
+
     }
 
 
@@ -581,7 +665,10 @@ var CLabel = Class(CObject,{
         DEFAULT_DESIGN: {
             doyou: "nom",
             wow:"g"
+        },
+        DEFAULT_LOGIC: {
         }
+
     },
 
     constructor: function(values) {
@@ -591,9 +678,6 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-
-        // Save data.
-        this.data.text   = values.text;
     },
     /**
      *  Build Object.
@@ -617,6 +701,49 @@ var x = new CLabel({text:"dvir",design:{width:"0px",ad:"hok"}});
 /**
  * Created by dvircn on 06/08/14.
  */
+
+var CContainer = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CContainer);
+
+        // Invoke parent's constructor
+        this.$class.$super.call(this, values);
+        this.data.childs = this.data.childs || [];
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(){
+        this.$class.$superp.prepareBuild.call(this);
+        // Prepare Build each child.
+        _.each(this.data.childs,function(childID){
+            var object = CObjectsHandler.getObjectById(childID);
+            // Case object doesn't exist.
+            if (CUtils.isEmpty(object)){
+                CLog.log("CContainer.prepareBuild error: Could not find element with ID: "+childID);
+                return;
+            }
+            //Set parent to this Object.
+            object.setParent(this.id);
+            // Prepare Build Object.
+            object.prepareBuild();
+        });
+    }
+
+
+
+});
+
+
 /**
  * Created by dvircn on 06/08/14.
  */

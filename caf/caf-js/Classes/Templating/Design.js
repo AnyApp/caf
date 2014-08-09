@@ -3,12 +3,6 @@
  */
 var CDesign = Class({
     $singleton: true,
-    onClick: function(elm,data){
-
-    },
-    text: function(elm,data){
-        elm.innerHTML = data.text;
-    },
     prepareDesign: function(object){
 
     },
@@ -17,3 +11,4 @@ var CDesign = Class({
     }
 
 });
+

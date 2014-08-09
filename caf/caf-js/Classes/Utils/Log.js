@@ -5,6 +5,9 @@ var CLog = Class({
     $singleton: true,
     log: function(data){
         window.console.log(data);
+    },
+    error: function(error){
+        window.console.log(error);
     }
 
 

@@ -110,6 +110,9 @@ var CUtils = Class({
             merged[key] = strong[key];
         }
         return merged;
+    },
+    element: function(id){
+        return document.getElementById(id) || null;
     }
 });
 
