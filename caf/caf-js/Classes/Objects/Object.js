@@ -113,7 +113,7 @@ var CObject = Class({
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
-        if (isCreated) return "";
+        if (isCreated) return view;
 
         // If not created, set classes last build to this build
         // Because we will insert them directly to the DOM.
