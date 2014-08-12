@@ -16,10 +16,10 @@ var CForm = Class(CContainer,{
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-        this.data.inputs             = this.data.inputs || [];
-        this.logic.saveToUrl         = this.logic.saveToUrl || [];
-        this.logic.saveToUrlCallback = this.logic.saveToUrlCallback || [];
-        this.logic.onSubmit          = this.logic.onSubmit || [];
+        this.data.inputs             = values.data.inputs || [];
+        this.logic.saveToUrl         = values.logic.saveToUrl || [];
+        this.logic.saveToUrlCallback = values.logic.saveToUrlCallback || [];
+        this.logic.onSubmit          = values.logic.onSubmit || [];
     },
     /**
      *  Build Object.
@@ -33,9 +33,9 @@ var CForm = Class(CContainer,{
         try {
             _.each(this.data.inputs,function(inputId){
                 var input = CObjectsHandler.object(inputId);
-                var name = input.name;
+                var name = input.getName();
                 var value = input.value();
-                var validators = input.validators;
+                var validators = input.getValidators();
                 _.each(validators,function(name){
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
