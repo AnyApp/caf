@@ -194,11 +194,94 @@
  */
 var CDesign = Class({
     $singleton: true,
-    onClick: function(elm,data){
+    colors: {
+        notLeveled: ['Black', 'White', 'SmokeWhite', 'LightSmokeWhite', 'DarkSmokeWhite'],
+        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray'],
+        levels: {
+            '-4':   'XXXLight',
+            '-3':   'XXLight',
+            '-2':   'XLight',
+            '-1':   'Light',
+            '0':    '',
+            '1':    'Dark',
+            '2':    'XDark',
+            '3':    'XXDark',
+            '4':    'XXXDark'
+        },
+        getColor: function(color,level){
+            // Not Leveled Color.
+            if (this.colors.notLeveled.indexOf(color)>=0){
+                return color;
+            }
+            if (CUtils.isEmpty(level))  level = 0;
 
+            return this.colors.levels[""+level]+color;
+        }
     },
-    text: function(elm,data){
-        elm.innerHTML = data.text;
+    designs: {
+        classes: function(data){
+            return data;
+        },
+        iconOnly: function(data){
+            return 'iconOnly '+CIconsManager.getIcon(data);
+        },
+        iconRight: function(data){
+            return 'IconRight borderBox '+CIconsManager.getIcon(data);
+        },
+        iconLeft: function(data){
+            return 'IconLeft borderBox '+CIconsManager.getIcon(data);
+        },
+        bgColor: function(data){
+            return "bg"+this.colors.getColor(data.color,data.level || null);
+        },
+        color: function(data){
+            return "c"+this.colors.getColor(data.color,data.level || null);
+        },
+        borderColor: function(data){
+            return "bc"+this.colors.getColor(data.color,data.level || null);
+        },
+        border: function(data){
+            var classes = "";
+            if (!CUtils.isEmpty(data['all']))       classes+="border"+data['all']+"p ";
+            if (!CUtils.isEmpty(data['bottom']))    classes+="borderBottom"+data['bottom']+"p ";
+            if (!CUtils.isEmpty(data['right']))     classes+="borderRight"+data['right']+"p ";
+            if (!CUtils.isEmpty(data['left']))      classes+="borderLeft"+data['left']+"p ";
+            if (!CUtils.isEmpty(data['top']))       classes+="borderTop"+data['top']+"p ";
+
+            return classes;
+        },
+        font: function(data){
+            var classes = "";
+            var style = data.style || [];
+            if (style.indexOf('bold')>=0)       classes+="bold ";
+            if (style.indexOf('italic')>=0)     classes+="italic ";
+
+            // Font Size
+            if (!CUtils.isEmpty(data.size))     classes += data.size+"FontSize";
+
+            return classes;
+        },
+        direction: function(data){
+            var values = ['rtl','ltr'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        textAlign: function(data){
+            var values = ['center','right','left'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return "text"+CUtils.capitaliseFirstLetter(data);
+            }
+            return "";
+        },
+        direction: function(data){
+            var values = ['rtl','ltr'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        }
     },
     prepareDesign: function(object){
 
@@ -208,6 +291,7 @@ var CDesign = Class({
     }
 
 });
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -247,7 +331,7 @@ var CObjectsHandler = Class({
     addPreparedObject: function(object){
         this.preparedObjects.push(object);
     },
-    getObjectById: function(id){
+    object: function(id){
         return this.objectsById[id];
     },
     getObjectsOrdered: function(){
@@ -290,7 +374,7 @@ var CTemplator = Class({
      * Build all objects.
      */
     buildAll: function(){
-        CObjectsHandler.getObjectById(CObjectsHandler.appContainerId).setParent('body');
+        CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
         this.build(CObjectsHandler.appContainerId);
     },
     /**
@@ -302,8 +386,10 @@ var CTemplator = Class({
         CObjectsHandler.clearPreparedObjects();
 
         // Prepare for build and get the view (If the objects aren't in the DOM).
-        var currentObject   = CObjectsHandler.getObjectById(id);
-        var viewStr         = currentObject.prepareBuild();
+        var currentObject   = CObjectsHandler.object(id);
+        var view         = new CStringBuilder();
+
+        currentObject.prepareBuild({view:view});
 
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
@@ -352,6 +438,9 @@ var CLog = Class({
     $singleton: true,
     log: function(data){
         window.console.log(data);
+    },
+    error: function(error){
+        window.console.log(error);
     }
 
 
@@ -395,13 +484,20 @@ var CStringBuilder = Class({
     constructor: function() {
         this.array = Array();
     },
-
+    /**
+     *
+     * @param value - Array of Strings or String.
+     * @param toStart - if true - will append to start of string. Else - end.
+     */
     append: function(value,toStart){
         var operation = toStart===true? this.array.unshift : this.array.push;
         // String Case.
         if( typeof value === 'string' ) value = [value];
 
         operation.apply(this.array, value);
+    },
+    merge: function(stringBuilder){
+        this.append(stringBuilder.array,false);
     },
 
     /**
@@ -533,6 +629,9 @@ var CUtils = Class({
     },
     element: function(id){
         return document.getElementById(id) || null;
+    },
+    capitaliseFirstLetter: function(string){
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 });
 
@@ -544,6 +643,17 @@ var CUtils = Class({
 /**
  * Created by dvircn on 06/08/14.
  */
+/**
+ * Created by dvircn on 10/08/14.
+ */
+
+var CIconsManager = Class({
+    $singleton: true,
+
+    getIcon: function(name) {
+        return "";
+    }
+});
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -616,9 +726,10 @@ var CObject = Class({
      *  Build Object.
      */
     prepareBuild: function(data){
-        var innerDom    = data['innerDom'],
+        var view        = data['view'] || new CStringBuilder(),
             tag         = data['tag'],
             attributes  = data['attributes'],
+            forceDesign = data['forceDesign'],
             tagHasInner = data['tagHasInner'];
 
         // Check if this element is already in the DOM.
@@ -632,21 +743,40 @@ var CObject = Class({
         this.saveLastBuild();
 
         // Prepare Design and Logic.
-        CDesign.prepareDesign(this);
+        CDesign.prepareDesign(this,forceDesign);
         CLogic.prepareLogic(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
         if (isCreated) return "";
 
+        // If not created, set classes last build to this build
+        // Because we will insert them directly to the DOM.
+        this.lastClasses = this.classes;
+
         // Create element and add to the dom array.
         // Custom tag - can be used to insert a,input..
         tag         = CUtils.isEmpty(tag)? 'div' : tag;
+        var tagOpen = '<'+tag;
         // Extra tag attributes. For example: 'href="http://www.web.com"'
-        attributes  = CUtils.isEmpty(attributes)? ' ' : ' '+attributes.join(' ');
+        attributes  = CUtils.isEmpty(attributes)? Array() : attributes;
+        // Add class attribute.
+        attributes.push('class="'+this.classes+'"');
+
         // If tag has inner or not.
         tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;
-        var viewArray = ['<',tag,attributes,'>'];
+
+        if (tagHasInner ===false) {
+            view.append([tagOpen,attributes,'/>'],true);
+        }
+        else {
+            // Has Inner - Wrap it.
+            view.append([tagOpen,attributes,'>'],true); // Add to beginning.
+            view.append('</'+tag+'>');      // Add to end.
+        }
+        return view;
+
+
 
     }
 
@@ -722,21 +852,26 @@ var CContainer = Class(CObject,{
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
-        this.$class.$superp.prepareBuild.call(this);
+    prepareBuild: function(data){
+        var content = new CStringBuilder();
         // Prepare Build each child.
         _.each(this.data.childs,function(childID){
-            var object = CObjectsHandler.getObjectById(childID);
+            var object = CObjectsHandler.object(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
-                CLog.log("CContainer.prepareBuild error: Could not find element with ID: "+childID);
+                CLog.error("CContainer.prepareBuild error: Could not find element with ID: "+childID);
                 return;
             }
             //Set parent to this Object.
             object.setParent(this.id);
-            // Prepare Build Object.
-            object.prepareBuild();
+            // Prepare Build Object and merge with the content.
+            content.merge(object.prepareBuild(data));
         });
+
+        // Prepare this element - wrap it's children.
+        this.$class.$superp.prepareBuild.call(this,{view: content});
+
+        return content;
     }
 
 

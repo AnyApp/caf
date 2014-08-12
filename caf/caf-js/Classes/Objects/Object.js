@@ -36,11 +36,27 @@ var CObject = Class({
         this.logic          = values.logic      || {};
         this.design         = values.design     || {};
         this.data           = values.data       || {};
+        this.onClicks       = Array();
         this.classes        = "";
-        this.functions      = Array();
         this.lastClasses    = "";
-        this.lastFunctions  = Array();
+        this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
+    },
+    /**
+     * Return Unique identifier.
+     * Enabling giving readable unique name to object.
+     * @returns unique identifier.
+     */
+    uid: function(){
+        if (CUtils.isEmpty(this.uname))
+            return this.id;
+        return this.uname;
+    },
+    addOnClick: function(onClick) {
+        this.onClicks.push(onClick);
+    },
+    getOnClicks: function(){
+        return this.onClicks;
     },
     setParent: function(parentID) {
         this.parent = parentID;
@@ -48,9 +64,29 @@ var CObject = Class({
     getParent: function() {
         return this.parent;
     },
-    saveLastBuild: function () {
-        this.lastClasses    = this.classes;
-        this.lastFunctions  = this.functions.slice(0); // Clone Array.
+    getParentObject: function() {
+        return CObjectsHandler.object(this.parent);
+    },
+    getDesign: function() {
+        return this.design;
+    },
+    saveLastLogic: function () {
+        // Change cache only if logic was updated.
+        if (!CUtils.equals(this.logic,this.lastLogic)){
+            this.lastLogic = CUtils.clone(this.logic); // Clone JSON.
+        }
+    },
+    setClasses: function(classes){
+        this.classes = classes;
+    },
+    getClasses: function(){
+        return this.classes;
+    },
+    getLastLogic: function(){
+        return this.lastLogic;
+    },
+    getLogic: function(){
+        return this.logic;
     },
     /**
      *  Build Object.
@@ -63,18 +99,17 @@ var CObject = Class({
             tagHasInner = data['tagHasInner'];
 
         // Check if this element is already in the DOM.
-        var isCreated = !CUtils.isEmpty(CUtils.element(this.id));
+        var isCreated = !CUtils.isEmpty(CUtils.element(this.uid()));
 
         // Add to prepared Objects.
         CObjectsHandler.addPreparedObject(this);
 
-        // Save old function and classes - previous build.
+        // Save old classes - previous build.
         // This will prevent unnecessary build operations - better performance.
-        this.saveLastBuild();
+        this.lastClasses    = this.classes;
 
         // Prepare Design and Logic.
         CDesign.prepareDesign(this,forceDesign);
-        CLogic.prepareLogic(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.

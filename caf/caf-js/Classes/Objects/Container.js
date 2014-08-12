@@ -26,14 +26,14 @@ var CContainer = Class(CObject,{
         var content = new CStringBuilder();
         // Prepare Build each child.
         _.each(this.data.childs,function(childID){
-            var object = CObjectsHandler.getObjectById(childID);
+            var object = CObjectsHandler.object(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
                 CLog.error("CContainer.prepareBuild error: Could not find element with ID: "+childID);
                 return;
             }
             //Set parent to this Object.
-            object.setParent(this.id);
+            object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild(data));
         });

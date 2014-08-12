@@ -8,7 +8,7 @@ var CTemplator = Class({
      * Build all objects.
      */
     buildAll: function(){
-        CObjectsHandler.getObjectById(CObjectsHandler.appContainerId).setParent('body');
+        CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
         this.build(CObjectsHandler.appContainerId);
     },
     /**
@@ -20,7 +20,7 @@ var CTemplator = Class({
         CObjectsHandler.clearPreparedObjects();
 
         // Prepare for build and get the view (If the objects aren't in the DOM).
-        var currentObject   = CObjectsHandler.getObjectById(id);
+        var currentObject   = CObjectsHandler.object(id);
         var view         = new CStringBuilder();
 
         currentObject.prepareBuild({view:view});

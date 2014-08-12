@@ -59,6 +59,7 @@ caf.ui.attributes =
     },
     initAttributes: function()
     {
+/*
         this.addAttr(['data-caf-active'],function(args){
             args.view.activeClass(args['data-caf-active']);
         });
@@ -73,17 +74,6 @@ caf.ui.attributes =
         });
         this.addAttr(['data-caf-to-page'],function(args){
             args.view.onClick( function() {caf.pager.moveToPage(args['data-caf-to-page']); } );
-        });
-        this.addAttr(['data-caf-to-tab','data-caf-tab-container'],function(args){
-            var tabId = args.view.id;
-            var toSlide = args['data-caf-to-tab'];
-            var tabContainer = args['data-caf-tab-container'];
-            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
-
-            if (toSlide == 0)
-            {
-                caf.pager.addHoldClass(tabId);
-            }
         });
         this.addAttr(['data-caf-drop-menu-overlay-of'],function(args){
             args.view.onClick( function() {caf.utils.hideOrShow(args['data-caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
@@ -133,9 +123,23 @@ caf.ui.attributes =
                 caf.ui.swipers.openOrCloseSideMenu('');
             } );
         });
+*/
+/*
+        this.addAttr(['data-caf-to-tab','data-caf-tab-container'],function(args){
+            var tabId = args.view.id;
+            var toSlide = args['data-caf-to-tab'];
+            var tabContainer = args['data-caf-tab-container'];
+            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
+
+            if (toSlide == 0)
+            {
+                caf.pager.addHoldClass(tabId);
+            }
+        });
         this.addAttr(['data-caf-current-tab'],function(args){
             //caf.pager.moveToTab(args['data-caf-current-tab'],args.view.mElement.id,true);
         });
+*/
         this.addAttr(['data-caf-form'],function(args){
             caf.ui.forms.createForm(args['data-caf-form']);
         });
@@ -172,12 +176,14 @@ caf.ui.attributes =
                 args['data-caf-form-input-type'],args['data-caf-form-input-validator'],
                 args['data-caf-form-input-prepare'])
         });
+/*
         this.addAttr(['data-caf-main-page'],function(args){
             caf.pager.setMainPage(args['data-caf-main-page']);
         });
         this.addAttr(['data-caf-back-button'],function(args){
             caf.pager.setBackButton(args['data-caf-back-button']);
         });
+*/
 
 
     }

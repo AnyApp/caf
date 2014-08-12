@@ -113,6 +113,15 @@ var CUtils = Class({
     },
     element: function(id){
         return document.getElementById(id) || null;
+    },
+    capitaliseFirstLetter: function(string){
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    clone: function(o) {
+        return JSON.parse(JSON.stringify(o));
+    },
+    equals: function(o1,o2){
+        return JSON.stringify(o1)===JSON.stringify(o2)
     }
 });
 

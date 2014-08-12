@@ -3,6 +3,7 @@
  */
 var CUI = Class({
     $singleton: true
+
 });
 
 
