@@ -31,7 +31,7 @@ var CInput = Class(CObject,{
         var value = CUtils.element(this.uid()).value;
         _.each(this.data.prepares,function(prepareFunctionId){
             CPrepareFunctions.prepareFunction(prepareFunctionId).prepare(value);
-        });
+        },this);
         return value;
     },
     clear: function() {

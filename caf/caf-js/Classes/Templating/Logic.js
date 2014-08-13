@@ -63,6 +63,30 @@ var CLogic = Class({
                 CUtils.hideOrShow(value,'fadein300','fadeout300',300);
             });
         },
+        formSubmitButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.submitForm();
+            });
+        },
+        formSendToUrlButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.sendFormToUrl();
+            });
+        },
+        formSaveToLocalStorageButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.saveFormToLocalStorage();
+            });
+        },
+        formClearButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.clearForm();
+            });
+        }
 
     },
     applyLogic: function(object){
@@ -76,13 +100,13 @@ var CLogic = Class({
         _.each(logic,function(value,attribute){
             // Apply only if the logic have changed / never applied before.
             if (CUtils.equals(logic[attribute],lastLogic[attribute]))
-                return
+                return;
             //if (CUtils.isEmpty(value))  return;
             // Apply Logic.
             this.logics[attribute](object,value);
-        });
+        },this);
         // Save last logic build.
-        object.saveLastBuild();
+        object.saveLastLogic();
     }
 
 

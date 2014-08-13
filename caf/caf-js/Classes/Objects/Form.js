@@ -60,10 +60,10 @@ var CForm = Class(CContainer,{
                             color:color});
                         throw "Error"; // Return empty result.
                     }
-                });
+                },this);
                 // Add value to result values.
                 values[name] = value;
-            });
+            },this);
         } catch (e){
             return null;
         }
@@ -73,7 +73,7 @@ var CForm = Class(CContainer,{
         // Clear each input.
         _.each(this.data.inputs,function(inputId){
             CObjectsHandler.object(inputId).clear();
-        });
+        },this);
     },
     addInput: function(inputId) {
         this.data.inputs.push(inputId);
@@ -102,7 +102,7 @@ var CForm = Class(CContainer,{
         // save each value to the local storage.
         _.each(values,function(value,key){
             CLocalStorage.save(key,value);
-        });
+        },this);
     }
 
 });

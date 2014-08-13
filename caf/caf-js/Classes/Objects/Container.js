@@ -16,8 +16,9 @@ var CContainer = Class(CObject,{
         CObject.mergeWithDefaults(values,CContainer);
 
         // Invoke parent's constructor
-        this.$class.$super.call(this, values);
-        this.data.childs = this.data.childs || [];
+        CContainer.$super.call(this, values);
+        CLog.dlog(this.data.childs);
+        this.data.childs = values.data.childs || [];
     },
     /**
      *  Build Object.
@@ -36,11 +37,9 @@ var CContainer = Class(CObject,{
             object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild(data));
-        });
-
+        },this);
         // Prepare this element - wrap it's children.
-        this.$class.$superp.prepareBuild.call(this,{view: content});
-
+        CContainer.$superp.prepareBuild.call(this,{view: content});
         return content;
     }
 

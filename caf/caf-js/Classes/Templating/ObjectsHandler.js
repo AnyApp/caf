@@ -37,17 +37,17 @@ var CObjectsHandler = Class({
         _.each(objects,function(object){
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
-            if (type=="AppContainer") this.appContainerId = object.uid(); // Identify Main Object.
             // Try to create object.
             try {
-                var cObject = eval("new C"+type+"()"); // Create the object.
+                var cObject = eval("new C"+type+"(object)"); // Create the object.
                 CObjectsHandler.addObject(cObject);
+                if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify Main Object.
             }
             catch (e){
-                CLog.log("Failed to create object from type: "+type);
+                CLog.log("Failed to create object from type: "+type+". Error: "+e);
             }
 
-        });
+        },this);
     }
 
 

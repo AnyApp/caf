@@ -121,7 +121,7 @@ var CUtils = Class({
         return JSON.parse(JSON.stringify(o));
     },
     equals: function(o1,o2){
-        return JSON.stringify(o1)===JSON.stringify(o2)
+        return JSONfn.stringify(o1)===JSONfn.stringify(o2)
     }
 });
 

@@ -41,7 +41,7 @@ var CPager = Class({
         _.each(tabs,function(buttonId){
             // Remove hold mark.
             this.removeHoldClass(buttonId);
-        });
+        },this);
 
         this.addHoldClass(tabButtonId);
 

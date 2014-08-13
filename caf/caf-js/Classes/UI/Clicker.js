@@ -10,9 +10,9 @@ var CClicker = Class({
     canClick: function()
     {
         var currentTime = (new Date()).getTime();
-        if (currentTime-this.lastClick>400)
+        if (currentTime-CClicker.lastClick>400)
         {
-            this.lastClick = currentTime;
+            CClicker.lastClick = currentTime;
             return true;
         }
         return false;
@@ -20,23 +20,11 @@ var CClicker = Class({
     addOnClick: function(object,onClick) {
         // Set on click-able.
         if (CUtils.isEmpty(object.onClicks))
-            this.setOnClickable(object);
+            CClicker.setOnClickable(object);
         // Add onclick.
         object.onClicks.push(onClick);
     },
     setOnClickable: function(object){
-
-        var element = CUtils.element(object.uid());
-        //Unbind
-        CUtils.unbindEvent(element,'touchstart',object.events.onTouchStartEvent);
-        CUtils.unbindEvent(element,'mousedown',object.events.onTouchStartEvent);
-        CUtils.unbindEvent(element,'touchend',object.events.onTouchEndEvent);
-        CUtils.unbindEvent(element,'mouseup',object.events.onTouchEndEvent);
-        CUtils.unbindEvent(element,'mouseout',object.events.onTouchEndEvent);
-        CUtils.unbindEvent(element,'touchcancel',object.events.onTouchEndEvent);
-        CUtils.unbindEvent(element,'touchmove',object.events.onTouchMoveEvent);
-        CUtils.unbindEvent(element,'mousemove',object.events.onTouchMoveEvent);
-
         // Init
         var design = object.getDesign();
         design.active       = design.active         || '';
@@ -50,6 +38,18 @@ var CClicker = Class({
         };
         object.events = {onTouchStartEvent:null,onTouchEndEvent:null,onTouchMoveEvent:null};
         object.onClicks = Array();
+
+        var element = CUtils.element(object.uid());
+        //Unbind
+        CUtils.unbindEvent(element,'touchstart',object.events.onTouchStartEvent);
+        CUtils.unbindEvent(element,'mousedown',object.events.onTouchStartEvent);
+        CUtils.unbindEvent(element,'touchend',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'mouseup',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'mouseout',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'touchcancel',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'touchmove',object.events.onTouchMoveEvent);
+        CUtils.unbindEvent(element,'mousemove',object.events.onTouchMoveEvent);
+
 
         // Create events.
         object.events.onTouchStartEvent = function(e)
@@ -87,12 +87,12 @@ var CClicker = Class({
             var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
             var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
             var boxSize = 15;
-            if (diffX<boxSize && diffY<boxSize && this.canClick() && e.type!='mouseout')
+            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout')
             {
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
                     onClick();
-                });
+                },this);
             }
             // Reset
             object.touchData.startX = -100000;

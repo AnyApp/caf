@@ -19,12 +19,12 @@ var CDesign = Class({
         },
         getColor: function(color,level){
             // Not Leveled Color.
-            if (this.colors.notLeveled.indexOf(color)>=0){
+            if (CDesign.colors.notLeveled.indexOf(color)>=0){
                 return color;
             }
             if (CUtils.isEmpty(level))  level = 0;
 
-            return this.colors.levels[""+level]+color;
+            return CDesign.colors.levels[""+level]+color;
         }
     },
     designs: {
@@ -50,13 +50,13 @@ var CDesign = Class({
             return 'IconLeft borderBox '+CIconsManager.getIcon(data);
         },
         bgColor: function(data){
-            return "bg"+this.colors.getColor(data.color,data.level || null);
+            return "bg"+CDesign.colors.getColor(data.color,data.level || null);
         },
         color: function(data){
-            return "c"+this.colors.getColor(data.color,data.level || null);
+            return "c"+CDesign.colors.getColor(data.color,data.level || null);
         },
         borderColor: function(data){
-            return "bc"+this.colors.getColor(data.color,data.level || null);
+            return "bc"+CDesign.colors.getColor(data.color,data.level || null);
         },
         border: function(data){
             var classes = "";
@@ -75,7 +75,7 @@ var CDesign = Class({
             if (style.indexOf('italic')>=0)     classes+="italic ";
 
             // Font Size
-            if (!CUtils.isEmpty(data.size))     classes += data.size+"FontSize";
+            if (!CUtils.isEmpty(data.size))     classes += 'fsz'+data.size;
 
             return classes;
         },
@@ -136,6 +136,9 @@ var CDesign = Class({
         height: function(data){
             return "hp"+data;
         },
+        minHeight: function(data){
+            return "mhp"+data;
+        },
         margin: function(data){
             if (data==="none")  return "noMargin";
             var classes = "";
@@ -181,8 +184,12 @@ var CDesign = Class({
         // Scan the designs and generate classes.
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
-            classesBuilder.append( this.designs[attribute](value) );
-        });
+            if (CUtils.isEmpty(CDesign.designs[attribute])){
+                CLog.error("Design: "+attribute+" doesn't exist.")
+                return;
+            }
+            classesBuilder.append( CDesign.designs[attribute](value) );
+        },this);
         // Save the classes in the object.
         object.setClasses(classesBuilder.build(" "));
     },

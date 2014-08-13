@@ -186,9 +186,127 @@
 /**
  * Created by dvircn on 06/08/14.
  */
+var CPrepareFunction = Class({
+
+    constructor: function(func) {
+        this.func = func;
+    },
+    prepare: function(value){
+        return this.func(value);
+    }
+
+});
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 12/08/14.
  */
+var CPrepareFunctions = Class({
+    $singleton: true,
+    prepares: {
+        same: new CPrepareFunction(
+            function(value){
+                return value;
+            }
+        ),
+        numbersOnly: new CPrepareFunction(
+            function(value){
+                return value.replace(/\D/g,'');
+            }
+        ),
+        email: new CPrepareFunction(
+            function(value){
+                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(value);
+            }
+        )
+
+
+},
+
+    prepareFunction: function(name){
+        return this.prepares[name];
+    }
+
+
+});
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CValidationResult = Class({
+
+    constructor: function(valid,message,title) {
+        this.valid      = valid;
+        this.message    = message;
+        this.title      = title;
+    },
+    isValid: function(){
+        return this.valid;
+    },
+    getMessage: function(){
+        return this.message;
+    },
+    getTitle: function(){
+        return this.title;
+    }
+
+
+});
+
+
+
+
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CValidator = Class({
+
+    constructor: function(errorTitle,errorMsg,successTitle,successMsg,validator) {
+        this.validator      = validator;
+        this.errorTitle     = errorTitle;
+        this.errorMsg       = errorMsg;
+        this.successTitle   = successTitle;
+        this.successMsg     = successMsg;
+    },
+    validate: function(value){
+        if (this.validator(value))
+            return new CValidationResult(true,this.successMsg,this.successTitle);
+        else
+            return new CValidationResult(false,this.errorMsg,this.errorTitle);
+
+    }
+
+});
+
+
+
+
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CValidators = Class({
+    $singleton: true,
+    validators: {
+        passAll: new CValidator('','','','',
+            function(value){
+                return true;
+            }
+        ),
+        notEmpty: new CValidator('Error','Value is empty','','',
+            function(value){
+                return !CUtils.isEmpty(value);
+            }
+        )
+    },
+
+    validator: function(name){
+        return this.validators[name];
+    }
+
+
+});
+
+
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -210,17 +328,26 @@ var CDesign = Class({
         },
         getColor: function(color,level){
             // Not Leveled Color.
-            if (this.colors.notLeveled.indexOf(color)>=0){
+            if (CDesign.colors.notLeveled.indexOf(color)>=0){
                 return color;
             }
             if (CUtils.isEmpty(level))  level = 0;
 
-            return this.colors.levels[""+level]+color;
+            return CDesign.colors.levels[""+level]+color;
         }
     },
     designs: {
         classes: function(data){
             return data;
+        },
+        active: function(data){
+            // Do Nothing. Just to mention the active class attribute.
+        },
+        hold: function(data){
+            // Do Nothing. Just to mention the hold class attribute.
+        },
+        activeRemove: function(data){
+            // Do Nothing. Just to mention the activeRemove class attribute.
         },
         iconOnly: function(data){
             return 'iconOnly '+CIconsManager.getIcon(data);
@@ -232,13 +359,13 @@ var CDesign = Class({
             return 'IconLeft borderBox '+CIconsManager.getIcon(data);
         },
         bgColor: function(data){
-            return "bg"+this.colors.getColor(data.color,data.level || null);
+            return "bg"+CDesign.colors.getColor(data.color,data.level || null);
         },
         color: function(data){
-            return "c"+this.colors.getColor(data.color,data.level || null);
+            return "c"+CDesign.colors.getColor(data.color,data.level || null);
         },
         borderColor: function(data){
-            return "bc"+this.colors.getColor(data.color,data.level || null);
+            return "bc"+CDesign.colors.getColor(data.color,data.level || null);
         },
         border: function(data){
             var classes = "";
@@ -257,7 +384,7 @@ var CDesign = Class({
             if (style.indexOf('italic')>=0)     classes+="italic ";
 
             // Font Size
-            if (!CUtils.isEmpty(data.size))     classes += data.size+"FontSize";
+            if (!CUtils.isEmpty(data.size))     classes += 'fsz'+data.size;
 
             return classes;
         },
@@ -275,19 +402,108 @@ var CDesign = Class({
             }
             return "";
         },
-        direction: function(data){
-            var values = ['rtl','ltr'];
+        position: function(data){
+            var values = ['absolute','relative'];
             if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
                 return data;
             }
             return "";
+        },
+        overflow: function(data){
+            if (data==="hidden")        return "hidden";
+            if (data==="scrollable")    return "overthrow";
+            return "";
+        },
+        boxSizing: function(data){
+            var values = ['borderBox'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        boxSizing: function(data){
+            if (data==="circle")    return "circle";
+
+            return (data || "s")+"Rounded";
+        },
+        width: function(data){
+            if (data.indexOf('%')>=0)   return "w"+data.substring(0,data.length-1);
+            return "wp"+data;
+        },
+        widthXS: function(data){
+            return "col-xs-"+data;
+        },
+        widthSM: function(data){
+            return "col-sm-"+data;
+        },
+        widthMD: function(data){
+            return "col-md-"+data;
+        },
+        widthLG: function(data){
+            return "col-lg-"+data;
+        },
+        height: function(data){
+            return "hp"+data;
+        },
+        minHeight: function(data){
+            return "mhp"+data;
+        },
+        margin: function(data){
+            if (data==="none")  return "noMargin";
+            var classes = "";
+            if (!CUtils.isEmpty(data['bottom']))    classes+="mb"+data['bottom']+" ";
+            if (!CUtils.isEmpty(data['top']))       classes+="mt"+data['top']+" ";
+            // If direction mentioned, right-left margin is ignored.
+            if (!CUtils.isEmpty(data['direction'])){
+                if (data['direction']==="centered") classes+"marginCentered ";
+                if (data['direction']==="toright")  classes+"marginRighted ";
+                if (data['direction']==="toleft")   classes+"marginLefted ";
+                return classes;
+            }
+
+            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
+            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left'];
+
+            return classes;
+        },
+        padding: function(data){
+            if (data==="none")  return "noPadding";
+            var classes = "";
+            if (!CUtils.isEmpty(data['bottom']))    classes+="pb"+data['bottom']+" ";
+            if (!CUtils.isEmpty(data['top']))       classes+="pt"+data['top']+" ";
+            if (!CUtils.isEmpty(data['right']))     classes+="pr"+data['right']+" ";
+            if (!CUtils.isEmpty(data['left']))      classes+="pl"+data['left'];
+
+            return classes;
+        },
+        absolutes: function(data){
+            var classes = "";
+            if (!CUtils.isEmpty(data['bottom']))    classes+="bottom"+data['bottom']+" ";
+            if (!CUtils.isEmpty(data['top']))       classes+="top"+data['top']+" ";
+            if (!CUtils.isEmpty(data['right']))     classes+="right"+data['right']+" ";
+            if (!CUtils.isEmpty(data['left']))      classes+="left"+data['left'];
+
+            return classes;
         }
+
     },
     prepareDesign: function(object){
-
+        var classesBuilder = new CStringBuilder();
+        var design = object.design;
+        // Scan the designs and generate classes.
+        _.each(design,function(value,attribute){
+            if (CUtils.isEmpty(value))  return;
+            if (CUtils.isEmpty(CDesign.designs[attribute])){
+                CLog.error("Design: "+attribute+" doesn't exist.")
+                return;
+            }
+            classesBuilder.append( CDesign.designs[attribute](value) );
+        },this);
+        // Save the classes in the object.
+        object.setClasses(classesBuilder.build(" "));
     },
     applyDesign: function(object){
-
+        CUtils.element(object.uid()).className = object.classes;
     }
 
 });
@@ -297,17 +513,110 @@ var CDesign = Class({
  */
 var CLogic = Class({
     $singleton: true,
-    onClick: function(elm,data){
-
-    },
-    text: function(elm,data){
-        elm.innerHTML = data.text;
-    },
-    prepareLogic: function(object){
+    logics: {
+        onClick: function(object,value){
+            CClicker.addOnClick(object,value);
+        },
+        toUrl: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CUtils.openURL(value);
+            });
+        },
+        toUrl: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CUtils.openURL(value);
+            });
+        },
+        toPage: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CPager.moveToPage(value);
+            });
+        },
+        toTab: function(object,value){
+            CSwiper.addButtonToTabSwiper(object,value);
+        },
+        sideMenuSwitch: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CSwiper.openOrCloseSideMenu(value);
+            });
+        },
+        swipePrev: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CSwiper.previous(value);
+            });
+        },
+        swipeNext: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CSwiper.next(value);
+            });
+        },
+        text: function(object,value){
+            CUtils.element(object.uid()).innerHTML = value;
+        },
+        doStopPropagation: function(object,value){
+            object.doStopPropagation = true;
+        },
+        backButton: function(object,value){
+            CPager.setBackButton(object.uid());
+        },
+        mainPage: function(object,value){
+            CPager.setMainPage(value);
+        },
+        sideMenu: function(object,value){
+            CSwiper.initSideMenu(object.uid(),value.position);
+        },
+        swipeView: function(object,value){
+            CSwiper.initSwiper(object.uid(),value.options,value.pagination);
+        },
+        dropMenuSwitch: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CUtils.hideOrShow(value,'fadein300','fadeout300',300);
+            });
+        },
+        formSubmitButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.submitForm();
+            });
+        },
+        formSendToUrlButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.sendFormToUrl();
+            });
+        },
+        formSaveToLocalStorageButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.saveFormToLocalStorage();
+            });
+        },
+        formClearButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.clearForm();
+            });
+        }
 
     },
     applyLogic: function(object){
+        var logic = object.getLogic();
+        var lastLogic = object.getLastLogic();
+        // Check if need to apply logic.
+        if (CUtils.equals(logic,lastLogic))
+            return; // Logic hasn't changed from the last build.
 
+        // Run each function.
+        _.each(logic,function(value,attribute){
+            // Apply only if the logic have changed / never applied before.
+            if (CUtils.equals(logic[attribute],lastLogic[attribute]))
+                return;
+            //if (CUtils.isEmpty(value))  return;
+            // Apply Logic.
+            this.logics[attribute](object,value);
+        },this);
+        // Save last logic build.
+        object.saveLastLogic();
     }
 
 
@@ -320,22 +629,28 @@ var CLogic = Class({
 var CObjectsHandler = Class({
     $singleton: true,
     objectsById: {},
-    objectsOrdered: Array(),
     preparedObjects: Array(),
     appContainerId: "",
 
     addObject: function(object){
-        this.objectsOrdered.push(object);
-        this.objectsById[object.id] = object;
+        this.objectsById[object.uid()] = object;
+    },
+    /**
+     * Remove object from the DOM and the ObjectsHandler.
+     * @param objectId
+     */
+    removeObject: function(objectId){
+        //Remove from the DOM.
+        var element = CUtils.element(this.object(objectId).uid());
+        element.parentNode.removeChild(element);
+        // Remove from ObjectsHandler.
+        delete this.objectsById[objectId];
     },
     addPreparedObject: function(object){
         this.preparedObjects.push(object);
     },
     object: function(id){
         return this.objectsById[id];
-    },
-    getObjectsOrdered: function(){
-        return this.objectsOrdered;
     },
     getPreparedObjects: function(){
         return this.preparedObjects;
@@ -347,17 +662,17 @@ var CObjectsHandler = Class({
         _.each(objects,function(object){
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
-            if (type=="AppContainer") this.appContainerId = object.id; // Identify Main Object.
             // Try to create object.
             try {
-                var cObject = eval("new C"+type+"()"); // Create the object.
+                var cObject = eval("new C"+type+"(object)"); // Create the object.
                 CObjectsHandler.addObject(cObject);
+                if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify Main Object.
             }
             catch (e){
-                CLog.log("Failed to create object from type: "+type);
+                CLog.log("Failed to create object from type: "+type+". Error: "+e);
             }
 
-        });
+        },this);
     }
 
 
@@ -375,7 +690,7 @@ var CTemplator = Class({
      */
     buildAll: function(){
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.build(CObjectsHandler.appContainerId);
+        this.buildFromObject(CObjectsHandler.appContainerId);
     },
     /**
      * Build from object.
@@ -387,9 +702,10 @@ var CTemplator = Class({
 
         // Prepare for build and get the view (If the objects aren't in the DOM).
         var currentObject   = CObjectsHandler.object(id);
-        var view         = new CStringBuilder();
+        var view            = new CStringBuilder();
 
-        currentObject.prepareBuild({view:view});
+        var viewBuilder = currentObject.prepareBuild({view:view});
+        var viewStr     = viewBuilder.build(' ');
 
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
@@ -401,7 +717,7 @@ var CTemplator = Class({
             // Apply Logic and Design on the Object.
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);
-        });
+        },this);
     }
 
 });
@@ -437,6 +753,9 @@ var CLocalStorage = Class({
 var CLog = Class({
     $singleton: true,
     log: function(data){
+        window.console.log(data);
+    },
+    dlog: function(data){
         window.console.log(data);
     },
     error: function(error){
@@ -475,8 +794,48 @@ var CNetwork = Class({
     }
 
 });/**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 12/08/14.
  */
+var CLocalStorage = Class({
+    $singleton: true,
+    /**
+     * Return whether or not the device platform is ios.
+     * @returns {boolean}
+     */
+    isWeb: function() {
+        return CUtils.isEmpty(navigator) && CUtils.isEmpty(device);
+    },
+    /**
+     * Return whether or not the device platform is ios.
+     * @returns {boolean}
+     */
+    isIOS: function() {
+        return navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+    },
+    /**
+     * Return whether or not the device platform is android.
+     * @returns {boolean}
+     */
+    isAndroid: function() {
+        if (caf.utils.isEmpty(device))      return false;
+        return device.platform.toLowerCase() == 'android';
+    },
+    /**
+     * Return the android series.
+     * Examples: 4.4 => 4, 4.1 => 4, 2.3.3 => 2, 2.2 => 2, 3.2 => 3
+     * @returns {number}
+     */
+    androidSeries: function() {
+        if (!this.isAndroid()) return 0;
+
+        var deviceOSVersion = device.version;  //fetch the device OS version
+        return Number(deviceOSVersion.substring(0,deviceOSVersion.indexOf(".")));
+    }
+
+});
+
+
+
 /**
  * Created by dvircn on 09/08/14.
  */
@@ -489,8 +848,8 @@ var CStringBuilder = Class({
      * @param value - Array of Strings or String.
      * @param toStart - if true - will append to start of string. Else - end.
      */
-    append: function(value,toStart){
-        var operation = toStart===true? this.array.unshift : this.array.push;
+    append: function(value,inStart){
+        var operation = inStart===true? this.array.unshift : this.array.push;
         // String Case.
         if( typeof value === 'string' ) value = [value];
 
@@ -632,9 +991,166 @@ var CUtils = Class({
     },
     capitaliseFirstLetter: function(string){
         return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    clone: function(o) {
+        return JSON.parse(JSON.stringify(o));
+    },
+    equals: function(o1,o2){
+        return JSONfn.stringify(o1)===JSONfn.stringify(o2)
     }
 });
 
+
+
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CAnimations = Class({
+    $singleton: true,
+    /* Animate view with fade in or out */
+    fadeIn: function(elm,time,onEnter) {
+        onEnter = onEnter || function(){};
+        CUtils.addClass(elm,'hidden');
+        var clientHeight = elm.clientHeight;
+        CUtils.removeClass(elm,'hidden');
+        CUtils.addClass(elm,'fadein'+time);
+        window.setTimeout(function(){
+            CUtils.removeClass(elm,'fadein'+time);
+            onEnter();
+        },time);
+    },
+    fadeOut: function(elm,time,onOut) {
+        onOut = onOut || function(){};
+        CUtils.addClass(elm,'fadeout'+time);
+        window.setTimeout(function(){
+            CUtils.removeClass(elm,'fadeout'+time);
+            onOut();
+        },time);
+    }
+    
+});
+
+
+/**
+ * Created by dvircn on 11/08/14.
+ */
+var CClicker = Class({
+    $singleton: true,
+    lastClick: 0,
+    /**
+     * Prevent burst of clicks.
+     */
+    canClick: function()
+    {
+        var currentTime = (new Date()).getTime();
+        if (currentTime-CClicker.lastClick>400)
+        {
+            CClicker.lastClick = currentTime;
+            return true;
+        }
+        return false;
+    },
+    addOnClick: function(object,onClick) {
+        // Set on click-able.
+        if (CUtils.isEmpty(object.onClicks))
+            CClicker.setOnClickable(object);
+        // Add onclick.
+        object.onClicks.push(onClick);
+    },
+    setOnClickable: function(object){
+        // Init
+        var design = object.getDesign();
+        design.active       = design.active         || '';
+        design.activeRemove = design.activeRemove   || '';
+        object.doStopPropogation = object.doStopPropogation || false;
+        object.touchData = {
+            startX:-100000,
+            startY:-100000,
+            lastX:-200000,
+            lastY:-200000
+        };
+        object.events = {onTouchStartEvent:null,onTouchEndEvent:null,onTouchMoveEvent:null};
+        object.onClicks = Array();
+
+        var element = CUtils.element(object.uid());
+        //Unbind
+        CUtils.unbindEvent(element,'touchstart',object.events.onTouchStartEvent);
+        CUtils.unbindEvent(element,'mousedown',object.events.onTouchStartEvent);
+        CUtils.unbindEvent(element,'touchend',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'mouseup',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'mouseout',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'touchcancel',object.events.onTouchEndEvent);
+        CUtils.unbindEvent(element,'touchmove',object.events.onTouchMoveEvent);
+        CUtils.unbindEvent(element,'mousemove',object.events.onTouchMoveEvent);
+
+
+        // Create events.
+        object.events.onTouchStartEvent = function(e)
+        {
+            var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
+            if (isRightClick) return false;
+
+            e.preventDefault();
+            if (object.doStopPropogation)
+            {
+                e.stopPropagation();
+            }
+
+            var pointer = CUtils.getPointerEvent(e);
+            // caching the start x & y
+            object.touchData.startX = pointer.pageX;
+            object.touchData.startY = pointer.pageY;
+            object.touchData.lastX = pointer.pageX;
+            object.touchData.lastY = pointer.pageY;
+            CUtils.addClass(element,object.getDesign().active);
+            CUtils.removeClass(element,object.getDesign().activeRemove);
+        }
+        object.events.onTouchMoveEvent = function(e)
+        {
+            e.preventDefault();
+            var pointer = CUtils.getPointerEvent(e);
+            // caching the last x & y
+            object.touchData.lastX = pointer.pageX;
+            object.touchData.lastY = pointer.pageY;
+        }
+        object.events.onTouchEndEvent = function(e)
+        {
+            e.preventDefault();
+
+            var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
+            var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
+            var boxSize = 15;
+            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout')
+            {
+                // Execute OnClicks.
+                _.each(object.onClicks,function(onClick){
+                    onClick();
+                },this);
+            }
+            // Reset
+            object.touchData.startX = -100000;
+            object.touchData.startY = -100000;
+            object.touchData.lastX = -200000;
+            object.touchData.lastY = -200000;
+            CUtils.removeClass(element,object.getDesign().active);
+            CUtils.addClass(element,object.getDesign().activeRemove);
+
+        }
+
+        // Set Events Handlers.
+        element.addEventListener("touchstart",object.events.onTouchStartEvent);
+        element.addEventListener("mousedown",object.events.onTouchStartEvent);
+        element.addEventListener("touchend",object.events.onTouchEndEvent);
+        element.addEventListener("mouseup",object.events.onTouchEndEvent);
+        element.addEventListener("mouseout",object.events.onTouchEndEvent);
+        element.addEventListener("touchcancel",object.events.onTouchEndEvent);
+        element.addEventListener("touchmove",object.events.onTouchMoveEvent);
+        element.addEventListener("mousemove",object.events.onTouchMoveEvent);
+
+    }
+
+
+});
 
 
 /**
@@ -655,16 +1171,282 @@ var CIconsManager = Class({
     }
 });
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 11/08/14.
  */
+var CPager = Class({
+    $singleton: true,
+    firstLoad: true,
+    historyStack: new Array(),
+    currentPage: "",
+    mainPage: '',
+    backButtonId: '',
+
+    setMainPage: function(mainPage) {
+        this.mainPage = mainPage;
+        this.moveToPage(mainPage);
+    },
+    setBackButton: function(backButtonId) {
+        this.backButtonId = backButtonId;
+        this.checkAndChangeBackButtonState();
+    },
+    insertPageToStack: function(pageId) {
+        for (var i=this.historyStack.length-1; i>=0; i--) {
+            if (this.historyStack[i] === pageId) {
+                this.historyStack.splice(i, 1);
+                // break;       //<-- Uncomment  if only the first term has to be removed
+            }
+        }
+        this.historyStack.push(pageId);
+    },
+    /**
+     * Restructure that pages z-index as their position in the history.
+     * Recent page equals greater z-index.
+     */
+    restructure: function() {
+        for (var i=this.historyStack.length-1; i>=0; i--) {
+            CUtils.element(this.historyStack[i]).style.zIndex = (i+1)*10;
+        }
+    },
+    moveToTab: function(tabButtonId,toSlide,swiperId) {
+        // Get Tabs.
+        var tabs = CSwiper.getSwiperButtons(swiperId);
+        _.each(tabs,function(buttonId){
+            // Remove hold mark.
+            this.removeHoldClass(buttonId);
+        },this);
+
+        this.addHoldClass(tabButtonId);
+
+        if (!CUtils.isEmpty(toSlide))
+            CSwiper.moveSwiperToSlide(swiperId,toSlide);
+
+
+    },
+    addHoldClass: function(tabButtonId) {
+        if (CUtils.isEmpty(tabButtonId))    return;
+
+        var holdClass = CObjectsHandler.object(tabButtonId).getDesign().hold;
+        if (!CUtils.isEmpty(holdClass))
+            CUtils.addClass(CUtils.element(tabButtonId),holdClass);
+    },
+    removeHoldClass: function(tabButtonId) {
+        if (CUtils.isEmpty(tabButtonId))    return;
+
+        var holdClass = CObjectsHandler.object(tabButtonId).getDesign().hold;
+        if (!CUtils.isEmpty(holdClass))
+            CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
+    },
+    /**
+     * move to page.
+     */
+    moveToPage: function(toPageId,isRealPage,inAnim,outAnim) {
+        // Check if need to move back.
+        if (toPageId == 'move-back') {
+            this.moveBack();
+            return;
+        }
+
+        if (this.currentPage == toPageId) {
+            return;
+        }
+
+        var lastPageId = this.currentPage;
+
+        //Replace current page.
+        this.currentPage = toPageId;
+        this.insertPageToStack(toPageId);
+        this.restructure();
+        var toPageDiv = document.getElementById(toPageId);
+
+        if (CUtils.isEmpty(lastPageId)) {
+            // on load page.
+            CPager.onLoadPage(toPageDiv);
+            // Hide back button if needed.
+            this.checkAndChangeBackButtonState();
+            return;
+        }
+
+        CAnimations.fadeIn(toPageDiv,300);
+
+        // on load page.
+        CPager.onLoadPage(toPageDiv);
+        // Hide back button if needed.
+        this.checkAndChangeBackButtonState();
+
+
+    },
+    moveBack: function() {
+        if (this.historyStack.length <= 1) {
+            // TODO: Ask to leave app.
+            return;
+        }
+
+        //Remove last page from the history.
+        var toRemovePageId = this.historyStack.pop();
+        var toPageId = this.historyStack.pop();
+
+        //Replace current page.
+        this.currentPage = toPageId;
+        this.insertPageToStack(toPageId);
+        this.restructure();
+
+        var lastPageDiv = document.getElementById(toRemovePageId);
+        var toPageDiv = document.getElementById(toPageId);
+
+        CAnimations.fadeOut(lastPageDiv,300,function() { lastPageDiv.style.zIndex = 0;});
+
+        // on load page.
+        CPager.onLoadPage(toPageDiv);
+        // Hide back button if needed.
+
+        this.checkAndChangeBackButtonState();
+
+
+
+    },
+    onLoadPage: function(pageId) {
+        var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
+        if (CUtils.isEmpty(onPageLoad))
+            return;
+        // Execute onPageLoad.
+        onPageLoad();
+    },
+    checkAndChangeBackButtonState:function()
+    {
+        if (CUtils.isEmpty(this.backButtonId)) return;
+
+        if (this.currentPage == this.mainPage)
+        {
+            CUtils.addClass(document.getElementById(this.backButtonId),'hidden');
+        }
+        else
+        {
+            CUtils.removeClass(document.getElementById(this.backButtonId),'hidden');
+        }
+    }
+
+
+});
+
+
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 12/08/14.
  */
+var CSwiper = Class({
+    $singleton: true,
+    mSwipers: {},
+    sideMenu: null,
+    sideMenuSide: 'left',
+    initSwiper: function(swiperId,swiperOptionsArray,pagination)
+    {
+        var options = {
+            moveStartThreshold: 50,
+            resistance: '100%'
+        };
+        if (!CUtils.isEmpty(pagination)) {
+            options.pagination = '#'+pagination;
+            options.paginationClickable= true;
+        }
+        if (!CUtils.isEmpty(swiperOptionsArray)) {
+            if (swiperOptionsArray.indexOf('loop')>=0)
+                options.loop=true;
+        }
+
+        this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
+
+        this.mSwipers[swiperId].addCallback('SlideChangeStart', function(swiper){
+            var toSlide         = swiper.activeIndex;
+            var swiperButtons   = this.mSwipers[swiperId].swiperTabButtons;
+            var tabRelatedButton= swiperButtons[toSlide];
+            if (!CUtils.isEmpty(tabRelatedButton))
+                CPager.moveToTab(tabRelatedButton,null,swiperId);
+
+            window.setTimeout(function() {
+                var height = CUtils.element(swiperId).style.height;
+                CUtils.element(swiperId).style.height = '0px';
+                CUtils.element(swiperId).clientHeight;
+                CUtils.element(swiperId).style.height = height;
+            },100);
+        });
+
+        // Fix Pagination disappear.
+        this.mSwipers[swiperId].addCallback('SlideChangeEnd', function(swiper){
+            var height = document.getElementById(swiperId).style.height;
+            CUtils.element(swiperId).style.height = '0px';
+            CUtils.element(swiperId).clientHeight;
+            CUtils.element(swiperId).style.height = height;
+        });
+
+        this.mSwipers[swiperId].swiperTabButtons = Array();
+    },
+    /**
+     * Add button to tab container.
+     * @param object
+     * @param swiperId
+     */
+    addButtonToTabSwiper: function(object,swiperId){
+        var swiperButtons       = this.mSwipers[swiperId].swiperTabButtons;
+        var currentSlideNumber  = swiperButtons.length;
+        this.mSwipers[swiperId].swiperTabButtons.push(object.uid());
+
+        CClicker.addOnClick(object,function(){
+            CPager.moveToTab(object.uid(),currentSlideNumber,swiperId);
+        });
+
+        if (swiperId == 0){
+            CPager.addHoldClass(object.uid());
+        }
+    },
+    getSwiperButtons: function(swiperId){
+        return this.mSwipers[swiperId].swiperTabButtons;
+    },
+    next: function(swiperName)
+    {
+        this.mSwipers[swiperName].swipeNext();
+    },
+    previous: function(swiperName)
+    {
+        this.mSwipers[swiperName].swipePrev();
+    },
+    moveSwiperToSlide: function(swiperContainerId,slide)
+    {
+        this.mSwipers[swiperContainerId].swipeTo(slide);
+    },
+    initSideMenu: function(swiperContainerId,position)
+    {
+        this.sideMenuSide = position || 'left';
+
+        this.sideMenu = new Snap({
+            element: document.getElementById(swiperContainerId),
+            disable: position=='left'? 'right' : 'left',
+            resistance:10000000
+        });
+    },
+    openOrCloseSideMenu: function(name)
+    {
+        if (CUtils.isEmpty(this.sideMenu)) return;
+        var state = this.sideMenu.state().state;
+
+        if (state=="closed")
+            this.sideMenu.open(this.sideMenuSide);
+        else
+            this.sideMenu.close();
+    },
+    isSideMenuOpen: function()
+    {
+        return this.sideMenu.state().state!="closed";
+    }
+
+
+});
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
 var CUI = Class({
     $singleton: true
+
 });
 
 
@@ -674,9 +1456,7 @@ var CUI = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            width: "150px",
-            wow:" gi",
-            woke:" gi"
+            width: "150"
         },
         DEFAULT_LOGIC: {
         },
@@ -707,10 +1487,19 @@ var CObject = Class({
         this.design         = values.design     || {};
         this.data           = values.data       || {};
         this.classes        = "";
-        this.functions      = Array();
         this.lastClasses    = "";
-        this.lastFunctions  = Array();
+        this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
+    },
+    /**
+     * Return Unique identifier.
+     * Enabling giving readable unique name to object.
+     * @returns unique identifier.
+     */
+    uid: function(){
+        if (CUtils.isEmpty(this.uname))
+            return this.id;
+        return this.uname;
     },
     setParent: function(parentID) {
         this.parent = parentID;
@@ -718,9 +1507,29 @@ var CObject = Class({
     getParent: function() {
         return this.parent;
     },
-    saveLastBuild: function () {
-        this.lastClasses    = this.classes;
-        this.lastFunctions  = this.functions.slice(0); // Clone Array.
+    getParentObject: function() {
+        return CObjectsHandler.object(this.parent);
+    },
+    getDesign: function() {
+        return this.design;
+    },
+    saveLastLogic: function () {
+        // Change cache only if logic was updated.
+        if (!CUtils.equals(this.logic,this.lastLogic)){
+            this.lastLogic = CUtils.clone(this.logic); // Clone JSON.
+        }
+    },
+    setClasses: function(classes){
+        this.classes = classes;
+    },
+    getClasses: function(){
+        return this.classes;
+    },
+    getLastLogic: function(){
+        return this.lastLogic;
+    },
+    getLogic: function(){
+        return this.logic;
     },
     /**
      *  Build Object.
@@ -733,22 +1542,21 @@ var CObject = Class({
             tagHasInner = data['tagHasInner'];
 
         // Check if this element is already in the DOM.
-        var isCreated = !CUtils.isEmpty(CUtils.element(this.id));
+        var isCreated = !CUtils.isEmpty(CUtils.element(this.uid()));
 
         // Add to prepared Objects.
         CObjectsHandler.addPreparedObject(this);
 
-        // Save old function and classes - previous build.
+        // Save old classes - previous build.
         // This will prevent unnecessary build operations - better performance.
-        this.saveLastBuild();
+        this.lastClasses    = this.classes;
 
         // Prepare Design and Logic.
         CDesign.prepareDesign(this,forceDesign);
-        CLogic.prepareLogic(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
-        if (isCreated) return "";
+        if (isCreated) return view;
 
         // If not created, set classes last build to this build
         // Because we will insert them directly to the DOM.
@@ -761,17 +1569,22 @@ var CObject = Class({
         // Extra tag attributes. For example: 'href="http://www.web.com"'
         attributes  = CUtils.isEmpty(attributes)? Array() : attributes;
         // Add class attribute.
+        attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
 
         // If tag has inner or not.
         tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;
 
         if (tagHasInner ===false) {
-            view.append([tagOpen,attributes,'/>'],true);
+            view.append('/>',true);
+            view.append(attributes,true);
+            view.append(tagOpen,true);
         }
         else {
             // Has Inner - Wrap it.
-            view.append([tagOpen,attributes,'>'],true); // Add to beginning.
+            view.append('>',true);
+            view.append(attributes,true);
+            view.append(tagOpen,true);
             view.append('</'+tag+'>');      // Add to end.
         }
         return view;
@@ -793,8 +1606,7 @@ var CObject = Class({
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            doyou: "nom",
-            wow:"g"
+            minHeight: 20
         },
         DEFAULT_LOGIC: {
         }
@@ -812,8 +1624,8 @@ var CLabel = Class(CObject,{
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
-        this.$class.$superp.prepareBuild.call(this);
+    prepareBuild: function(data){
+        return CLabel.$superp.prepareBuild.call(this,data);
     }
 
 
@@ -846,8 +1658,9 @@ var CContainer = Class(CObject,{
         CObject.mergeWithDefaults(values,CContainer);
 
         // Invoke parent's constructor
-        this.$class.$super.call(this, values);
-        this.data.childs = this.data.childs || [];
+        CContainer.$super.call(this, values);
+        CLog.dlog(this.data.childs);
+        this.data.childs = values.data.childs || [];
     },
     /**
      *  Build Object.
@@ -863,18 +1676,38 @@ var CContainer = Class(CObject,{
                 return;
             }
             //Set parent to this Object.
-            object.setParent(this.id);
+            object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild(data));
-        });
-
+        },this);
         // Prepare this element - wrap it's children.
-        this.$class.$superp.prepareBuild.call(this,{view: content});
-
+        CContainer.$superp.prepareBuild.call(this,{view: content});
         return content;
     }
 
 
+
+});
+
+
+/**
+ * Created by dvircn on 07/08/14.
+ */
+var CAppContainer = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CAppContainer);
+        // Invoke parent's constructor
+        CAppContainer.$super.call(this, values);
+    }
 
 });
 
@@ -910,19 +1743,218 @@ var CContainer = Class(CObject,{
  * Created by dvircn on 06/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 12/08/14.
+ */
+var CForm = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CForm);
+
+        // Invoke parent's constructor
+        this.$class.$super.call(this, values);
+        this.data.inputs             = values.data.inputs || [];
+        this.logic.saveToUrl         = values.logic.saveToUrl || [];
+        this.logic.saveToUrlCallback = values.logic.saveToUrlCallback || [];
+        this.logic.onSubmit          = values.logic.onSubmit || [];
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element - wrap it's children.
+        this.$class.$superp.prepareBuild.call(this,data);
+    },
+    formValues: function() {
+        var values = {};
+        try {
+            _.each(this.data.inputs,function(inputId){
+                var input = CObjectsHandler.object(inputId);
+                var name = input.getName();
+                var value = input.value();
+                var validators = input.getValidators();
+                _.each(validators,function(name){
+                    var validationResult = CValidators.validator(name).validate(value);
+                    // Validation Failed!
+                    if (!validationResult.isValid()){
+                        // Dialog Color Showcase.
+                        //TODO Remove
+                        var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
+                        var color = colors[Math.floor(Math.random() * colors.length)];
+                        // Show Message.
+                        CDialogs.show({
+                            title: validationResult.getTitle(),
+                            content:validationResult.getMessage(),
+                            closeText:'Close',closeCallback:function(){
+                                CLog.log('Closed..')
+                            },
+                            confirmText:'Confirm',confirmCallback:function(){
+                                CLog.log('Confirmed..')
+                            },
+                            extraText:'Extra',extraCallback:function(){
+                                CLog.log('Extra..')
+                            },
+                            color:color});
+                        throw "Error"; // Return empty result.
+                    }
+                },this);
+                // Add value to result values.
+                values[name] = value;
+            },this);
+        } catch (e){
+            return null;
+        }
+        return values;
+    },
+    clearForm: function() {
+        // Clear each input.
+        _.each(this.data.inputs,function(inputId){
+            CObjectsHandler.object(inputId).clear();
+        },this);
+    },
+    addInput: function(inputId) {
+        this.data.inputs.push(inputId);
+    },
+    submitForm: function() {
+        // Retrieve the values from the form.
+        var values = this.formValues();
+        // Check if the was validation error.
+        if (values == null)     return;
+        // Run onSubmit with the values.
+        this.logic.onSubmit(values);
+    },
+    sendFormToUrl: function() {
+        // Retrieve the values from the form.
+        var values = this.formValues();
+        // Check if the was validation error.
+        if (values == null)     return;
+        // Run send with the values.
+        CNetwork.send(this.logic.saveToUrl,values,this.logic.saveToUrlCallback);
+    },
+    saveFormToLocalStorage: function() {
+        // Retrieve the values from the form.
+        var values = this.formValues();
+        // Check if the was validation error.
+        if (values == null)     return;
+        // save each value to the local storage.
+        _.each(values,function(value,key){
+            CLocalStorage.save(key,value);
+        },this);
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 12/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 12/08/14.
  */
+var CInput = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CForm);
+
+        // Invoke parent's constructor
+        this.$class.$super.call(this, values);
+        this.data.name               = values.name          || '';
+        this.data.required           = values.required      || false;
+        this.data.validators         = values.validators    || [];
+        this.data.prepares           = values.prepares      || [];
+
+        if (this.data.required)
+            this.data.validators.unshift('notEmpty');
+    },
+    value: function() {
+        var value = CUtils.element(this.uid()).value;
+        _.each(this.data.prepares,function(prepareFunctionId){
+            CPrepareFunctions.prepareFunction(prepareFunctionId).prepare(value);
+        },this);
+        return value;
+    },
+    clear: function() {
+        CUtils.element(this.uid()).value = '';
+        CUtils.element(this.uid()).setAttribute('value','');
+    },
+    getName: function(){
+        return this.data.name;
+    },
+    getValidators: function(){
+        return this.data.validators;
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 12/08/14.
+ */
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CInputEmail = Class(CInput,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CForm);
+
+        values.prepares = values.prepares || [];
+        values.prepares.push('email');
+        // Invoke parent's constructor
+        this.$class.$super.call(this, values);
+    }
+
+});
+
+
 /**
  * Created by dvircn on 06/08/14.
  */
 var Caf = Class({
     constructor: function() {
+    },
+    init: function(objects){
+        var startLoadObjects = (new  Date()).getTime();
+        CObjectsHandler.loadObjects(objects);
+        var endLoadObjects  = (new  Date()).getTime();
+        CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
+
+        var startBuildAll = (new  Date()).getTime();
+
+        CTemplator.buildAll();
+        var endBuildAll = (new  Date()).getTime();
+        CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
+
+        CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
+
     }
 
-});/**
+});
+
+/**
  * CAF - Codletech Application Framework.
  * Dependencies:
  * - overthrow.js
@@ -1164,28 +2196,6 @@ caf.ui = {
         }
         return false;
     },
-    /* Animate view with fade in or out */
-    fadeIn: function(elm,time,onEnter)
-    {
-        onEnter = onEnter || function(){};
-        caf.utils.addClass(elm,'hidden');
-        var clientHeight = elm.clientHeight;
-        caf.utils.removeClass(elm,'hidden');
-        caf.utils.addClass(elm,'fadein'+time);
-        window.setTimeout(function(){
-            caf.utils.removeClass(elm,'fadein'+time);
-            onEnter();
-        },time);
-    },
-    fadeOut: function(elm,time,onOut)
-    {
-        onOut = onOut || function(){};
-        caf.utils.addClass(elm,'fadeout'+time);
-        window.setTimeout(function(){
-            caf.utils.removeClass(elm,'fadeout'+time);
-            onOut();
-        },time);
-    },
     /**
      * Check that the element has caf attributes.
      * Add to the view all the caf capabilities.
@@ -1424,6 +2434,7 @@ caf.ui.attributes =
     },
     initAttributes: function()
     {
+/*
         this.addAttr(['data-caf-active'],function(args){
             args.view.activeClass(args['data-caf-active']);
         });
@@ -1438,17 +2449,6 @@ caf.ui.attributes =
         });
         this.addAttr(['data-caf-to-page'],function(args){
             args.view.onClick( function() {caf.pager.moveToPage(args['data-caf-to-page']); } );
-        });
-        this.addAttr(['data-caf-to-tab','data-caf-tab-container'],function(args){
-            var tabId = args.view.id;
-            var toSlide = args['data-caf-to-tab'];
-            var tabContainer = args['data-caf-tab-container'];
-            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
-
-            if (toSlide == 0)
-            {
-                caf.pager.addHoldClass(tabId);
-            }
         });
         this.addAttr(['data-caf-drop-menu-overlay-of'],function(args){
             args.view.onClick( function() {caf.utils.hideOrShow(args['data-caf-drop-menu-overlay-of'],'fadein300','fadeout300',300); } );
@@ -1498,9 +2498,24 @@ caf.ui.attributes =
                 caf.ui.swipers.openOrCloseSideMenu('');
             } );
         });
+*/
+/*
+        this.addAttr(['data-caf-to-tab','data-caf-tab-container'],function(args){
+            var tabId = args.view.id;
+            var toSlide = args['data-caf-to-tab'];
+            var tabContainer = args['data-caf-tab-container'];
+            args.view.onClick( function() {caf.pager.moveToTab(tabId,toSlide,tabContainer); } );
+
+            if (toSlide == 0)
+            {
+                caf.pager.addHoldClass(tabId);
+            }
+        });
         this.addAttr(['data-caf-current-tab'],function(args){
             //caf.pager.moveToTab(args['data-caf-current-tab'],args.view.mElement.id,true);
         });
+*/
+/*
         this.addAttr(['data-caf-form'],function(args){
             caf.ui.forms.createForm(args['data-caf-form']);
         });
@@ -1514,6 +2529,8 @@ caf.ui.attributes =
             var callback = eval(args['data-caf-form-send-to-url-callback']);
             caf.ui.forms.setFormSaveToUrlCallback(args['data-caf-form'],callback);
         });
+*/
+/*
         this.addAttr(['data-caf-form-submit-button'],function(args){
             var formName = args['data-caf-form-submit-button'];
             args.view.onClick( function(){caf.ui.forms.submitForm(formName);} );
@@ -1530,6 +2547,8 @@ caf.ui.attributes =
             var formName = args['data-caf-form-clear-button'];
             args.view.onClick( function(){caf.ui.forms.clearForm(formName);} );
         });
+*/
+/*
         this.addAttr(['data-caf-form-input','data-caf-form-input-name','data-caf-form-input-type',
             'data-caf-form-input-validator','data-caf-form-input-prepare'],function(args){
             // Create input.
@@ -1537,12 +2556,15 @@ caf.ui.attributes =
                 args['data-caf-form-input-type'],args['data-caf-form-input-validator'],
                 args['data-caf-form-input-prepare'])
         });
+*/
+/*
         this.addAttr(['data-caf-main-page'],function(args){
             caf.pager.setMainPage(args['data-caf-main-page']);
         });
         this.addAttr(['data-caf-back-button'],function(args){
             caf.pager.setBackButton(args['data-caf-back-button']);
         });
+*/
 
 
     }
@@ -5711,3 +6733,50 @@ if (typeof define === 'function' && define.amd) {
 //     Underscore may be freely distributed under the MIT license.
 (function(){var n=this,t=n._,r={},e=Array.prototype,u=Object.prototype,i=Function.prototype,a=e.push,o=e.slice,c=e.concat,l=u.toString,f=u.hasOwnProperty,s=e.forEach,p=e.map,h=e.reduce,v=e.reduceRight,g=e.filter,d=e.every,m=e.some,y=e.indexOf,b=e.lastIndexOf,x=Array.isArray,w=Object.keys,_=i.bind,j=function(n){return n instanceof j?n:this instanceof j?void(this._wrapped=n):new j(n)};"undefined"!=typeof exports?("undefined"!=typeof module&&module.exports&&(exports=module.exports=j),exports._=j):n._=j,j.VERSION="1.6.0";var A=j.each=j.forEach=function(n,t,e){if(null==n)return n;if(s&&n.forEach===s)n.forEach(t,e);else if(n.length===+n.length){for(var u=0,i=n.length;i>u;u++)if(t.call(e,n[u],u,n)===r)return}else for(var a=j.keys(n),u=0,i=a.length;i>u;u++)if(t.call(e,n[a[u]],a[u],n)===r)return;return n};j.map=j.collect=function(n,t,r){var e=[];return null==n?e:p&&n.map===p?n.map(t,r):(A(n,function(n,u,i){e.push(t.call(r,n,u,i))}),e)};var O="Reduce of empty array with no initial value";j.reduce=j.foldl=j.inject=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),h&&n.reduce===h)return e&&(t=j.bind(t,e)),u?n.reduce(t,r):n.reduce(t);if(A(n,function(n,i,a){u?r=t.call(e,r,n,i,a):(r=n,u=!0)}),!u)throw new TypeError(O);return r},j.reduceRight=j.foldr=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),v&&n.reduceRight===v)return e&&(t=j.bind(t,e)),u?n.reduceRight(t,r):n.reduceRight(t);var i=n.length;if(i!==+i){var a=j.keys(n);i=a.length}if(A(n,function(o,c,l){c=a?a[--i]:--i,u?r=t.call(e,r,n[c],c,l):(r=n[c],u=!0)}),!u)throw new TypeError(O);return r},j.find=j.detect=function(n,t,r){var e;return k(n,function(n,u,i){return t.call(r,n,u,i)?(e=n,!0):void 0}),e},j.filter=j.select=function(n,t,r){var e=[];return null==n?e:g&&n.filter===g?n.filter(t,r):(A(n,function(n,u,i){t.call(r,n,u,i)&&e.push(n)}),e)},j.reject=function(n,t,r){return j.filter(n,function(n,e,u){return!t.call(r,n,e,u)},r)},j.every=j.all=function(n,t,e){t||(t=j.identity);var u=!0;return null==n?u:d&&n.every===d?n.every(t,e):(A(n,function(n,i,a){return(u=u&&t.call(e,n,i,a))?void 0:r}),!!u)};var k=j.some=j.any=function(n,t,e){t||(t=j.identity);var u=!1;return null==n?u:m&&n.some===m?n.some(t,e):(A(n,function(n,i,a){return u||(u=t.call(e,n,i,a))?r:void 0}),!!u)};j.contains=j.include=function(n,t){return null==n?!1:y&&n.indexOf===y?n.indexOf(t)!=-1:k(n,function(n){return n===t})},j.invoke=function(n,t){var r=o.call(arguments,2),e=j.isFunction(t);return j.map(n,function(n){return(e?t:n[t]).apply(n,r)})},j.pluck=function(n,t){return j.map(n,j.property(t))},j.where=function(n,t){return j.filter(n,j.matches(t))},j.findWhere=function(n,t){return j.find(n,j.matches(t))},j.max=function(n,t,r){if(!t&&j.isArray(n)&&n[0]===+n[0]&&n.length<65535)return Math.max.apply(Math,n);var e=-1/0,u=-1/0;return A(n,function(n,i,a){var o=t?t.call(r,n,i,a):n;o>u&&(e=n,u=o)}),e},j.min=function(n,t,r){if(!t&&j.isArray(n)&&n[0]===+n[0]&&n.length<65535)return Math.min.apply(Math,n);var e=1/0,u=1/0;return A(n,function(n,i,a){var o=t?t.call(r,n,i,a):n;u>o&&(e=n,u=o)}),e},j.shuffle=function(n){var t,r=0,e=[];return A(n,function(n){t=j.random(r++),e[r-1]=e[t],e[t]=n}),e},j.sample=function(n,t,r){return null==t||r?(n.length!==+n.length&&(n=j.values(n)),n[j.random(n.length-1)]):j.shuffle(n).slice(0,Math.max(0,t))};var E=function(n){return null==n?j.identity:j.isFunction(n)?n:j.property(n)};j.sortBy=function(n,t,r){return t=E(t),j.pluck(j.map(n,function(n,e,u){return{value:n,index:e,criteria:t.call(r,n,e,u)}}).sort(function(n,t){var r=n.criteria,e=t.criteria;if(r!==e){if(r>e||r===void 0)return 1;if(e>r||e===void 0)return-1}return n.index-t.index}),"value")};var F=function(n){return function(t,r,e){var u={};return r=E(r),A(t,function(i,a){var o=r.call(e,i,a,t);n(u,o,i)}),u}};j.groupBy=F(function(n,t,r){j.has(n,t)?n[t].push(r):n[t]=[r]}),j.indexBy=F(function(n,t,r){n[t]=r}),j.countBy=F(function(n,t){j.has(n,t)?n[t]++:n[t]=1}),j.sortedIndex=function(n,t,r,e){r=E(r);for(var u=r.call(e,t),i=0,a=n.length;a>i;){var o=i+a>>>1;r.call(e,n[o])<u?i=o+1:a=o}return i},j.toArray=function(n){return n?j.isArray(n)?o.call(n):n.length===+n.length?j.map(n,j.identity):j.values(n):[]},j.size=function(n){return null==n?0:n.length===+n.length?n.length:j.keys(n).length},j.first=j.head=j.take=function(n,t,r){return null==n?void 0:null==t||r?n[0]:0>t?[]:o.call(n,0,t)},j.initial=function(n,t,r){return o.call(n,0,n.length-(null==t||r?1:t))},j.last=function(n,t,r){return null==n?void 0:null==t||r?n[n.length-1]:o.call(n,Math.max(n.length-t,0))},j.rest=j.tail=j.drop=function(n,t,r){return o.call(n,null==t||r?1:t)},j.compact=function(n){return j.filter(n,j.identity)};var M=function(n,t,r){return t&&j.every(n,j.isArray)?c.apply(r,n):(A(n,function(n){j.isArray(n)||j.isArguments(n)?t?a.apply(r,n):M(n,t,r):r.push(n)}),r)};j.flatten=function(n,t){return M(n,t,[])},j.without=function(n){return j.difference(n,o.call(arguments,1))},j.partition=function(n,t){var r=[],e=[];return A(n,function(n){(t(n)?r:e).push(n)}),[r,e]},j.uniq=j.unique=function(n,t,r,e){j.isFunction(t)&&(e=r,r=t,t=!1);var u=r?j.map(n,r,e):n,i=[],a=[];return A(u,function(r,e){(t?e&&a[a.length-1]===r:j.contains(a,r))||(a.push(r),i.push(n[e]))}),i},j.union=function(){return j.uniq(j.flatten(arguments,!0))},j.intersection=function(n){var t=o.call(arguments,1);return j.filter(j.uniq(n),function(n){return j.every(t,function(t){return j.contains(t,n)})})},j.difference=function(n){var t=c.apply(e,o.call(arguments,1));return j.filter(n,function(n){return!j.contains(t,n)})},j.zip=function(){for(var n=j.max(j.pluck(arguments,"length").concat(0)),t=new Array(n),r=0;n>r;r++)t[r]=j.pluck(arguments,""+r);return t},j.object=function(n,t){if(null==n)return{};for(var r={},e=0,u=n.length;u>e;e++)t?r[n[e]]=t[e]:r[n[e][0]]=n[e][1];return r},j.indexOf=function(n,t,r){if(null==n)return-1;var e=0,u=n.length;if(r){if("number"!=typeof r)return e=j.sortedIndex(n,t),n[e]===t?e:-1;e=0>r?Math.max(0,u+r):r}if(y&&n.indexOf===y)return n.indexOf(t,r);for(;u>e;e++)if(n[e]===t)return e;return-1},j.lastIndexOf=function(n,t,r){if(null==n)return-1;var e=null!=r;if(b&&n.lastIndexOf===b)return e?n.lastIndexOf(t,r):n.lastIndexOf(t);for(var u=e?r:n.length;u--;)if(n[u]===t)return u;return-1},j.range=function(n,t,r){arguments.length<=1&&(t=n||0,n=0),r=arguments[2]||1;for(var e=Math.max(Math.ceil((t-n)/r),0),u=0,i=new Array(e);e>u;)i[u++]=n,n+=r;return i};var R=function(){};j.bind=function(n,t){var r,e;if(_&&n.bind===_)return _.apply(n,o.call(arguments,1));if(!j.isFunction(n))throw new TypeError;return r=o.call(arguments,2),e=function(){if(!(this instanceof e))return n.apply(t,r.concat(o.call(arguments)));R.prototype=n.prototype;var u=new R;R.prototype=null;var i=n.apply(u,r.concat(o.call(arguments)));return Object(i)===i?i:u}},j.partial=function(n){var t=o.call(arguments,1);return function(){for(var r=0,e=t.slice(),u=0,i=e.length;i>u;u++)e[u]===j&&(e[u]=arguments[r++]);for(;r<arguments.length;)e.push(arguments[r++]);return n.apply(this,e)}},j.bindAll=function(n){var t=o.call(arguments,1);if(0===t.length)throw new Error("bindAll must be passed function names");return A(t,function(t){n[t]=j.bind(n[t],n)}),n},j.memoize=function(n,t){var r={};return t||(t=j.identity),function(){var e=t.apply(this,arguments);return j.has(r,e)?r[e]:r[e]=n.apply(this,arguments)}},j.delay=function(n,t){var r=o.call(arguments,2);return setTimeout(function(){return n.apply(null,r)},t)},j.defer=function(n){return j.delay.apply(j,[n,1].concat(o.call(arguments,1)))},j.throttle=function(n,t,r){var e,u,i,a=null,o=0;r||(r={});var c=function(){o=r.leading===!1?0:j.now(),a=null,i=n.apply(e,u),e=u=null};return function(){var l=j.now();o||r.leading!==!1||(o=l);var f=t-(l-o);return e=this,u=arguments,0>=f?(clearTimeout(a),a=null,o=l,i=n.apply(e,u),e=u=null):a||r.trailing===!1||(a=setTimeout(c,f)),i}},j.debounce=function(n,t,r){var e,u,i,a,o,c=function(){var l=j.now()-a;t>l?e=setTimeout(c,t-l):(e=null,r||(o=n.apply(i,u),i=u=null))};return function(){i=this,u=arguments,a=j.now();var l=r&&!e;return e||(e=setTimeout(c,t)),l&&(o=n.apply(i,u),i=u=null),o}},j.once=function(n){var t,r=!1;return function(){return r?t:(r=!0,t=n.apply(this,arguments),n=null,t)}},j.wrap=function(n,t){return j.partial(t,n)},j.compose=function(){var n=arguments;return function(){for(var t=arguments,r=n.length-1;r>=0;r--)t=[n[r].apply(this,t)];return t[0]}},j.after=function(n,t){return function(){return--n<1?t.apply(this,arguments):void 0}},j.keys=function(n){if(!j.isObject(n))return[];if(w)return w(n);var t=[];for(var r in n)j.has(n,r)&&t.push(r);return t},j.values=function(n){for(var t=j.keys(n),r=t.length,e=new Array(r),u=0;r>u;u++)e[u]=n[t[u]];return e},j.pairs=function(n){for(var t=j.keys(n),r=t.length,e=new Array(r),u=0;r>u;u++)e[u]=[t[u],n[t[u]]];return e},j.invert=function(n){for(var t={},r=j.keys(n),e=0,u=r.length;u>e;e++)t[n[r[e]]]=r[e];return t},j.functions=j.methods=function(n){var t=[];for(var r in n)j.isFunction(n[r])&&t.push(r);return t.sort()},j.extend=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]=t[r]}),n},j.pick=function(n){var t={},r=c.apply(e,o.call(arguments,1));return A(r,function(r){r in n&&(t[r]=n[r])}),t},j.omit=function(n){var t={},r=c.apply(e,o.call(arguments,1));for(var u in n)j.contains(r,u)||(t[u]=n[u]);return t},j.defaults=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]===void 0&&(n[r]=t[r])}),n},j.clone=function(n){return j.isObject(n)?j.isArray(n)?n.slice():j.extend({},n):n},j.tap=function(n,t){return t(n),n};var S=function(n,t,r,e){if(n===t)return 0!==n||1/n==1/t;if(null==n||null==t)return n===t;n instanceof j&&(n=n._wrapped),t instanceof j&&(t=t._wrapped);var u=l.call(n);if(u!=l.call(t))return!1;switch(u){case"[object String]":return n==String(t);case"[object Number]":return n!=+n?t!=+t:0==n?1/n==1/t:n==+t;case"[object Date]":case"[object Boolean]":return+n==+t;case"[object RegExp]":return n.source==t.source&&n.global==t.global&&n.multiline==t.multiline&&n.ignoreCase==t.ignoreCase}if("object"!=typeof n||"object"!=typeof t)return!1;for(var i=r.length;i--;)if(r[i]==n)return e[i]==t;var a=n.constructor,o=t.constructor;if(a!==o&&!(j.isFunction(a)&&a instanceof a&&j.isFunction(o)&&o instanceof o)&&"constructor"in n&&"constructor"in t)return!1;r.push(n),e.push(t);var c=0,f=!0;if("[object Array]"==u){if(c=n.length,f=c==t.length)for(;c--&&(f=S(n[c],t[c],r,e)););}else{for(var s in n)if(j.has(n,s)&&(c++,!(f=j.has(t,s)&&S(n[s],t[s],r,e))))break;if(f){for(s in t)if(j.has(t,s)&&!c--)break;f=!c}}return r.pop(),e.pop(),f};j.isEqual=function(n,t){return S(n,t,[],[])},j.isEmpty=function(n){if(null==n)return!0;if(j.isArray(n)||j.isString(n))return 0===n.length;for(var t in n)if(j.has(n,t))return!1;return!0},j.isElement=function(n){return!(!n||1!==n.nodeType)},j.isArray=x||function(n){return"[object Array]"==l.call(n)},j.isObject=function(n){return n===Object(n)},A(["Arguments","Function","String","Number","Date","RegExp"],function(n){j["is"+n]=function(t){return l.call(t)=="[object "+n+"]"}}),j.isArguments(arguments)||(j.isArguments=function(n){return!(!n||!j.has(n,"callee"))}),"function"!=typeof/./&&(j.isFunction=function(n){return"function"==typeof n}),j.isFinite=function(n){return isFinite(n)&&!isNaN(parseFloat(n))},j.isNaN=function(n){return j.isNumber(n)&&n!=+n},j.isBoolean=function(n){return n===!0||n===!1||"[object Boolean]"==l.call(n)},j.isNull=function(n){return null===n},j.isUndefined=function(n){return n===void 0},j.has=function(n,t){return f.call(n,t)},j.noConflict=function(){return n._=t,this},j.identity=function(n){return n},j.constant=function(n){return function(){return n}},j.property=function(n){return function(t){return t[n]}},j.matches=function(n){return function(t){if(t===n)return!0;for(var r in n)if(n[r]!==t[r])return!1;return!0}},j.times=function(n,t,r){for(var e=Array(Math.max(0,n)),u=0;n>u;u++)e[u]=t.call(r,u);return e},j.random=function(n,t){return null==t&&(t=n,n=0),n+Math.floor(Math.random()*(t-n+1))},j.now=Date.now||function(){return(new Date).getTime()};var T={escape:{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;"}};T.unescape=j.invert(T.escape);var I={escape:new RegExp("["+j.keys(T.escape).join("")+"]","g"),unescape:new RegExp("("+j.keys(T.unescape).join("|")+")","g")};j.each(["escape","unescape"],function(n){j[n]=function(t){return null==t?"":(""+t).replace(I[n],function(t){return T[n][t]})}}),j.result=function(n,t){if(null==n)return void 0;var r=n[t];return j.isFunction(r)?r.call(n):r},j.mixin=function(n){A(j.functions(n),function(t){var r=j[t]=n[t];j.prototype[t]=function(){var n=[this._wrapped];return a.apply(n,arguments),z.call(this,r.apply(j,n))}})};var N=0;j.uniqueId=function(n){var t=++N+"";return n?n+t:t},j.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var q=/(.)^/,B={"'":"'","\\":"\\","\r":"r","\n":"n","	":"t","\u2028":"u2028","\u2029":"u2029"},D=/\\|'|\r|\n|\t|\u2028|\u2029/g;j.template=function(n,t,r){var e;r=j.defaults({},r,j.templateSettings);var u=new RegExp([(r.escape||q).source,(r.interpolate||q).source,(r.evaluate||q).source].join("|")+"|$","g"),i=0,a="__p+='";n.replace(u,function(t,r,e,u,o){return a+=n.slice(i,o).replace(D,function(n){return"\\"+B[n]}),r&&(a+="'+\n((__t=("+r+"))==null?'':_.escape(__t))+\n'"),e&&(a+="'+\n((__t=("+e+"))==null?'':__t)+\n'"),u&&(a+="';\n"+u+"\n__p+='"),i=o+t.length,t}),a+="';\n",r.variable||(a="with(obj||{}){\n"+a+"}\n"),a="var __t,__p='',__j=Array.prototype.join,"+"print=function(){__p+=__j.call(arguments,'');};\n"+a+"return __p;\n";try{e=new Function(r.variable||"obj","_",a)}catch(o){throw o.source=a,o}if(t)return e(t,j);var c=function(n){return e.call(this,n,j)};return c.source="function("+(r.variable||"obj")+"){\n"+a+"}",c},j.chain=function(n){return j(n).chain()};var z=function(n){return this._chain?j(n).chain():n};j.mixin(j),A(["pop","push","reverse","shift","sort","splice","unshift"],function(n){var t=e[n];j.prototype[n]=function(){var r=this._wrapped;return t.apply(r,arguments),"shift"!=n&&"splice"!=n||0!==r.length||delete r[0],z.call(this,r)}}),A(["concat","join","slice"],function(n){var t=e[n];j.prototype[n]=function(){return z.call(this,t.apply(this._wrapped,arguments))}}),j.extend(j.prototype,{chain:function(){return this._chain=!0,this},value:function(){return this._wrapped}}),"function"==typeof define&&define.amd&&define("underscore",[],function(){return j})}).call(this);
 //# sourceMappingURL=underscore-min.map
+var JSONfn  = {};
+JSONfn.stringify = function (obj) {
+
+    return JSON.stringify(obj, function (key, value) {
+        if (value instanceof Function || typeof value == 'function') {
+            return value.toString();
+        }
+        if (value instanceof RegExp) {
+            return '_PxEgEr_' + value;
+        }
+        return value;
+    });
+};
+
+JSONfn.parse = function (str, date2obj) {
+
+    var iso8061 = date2obj ? /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/ : false;
+
+    return JSON.parse(str, function (key, value) {
+        var prefix;
+
+        if (typeof value != 'string') {
+            return value;
+        }
+        if (value.length < 8) {
+            return value;
+        }
+
+        prefix = value.substring(0, 8);
+
+        if (iso8061 && value.match(iso8061)) {
+            return new Date(value);
+        }
+        if (prefix === 'function') {
+            return eval('(' + value + ')');
+        }
+        if (prefix === '_PxEgEr_') {
+            return eval(value.slice(8));
+        }
+
+        return value;
+    });
+};
+
+JSONfn.clone = function (obj, date2obj) {
+    return JSONfn.parse(JSONfn.stringify(obj), date2obj);
+};

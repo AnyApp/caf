@@ -9,7 +9,7 @@ var CTemplator = Class({
      */
     buildAll: function(){
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.build(CObjectsHandler.appContainerId);
+        this.buildFromObject(CObjectsHandler.appContainerId);
     },
     /**
      * Build from object.
@@ -36,7 +36,7 @@ var CTemplator = Class({
             // Apply Logic and Design on the Object.
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);
-        });
+        },this);
     }
 
 });

@@ -5,8 +5,7 @@
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            doyou: "nom",
-            wow:"g"
+            minHeight: 20
         },
         DEFAULT_LOGIC: {
         }
@@ -24,8 +23,8 @@ var CLabel = Class(CObject,{
     /**
      *  Build Object.
      */
-    prepareBuild: function(){
-        this.$class.$superp.prepareBuild.call(this);
+    prepareBuild: function(data){
+        return CLabel.$superp.prepareBuild.call(this,data);
     }
 
 

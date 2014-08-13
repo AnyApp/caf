@@ -140,6 +140,7 @@ caf.ui.attributes =
             //caf.pager.moveToTab(args['data-caf-current-tab'],args.view.mElement.id,true);
         });
 */
+/*
         this.addAttr(['data-caf-form'],function(args){
             caf.ui.forms.createForm(args['data-caf-form']);
         });
@@ -153,6 +154,8 @@ caf.ui.attributes =
             var callback = eval(args['data-caf-form-send-to-url-callback']);
             caf.ui.forms.setFormSaveToUrlCallback(args['data-caf-form'],callback);
         });
+*/
+/*
         this.addAttr(['data-caf-form-submit-button'],function(args){
             var formName = args['data-caf-form-submit-button'];
             args.view.onClick( function(){caf.ui.forms.submitForm(formName);} );
@@ -169,6 +172,8 @@ caf.ui.attributes =
             var formName = args['data-caf-form-clear-button'];
             args.view.onClick( function(){caf.ui.forms.clearForm(formName);} );
         });
+*/
+/*
         this.addAttr(['data-caf-form-input','data-caf-form-input-name','data-caf-form-input-type',
             'data-caf-form-input-validator','data-caf-form-input-prepare'],function(args){
             // Create input.
@@ -176,6 +181,7 @@ caf.ui.attributes =
                 args['data-caf-form-input-type'],args['data-caf-form-input-validator'],
                 args['data-caf-form-input-prepare'])
         });
+*/
 /*
         this.addAttr(['data-caf-main-page'],function(args){
             caf.pager.setMainPage(args['data-caf-main-page']);

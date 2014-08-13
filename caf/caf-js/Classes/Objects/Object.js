@@ -4,9 +4,7 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            width: "150px",
-            wow:" gi",
-            woke:" gi"
+            width: "150"
         },
         DEFAULT_LOGIC: {
         },
@@ -36,7 +34,6 @@ var CObject = Class({
         this.logic          = values.logic      || {};
         this.design         = values.design     || {};
         this.data           = values.data       || {};
-        this.onClicks       = Array();
         this.classes        = "";
         this.lastClasses    = "";
         this.lastLogic      = {};
@@ -51,12 +48,6 @@ var CObject = Class({
         if (CUtils.isEmpty(this.uname))
             return this.id;
         return this.uname;
-    },
-    addOnClick: function(onClick) {
-        this.onClicks.push(onClick);
-    },
-    getOnClicks: function(){
-        return this.onClicks;
     },
     setParent: function(parentID) {
         this.parent = parentID;
@@ -126,17 +117,22 @@ var CObject = Class({
         // Extra tag attributes. For example: 'href="http://www.web.com"'
         attributes  = CUtils.isEmpty(attributes)? Array() : attributes;
         // Add class attribute.
+        attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
 
         // If tag has inner or not.
         tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;
 
         if (tagHasInner ===false) {
-            view.append([tagOpen,attributes,'/>'],true);
+            view.append('/>',true);
+            view.append(attributes,true);
+            view.append(tagOpen,true);
         }
         else {
             // Has Inner - Wrap it.
-            view.append([tagOpen,attributes,'>'],true); // Add to beginning.
+            view.append('>',true);
+            view.append(attributes,true);
+            view.append(tagOpen,true);
             view.append('</'+tag+'>');      // Add to end.
         }
         return view;

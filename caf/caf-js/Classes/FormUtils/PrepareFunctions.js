@@ -4,7 +4,7 @@
 var CPrepareFunctions = Class({
     $singleton: true,
     prepares: {
-        same: new CValidator(
+        same: new CPrepareFunction(
             function(value){
                 return value;
             }

@@ -11,7 +11,7 @@ var CStringBuilder = Class({
      * @param toStart - if true - will append to start of string. Else - end.
      */
     append: function(value,inStart){
-        var operation = toStart===true? this.array.unshift : this.array.push;
+        var operation = inStart===true? this.array.unshift : this.array.push;
         // String Case.
         if( typeof value === 'string' ) value = [value];
 
