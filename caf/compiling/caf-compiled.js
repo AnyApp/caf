@@ -388,6 +388,13 @@ var CDesign = Class({
 
             return classes;
         },
+        cursor: function(data){
+            var values = ['pointer'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
         direction: function(data){
             var values = ['rtl','ltr'];
             if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
@@ -453,16 +460,19 @@ var CDesign = Class({
             var classes = "";
             if (!CUtils.isEmpty(data['bottom']))    classes+="mb"+data['bottom']+" ";
             if (!CUtils.isEmpty(data['top']))       classes+="mt"+data['top']+" ";
-            // If direction mentioned, right-left margin is ignored.
+            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
+            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left']+" ";
+
             if (!CUtils.isEmpty(data['direction'])){
-                if (data['direction']==="centered") classes+"marginCentered ";
-                if (data['direction']==="toright")  classes+"marginRighted ";
-                if (data['direction']==="toleft")   classes+"marginLefted ";
-                return classes;
+
+                if (data['direction']==="centered")
+                    classes+="marginCentered ";
+                if (data['direction']==="to-right")
+                    classes+="marginRighted ";
+                if (data['direction']==="to-left")
+                    classes+="marginLefted ";
             }
 
-            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left'];
 
             return classes;
         },
@@ -478,6 +488,7 @@ var CDesign = Class({
         },
         absolutes: function(data){
             var classes = "";
+
             if (!CUtils.isEmpty(data['bottom']))    classes+="bottom"+data['bottom']+" ";
             if (!CUtils.isEmpty(data['top']))       classes+="top"+data['top']+" ";
             if (!CUtils.isEmpty(data['right']))     classes+="right"+data['right']+" ";
@@ -488,19 +499,25 @@ var CDesign = Class({
 
     },
     prepareDesign: function(object){
-        var classesBuilder = new CStringBuilder();
         var design = object.design;
+        // Save the classes in the object.
+        object.setClasses(CDesign.designToClasses(design));
+    },
+    designToClasses: function(design){
+        if (CUtils.isEmpty(design))
+            return "";
+
+        var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
             if (CUtils.isEmpty(CDesign.designs[attribute])){
                 CLog.error("Design: "+attribute+" doesn't exist.")
-                return;
+                return "";
             }
             classesBuilder.append( CDesign.designs[attribute](value) );
         },this);
-        // Save the classes in the object.
-        object.setClasses(classesBuilder.build(" "));
+        return classesBuilder.build(' ');
     },
     applyDesign: function(object){
         CUtils.element(object.uid()).className = object.classes;
@@ -563,7 +580,7 @@ var CLogic = Class({
             CPager.setMainPage(value);
         },
         sideMenu: function(object,value){
-            CSwiper.initSideMenu(object.uid(),value.position);
+            CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
             CSwiper.initSwiper(object.uid(),value.options,value.pagination);
@@ -624,6 +641,28 @@ var CLogic = Class({
 
 
 /**
+ * Created by dvircn on 14/08/14.
+ */
+var COF = Class({
+    $singleton: true,
+
+    toJSON: function(type,uname,design,logic,data){
+        var object = {};
+        object.type     = type;
+        object.uname    = uname;
+        object.design   = design;
+        object.logic    = logic;
+        object.data     = data;
+    },
+    Buttons: {
+        custom: function(uname,design,active){
+
+        }
+    }
+
+
+});
+/**
  * Created by dvircn on 07/08/14.
  */
 var CObjectsHandler = Class({
@@ -631,6 +670,7 @@ var CObjectsHandler = Class({
     objectsById: {},
     preparedObjects: Array(),
     appContainerId: "",
+    mainViewId: "",
 
     addObject: function(object){
         this.objectsById[object.uid()] = object;
@@ -664,15 +704,20 @@ var CObjectsHandler = Class({
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
             try {
-                var cObject = eval("new C"+type+"(object)"); // Create the object.
-                CObjectsHandler.addObject(cObject);
-                if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify Main Object.
+                this.createObject(type,object);
             }
             catch (e){
                 CLog.log("Failed to create object from type: "+type+". Error: "+e);
             }
 
         },this);
+    },
+    createObject: function(type,data){
+        var cObject = eval("new C"+type+"(data)"); // Create the object.
+        CObjectsHandler.addObject(cObject);
+        if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
+        if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
+        return cObject;
     }
 
 
@@ -718,7 +763,19 @@ var CTemplator = Class({
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);
         },this);
+
+        // Clear Whitespaces.
+        CUtils.cleanWhitespace();
+    },
+    objectJSON: function(type,uname,design,logic,data){
+        var object = {};
+        object.type     = type;
+        object.uname    = uname;
+        object.design   = design;
+        object.logic    = logic;
+        object.data     = data;
     }
+
 
 });
 /**
@@ -919,7 +976,7 @@ var CUtils = Class({
     },
     isEmpty: function(obj)
     {
-        return obj == undefined || obj == null || obj == '' || obj.toString()=='';
+        return obj === undefined || obj === null || obj === '' || obj.toString()==='';
     },
     isString: function(variable)
     {
@@ -1060,8 +1117,9 @@ var CClicker = Class({
     setOnClickable: function(object){
         // Init
         var design = object.getDesign();
-        design.active       = design.active         || '';
-        design.activeRemove = design.activeRemove   || '';
+
+        design.active       = CDesign.designToClasses(object.getDesign().active);
+        design.activeRemove = CDesign.designToClasses(object.getDesign().activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,
@@ -1225,14 +1283,14 @@ var CPager = Class({
     addHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;
 
-        var holdClass = CObjectsHandler.object(tabButtonId).getDesign().hold;
+        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
         if (!CUtils.isEmpty(holdClass))
             CUtils.addClass(CUtils.element(tabButtonId),holdClass);
     },
     removeHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;
 
-        var holdClass = CObjectsHandler.object(tabButtonId).getDesign().hold;
+        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
         if (!CUtils.isEmpty(holdClass))
             CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
     },
@@ -1412,13 +1470,20 @@ var CSwiper = Class({
     {
         this.mSwipers[swiperContainerId].swipeTo(slide);
     },
-    initSideMenu: function(swiperContainerId,position)
+    initSideMenu: function(positions)
     {
-        this.sideMenuSide = position || 'left';
+        var hasLeft     = positions.indexOf('left')>=0;
+        var hasRight    = positions.indexOf('right')>=0;
+        var disable     = 'none';
+        if (!hasLeft && !hasRight)   return;
+        if (!hasLeft)
+            disable  = 'left';
+        if (!hasRight)
+            disable  = 'right';
 
         this.sideMenu = new Snap({
-            element: document.getElementById(swiperContainerId),
-            disable: position=='left'? 'right' : 'left',
+            element: CUtils.element(CObjectsHandler.mainViewId),
+            disable: disable,
             resistance:10000000
         });
     },
@@ -1428,7 +1493,7 @@ var CSwiper = Class({
         var state = this.sideMenu.state().state;
 
         if (state=="closed")
-            this.sideMenu.open(this.sideMenuSide);
+            this.sideMenu.open(name);
         else
             this.sideMenu.close();
     },
@@ -1456,7 +1521,6 @@ var CUI = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            width: "150"
         },
         DEFAULT_LOGIC: {
         },
@@ -1606,7 +1670,9 @@ var CObject = Class({
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            minHeight: 20
+            minHeight: 20,
+            widthSM: 5,
+            widthXS: 10
         },
         DEFAULT_LOGIC: {
         }
@@ -1619,24 +1685,40 @@ var CLabel = Class(CObject,{
         CObject.mergeWithDefaults(values,CLabel);
 
         // Invoke parent's constructor
-        this.$class.$super.call(this, values);
+        CLabel.$super.call(this, values);
     },
-    /**
-     *  Build Object.
-     */
-    prepareBuild: function(data){
-        return CLabel.$superp.prepareBuild.call(this,data);
-    }
-
 
 
 });
 
-var x = new CLabel({text:"dvir",design:{width:"0px",ad:"hok"}});
-
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 13/08/14.
  */
+var CButton = Class(CLabel,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            cursor: 'pointer',
+            active:{
+                bgColor:{color:'Gray',level:3}
+            }
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CButton);
+
+        // Invoke parent's constructor
+        CButton.$super.call(this, values);
+    }
+
+
+});
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -1659,8 +1741,7 @@ var CContainer = Class(CObject,{
 
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
-        CLog.dlog(this.data.childs);
-        this.data.childs = values.data.childs || [];
+        this.data.childs = this.data.childs || [];
     },
     /**
      *  Build Object.
@@ -1696,6 +1777,8 @@ var CContainer = Class(CObject,{
 var CAppContainer = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
+            classes: 'app_container',
+            direction: 'ltr'
         },
         DEFAULT_LOGIC: {
         }
@@ -1705,8 +1788,134 @@ var CAppContainer = Class(CContainer,{
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CAppContainer);
+
         // Invoke parent's constructor
         CAppContainer.$super.call(this, values);
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 13/08/14.
+ */
+var CMainView = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'snap-content',
+            bgColor:{color:'White'}
+
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CMainView);
+        // Invoke parent's constructor
+        CMainView.$super.call(this, values);
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 13/08/14.
+ */
+var CSideMenu = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'snap-drawers'
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSideMenu);
+        // Invoke parent's constructor
+        CSideMenu.$super.call(this, values);
+        this.leftContainer  = values.data.leftContainer  || null;
+        this.rightContainer = values.data.rightContainer || null;
+
+        // Create left and right menus.
+        this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
+            data: {  childs: [this.leftContainer] }
+        });
+        this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
+            data: {  childs: [this.rightContainer] }
+        });
+
+        // Set Children.
+        this.data.childs = ['side-menu-left','side-menu-right'];
+        var positions = [];
+        if (this.leftContainer != null)
+            positions.push('left');
+        if (this.rightContainer != null)
+            positions.push('right');
+
+        this.logic.sideMenu = {
+            positions: positions
+        };
+
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 13/08/14.
+ */
+var CSideMenuLeft = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'snap-drawer snap-drawer-left',
+            bgColor:{color:'Gray',level:4},
+            overflow: 'scrollable',
+            textAlign: 'center'
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSideMenuLeft);
+        // Invoke parent's constructor
+        CSideMenuLeft.$super.call(this, values);
+        this.uname = 'side-menu-left';
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 13/08/14.
+ */
+var CSideMenuRight = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'snap-drawer snap-drawer-right',
+            bgColor:{color:'Gray',level:4},
+            overflow: 'scrollable',
+            textAlign: 'center'
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSideMenuRight);
+        // Invoke parent's constructor
+        CSideMenuRight.$super.call(this, values);
+        this.uname = 'side-menu-right';
     }
 
 });

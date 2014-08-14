@@ -4,7 +4,6 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            width: "150"
         },
         DEFAULT_LOGIC: {
         },

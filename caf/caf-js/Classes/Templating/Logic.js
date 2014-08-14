@@ -53,7 +53,7 @@ var CLogic = Class({
             CPager.setMainPage(value);
         },
         sideMenu: function(object,value){
-            CSwiper.initSideMenu(object.uid(),value.position);
+            CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
             CSwiper.initSwiper(object.uid(),value.options,value.pagination);

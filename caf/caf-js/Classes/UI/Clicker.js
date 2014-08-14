@@ -27,8 +27,9 @@ var CClicker = Class({
     setOnClickable: function(object){
         // Init
         var design = object.getDesign();
-        design.active       = design.active         || '';
-        design.activeRemove = design.activeRemove   || '';
+
+        design.active       = CDesign.designToClasses(object.getDesign().active);
+        design.activeRemove = CDesign.designToClasses(object.getDesign().activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,

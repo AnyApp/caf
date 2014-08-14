@@ -17,8 +17,7 @@ var CContainer = Class(CObject,{
 
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
-        CLog.dlog(this.data.childs);
-        this.data.childs = values.data.childs || [];
+        this.data.childs = this.data.childs || [];
     },
     /**
      *  Build Object.

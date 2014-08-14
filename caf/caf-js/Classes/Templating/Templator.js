@@ -37,6 +37,18 @@ var CTemplator = Class({
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);
         },this);
+
+        // Clear Whitespaces.
+        CUtils.cleanWhitespace();
+    },
+    objectJSON: function(type,uname,design,logic,data){
+        var object = {};
+        object.type     = type;
+        object.uname    = uname;
+        object.design   = design;
+        object.logic    = logic;
+        object.data     = data;
     }
+
 
 });

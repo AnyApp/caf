@@ -4,32 +4,47 @@ var app =
     {
         var objects = [
             {   uname:  'app-container', type:   'AppContainer',
-                data: {  childs: ['label','button','side-menu'] }
+                data: {  childs: ['side-menu','main-view'] }
             },
-            {   uname:  'side-menu', type:   'Label',
+            {   uname:  'side-menu', type:   'SideMenu',
+                data: {
+                    leftContainer: 'side-menu-left-container',
+                    rightContainer:'side-menu-right-container'
+                }
+            },
+            {   uname:  'side-menu-left-container', type:   'Container',
+                data: {  childs: [] }
+            },
+            {   uname:  'side-menu-right-container', type:  'Container',
+                data: {  childs: [] }
+            },
+
+            {   uname:  'main-view', type:   'MainView',
+                data: {  childs: ['label','button'] },
                 design: {
-                    bgColor:{color:'Gray',level:4}
-                },
-                logic: {
-                    sideMenu: { position:'left' }
+                    textAlign: 'center'
                 }
             },
             {   uname:  'label', type:   'Label',
                 design: {
                     height: 100, textAlign: 'center',
                     color:{color:'White'},
-                    bgColor:{color:'Cyan',level:3},
+                    bgColor:{color:'Blue',level:1},
                     font: { size:18, style:['bold']},
-                    //TODO: active // Fix Active To be active design inner!!
+                    margin: { right:1, left:1, top:3, direction: 'centered' },
                 },
                 logic: { text: "Label" }
             },
-            {   uname:  'button', type:   'Label',
+            {   uname:  'button', type:   'Button',
                 design: {
                     height: 100, textAlign: 'center',
                     color:{color:'White'},
-                    bgColor:{color:'Cyan',level:3},
-                    font: { size:18, style:['bold']}
+                    bgColor:{color:'Cyan',level:1},
+                    font: { size:18, style:['bold']},
+                    margin: { right:1, left:1, top:3, direction: 'centered' },
+                    active: {
+                        bgColor:{color:'Cyan',level:4}
+                    }
                 },
                 logic: {
                     text: "Button",

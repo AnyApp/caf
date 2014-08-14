@@ -1,28 +1,25 @@
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 13/08/14.
  */
-
-var CLabel = Class(CObject,{
+var CMainView = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            minHeight: 20,
-            widthSM: 5,
-            widthXS: 10
+            classes:'snap-content',
+            bgColor:{color:'White'}
+
         },
         DEFAULT_LOGIC: {
         }
-
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLabel);
-
+        CObject.mergeWithDefaults(values,CMainView);
         // Invoke parent's constructor
-        CLabel.$super.call(this, values);
-    },
-
+        CMainView.$super.call(this, values);
+    }
 
 });
+
 

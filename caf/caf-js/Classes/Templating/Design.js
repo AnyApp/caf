@@ -79,6 +79,13 @@ var CDesign = Class({
 
             return classes;
         },
+        cursor: function(data){
+            var values = ['pointer'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
         direction: function(data){
             var values = ['rtl','ltr'];
             if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
@@ -144,16 +151,19 @@ var CDesign = Class({
             var classes = "";
             if (!CUtils.isEmpty(data['bottom']))    classes+="mb"+data['bottom']+" ";
             if (!CUtils.isEmpty(data['top']))       classes+="mt"+data['top']+" ";
-            // If direction mentioned, right-left margin is ignored.
+            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
+            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left']+" ";
+
             if (!CUtils.isEmpty(data['direction'])){
-                if (data['direction']==="centered") classes+"marginCentered ";
-                if (data['direction']==="toright")  classes+"marginRighted ";
-                if (data['direction']==="toleft")   classes+"marginLefted ";
-                return classes;
+
+                if (data['direction']==="centered")
+                    classes+="marginCentered ";
+                if (data['direction']==="to-right")
+                    classes+="marginRighted ";
+                if (data['direction']==="to-left")
+                    classes+="marginLefted ";
             }
 
-            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left'];
 
             return classes;
         },
@@ -169,6 +179,7 @@ var CDesign = Class({
         },
         absolutes: function(data){
             var classes = "";
+
             if (!CUtils.isEmpty(data['bottom']))    classes+="bottom"+data['bottom']+" ";
             if (!CUtils.isEmpty(data['top']))       classes+="top"+data['top']+" ";
             if (!CUtils.isEmpty(data['right']))     classes+="right"+data['right']+" ";
@@ -179,19 +190,25 @@ var CDesign = Class({
 
     },
     prepareDesign: function(object){
-        var classesBuilder = new CStringBuilder();
         var design = object.design;
+        // Save the classes in the object.
+        object.setClasses(CDesign.designToClasses(design));
+    },
+    designToClasses: function(design){
+        if (CUtils.isEmpty(design))
+            return "";
+
+        var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
             if (CUtils.isEmpty(CDesign.designs[attribute])){
                 CLog.error("Design: "+attribute+" doesn't exist.")
-                return;
+                return "";
             }
             classesBuilder.append( CDesign.designs[attribute](value) );
         },this);
-        // Save the classes in the object.
-        object.setClasses(classesBuilder.build(" "));
+        return classesBuilder.build(' ');
     },
     applyDesign: function(object){
         CUtils.element(object.uid()).className = object.classes;

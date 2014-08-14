@@ -81,13 +81,20 @@ var CSwiper = Class({
     {
         this.mSwipers[swiperContainerId].swipeTo(slide);
     },
-    initSideMenu: function(swiperContainerId,position)
+    initSideMenu: function(positions)
     {
-        this.sideMenuSide = position || 'left';
+        var hasLeft     = positions.indexOf('left')>=0;
+        var hasRight    = positions.indexOf('right')>=0;
+        var disable     = 'none';
+        if (!hasLeft && !hasRight)   return;
+        if (!hasLeft)
+            disable  = 'left';
+        if (!hasRight)
+            disable  = 'right';
 
         this.sideMenu = new Snap({
-            element: document.getElementById(swiperContainerId),
-            disable: position=='left'? 'right' : 'left',
+            element: CUtils.element(CObjectsHandler.mainViewId),
+            disable: disable,
             resistance:10000000
         });
     },
@@ -97,7 +104,7 @@ var CSwiper = Class({
         var state = this.sideMenu.state().state;
 
         if (state=="closed")
-            this.sideMenu.open(this.sideMenuSide);
+            this.sideMenu.open(name);
         else
             this.sideMenu.close();
     },

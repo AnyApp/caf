@@ -44,7 +44,7 @@ var CUtils = Class({
     },
     isEmpty: function(obj)
     {
-        return obj == undefined || obj == null || obj == '' || obj.toString()=='';
+        return obj === undefined || obj === null || obj === '' || obj.toString()==='';
     },
     isString: function(variable)
     {

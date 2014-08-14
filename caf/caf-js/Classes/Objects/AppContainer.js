@@ -4,6 +4,8 @@
 var CAppContainer = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
+            classes: 'app_container',
+            direction: 'ltr'
         },
         DEFAULT_LOGIC: {
         }
@@ -13,6 +15,7 @@ var CAppContainer = Class(CContainer,{
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CAppContainer);
+
         // Invoke parent's constructor
         CAppContainer.$super.call(this, values);
     }

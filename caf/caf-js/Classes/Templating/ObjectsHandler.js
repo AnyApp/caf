@@ -6,6 +6,7 @@ var CObjectsHandler = Class({
     objectsById: {},
     preparedObjects: Array(),
     appContainerId: "",
+    mainViewId: "",
 
     addObject: function(object){
         this.objectsById[object.uid()] = object;
@@ -39,15 +40,20 @@ var CObjectsHandler = Class({
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
             try {
-                var cObject = eval("new C"+type+"(object)"); // Create the object.
-                CObjectsHandler.addObject(cObject);
-                if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify Main Object.
+                this.createObject(type,object);
             }
             catch (e){
                 CLog.log("Failed to create object from type: "+type+". Error: "+e);
             }
 
         },this);
+    },
+    createObject: function(type,data){
+        var cObject = eval("new C"+type+"(data)"); // Create the object.
+        CObjectsHandler.addObject(cObject);
+        if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
+        if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
+        return cObject;
     }
 
 
