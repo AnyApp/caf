@@ -5,7 +5,8 @@ var CMainView = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'snap-content',
-            bgColor:{color:'White'}
+            bgColor:{color:'White'},
+            textAlign: 'center'
 
         },
         DEFAULT_LOGIC: {

@@ -12,11 +12,6 @@ var CLogic = Class({
                 CUtils.openURL(value);
             });
         },
-        toUrl: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CUtils.openURL(value);
-            });
-        },
         toPage: function(object,value){
             CClicker.addOnClick(object,function(){
                 CPager.moveToPage(value);
@@ -56,7 +51,7 @@ var CLogic = Class({
             CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
-            CSwiper.initSwiper(object.uid(),value.options,value.pagination);
+            CSwiper.initSwiper(value);
         },
         dropMenuSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -86,6 +81,13 @@ var CLogic = Class({
                 var form = CObjectsHandler.object(value);
                 form.clearForm();
             });
+        },
+        loadInputFromStorage: function(object,value){
+            if (value===true){
+                var inputStoredValue = CLocalStorage.get(object.getName());
+                if (!CUtils.isEmpty(inputStoredValue))
+                    object.setValue(inputStoredValue);
+            }
         }
 
     },
@@ -101,7 +103,6 @@ var CLogic = Class({
             // Apply only if the logic have changed / never applied before.
             if (CUtils.equals(logic[attribute],lastLogic[attribute]))
                 return;
-            //if (CUtils.isEmpty(value))  return;
             // Apply Logic.
             this.logics[attribute](object,value);
         },this);

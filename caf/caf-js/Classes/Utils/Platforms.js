@@ -1,7 +1,7 @@
 /**
  * Created by dvircn on 12/08/14.
  */
-var CLocalStorage = Class({
+var CPlatforms = Class({
     $singleton: true,
     /**
      * Return whether or not the device platform is ios.

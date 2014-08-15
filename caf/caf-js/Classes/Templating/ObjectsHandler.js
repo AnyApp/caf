@@ -53,7 +53,7 @@ var CObjectsHandler = Class({
         CObjectsHandler.addObject(cObject);
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
-        return cObject;
+        return cObject.uid();
     }
 
 

@@ -5,9 +5,15 @@
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            minHeight: 20,
-            widthSM: 5,
-            widthXS: 10
+            height: 40,
+            color: {color:'White'},
+            fontSize:16,
+            fontStyle:['bold'],
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            textAlign: 'center',
+            round: 2
         },
         DEFAULT_LOGIC: {
         }
@@ -21,7 +27,7 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
-    },
+    }
 
 
 });

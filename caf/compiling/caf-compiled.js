@@ -377,15 +377,14 @@ var CDesign = Class({
 
             return classes;
         },
-        font: function(data){
-            var classes = "";
-            var style = data.style || [];
-            if (style.indexOf('bold')>=0)       classes+="bold ";
-            if (style.indexOf('italic')>=0)     classes+="italic ";
-
+        fontSize: function(data){
             // Font Size
-            if (!CUtils.isEmpty(data.size))     classes += 'fsz'+data.size;
-
+            return 'fsz'+data;
+        },
+        fontStyle: function(data){
+            var classes = "";
+            if (data.indexOf('bold')>=0)       classes+="bold ";
+            if (data.indexOf('italic')>=0)     classes+="italic ";
             return classes;
         },
         cursor: function(data){
@@ -416,6 +415,13 @@ var CDesign = Class({
             }
             return "";
         },
+        display: function(data){
+            var values = ['inlineBlock','block','hidden'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
         overflow: function(data){
             if (data==="hidden")        return "hidden";
             if (data==="scrollable")    return "overthrow";
@@ -428,12 +434,13 @@ var CDesign = Class({
             }
             return "";
         },
-        boxSizing: function(data){
+        round: function(data){
             if (data==="circle")    return "circle";
 
-            return (data || "s")+"Rounded";
+            return "Rounded"+data;
         },
         width: function(data){
+            data = ""+data;
             if (data.indexOf('%')>=0)   return "w"+data.substring(0,data.length-1);
             return "wp"+data;
         },
@@ -456,35 +463,44 @@ var CDesign = Class({
             return "mhp"+data;
         },
         margin: function(data){
-            if (data==="none")  return "noMargin";
-            var classes = "";
-            if (!CUtils.isEmpty(data['bottom']))    classes+="mb"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="mt"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left']+" ";
-
-            if (!CUtils.isEmpty(data['direction'])){
-
-                if (data['direction']==="centered")
-                    classes+="marginCentered ";
-                if (data['direction']==="to-right")
-                    classes+="marginRighted ";
-                if (data['direction']==="to-left")
-                    classes+="marginLefted ";
-            }
-
-
-            return classes;
+            if (data==="none")
+                return "noMargin";
+            if (data==="centered")
+                return "marginCentered";
+            if (data==="to-right")
+                return "marginRighted";
+            if (data==="to-left")
+                return "marginLefted";
+            return "mt"+data+"mb"+data+"mr"+data+"ml"+data;
+        },
+        marginTop: function(data){
+            return "mt"+data;
+        },
+        marginBottom: function(data){
+            return "mb"+data;
+        },
+        marginLeft: function(data){
+            return "ml"+data;
+        },
+        marginRight: function(data){
+            return "mr"+data;
+        },
+        paddingTop: function(data){
+            return "pt"+data;
+        },
+        paddingBottom: function(data){
+            return "pb"+data;
+        },
+        paddingLeft: function(data){
+            return "pl"+data;
+        },
+        paddingRight: function(data){
+            return "pr"+data;
         },
         padding: function(data){
-            if (data==="none")  return "noPadding";
-            var classes = "";
-            if (!CUtils.isEmpty(data['bottom']))    classes+="pb"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="pt"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="pr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="pl"+data['left'];
-
-            return classes;
+            if (data==="none")
+                return "noPadding";
+            return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
         },
         absolutes: function(data){
             var classes = "";
@@ -539,11 +555,6 @@ var CLogic = Class({
                 CUtils.openURL(value);
             });
         },
-        toUrl: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CUtils.openURL(value);
-            });
-        },
         toPage: function(object,value){
             CClicker.addOnClick(object,function(){
                 CPager.moveToPage(value);
@@ -583,7 +594,7 @@ var CLogic = Class({
             CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
-            CSwiper.initSwiper(object.uid(),value.options,value.pagination);
+            CSwiper.initSwiper(value);
         },
         dropMenuSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -613,6 +624,13 @@ var CLogic = Class({
                 var form = CObjectsHandler.object(value);
                 form.clearForm();
             });
+        },
+        loadInputFromStorage: function(object,value){
+            if (value===true){
+                var inputStoredValue = CLocalStorage.get(object.getName());
+                if (!CUtils.isEmpty(inputStoredValue))
+                    object.setValue(inputStoredValue);
+            }
         }
 
     },
@@ -628,7 +646,6 @@ var CLogic = Class({
             // Apply only if the logic have changed / never applied before.
             if (CUtils.equals(logic[attribute],lastLogic[attribute]))
                 return;
-            //if (CUtils.isEmpty(value))  return;
             // Apply Logic.
             this.logics[attribute](object,value);
         },this);
@@ -643,25 +660,29 @@ var CLogic = Class({
 /**
  * Created by dvircn on 14/08/14.
  */
-var COF = Class({
-    $singleton: true,
-
-    toJSON: function(type,uname,design,logic,data){
-        var object = {};
-        object.type     = type;
-        object.uname    = uname;
-        object.design   = design;
-        object.logic    = logic;
-        object.data     = data;
+var COBuilder = Class({
+    constructor: function(type,uname,design,logic,data) {
+        this.type   = type      || 'Object';
+        this.uname  = uname     || '';
+        this.design = design    || {};
+        this.logic  = logic     || {};
+        this.data   = data      || {};
     },
-    Buttons: {
-        custom: function(uname,design,active){
+    build: function(){
+        return {
+            type:   this.type,
+            uname:  this.uname,
+            design: this.design  || {},
+            logic:  this.logic   || {},
+            data:   this.data    || {}
+        };
+    },
 
-        }
-    }
 
 
 });
+
+
 /**
  * Created by dvircn on 07/08/14.
  */
@@ -717,7 +738,7 @@ var CObjectsHandler = Class({
         CObjectsHandler.addObject(cObject);
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
-        return cObject;
+        return cObject.uid();
     }
 
 
@@ -853,7 +874,7 @@ var CNetwork = Class({
 });/**
  * Created by dvircn on 12/08/14.
  */
-var CLocalStorage = Class({
+var CPlatforms = Class({
     $singleton: true,
     /**
      * Return whether or not the device platform is ios.
@@ -1395,20 +1416,19 @@ var CSwiper = Class({
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
-    initSwiper: function(swiperId,swiperOptionsArray,pagination)
+    initSwiper: function(data)
     {
+        var swiperId = data.container;
         var options = {
             moveStartThreshold: 50,
             resistance: '100%'
         };
-        if (!CUtils.isEmpty(pagination)) {
-            options.pagination = '#'+pagination;
+        if (!CUtils.isEmpty(data.pagination)) {
+            options.pagination = '#'+data.pagination;
             options.paginationClickable= true;
         }
-        if (!CUtils.isEmpty(swiperOptionsArray)) {
-            if (swiperOptionsArray.indexOf('loop')>=0)
-                options.loop=true;
-        }
+        if (data.loop===true)
+            options.loop=true;
 
         this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
 
@@ -1521,6 +1541,7 @@ var CUI = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
+            boxSizing: 'borderBox'
         },
         DEFAULT_LOGIC: {
         },
@@ -1602,7 +1623,7 @@ var CObject = Class({
         var view        = data['view'] || new CStringBuilder(),
             tag         = data['tag'],
             attributes  = data['attributes'],
-            forceDesign = data['forceDesign'],
+            forceDesign = data['forceDesign'] || {},
             tagHasInner = data['tagHasInner'];
 
         // Check if this element is already in the DOM.
@@ -1615,8 +1636,12 @@ var CObject = Class({
         // This will prevent unnecessary build operations - better performance.
         this.lastClasses    = this.classes;
 
-        // Prepare Design and Logic.
-        CDesign.prepareDesign(this,forceDesign);
+        // Prepare Design.
+        // Save original classes - append them.
+        forceDesign.classes =
+            (forceDesign.classes || '')+' '+(this.design.classes || '');
+        this.design = CUtils.mergeJSONs(forceDesign,this.design);
+        CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
@@ -1670,9 +1695,15 @@ var CObject = Class({
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            minHeight: 20,
-            widthSM: 5,
-            widthXS: 10
+            height: 40,
+            color: {color:'White'},
+            fontSize:16,
+            fontStyle:['bold'],
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            textAlign: 'center',
+            round: 2
         },
         DEFAULT_LOGIC: {
         }
@@ -1686,7 +1717,7 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
-    },
+    }
 
 
 });
@@ -1759,10 +1790,13 @@ var CContainer = Class(CObject,{
             //Set parent to this Object.
             object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
-            content.merge(object.prepareBuild(data));
+            content.merge(object.prepareBuild({
+                forceDesign: data.forceDesign
+            }));
         },this);
         // Prepare this element - wrap it's children.
-        CContainer.$superp.prepareBuild.call(this,{view: content});
+        data.view = content;
+        CContainer.$superp.prepareBuild.call(this,CUtils.mergeJSONs(data));
         return content;
     }
 
@@ -1803,7 +1837,8 @@ var CMainView = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'snap-content',
-            bgColor:{color:'White'}
+            bgColor:{color:'White'},
+            textAlign: 'center'
 
         },
         DEFAULT_LOGIC: {
@@ -1931,11 +1966,134 @@ var CSideMenuRight = Class(CContainer,{
  * Created by dvircn on 06/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 15/08/14.
  */
+var CImage = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            height: 40,
+            width: 40,
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            marginBottom:1
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CImage);
+
+        // Invoke parent's constructor
+        CImage.$super.call(this, values);
+
+        this.data.src = values.data.src || '';
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element - wrap it's children.
+        return CImage.$superp.prepareBuild.call(this,{
+            tag: 'img',
+            attributes: ['src="'+this.data.src+'"'],
+            tagHasInner: false
+        });
+    }
+
+
+});
+
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 15/08/14.
  */
+var CSlider = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            height: 40,
+            width: 40,
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            marginBottom:1
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSlider);
+
+        // Invoke parent's constructor
+        CSlider.$super.call(this, values);
+
+        // Create Container.
+        this.sliderContainer = CObjectsHandler.createObject('CSliderContainer',{
+            data: {  childs: [this.uid()] }
+        });
+        // Create Pagination
+        var paginationDesign = values.pagination ===true ? {} :
+        {  display: 'hidden' };
+        this.pagination = CObjectsHandler.createObject('CPagination',{
+            design: paginationDesign
+        });
+
+        // Create images childs inside Gallery!
+
+        this.logic.swipeView = {
+            container: this.sliderContainer,
+            pagination: this.pagination,
+            loop: values.data.loop || false
+
+        }
+
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element - force design it's children.
+        return CSlider.$superp.prepareBuild.call(this,{
+            forceDesign: {
+                classes: 'swiper-slide'
+            }
+        });
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
+var CGallery = Class(CSlider,{
+    $statics: {
+        DEFAULT_DESIGN: {
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CGallery);
+
+        // Invoke parent's constructor
+        CGallery.$super.call(this, values);
+    }
+
+
+});
+
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -1957,6 +2115,11 @@ var CSideMenuRight = Class(CContainer,{
 var CForm = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            margin: 'centered',
+            textAlign: 'center'
         },
         DEFAULT_LOGIC: {
         }
@@ -1969,17 +2132,10 @@ var CForm = Class(CContainer,{
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-        this.data.inputs             = values.data.inputs || [];
-        this.logic.saveToUrl         = values.logic.saveToUrl || [];
-        this.logic.saveToUrlCallback = values.logic.saveToUrlCallback || [];
-        this.logic.onSubmit          = values.logic.onSubmit || [];
-    },
-    /**
-     *  Build Object.
-     */
-    prepareBuild: function(data){
-        // Prepare this element - wrap it's children.
-        this.$class.$superp.prepareBuild.call(this,data);
+        this.data.inputs            = values.data.inputs || [];
+        this.data.saveToUrl         = values.data.saveToUrl || '';
+        this.data.saveToUrlCallback = values.data.saveToUrlCallback || function(){};
+        this.data.onSubmit          = values.data.onSubmit ||  function(){};
     },
     formValues: function() {
         var values = {};
@@ -1989,6 +2145,7 @@ var CForm = Class(CContainer,{
                 var name = input.getName();
                 var value = input.value();
                 var validators = input.getValidators();
+
                 _.each(validators,function(name){
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
@@ -1998,6 +2155,7 @@ var CForm = Class(CContainer,{
                         var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
                         var color = colors[Math.floor(Math.random() * colors.length)];
                         // Show Message.
+/*
                         CDialogs.show({
                             title: validationResult.getTitle(),
                             content:validationResult.getMessage(),
@@ -2011,6 +2169,7 @@ var CForm = Class(CContainer,{
                                 CLog.log('Extra..')
                             },
                             color:color});
+*/
                         throw "Error"; // Return empty result.
                     }
                 },this);
@@ -2037,7 +2196,7 @@ var CForm = Class(CContainer,{
         // Check if the was validation error.
         if (values == null)     return;
         // Run onSubmit with the values.
-        this.logic.onSubmit(values);
+        this.data.onSubmit(values);
     },
     sendFormToUrl: function() {
         // Retrieve the values from the form.
@@ -2045,7 +2204,7 @@ var CForm = Class(CContainer,{
         // Check if the was validation error.
         if (values == null)     return;
         // Run send with the values.
-        CNetwork.send(this.logic.saveToUrl,values,this.logic.saveToUrlCallback);
+        CNetwork.send(this.data.saveToUrl,values,this.data.saveToUrlCallback);
     },
     saveFormToLocalStorage: function() {
         // Retrieve the values from the form.
@@ -2070,6 +2229,14 @@ var CForm = Class(CContainer,{
 var CInput = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
+            height:35,
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            padding: 2,
+            fontSize:16,
+            fontStyle:['bold'],
+            round: 2
         },
         DEFAULT_LOGIC: {
         }
@@ -2078,17 +2245,27 @@ var CInput = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CForm);
+        CObject.mergeWithDefaults(values,CInput);
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-        this.data.name               = values.name          || '';
-        this.data.required           = values.required      || false;
-        this.data.validators         = values.validators    || [];
-        this.data.prepares           = values.prepares      || [];
+        this.data.name               = values.data.name          || '';
+        this.data.required           = values.data.required      || false;
+        this.data.validators         = values.data.validators    || [];
+        this.data.prepares           = values.data.prepares      || [];
 
         if (this.data.required)
             this.data.validators.unshift('notEmpty');
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element - wrap it's children.
+        return CInput.$superp.prepareBuild.call(this,{
+            tag: 'input',
+            tagHasInner: false
+        });
     },
     value: function() {
         var value = CUtils.element(this.uid()).value;
@@ -2096,6 +2273,10 @@ var CInput = Class(CObject,{
             CPrepareFunctions.prepareFunction(prepareFunctionId).prepare(value);
         },this);
         return value;
+    },
+    setValue: function(value){
+        CUtils.element(this.uid()).value = value;
+        CUtils.element(this.uid()).setAttribute('value',value);
     },
     clear: function() {
         CUtils.element(this.uid()).value = '';
@@ -2149,14 +2330,13 @@ var Caf = Class({
         var startLoadObjects = (new  Date()).getTime();
         CObjectsHandler.loadObjects(objects);
         var endLoadObjects  = (new  Date()).getTime();
-        CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
 
         var startBuildAll = (new  Date()).getTime();
 
         CTemplator.buildAll();
         var endBuildAll = (new  Date()).getTime();
+        CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
         CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
-
         CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
     }

@@ -1,19 +1,4 @@
 
-/* Margins */
-
-.marginCentered{
-    margin-left: auto;
-    margin-right: auto;
-}
-.marginRighted {
-    margin-left: auto;
-}
-.marginLefted {
-    margin-right: auto;
-}
-
-
-/* End Margins  */
 
 .mr0{
     margin-right:0px;
@@ -1227,3 +1212,22 @@
 .mb100{
     margin-bottom:100px;
 }
+
+
+/* Margins */
+
+.marginCentered{
+    margin-left: auto;
+    margin-right: auto;
+}
+.marginRighted {
+    margin-left: auto;
+}
+.marginLefted {
+    margin-right: auto;
+}
+
+
+/* End Margins  */
+
+

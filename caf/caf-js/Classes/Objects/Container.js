@@ -35,10 +35,13 @@ var CContainer = Class(CObject,{
             //Set parent to this Object.
             object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
-            content.merge(object.prepareBuild(data));
+            content.merge(object.prepareBuild({
+                forceDesign: data.forceDesign
+            }));
         },this);
         // Prepare this element - wrap it's children.
-        CContainer.$superp.prepareBuild.call(this,{view: content});
+        data.view = content;
+        CContainer.$superp.prepareBuild.call(this,CUtils.mergeJSONs(data));
         return content;
     }
 

@@ -68,15 +68,14 @@ var CDesign = Class({
 
             return classes;
         },
-        font: function(data){
-            var classes = "";
-            var style = data.style || [];
-            if (style.indexOf('bold')>=0)       classes+="bold ";
-            if (style.indexOf('italic')>=0)     classes+="italic ";
-
+        fontSize: function(data){
             // Font Size
-            if (!CUtils.isEmpty(data.size))     classes += 'fsz'+data.size;
-
+            return 'fsz'+data;
+        },
+        fontStyle: function(data){
+            var classes = "";
+            if (data.indexOf('bold')>=0)       classes+="bold ";
+            if (data.indexOf('italic')>=0)     classes+="italic ";
             return classes;
         },
         cursor: function(data){
@@ -107,6 +106,13 @@ var CDesign = Class({
             }
             return "";
         },
+        display: function(data){
+            var values = ['inlineBlock','block','hidden'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
         overflow: function(data){
             if (data==="hidden")        return "hidden";
             if (data==="scrollable")    return "overthrow";
@@ -119,12 +125,13 @@ var CDesign = Class({
             }
             return "";
         },
-        boxSizing: function(data){
+        round: function(data){
             if (data==="circle")    return "circle";
 
-            return (data || "s")+"Rounded";
+            return "Rounded"+data;
         },
         width: function(data){
+            data = ""+data;
             if (data.indexOf('%')>=0)   return "w"+data.substring(0,data.length-1);
             return "wp"+data;
         },
@@ -141,41 +148,52 @@ var CDesign = Class({
             return "col-lg-"+data;
         },
         height: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
             return "hp"+data;
         },
         minHeight: function(data){
             return "mhp"+data;
         },
         margin: function(data){
-            if (data==="none")  return "noMargin";
-            var classes = "";
-            if (!CUtils.isEmpty(data['bottom']))    classes+="mb"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="mt"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="mr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="ml"+data['left']+" ";
-
-            if (!CUtils.isEmpty(data['direction'])){
-
-                if (data['direction']==="centered")
-                    classes+="marginCentered ";
-                if (data['direction']==="to-right")
-                    classes+="marginRighted ";
-                if (data['direction']==="to-left")
-                    classes+="marginLefted ";
-            }
-
-
-            return classes;
+            if (data==="none")
+                return "noMargin";
+            if (data==="centered")
+                return "marginCentered";
+            if (data==="to-right")
+                return "marginRighted";
+            if (data==="to-left")
+                return "marginLefted";
+            return "mt"+data+"mb"+data+"mr"+data+"ml"+data;
+        },
+        marginTop: function(data){
+            return "mt"+data;
+        },
+        marginBottom: function(data){
+            return "mb"+data;
+        },
+        marginLeft: function(data){
+            return "ml"+data;
+        },
+        marginRight: function(data){
+            return "mr"+data;
+        },
+        paddingTop: function(data){
+            return "pt"+data;
+        },
+        paddingBottom: function(data){
+            return "pb"+data;
+        },
+        paddingLeft: function(data){
+            return "pl"+data;
+        },
+        paddingRight: function(data){
+            return "pr"+data;
         },
         padding: function(data){
-            if (data==="none")  return "noPadding";
-            var classes = "";
-            if (!CUtils.isEmpty(data['bottom']))    classes+="pb"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="pt"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="pr"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="pl"+data['left'];
-
-            return classes;
+            if (data==="none")
+                return "noPadding";
+            return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
         },
         absolutes: function(data){
             var classes = "";

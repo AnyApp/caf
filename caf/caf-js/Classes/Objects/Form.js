@@ -4,6 +4,11 @@
 var CForm = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
+            marginRight:1,
+            marginLeft:1,
+            marginTop:1,
+            margin: 'centered',
+            textAlign: 'center'
         },
         DEFAULT_LOGIC: {
         }
@@ -16,17 +21,10 @@ var CForm = Class(CContainer,{
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
-        this.data.inputs             = values.data.inputs || [];
-        this.logic.saveToUrl         = values.logic.saveToUrl || [];
-        this.logic.saveToUrlCallback = values.logic.saveToUrlCallback || [];
-        this.logic.onSubmit          = values.logic.onSubmit || [];
-    },
-    /**
-     *  Build Object.
-     */
-    prepareBuild: function(data){
-        // Prepare this element - wrap it's children.
-        this.$class.$superp.prepareBuild.call(this,data);
+        this.data.inputs            = values.data.inputs || [];
+        this.data.saveToUrl         = values.data.saveToUrl || '';
+        this.data.saveToUrlCallback = values.data.saveToUrlCallback || function(){};
+        this.data.onSubmit          = values.data.onSubmit ||  function(){};
     },
     formValues: function() {
         var values = {};
@@ -36,6 +34,7 @@ var CForm = Class(CContainer,{
                 var name = input.getName();
                 var value = input.value();
                 var validators = input.getValidators();
+
                 _.each(validators,function(name){
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
@@ -45,6 +44,7 @@ var CForm = Class(CContainer,{
                         var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
                         var color = colors[Math.floor(Math.random() * colors.length)];
                         // Show Message.
+/*
                         CDialogs.show({
                             title: validationResult.getTitle(),
                             content:validationResult.getMessage(),
@@ -58,6 +58,7 @@ var CForm = Class(CContainer,{
                                 CLog.log('Extra..')
                             },
                             color:color});
+*/
                         throw "Error"; // Return empty result.
                     }
                 },this);
@@ -84,7 +85,7 @@ var CForm = Class(CContainer,{
         // Check if the was validation error.
         if (values == null)     return;
         // Run onSubmit with the values.
-        this.logic.onSubmit(values);
+        this.data.onSubmit(values);
     },
     sendFormToUrl: function() {
         // Retrieve the values from the form.
@@ -92,7 +93,7 @@ var CForm = Class(CContainer,{
         // Check if the was validation error.
         if (values == null)     return;
         // Run send with the values.
-        CNetwork.send(this.logic.saveToUrl,values,this.logic.saveToUrlCallback);
+        CNetwork.send(this.data.saveToUrl,values,this.data.saveToUrlCallback);
     },
     saveFormToLocalStorage: function() {
         // Retrieve the values from the form.

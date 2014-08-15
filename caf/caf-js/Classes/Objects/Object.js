@@ -4,6 +4,7 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
+            boxSizing: 'borderBox'
         },
         DEFAULT_LOGIC: {
         },
@@ -85,7 +86,7 @@ var CObject = Class({
         var view        = data['view'] || new CStringBuilder(),
             tag         = data['tag'],
             attributes  = data['attributes'],
-            forceDesign = data['forceDesign'],
+            forceDesign = data['forceDesign'] || {},
             tagHasInner = data['tagHasInner'];
 
         // Check if this element is already in the DOM.
@@ -98,8 +99,12 @@ var CObject = Class({
         // This will prevent unnecessary build operations - better performance.
         this.lastClasses    = this.classes;
 
-        // Prepare Design and Logic.
-        CDesign.prepareDesign(this,forceDesign);
+        // Prepare Design.
+        // Save original classes - append them.
+        forceDesign.classes =
+            (forceDesign.classes || '')+' '+(this.design.classes || '');
+        this.design = CUtils.mergeJSONs(forceDesign,this.design);
+        CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.

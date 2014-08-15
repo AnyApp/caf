@@ -2,57 +2,107 @@ var app =
 {
     initialize: function()
     {
-        var objects = [
-            {   uname:  'app-container', type:   'AppContainer',
-                data: {  childs: ['side-menu','main-view'] }
+        var appContainer = {   uname:  'app-container', type:   'AppContainer',
+            data: {  childs: ['side-menu','main-view'] }
+        };
+        var sideMenu = {   uname:  'side-menu', type:   'SideMenu',
+            data: { leftContainer: 'side-menu-left-container', rightContainer:'side-menu-right-container' }
+        }
+        var sideMenuLeftContainer = {uname:'side-menu-left-container',type:'Container',
+            data: {childs: []}
+        };
+        var sideMenuRightContainer = {uname:'side-menu-right-container',type:'Container',
+            data: {childs: []}
+        };
+        var mainView = {   uname:  'main-view', type:   'MainView',
+            data: {  childs: ['main-label','main-button','form'] }
+        };
+        var mainViewLabel = {   uname:  'main-label', type:   'Label',
+            design: { bgColor:{color:'Blue',level:1},widthSM: 5, widthXS: 10 },
+            logic: { text: "Label" }
+        };
+        var mainViewButton = {   uname:  'main-button', type:   'Button',
+            design: { bgColor:{color:'Cyan',level:1},widthSM: 5, widthXS: 10,
+                active: { bgColor:{color:'Cyan',level:4} }
             },
-            {   uname:  'side-menu', type:   'SideMenu',
-                data: {
-                    leftContainer: 'side-menu-left-container',
-                    rightContainer:'side-menu-right-container'
-                }
-            },
-            {   uname:  'side-menu-left-container', type:   'Container',
-                data: {  childs: [] }
-            },
-            {   uname:  'side-menu-right-container', type:  'Container',
-                data: {  childs: [] }
-            },
-
-            {   uname:  'main-view', type:   'MainView',
-                data: {  childs: ['label','button'] },
-                design: {
-                    textAlign: 'center'
-                }
-            },
-            {   uname:  'label', type:   'Label',
-                design: {
-                    height: 100, textAlign: 'center',
-                    color:{color:'White'},
-                    bgColor:{color:'Blue',level:1},
-                    font: { size:18, style:['bold']},
-                    margin: { right:1, left:1, top:3, direction: 'centered' },
-                },
-                logic: { text: "Label" }
-            },
-            {   uname:  'button', type:   'Button',
-                design: {
-                    height: 100, textAlign: 'center',
-                    color:{color:'White'},
-                    bgColor:{color:'Cyan',level:1},
-                    font: { size:18, style:['bold']},
-                    margin: { right:1, left:1, top:3, direction: 'centered' },
-                    active: {
-                        bgColor:{color:'Cyan',level:4}
-                    }
-                },
-                logic: {
-                    text: "Button",
-                    onClick: function(){
-                        CLog.log('Button Clicked');
-                    }
+            logic: { text: "Button",
+                onClick: function(){
+                    CLog.log('Button Clicked');
                 }
             }
+        };
+        var form = { uname: 'form', type: 'Form',
+            data: { inputs: ['form-input-name','form-input-phone'],
+                    childs: ['form-input-name','form-input-phone',
+                            'form-submit-button','form-sent-to-url-button',
+                            'form-save-to-local-storage-button','form-clear-button'],
+                    onSubmit: function(values) { CLog.log(values); }
+            },
+            design: { widthSM: 5,widthXS: 10,padding: 5,round:3,marginTop:10,
+                border: {all:1},borderColor:{color:'Gray',level:-2}
+            }
+        }
+        var inputsDesign = {
+            marginTop:4, margin: 'centered',widthSM: 7, widthXS: 11
+        };
+        var inputName = { uname: 'form-input-name', type: 'Input',
+            data: { name:'name', required: true },
+            design:inputsDesign,
+            logic: {loadInputFromStorage: true}
+        }
+        var inputPhone = { uname: 'form-input-phone', type: 'Input',
+            data: { name:'phone', required: true,loadInputFromStorage: true },
+            design:inputsDesign,
+            logic: {loadInputFromStorage: true}
+        }
+        var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
+            design: { bgColor:{color:'Green',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+                active: { bgColor:{color:'Green',level:4} }
+            },
+            logic: { text: "Submit Form",
+                formSubmitButton: 'form'
+            }
+        };
+        var formSendToURLButton = { uname: 'form-sent-to-url-button', type: 'Button',
+            design: { bgColor:{color:'Blue',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+                active: { bgColor:{color:'Blue',level:4} }
+            },
+            logic: { text: "Send to URL",
+                formSendToUrlButton: 'form'
+            }
+        };
+        var formSaveToLocalStorageButton = { uname: 'form-save-to-local-storage-button', type: 'Button',
+            design: { bgColor:{color:'Purple',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+                active: { bgColor:{color:'Purple',level:4} }
+            },
+            logic: { text: "Save to Local Storage",
+                formSaveToLocalStorageButton: 'form'
+            }
+        };
+        var formClearButton = { uname: 'form-clear-button', type: 'Button',
+            design: { bgColor:{color:'Red',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+                active: { bgColor:{color:'Red',level:4} }
+            },
+            logic: { text: "Clear Form",
+                formClearButton: 'form'
+            }
+        };
+
+        var objects = [
+            appContainer,
+            sideMenu,
+            sideMenuLeftContainer,
+            sideMenuRightContainer,
+            mainView,
+            mainViewLabel,
+            mainViewButton,
+            form,
+            inputPhone,
+            inputName,
+            formSubmitButton,
+            formSendToURLButton,
+            formSaveToLocalStorageButton,
+            formClearButton
 
 
         ];

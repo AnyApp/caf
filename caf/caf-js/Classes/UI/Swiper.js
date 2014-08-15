@@ -6,20 +6,19 @@ var CSwiper = Class({
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
-    initSwiper: function(swiperId,swiperOptionsArray,pagination)
+    initSwiper: function(data)
     {
+        var swiperId = data.container;
         var options = {
             moveStartThreshold: 50,
             resistance: '100%'
         };
-        if (!CUtils.isEmpty(pagination)) {
-            options.pagination = '#'+pagination;
+        if (!CUtils.isEmpty(data.pagination)) {
+            options.pagination = '#'+data.pagination;
             options.paginationClickable= true;
         }
-        if (!CUtils.isEmpty(swiperOptionsArray)) {
-            if (swiperOptionsArray.indexOf('loop')>=0)
-                options.loop=true;
-        }
+        if (data.loop===true)
+            options.loop=true;
 
         this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
 
