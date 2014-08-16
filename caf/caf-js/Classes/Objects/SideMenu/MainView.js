@@ -6,7 +6,8 @@ var CMainView = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-content',
             bgColor:{color:'White'},
-            textAlign: 'center'
+            textAlign: 'center',
+            overflow: 'scrollable'
 
         },
         DEFAULT_LOGIC: {

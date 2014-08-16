@@ -15,7 +15,17 @@ var app =
             data: {childs: []}
         };
         var mainView = {   uname:  'main-view', type:   'MainView',
-            data: {  childs: ['main-label','main-button','form'] }
+            data: {  childs: ['header','content','footer'] }
+        };
+        var header = {   uname:  'header', type:   'Header'
+        };
+        var footer = {   uname:  'footer', type:   'Footer'
+        };
+        var content = {   uname:  'content', type:   'Content',
+            data: {  childs: ['main-page'] }
+        };
+        var mainPage = {   uname:  'main-page', type:   'Page',
+            data: {  childs: ['main-label','main-button','form','main-gallery'] }
         };
         var mainViewLabel = {   uname:  'main-label', type:   'Label',
             design: { bgColor:{color:'Blue',level:1},widthSM: 5, widthXS: 10 },
@@ -87,6 +97,15 @@ var app =
                 formClearButton: 'form'
             }
         };
+        var gallery = { uname: 'main-gallery', type: 'Gallery',
+            data: {
+                images:['http://ourevent.co.il/wp-content/uploads/2014/04/1-1.jpg',
+                    'http://ourevent.co.il/wp-content/uploads/2014/04/2-1.jpg',
+                    'http://ourevent.co.il/wp-content/uploads/2014/04/3-1.jpg',
+                    'http://ourevent.co.il/wp-content/uploads/2014/04/4-1.jpg'],
+                pagination: true
+            }
+        };
 
         var objects = [
             appContainer,
@@ -102,10 +121,17 @@ var app =
             formSubmitButton,
             formSendToURLButton,
             formSaveToLocalStorageButton,
-            formClearButton
+            formClearButton,
+            gallery,
+            header,
+            footer,
+            content,
+            mainPage
 
 
         ];
+
+
         var caf = new Caf();
         caf.init(objects);
         //caf.init('');

@@ -149,6 +149,7 @@ var CDesign = Class({
         },
         height: function(data){
             data = ""+data;
+            if (data==='auto') return 'heightAuto';
             if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
             return "hp"+data;
         },
@@ -195,15 +196,17 @@ var CDesign = Class({
                 return "noPadding";
             return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
         },
-        absolutes: function(data){
-            var classes = "";
-
-            if (!CUtils.isEmpty(data['bottom']))    classes+="bottom"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="top"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="right"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="left"+data['left'];
-
-            return classes;
+        top: function(data){
+            return "top"+data;
+        },
+        bottom: function(data){
+            return "bottom"+data;
+        },
+        left: function(data){
+            return "left"+data;
+        },
+        right: function(data){
+            return "right"+data;
         }
 
     },

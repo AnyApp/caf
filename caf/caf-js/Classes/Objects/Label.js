@@ -27,6 +27,9 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
+    },
+    setText: function(text){
+        CUtils.element(this.uid()).innerHTML = text;
     }
 
 

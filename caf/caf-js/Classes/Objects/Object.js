@@ -4,7 +4,6 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            boxSizing: 'borderBox'
         },
         DEFAULT_LOGIC: {
         },

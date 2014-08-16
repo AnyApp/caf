@@ -15,8 +15,20 @@ var CGallery = Class(CSlider,{
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CGallery);
 
+        this.data = values.data || {};
+        this.data.childs = values.data.childs || [];
+
+        // Create Images.
+        _.each(this.data.images,function(imageSrc){
+            var imageId = CObjectsHandler.createObject('Image',{
+                data: {  src: [imageSrc] }
+            });
+            this.data.childs.push(imageId);
+        },this);
+
         // Invoke parent's constructor
         CGallery.$super.call(this, values);
+
     }
 
 

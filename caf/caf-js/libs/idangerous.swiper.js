@@ -1299,14 +1299,13 @@ var Swiper = function (selector, params) {
     var allowThresholdMove;
     var allowMomentumBounce = true;
     function onTouchStart(event) {
-        if (caf.ui.swipers.isSideMenuOpen()) return false;
+        if (CSwiper.isSideMenuOpen()) return false;
 
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched
         if (_this.isTouched || params.onlyExternal) {
             return false;
         }
-        caf.log(event.srcElement.id || event.srcElement);
         // Blur active elements
         var eventTarget = event.target || event.srcElement;
         if (document.activeElement) {
@@ -1369,7 +1368,7 @@ var Swiper = function (selector, params) {
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
 
-        if (caf.ui.swipers.isSideMenuOpen()) return;
+        if (CSwiper.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         //if (isTouchEvent && event.type === 'mousemove') return;

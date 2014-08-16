@@ -20,9 +20,7 @@ var CSwiper = Class({
         if (data.loop===true)
             options.loop=true;
 
-        this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
-
-        this.mSwipers[swiperId].addCallback('SlideChangeStart', function(swiper){
+        options['SlideChangeStart'] = function(swiper){
             var toSlide         = swiper.activeIndex;
             var swiperButtons   = this.mSwipers[swiperId].swiperTabButtons;
             var tabRelatedButton= swiperButtons[toSlide];
@@ -35,15 +33,17 @@ var CSwiper = Class({
                 CUtils.element(swiperId).clientHeight;
                 CUtils.element(swiperId).style.height = height;
             },100);
-        });
+        };
 
         // Fix Pagination disappear.
-        this.mSwipers[swiperId].addCallback('SlideChangeEnd', function(swiper){
+        options['SlideChangeEnd'] = function(swiper){
             var height = document.getElementById(swiperId).style.height;
             CUtils.element(swiperId).style.height = '0px';
             CUtils.element(swiperId).clientHeight;
             CUtils.element(swiperId).style.height = height;
-        });
+        };
+
+        this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
 
         this.mSwipers[swiperId].swiperTabButtons = Array();
     },
@@ -109,6 +109,8 @@ var CSwiper = Class({
     },
     isSideMenuOpen: function()
     {
+        if (CUtils.isEmpty(this.sideMenu))
+            return false;
         return this.sideMenu.state().state!="closed";
     }
 

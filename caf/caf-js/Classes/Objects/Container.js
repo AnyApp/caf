@@ -35,9 +35,7 @@ var CContainer = Class(CObject,{
             //Set parent to this Object.
             object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
-            content.merge(object.prepareBuild({
-                forceDesign: data.forceDesign
-            }));
+            content.merge(object.prepareBuild({}));
         },this);
         // Prepare this element - wrap it's children.
         data.view = content;
@@ -45,7 +43,10 @@ var CContainer = Class(CObject,{
         return content;
     }
 
-
+    ////////////////////////////////////////////////
+    // A Way to Force Design: before content.merge(object.prepareBuild({}));
+    // Run a function that will change the son-object design! :)
+    ////////////////////////////////////////////////
 
 });
 

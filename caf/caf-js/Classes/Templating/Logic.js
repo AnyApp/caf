@@ -51,7 +51,9 @@ var CLogic = Class({
             CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
-            CSwiper.initSwiper(value);
+            CThreads.start(function(){
+                CSwiper.initSwiper(value);
+            });
         },
         dropMenuSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -84,9 +86,11 @@ var CLogic = Class({
         },
         loadInputFromStorage: function(object,value){
             if (value===true){
-                var inputStoredValue = CLocalStorage.get(object.getName());
-                if (!CUtils.isEmpty(inputStoredValue))
-                    object.setValue(inputStoredValue);
+                CThreads.start(function() {
+                    var inputStoredValue = CLocalStorage.get(object.getName());
+                    if (!CUtils.isEmpty(inputStoredValue))
+                        object.setValue(inputStoredValue);
+                });
             }
         }
 

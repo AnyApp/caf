@@ -4,12 +4,8 @@
 var CImage = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            height: 40,
-            width: 40,
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
-            marginBottom:1
+            height: 'auto',
+            width: '100%'
         },
         DEFAULT_LOGIC: {
         }

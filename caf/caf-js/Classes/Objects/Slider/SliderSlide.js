@@ -4,9 +4,7 @@
 var CSliderSlide = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'swiper-slide',
-            width:'100%',
-            height:'100%'
+            classes:'swiper-slide'
         },
         DEFAULT_LOGIC: {
         }

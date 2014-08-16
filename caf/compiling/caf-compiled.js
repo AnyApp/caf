@@ -457,6 +457,9 @@ var CDesign = Class({
             return "col-lg-"+data;
         },
         height: function(data){
+            data = ""+data;
+            if (data==='auto') return 'heightAuto';
+            if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
             return "hp"+data;
         },
         minHeight: function(data){
@@ -502,15 +505,17 @@ var CDesign = Class({
                 return "noPadding";
             return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
         },
-        absolutes: function(data){
-            var classes = "";
-
-            if (!CUtils.isEmpty(data['bottom']))    classes+="bottom"+data['bottom']+" ";
-            if (!CUtils.isEmpty(data['top']))       classes+="top"+data['top']+" ";
-            if (!CUtils.isEmpty(data['right']))     classes+="right"+data['right']+" ";
-            if (!CUtils.isEmpty(data['left']))      classes+="left"+data['left'];
-
-            return classes;
+        top: function(data){
+            return "top"+data;
+        },
+        bottom: function(data){
+            return "bottom"+data;
+        },
+        left: function(data){
+            return "left"+data;
+        },
+        right: function(data){
+            return "right"+data;
         }
 
     },
@@ -594,7 +599,9 @@ var CLogic = Class({
             CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
-            CSwiper.initSwiper(value);
+            CThreads.start(function(){
+                CSwiper.initSwiper(value);
+            });
         },
         dropMenuSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -627,9 +634,11 @@ var CLogic = Class({
         },
         loadInputFromStorage: function(object,value){
             if (value===true){
-                var inputStoredValue = CLocalStorage.get(object.getName());
-                if (!CUtils.isEmpty(inputStoredValue))
-                    object.setValue(inputStoredValue);
+                CThreads.start(function() {
+                    var inputStoredValue = CLocalStorage.get(object.getName());
+                    if (!CUtils.isEmpty(inputStoredValue))
+                        object.setValue(inputStoredValue);
+                });
             }
         }
 
@@ -806,6 +815,34 @@ var CTemplator = Class({
  * Created by dvircn on 06/08/14.
  */
 /**
+ * Created by dvircn on 16/08/14.
+ */
+var CAppConfig = Class({
+    $singleton: true,
+    loaded: false,
+    data: {
+        headerSize: 45,
+        footerSize: 35
+    },
+
+    load: function(){
+        var savedData = JSON.parse(CLocalStorage.get('app-config'));
+        this.data = CUtils.mergeJSONs(savedData,this.data);
+    },
+    get: function(key){
+        if (!this.loaded)
+            this.load();
+        return this.data[key];
+    },
+    saveConfig: function(data){
+        if (!this.loaded)
+            this.load();
+        this.data = CUtils.mergeJSONs(data,this.data);
+        CLocalStorage.save('app-config',JSON.stringify(this.data));
+    }
+});
+
+/**
  * Created by dvircn on 06/08/14.
  */
 var CLocalStorage = Class({
@@ -950,6 +987,16 @@ var CStringBuilder = Class({
 
 
 
+
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CThreads = Class({
+    $singleton: true,
+    start: function(task){
+        window.setTimeout(task,0);
+    }
+});
 
 /**
  * Created by dvircn on 06/08/14.
@@ -1430,9 +1477,7 @@ var CSwiper = Class({
         if (data.loop===true)
             options.loop=true;
 
-        this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
-
-        this.mSwipers[swiperId].addCallback('SlideChangeStart', function(swiper){
+        options['SlideChangeStart'] = function(swiper){
             var toSlide         = swiper.activeIndex;
             var swiperButtons   = this.mSwipers[swiperId].swiperTabButtons;
             var tabRelatedButton= swiperButtons[toSlide];
@@ -1445,15 +1490,17 @@ var CSwiper = Class({
                 CUtils.element(swiperId).clientHeight;
                 CUtils.element(swiperId).style.height = height;
             },100);
-        });
+        };
 
         // Fix Pagination disappear.
-        this.mSwipers[swiperId].addCallback('SlideChangeEnd', function(swiper){
+        options['SlideChangeEnd'] = function(swiper){
             var height = document.getElementById(swiperId).style.height;
             CUtils.element(swiperId).style.height = '0px';
             CUtils.element(swiperId).clientHeight;
             CUtils.element(swiperId).style.height = height;
-        });
+        };
+
+        this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
 
         this.mSwipers[swiperId].swiperTabButtons = Array();
     },
@@ -1519,6 +1566,8 @@ var CSwiper = Class({
     },
     isSideMenuOpen: function()
     {
+        if (CUtils.isEmpty(this.sideMenu))
+            return false;
         return this.sideMenu.state().state!="closed";
     }
 
@@ -1530,7 +1579,16 @@ var CSwiper = Class({
  * Created by dvircn on 06/08/14.
  */
 var CUI = Class({
-    $singleton: true
+    $singleton: true,
+    titleId: '',
+    setTitleObject: function(id){
+        this.titleId = id;
+    },
+    setTitle: function(text){
+        var titleObject = CObjectsHandler.object(this.titleId);
+        if (!CUtils.isEmpty(titleObject))
+            titleObject.setText(text);
+    }
 
 });
 
@@ -1541,7 +1599,6 @@ var CUI = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            boxSizing: 'borderBox'
         },
         DEFAULT_LOGIC: {
         },
@@ -1717,6 +1774,9 @@ var CLabel = Class(CObject,{
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
+    },
+    setText: function(text){
+        CUtils.element(this.uid()).innerHTML = text;
     }
 
 
@@ -1790,9 +1850,7 @@ var CContainer = Class(CObject,{
             //Set parent to this Object.
             object.setParent(this.uid());
             // Prepare Build Object and merge with the content.
-            content.merge(object.prepareBuild({
-                forceDesign: data.forceDesign
-            }));
+            content.merge(object.prepareBuild({}));
         },this);
         // Prepare this element - wrap it's children.
         data.view = content;
@@ -1838,7 +1896,8 @@ var CMainView = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-content',
             bgColor:{color:'White'},
-            textAlign: 'center'
+            textAlign: 'center',
+            overflow: 'scrollable'
 
         },
         DEFAULT_LOGIC: {
@@ -1963,20 +2022,169 @@ var CSideMenuRight = Class(CContainer,{
  * Created by dvircn on 06/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 15/08/14.
  */
+var CFooter = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: 'footer',
+            bottom:0,
+            bgColor:{
+                color: 'Blue',
+                level: 2
+            }
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CFooter);
+
+        // Invoke parent's constructor
+        CFooter.$super.call(this, values);
+
+        this.design.height = CAppConfig.get('footerSize');
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
+var CHeader = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: 'header',
+            bgColor:{
+                color: 'Blue',
+                level: 2
+            }
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CHeader);
+
+        // Invoke parent's constructor
+        CHeader.$super.call(this, values);
+
+        this.design.height = CAppConfig.get('headerSize');
+
+        this.data.itemSize = this.design.height;
+
+        // Declare Left & Right Buttons
+        this.data.left  = this.data.left  || [];
+        this.data.right = this.data.right || [];
+
+        this.data.titleDesign = this.data.titleDesign || {};
+        this.data.titleDesign = CUtils.mergeJSONs(this.data.titleDesign,{
+            position: 'absolute',
+            left: this.data.itemSize * this.data.left.length,
+            right: this.data.itemSize * this.data.right.length,
+            top: 0, bottom:0, margin: 'none', height:'auto'
+        });
+        // Create Title.
+        this.data.title = CObjectsHandler.createObject('Label',{
+            design: this.data.titleDesign
+        });
+        CUI.setTitleObject(this.data.title);
+
+        // Set up childs array.
+        this.data.childs = this.data.childs.concat(this.data.left);
+        this.data.childs = this.data.childs.concat([this.data.title]);
+        this.data.childs = this.data.childs.concat(this.data.right);
+
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 16/08/14.
+ */
+var CContent = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: 'content',
+            bgColor:{
+                color: 'White'
+            }
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CContent);
+
+        // Invoke parent's constructor
+        CContent.$super.call(this, values);
+
+        this.design.top     =   CAppConfig.get('headerSize');
+        this.design.bottom  =   CAppConfig.get('footerSize');
+
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 16/08/14.
+ */
+var CPage = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            bgColor:{
+                color: 'White'
+            },
+            height:'100%',
+            width:'100%',
+            position: 'relative',
+            overflow: 'scrollable'
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CPage);
+
+        // Invoke parent's constructor
+        CPage.$super.call(this, values);
+
+
+    }
+
+
+});
+
 /**
  * Created by dvircn on 15/08/14.
  */
 var CImage = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            height: 40,
-            width: 40,
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
-            marginBottom:1
+            height: 'auto',
+            width: '100%'
         },
         DEFAULT_LOGIC: {
         }
@@ -2011,15 +2219,96 @@ var CImage = Class(CObject,{
 /**
  * Created by dvircn on 15/08/14.
  */
+var CPagination = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'pagination',
+            boxSizing: ''
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CPagination);
+
+        // Invoke parent's constructor
+        CPagination.$super.call(this, values);
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
+var CSliderWrapper = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'swiper-wrapper'
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSliderWrapper);
+
+        // Invoke parent's constructor
+        CSliderWrapper.$super.call(this, values);
+
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn SliderSlide on 15/08/14.
+ */
+var CSliderSlide = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'swiper-slide'
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSliderSlide);
+
+        // Invoke parent's constructor
+        CSliderSlide.$super.call(this, values);
+
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
 var CSlider = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            height: 40,
-            width: 40,
+            height: 300,
+            widthSM: 10,
             marginRight:1,
             marginLeft:1,
             marginTop:1,
-            marginBottom:1
+            marginBottom:1,
+            classes:'swiper-container'
         },
         DEFAULT_LOGIC: {
         }
@@ -2034,37 +2323,44 @@ var CSlider = Class(CContainer,{
         // Invoke parent's constructor
         CSlider.$super.call(this, values);
 
-        // Create Container.
-        this.sliderContainer = CObjectsHandler.createObject('CSliderContainer',{
-            data: {  childs: [this.uid()] }
-        });
         // Create Pagination
-        var paginationDesign = values.pagination ===true ? {} :
+        var paginationDesign = values.data.pagination ===true ? {} :
         {  display: 'hidden' };
-        this.pagination = CObjectsHandler.createObject('CPagination',{
+        this.pagination = CObjectsHandler.createObject('Pagination',{
             design: paginationDesign
         });
 
-        // Create images childs inside Gallery!
+        // Create Slides
+        var childs = this.data.childs;
+        this.data.childs = [];
+        _.each(childs,function(child){
+            var sliderId = CObjectsHandler.createObject('SliderSlide',{
+                data: {  childs: [child] }
+            });
+            this.data.childs.push(sliderId);
+        },this);
+
+        var wrapperChilds = this.data.childs;
+        // Create Wrapper.
+        this.sliderWrapper = CObjectsHandler.createObject('SliderWrapper',{
+            data: {  childs: wrapperChilds }
+        });
+
+        // Set the wrapper to be the only child.
+        this.data.childs = [this.sliderWrapper,this.pagination];
+
+
+        var loop = true;
+        if (!CUtils.isEmpty(this.data.loop))
+            loop = this.data.loop;
 
         this.logic.swipeView = {
-            container: this.sliderContainer,
+            container: this.uid(),
             pagination: this.pagination,
-            loop: values.data.loop || false
+            loop: loop
+        };
 
-        }
 
-    },
-    /**
-     *  Build Object.
-     */
-    prepareBuild: function(data){
-        // Prepare this element - force design it's children.
-        return CSlider.$superp.prepareBuild.call(this,{
-            forceDesign: {
-                classes: 'swiper-slide'
-            }
-        });
     }
 
 
@@ -2087,8 +2383,20 @@ var CGallery = Class(CSlider,{
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CGallery);
 
+        this.data = values.data || {};
+        this.data.childs = values.data.childs || [];
+
+        // Create Images.
+        _.each(this.data.images,function(imageSrc){
+            var imageId = CObjectsHandler.createObject('Image',{
+                data: {  src: [imageSrc] }
+            });
+            this.data.childs.push(imageId);
+        },this);
+
         // Invoke parent's constructor
         CGallery.$super.call(this, values);
+
     }
 
 
@@ -5577,14 +5885,13 @@ var Swiper = function (selector, params) {
     var allowThresholdMove;
     var allowMomentumBounce = true;
     function onTouchStart(event) {
-        if (caf.ui.swipers.isSideMenuOpen()) return false;
+        if (CSwiper.isSideMenuOpen()) return false;
 
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched
         if (_this.isTouched || params.onlyExternal) {
             return false;
         }
-        caf.log(event.srcElement.id || event.srcElement);
         // Blur active elements
         var eventTarget = event.target || event.srcElement;
         if (document.activeElement) {
@@ -5647,7 +5954,7 @@ var Swiper = function (selector, params) {
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
 
-        if (caf.ui.swipers.isSideMenuOpen()) return;
+        if (CSwiper.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         //if (isTouchEvent && event.type === 'mousemove') return;

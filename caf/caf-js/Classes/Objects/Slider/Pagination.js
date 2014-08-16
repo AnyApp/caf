@@ -4,7 +4,8 @@
 var CPagination = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'pagination'
+            classes:'pagination',
+            boxSizing: ''
         },
         DEFAULT_LOGIC: {
         }

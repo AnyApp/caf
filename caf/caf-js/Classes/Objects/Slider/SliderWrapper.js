@@ -1,10 +1,10 @@
 /**
  * Created by dvircn on 15/08/14.
  */
-var CSliderContainer = Class(CContainer,{
+var CSliderWrapper = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'swiper-container'
+            classes:'swiper-wrapper'
         },
         DEFAULT_LOGIC: {
         }
@@ -14,10 +14,10 @@ var CSliderContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSliderContainer);
+        CObject.mergeWithDefaults(values,CSliderWrapper);
 
         // Invoke parent's constructor
-        CSliderContainer.$super.call(this, values);
+        CSliderWrapper.$super.call(this, values);
 
 
     }
