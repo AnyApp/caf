@@ -313,8 +313,8 @@ var CValidators = Class({
 var CDesign = Class({
     $singleton: true,
     colors: {
-        notLeveled: ['Black', 'White', 'SmokeWhite', 'LightSmokeWhite', 'DarkSmokeWhite'],
-        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray'],
+        notLeveled: ['Black', 'White'],
+        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray','WhiteSmoke'],
         levels: {
             '-4':   'XXXLight',
             '-3':   'XXLight',
@@ -544,7 +544,8 @@ var CDesign = Class({
         return classesBuilder.build(' ');
     },
     applyDesign: function(object){
-        CUtils.element(object.uid()).className = object.classes;
+        if (object.lastClasses !== object.classes)
+            CUtils.element(object.uid()).className = object.classes;
     }
 
 });
@@ -802,6 +803,8 @@ var CTemplator = Class({
 
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
+
+        //CAnimations.cascadeShow(['form-input-name','form-input-phone','form-submit-button','form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button']);
     },
     objectJSON: function(type,uname,design,logic,data){
         var object = {};
@@ -1205,28 +1208,68 @@ var CUtils = Class({
  */
 var CAnimations = Class({
     $singleton: true,
-    applyAnimation: function(objectId,anim,duration,onComplete){
-        this[anim](CUtils.element(objectId),duration,onComplete);
+    init: function(object){
+        object.data.animation           = object.data.animation             || 'fade';
+        object.data.animationDuration   = object.data.animationDuration     || 300;
+        object.data.onAnimShowComplete  = object.data.onAnimShowComplete    || function(){};
+        object.data.onAnimHideComplete  = object.data.onAnimHideComplete    || function(){};
+
     },
-    /* Animate view with fade in or out */
-    fadeIn: function(elm,time,onEnter) {
-        onEnter = onEnter || function(){};
-        CUtils.addClass(elm,'hidden');
-        var clientHeight = elm.clientHeight;
-        CUtils.removeClass(elm,'hidden');
-        CUtils.addClass(elm,'fadein'+time);
-        window.setTimeout(function(){
-            CUtils.removeClass(elm,'fadein'+time);
-            onEnter();
-        },time);
+    cascadeShow: function(objectsIds){
+        CLog.dlog(objectsIds);
+
+        for (var i in objectsIds){
+            var index = Number(i);
+            var objectId        = objectsIds[index];
+            // Hide all elements.
+            CUtils.addClass(CUtils.element(objectId),'hidden');
+
+            if (index+1 == objectsIds.length)
+                continue;
+
+            var nextObjectId    = objectsIds[index+1];
+            var object          = CObjectsHandler.object(objectId);
+            object.data.onAnimShowComplete = this.createCascadeFunction(nextObjectId);
+        }
+
+        CAnimations.show(objectsIds[0]);
     },
-    fadeOut: function(elm,time,onOut) {
-        onOut = onOut || function(){};
-        CUtils.addClass(elm,'fadeout'+time);
-        window.setTimeout(function(){
-            CUtils.removeClass(elm,'fadeout'+time);
-            onOut();
-        },time);
+    createCascadeFunction: function(nextObjectId){
+        return function(){
+            CAnimations.show(nextObjectId);
+        };
+    },
+    show: function(objectId){
+        var object = CObjectsHandler.object(objectId);
+        this.init(object);
+        this[object.data.animation]['in'](CUtils.element(objectId),object.data.animationDuration,
+            object.data.onAnimShowComplete);
+    },
+    hide: function(objectId){
+        var object = CObjectsHandler.object(objectId);
+        this.init(object);
+        this[object.data.animation]['out'](CUtils.element(objectId),object.data.animationDuration,
+            object.data.onAnimHideComplete);
+    },
+    fade: {
+        in: function(elm,duration,onEnter) {
+            CLog.dlog('showing');
+            CUtils.addClass(elm,'hidden');
+            var clientHeight = elm.clientHeight;
+            CUtils.removeClass(elm,'hidden');
+            CUtils.addClass(elm,'fadein'+duration);
+            window.setTimeout(function(){
+                CUtils.removeClass(elm,'fadein'+duration);
+                onEnter();
+            },duration);
+        },
+        out: function(elm,duration,onOut) {
+            CUtils.addClass(elm,'fadeout'+duration);
+            window.setTimeout(function(){
+                CUtils.removeClass(elm,'fadeout'+duration);
+                onOut();
+            },duration);
+        }
     }
     
 });
@@ -2015,17 +2058,55 @@ var CContainer = Class(CObject,{
 
 
 /**
+ * Created by dvircn on 17/08/14.
+ */
+var  CDialogContainer = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'cDialog',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            minHeight: 100,
+            maxWidth: 400,
+            margin: 'auto',
+            round:2,
+            bgColor:{color:'WhiteSmoke',level:-2},
+            border: { all: 1},
+            borderColor:{color:'WhiteSmoke',level:3},
+            overflow: 'scrollable'
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CDialogContainer);
+        // Invoke parent's constructor
+        CDialogContainer.$super.call(this, values);
+
+
+    }
+
+});
+
+
+/**
  * Created by dvircn on 16/08/14.
  */
 var  CDialog = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'cDialog',
-            top: 50,
+            top: 0,
             left: 0,
             right: 0,
-            minHeight: 100/*,
-            display: 'hidden'*/
+            bottom: 0,
+            minHeight: 100
+
         },
         DEFAULT_LOGIC: {
         },
@@ -2034,11 +2115,9 @@ var  CDialog = Class(CContainer,{
                 parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
-                design: {
-                    bgColor:{color:'Red',level:1}
-                }
             });
             CObjectsHandler.object(parentId).appendChild(newDialog);
+            CAnimations.show(newDialog);
         }
     },
 
@@ -2053,18 +2132,24 @@ var  CDialog = Class(CContainer,{
 
         // Create Overlay.
         this.dialogOverlay = CObjectsHandler.createObject('Object',{
-            design: {
-                classes: 'cDialogOverlay'
-            },
-            logic: {
-                doStopPropagation: true,
-                onClick: function(){
-                    dialog.switchDialog();
-                }
+            design: { classes: 'cDialogOverlay' },
+            logic: { doStopPropagation: true,
+                onClick: function(){ dialog.switchDialog(); }
             }
         });
+        // Create Dialog Container.
+        this.dialogContainer = CObjectsHandler.createObject('DialogContainer',{
+            data: { childs: this.data.childs || []}
+        });
+
+        this.data.childs = [this.dialogContainer,this.dialogOverlay];
+
          // Add to Childs array.
-        this.data.childs.push(this.dialogOverlay);
+        //this.data.childs.push(this.dialogOverlay);
+
+        // Set default animation
+        this.data.animation         =  this.data.animation  || 'fade';
+        this.data.animationDuration =  this.data.animationDuration  || 300;
 
 
 

@@ -11730,9 +11730,9 @@ li{
 .cDialogOverlay{
     position: absolute;
     z-index: -1;
-    right: 0;
+    right: -100000px;
     top: -1000px;
-    width: 100000px;
+    width: 1000000px;
     height: 100000px;
     opacity: 0;
 }
@@ -12326,9 +12326,6 @@ li{
 .bgXXXDarkPurple{
     background-color: #24002f;
 }
-.bgBlack{
-    background-color: #000000;
-}
 .bgXXXLightGray{
     background-color: #bababa;
 }
@@ -12356,17 +12353,38 @@ li{
 .bgXXXDarkGray{
     background-color: #181818;
 }
+.bgXXXLightWhiteSmoke{
+    background-color: #fafafa;
+}
+.bgXXLightWhiteSmoke{
+    background-color: #f4f4f4;
+}
+.bgXLightWhiteSmoke{
+    background-color: #efefef;
+}
+.bgLightWhiteSmoke{
+    background-color: #ebebeb;
+}
+.bgWhiteSmoke{
+    background-color: #e6e6e6;
+}
+.bgDarkWhiteSmoke{
+    background-color: #dcdcdc;
+}
+.bgXDarkWhiteSmoke{
+    background-color: #d7d7d7;
+}
+.bgXXDarkWhiteSmoke{
+    background-color: #d3d3d3;
+}
+.bgXXXDarkWhiteSmoke{
+    background-color: #c6c6c6;
+}
+.bgBlack{
+    background-color: #000000;
+}
 .bgWhite{
     background-color: #ffffff;
-}
-.bgSmokeWhite{
-    background-color: #cdcdcd;
-}
-.bgLightSmokeWhite{
-    background-color: #e2e2e2;
-}
-.bgDarkSmokeWhite{
-    background-color: #c3c3c3;
 }
 
 /* End Backgrounds */
@@ -12561,9 +12579,6 @@ li{
 .bcXXXDarkPurple{
     border-color: #24002f;
 }
-.bcBlack{
-    border-color: #000000;
-}
 .bcXXXLightGray{
     border-color: #bababa;
 }
@@ -12591,18 +12606,40 @@ li{
 .bcXXXDarkGray{
     border-color: #181818;
 }
+.bcXXXLightWhiteSmoke{
+    border-color: #fafafa;
+}
+.bcXXLightWhiteSmoke{
+    border-color: #f4f4f4;
+}
+.bcXLightWhiteSmoke{
+    border-color: #efefef;
+}
+.bcLightWhiteSmoke{
+    border-color: #ebebeb;
+}
+.bcWhiteSmoke{
+    border-color: #e6e6e6;
+}
+.bcDarkWhiteSmoke{
+    border-color: #dcdcdc;
+}
+.bcXDarkWhiteSmoke{
+    border-color: #d7d7d7;
+}
+.bcXXDarkWhiteSmoke{
+    border-color: #d3d3d3;
+}
+.bcXXXDarkWhiteSmoke{
+    border-color: #c6c6c6;
+}
+.bcBlack{
+    border-color: #000000;
+}
 .bcWhite{
     border-color: #ffffff;
 }
-.bcSmokeWhite{
-    border-color: #cdcdcd;
-}
-.bcLightSmokeWhite{
-    border-color: #e2e2e2;
-}
-.bcDarkSmokeWhite{
-    border-color: #c3c3c3;
-}
+
 
 /* End Border Colors */
 
@@ -12796,9 +12833,6 @@ li{
 .cXXXDarkPurple{
     color: #24002f;
 }
-.cBlack{
-    color: #000000;
-}
 .cXXXLightGray{
     color: #bababa;
 }
@@ -12826,17 +12860,38 @@ li{
 .cXXXDarkGray{
     color: #181818;
 }
+.cXXXLightWhiteSmoke{
+    color: #fafafa;
+}
+.cXXLightWhiteSmoke{
+    color: #f4f4f4;
+}
+.cXLightWhiteSmoke{
+    color: #efefef;
+}
+.cLightWhiteSmoke{
+    color: #ebebeb;
+}
+.cWhiteSmoke{
+    color: #e6e6e6;
+}
+.cDarkWhiteSmoke{
+    color: #dcdcdc;
+}
+.cXDarkWhiteSmoke{
+    color: #d7d7d7;
+}
+.cXXDarkWhiteSmoke{
+    color: #d3d3d3;
+}
+.cXXXDarkWhiteSmoke{
+    color: #c6c6c6;
+}
+.cBlack{
+    color: #000000;
+}
 .cWhite{
     color: #ffffff;
-}
-.cSmokeWhite{
-    color: #cdcdcd;
-}
-.cLightSmokeWhite{
-    color: #e2e2e2;
-}
-.cDarkSmokeWhite{
-    color: #c3c3c3;
 }
 
 /* End Text Colors */

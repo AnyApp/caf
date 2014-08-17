@@ -5,11 +5,12 @@ var  CDialog = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'cDialog',
-            top: 50,
+            top: 0,
             left: 0,
             right: 0,
-            minHeight: 100/*,
-            display: 'hidden'*/
+            bottom: 0,
+            minHeight: 100
+
         },
         DEFAULT_LOGIC: {
         },
@@ -18,11 +19,9 @@ var  CDialog = Class(CContainer,{
                 parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
-                design: {
-                    bgColor:{color:'Red',level:1}
-                }
             });
             CObjectsHandler.object(parentId).appendChild(newDialog);
+            CAnimations.show(newDialog);
         }
     },
 
@@ -37,18 +36,24 @@ var  CDialog = Class(CContainer,{
 
         // Create Overlay.
         this.dialogOverlay = CObjectsHandler.createObject('Object',{
-            design: {
-                classes: 'cDialogOverlay'
-            },
-            logic: {
-                doStopPropagation: true,
-                onClick: function(){
-                    dialog.switchDialog();
-                }
+            design: { classes: 'cDialogOverlay' },
+            logic: { doStopPropagation: true,
+                onClick: function(){ dialog.switchDialog(); }
             }
         });
+        // Create Dialog Container.
+        this.dialogContainer = CObjectsHandler.createObject('DialogContainer',{
+            data: { childs: this.data.childs || []}
+        });
+
+        this.data.childs = [this.dialogContainer,this.dialogOverlay];
+
          // Add to Childs array.
-        this.data.childs.push(this.dialogOverlay);
+        //this.data.childs.push(this.dialogOverlay);
+
+        // Set default animation
+        this.data.animation         =  this.data.animation  || 'fade';
+        this.data.animationDuration =  this.data.animationDuration  || 300;
 
 
 

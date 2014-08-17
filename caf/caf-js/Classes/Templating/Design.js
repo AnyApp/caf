@@ -4,8 +4,8 @@
 var CDesign = Class({
     $singleton: true,
     colors: {
-        notLeveled: ['Black', 'White', 'SmokeWhite', 'LightSmokeWhite', 'DarkSmokeWhite'],
-        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray'],
+        notLeveled: ['Black', 'White'],
+        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray','WhiteSmoke'],
         levels: {
             '-4':   'XXXLight',
             '-3':   'XXLight',
@@ -162,6 +162,8 @@ var CDesign = Class({
         margin: function(data){
             if (data==="none")
                 return "noMargin";
+            if (data==="auto")
+                return "autoMargin";
             if (data==="centered")
                 return "marginCentered";
             if (data==="to-right")
@@ -235,7 +237,8 @@ var CDesign = Class({
         return classesBuilder.build(' ');
     },
     applyDesign: function(object){
-        CUtils.element(object.uid()).className = object.classes;
+        if (object.lastClasses !== object.classes)
+            CUtils.element(object.uid()).className = object.classes;
     }
 
 });

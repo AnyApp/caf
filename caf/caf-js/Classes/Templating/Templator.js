@@ -43,6 +43,8 @@ var CTemplator = Class({
 
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
+
+        //CAnimations.cascadeShow(['form-input-name','form-input-phone','form-submit-button','form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button']);
     },
     objectJSON: function(type,uname,design,logic,data){
         var object = {};
