@@ -156,6 +156,9 @@ var CDesign = Class({
         minHeight: function(data){
             return "mhp"+data;
         },
+        maxWidth: function(data){
+            return "maxwp"+data;
+        },
         margin: function(data){
             if (data==="none")
                 return "noMargin";

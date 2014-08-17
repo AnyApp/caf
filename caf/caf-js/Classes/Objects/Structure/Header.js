@@ -49,8 +49,31 @@ var CHeader = Class(CContainer,{
         this.data.childs = this.data.childs.concat([this.data.title]);
         this.data.childs = this.data.childs.concat(this.data.right);
 
-
+        // Set Force Design
+        this.forceDesign = {
+            position: 'absolute',
+            top: 0, bottom: 0,
+            width: this.data.itemSize
+        }
+    },
+    applyForceDesign: function(object){
+        var id = object.uid();
+        var leftPos     = this.data.left.indexOf(id);
+        var rightPos    = this.data.right.indexOf(id);
+        if (leftPos >= 0){
+            this.forceDesign['left']    = this.data.itemSize * leftPos;
+            this.forceDesign['right']   = null;
+        }
+        else if (rightPos >= 0){
+            this.forceDesign['left']    = null;
+            this.forceDesign['right']   = this.data.itemSize * rightPos;
+        }
+        else {
+            return;
+        }
+        CHeader.$superp.applyForceDesign.call(this,object);
     }
+
 
 
 });

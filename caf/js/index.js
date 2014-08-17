@@ -17,7 +17,11 @@ var app =
         var mainView = {   uname:  'main-view', type:   'MainView',
             data: {  childs: ['header','content','footer'] }
         };
-        var header = {   uname:  'header', type:   'Header'
+        var header = {   uname:  'header', type:   'Header',
+            data: {
+                left: ['header-button-left-0'],
+                right: ['header-button-right-0','header-button-right-1']
+            }
         };
         var footer = {   uname:  'footer', type:   'Footer'
         };
@@ -28,17 +32,46 @@ var app =
             data: {  childs: ['main-label','main-button','form','main-gallery'] }
         };
         var mainViewLabel = {   uname:  'main-label', type:   'Label',
-            design: { bgColor:{color:'Blue',level:1},widthSM: 5, widthXS: 10 },
+            design: { height:40, bgColor:{color:'Blue',level:1},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2},
             logic: { text: "Label" }
         };
         var mainViewButton = {   uname:  'main-button', type:   'Button',
-            design: { bgColor:{color:'Cyan',level:1},widthSM: 5, widthXS: 10,
+            design: { height:40, bgColor:{color:'Cyan',level:1},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Cyan',level:4} }
             },
-            logic: { text: "Button",
+            logic: { text: "Show Dialog",
+                onClick: function(){
+                    CLog.log('Button Clicked');
+                    CDialog.showDialog();
+                }
+            }
+        };
+        var headerButtonRight0 = {   uname:  'header-button-right-0', type:   'Button',
+            design: { bgColor:{color:'Red',level:1},
+                active: { bgColor:{color:'Red',level:4} }
+            },
+            logic: { text: "dm",
                 onClick: function(){
                     CLog.log('Button Clicked');
                 }
+            }
+        };
+        var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
+            design: { bgColor:{color:'Brown',level:1},
+                active: { bgColor:{color:'Brown',level:4} }
+            },
+            logic: { text: "X",
+                onClick: function(){
+                    CLog.log('Button Clicked');
+                }
+            }
+        };
+        var headerButtonLeft0 = {   uname:  'header-button-left-0', type:   'Button',
+            design: { bgColor:{color:'Red',level:1},
+                active: { bgColor:{color:'Red',level:4} }
+            },
+            logic: { text: "sm",
+                sideMenuSwitch: 'left'
             }
         };
         var form = { uname: 'form', type: 'Form',
@@ -66,7 +99,7 @@ var app =
             logic: {loadInputFromStorage: true}
         }
         var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
-            design: { bgColor:{color:'Green',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+            design: { height:40, bgColor:{color:'Green',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Green',level:4} }
             },
             logic: { text: "Submit Form",
@@ -74,7 +107,7 @@ var app =
             }
         };
         var formSendToURLButton = { uname: 'form-sent-to-url-button', type: 'Button',
-            design: { bgColor:{color:'Blue',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+            design: { height:40, bgColor:{color:'Blue',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Blue',level:4} }
             },
             logic: { text: "Send to URL",
@@ -82,7 +115,7 @@ var app =
             }
         };
         var formSaveToLocalStorageButton = { uname: 'form-save-to-local-storage-button', type: 'Button',
-            design: { bgColor:{color:'Purple',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+            design: { height:40, bgColor:{color:'Purple',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Purple',level:4} }
             },
             logic: { text: "Save to Local Storage",
@@ -90,7 +123,7 @@ var app =
             }
         };
         var formClearButton = { uname: 'form-clear-button', type: 'Button',
-            design: { bgColor:{color:'Red',level:1}, marginTop:4,widthSM: 7, widthXS: 11,
+            design: { height:40, bgColor:{color:'Red',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Red',level:4} }
             },
             logic: { text: "Clear Form",
@@ -104,6 +137,11 @@ var app =
                     'http://ourevent.co.il/wp-content/uploads/2014/04/3-1.jpg',
                     'http://ourevent.co.il/wp-content/uploads/2014/04/4-1.jpg'],
                 pagination: true
+            }
+        };
+        var dialog = { uname: 'main-dialog', type: 'Dialog',
+            design: {
+                bgColor:{color:'Red',level:1}
             }
         };
 
@@ -126,7 +164,10 @@ var app =
             header,
             footer,
             content,
-            mainPage
+            mainPage,
+            headerButtonRight0,
+            headerButtonRight1,
+            headerButtonLeft0
 
 
         ];

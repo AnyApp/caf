@@ -87,6 +87,20 @@ li{
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
+.cDialog {
+    position: absolute;
+    z-index: 10000;
+}
+.cDialogOverlay{
+    position: absolute;
+    z-index: -1;
+    right: 0;
+    top: -1000px;
+    width: 100000px;
+    height: 100000px;
+    opacity: 0;
+}
+
 .dropMenuRight {
     position: absolute;
     z-index: 10000;

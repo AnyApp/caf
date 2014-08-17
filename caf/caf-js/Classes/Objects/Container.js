@@ -34,6 +34,8 @@ var CContainer = Class(CObject,{
             }
             //Set parent to this Object.
             object.setParent(this.uid());
+            // Force Design.
+            this.applyForceDesign(object);
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild({}));
         },this);
@@ -41,12 +43,29 @@ var CContainer = Class(CObject,{
         data.view = content;
         CContainer.$superp.prepareBuild.call(this,CUtils.mergeJSONs(data));
         return content;
+    },
+    applyForceDesign: function(object){
+        if (!CUtils.isEmpty(this.forceDesign))
+            object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));
+    },
+    appendChild: function(objectId){
+        this.data.childs.push(objectId);
+        this.rebuild();
+    },
+    removeChild: function(objectId){
+        CUtils.arrayRemove(this.data.childs,objectId);
+        this.rebuild();
+    },
+    moveChildFromIndex: function(fromIndex,toIndex){
+         // Implement.
+    },
+    moveChild: function(objectId,toIndex){
+        this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
+    },
+    rebuild: function(){
+        CTemplator.buildFromObject(this.uid());
     }
 
-    ////////////////////////////////////////////////
-    // A Way to Force Design: before content.merge(object.prepareBuild({}));
-    // Run a function that will change the son-object design! :)
-    ////////////////////////////////////////////////
 
 });
 

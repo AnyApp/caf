@@ -60,6 +60,9 @@ var CObject = Class({
     getDesign: function() {
         return this.design;
     },
+    setDesign: function(design) {
+        this.design = design;
+    },
     saveLastLogic: function () {
         // Change cache only if logic was updated.
         if (!CUtils.equals(this.logic,this.lastLogic)){
@@ -100,9 +103,11 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
+/*
         forceDesign.classes =
             (forceDesign.classes || '')+' '+(this.design.classes || '');
         this.design = CUtils.mergeJSONs(forceDesign,this.design);
+*/
         CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.

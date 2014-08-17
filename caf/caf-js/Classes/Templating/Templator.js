@@ -23,9 +23,10 @@ var CTemplator = Class({
         var currentObject   = CObjectsHandler.object(id);
         var view            = new CStringBuilder();
 
-        var viewBuilder = currentObject.prepareBuild({view:view});
-        var viewStr     = viewBuilder.build(' ');
+        var viewBuilder     = currentObject.prepareBuild({view:view});
 
+        var viewStr         = viewBuilder.build(' ');
+        //CLog.dlog(viewStr);
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
         //       and the DOM won't change.

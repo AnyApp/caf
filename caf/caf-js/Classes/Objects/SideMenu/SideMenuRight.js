@@ -6,7 +6,6 @@ var CSideMenuRight = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-drawer snap-drawer-right',
             bgColor:{color:'Gray',level:4},
-            overflow: 'scrollable',
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {

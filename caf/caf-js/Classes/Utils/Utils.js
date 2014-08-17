@@ -21,7 +21,7 @@ var CUtils = Class({
     },
     hideOrShow: function(id,showClass,outClass,duration)
     {
-        var elm = document.getElementById(id);
+        var elm = CUtils.element(id);
         if (this.hasClass(elm,'hidden'))
         {
             this.removeClass(elm,'hidden');
@@ -118,10 +118,15 @@ var CUtils = Class({
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     clone: function(o) {
-        return JSON.parse(JSON.stringify(o));
+        return JSONfn.parse(JSONfn.stringify(o));
     },
     equals: function(o1,o2){
         return JSONfn.stringify(o1)===JSONfn.stringify(o2)
+    },
+    arrayRemove: function(array,item){
+        var index = array.indexOf(item);
+        if (index >= 0)
+            array.splice(index,1);
     }
 });
 

@@ -90,22 +90,21 @@ var CSwiper = Class({
             disable  = 'left';
         if (!hasRight)
             disable  = 'right';
-
+        //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable,
-            resistance:10000000
+            disable: disable
         });
     },
     openOrCloseSideMenu: function(name)
     {
-        if (CUtils.isEmpty(this.sideMenu)) return;
-        var state = this.sideMenu.state().state;
+        if (CUtils.isEmpty(CSwiper.sideMenu)) return;
+        var state = CSwiper.sideMenu.state().state;
 
         if (state=="closed")
-            this.sideMenu.open(name);
+            CSwiper.sideMenu.open(name);
         else
-            this.sideMenu.close();
+            CSwiper.sideMenu.close();
     },
     isSideMenuOpen: function()
     {

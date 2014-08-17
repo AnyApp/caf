@@ -5,15 +5,10 @@
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            height: 40,
             color: {color:'White'},
             fontSize:16,
             fontStyle:['bold'],
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
-            textAlign: 'center',
-            round: 2
+            textAlign: 'center'
         },
         DEFAULT_LOGIC: {
         }

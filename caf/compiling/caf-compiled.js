@@ -465,6 +465,9 @@ var CDesign = Class({
         minHeight: function(data){
             return "mhp"+data;
         },
+        maxWidth: function(data){
+            return "maxwp"+data;
+        },
         margin: function(data){
             if (data==="none")
                 return "noMargin";
@@ -779,9 +782,10 @@ var CTemplator = Class({
         var currentObject   = CObjectsHandler.object(id);
         var view            = new CStringBuilder();
 
-        var viewBuilder = currentObject.prepareBuild({view:view});
-        var viewStr     = viewBuilder.build(' ');
+        var viewBuilder     = currentObject.prepareBuild({view:view});
 
+        var viewStr         = viewBuilder.build(' ');
+        //CLog.dlog(viewStr);
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
         //       and the DOM won't change.
@@ -842,6 +846,49 @@ var CAppConfig = Class({
     }
 });
 
+/**
+ * Created by dvircn on 17/08/14.
+ */
+var CDom = Class({
+    $singleton: true,
+
+    exists: function(id){
+        return !CUtils.isEmpty(CUtils.element(id));
+    },
+    children: function(id){
+        return CUtils.element(id).children;
+    },
+    childrenCount: function(id){
+        return CUtils.element(id).children.length;
+    },
+    hasChildren: function(id){
+        return CUtils.element(id).children.length > 0;
+    },
+    indexInParent: function(id){
+        var node = CUtils.element(id);
+        return Array.prototype.indexOf.call(node.parentNode.children, node);
+    },
+    addChild: function(parentId,viewStr){
+        var node = CUtils.element(parentId);
+        node.innerHTML += viewStr;
+    },
+    /**
+     * Move node to index and push all other nodes forward.
+     * @param nodeId
+     * @param index
+     */
+    moveToIndex: function(nodeId, index){
+        // Check if already in index
+        var currentIndex = this.indexInParent(nodeId);
+        if (currentIndex===index)
+            return;
+        var beforeIndex = index+1;
+        var node = CUtils.element(nodeId);
+        node.parentNode.insertBefore(node,node.parentNode.children[beforeIndex]);
+
+    }
+
+});
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -1021,7 +1068,7 @@ var CUtils = Class({
     },
     hideOrShow: function(id,showClass,outClass,duration)
     {
-        var elm = document.getElementById(id);
+        var elm = CUtils.element(id);
         if (this.hasClass(elm,'hidden'))
         {
             this.removeClass(elm,'hidden');
@@ -1118,10 +1165,15 @@ var CUtils = Class({
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     clone: function(o) {
-        return JSON.parse(JSON.stringify(o));
+        return JSONfn.parse(JSONfn.stringify(o));
     },
     equals: function(o1,o2){
         return JSONfn.stringify(o1)===JSONfn.stringify(o2)
+    },
+    arrayRemove: function(array,item){
+        var index = array.indexOf(item);
+        if (index >= 0)
+            array.splice(index,1);
     }
 });
 
@@ -1547,22 +1599,21 @@ var CSwiper = Class({
             disable  = 'left';
         if (!hasRight)
             disable  = 'right';
-
+        //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable,
-            resistance:10000000
+            disable: disable
         });
     },
     openOrCloseSideMenu: function(name)
     {
-        if (CUtils.isEmpty(this.sideMenu)) return;
-        var state = this.sideMenu.state().state;
+        if (CUtils.isEmpty(CSwiper.sideMenu)) return;
+        var state = CSwiper.sideMenu.state().state;
 
         if (state=="closed")
-            this.sideMenu.open(name);
+            CSwiper.sideMenu.open(name);
         else
-            this.sideMenu.close();
+            CSwiper.sideMenu.close();
     },
     isSideMenuOpen: function()
     {
@@ -1655,6 +1706,9 @@ var CObject = Class({
     getDesign: function() {
         return this.design;
     },
+    setDesign: function(design) {
+        this.design = design;
+    },
     saveLastLogic: function () {
         // Change cache only if logic was updated.
         if (!CUtils.equals(this.logic,this.lastLogic)){
@@ -1695,9 +1749,11 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
+/*
         forceDesign.classes =
             (forceDesign.classes || '')+' '+(this.design.classes || '');
         this.design = CUtils.mergeJSONs(forceDesign,this.design);
+*/
         CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
@@ -1752,15 +1808,10 @@ var CObject = Class({
 var CLabel = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            height: 40,
             color: {color:'White'},
             fontSize:16,
             fontStyle:['bold'],
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
-            textAlign: 'center',
-            round: 2
+            textAlign: 'center'
         },
         DEFAULT_LOGIC: {
         }
@@ -1813,9 +1864,6 @@ var CButton = Class(CLabel,{
 /**
  * Created by dvircn on 06/08/14.
  */
-/**
- * Created by dvircn on 06/08/14.
- */
 
 var CContainer = Class(CObject,{
     $statics: {
@@ -1849,6 +1897,8 @@ var CContainer = Class(CObject,{
             }
             //Set parent to this Object.
             object.setParent(this.uid());
+            // Force Design.
+            this.applyForceDesign(object);
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild({}));
         },this);
@@ -1856,9 +1906,85 @@ var CContainer = Class(CObject,{
         data.view = content;
         CContainer.$superp.prepareBuild.call(this,CUtils.mergeJSONs(data));
         return content;
+    },
+    applyForceDesign: function(object){
+        if (!CUtils.isEmpty(this.forceDesign))
+            object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));
+    },
+    appendChild: function(objectId){
+        this.data.childs.push(objectId);
+        this.rebuild();
+    },
+    removeChild: function(objectId){
+        CUtils.arrayRemove(this.data.childs,objectId);
+        this.rebuild();
+    },
+    rebuild: function(){
+        CTemplator.buildFromObject(this.uid());
     }
 
 
+});
+
+
+/**
+ * Created by dvircn on 16/08/14.
+ */
+var  CDialog = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'cDialog',
+            top: 50,
+            left: 0,
+            right: 0,
+            minHeight: 100/*,
+            display: 'hidden'*/
+        },
+        DEFAULT_LOGIC: {
+        },
+        showDialog: function(parentId){
+            if (CUtils.isEmpty(parentId))
+                parentId = 'main-view';//CObjectsHandler.appContainerId;
+
+            var newDialog = CObjectsHandler.createObject('Dialog',{
+                design: {
+                    bgColor:{color:'Red',level:1}
+                }
+            });
+            CObjectsHandler.object(parentId).appendChild(newDialog);
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CDialog);
+        // Invoke parent's constructor
+        CDialog.$super.call(this, values);
+
+        var dialog = this;
+
+        // Create Overlay.
+        this.dialogOverlay = CObjectsHandler.createObject('Object',{
+            design: {
+                classes: 'cDialogOverlay'
+            },
+            logic: {
+                doStopPropagation: true,
+                onClick: function(){
+                    dialog.switchDialog();
+                }
+            }
+        });
+         // Add to Childs array.
+        this.data.childs.push(this.dialogOverlay);
+
+
+
+    },
+    switchDialog: function(){
+        CUtils.hideOrShow(this.uid(),'fadein300','fadeout300',300);
+    }
 
 });
 
@@ -1969,7 +2095,6 @@ var CSideMenuLeft = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-drawer snap-drawer-left',
             bgColor:{color:'Gray',level:4},
-            overflow: 'scrollable',
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
@@ -1996,7 +2121,6 @@ var CSideMenuRight = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-drawer snap-drawer-right',
             bgColor:{color:'Gray',level:4},
-            overflow: 'scrollable',
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
@@ -2019,8 +2143,59 @@ var CSideMenuRight = Class(CContainer,{
  * Created by dvircn on 06/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 16/08/14.
  */
+var CDropMenu = Class(CContainer,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes:'dropMenu'
+        },
+        DEFAULT_LOGIC: {
+        }
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CSideMenu);
+        // Invoke parent's constructor
+        CSideMenu.$super.call(this, values);
+
+        // Set position.
+        if (values.data.leftMenu === true)
+            this.design.left  = 0;
+        else
+            this.design.right = 0;
+
+
+        this.leftContainer  = values.data.leftContainer  || null;
+        this.rightContainer = values.data.rightContainer || null;
+
+        // Create left and right menus.
+        this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
+            data: {  childs: [this.leftContainer] }
+        });
+        this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
+            data: {  childs: [this.rightContainer] }
+        });
+
+        // Set Children.
+        this.data.childs = ['side-menu-left','side-menu-right'];
+        var positions = [];
+        if (this.leftContainer != null)
+            positions.push('left');
+        if (this.rightContainer != null)
+            positions.push('right');
+
+        this.logic.sideMenu = {
+            positions: positions
+        };
+
+    }
+
+});
+
+
 /**
  * Created by dvircn on 15/08/14.
  */
@@ -2105,8 +2280,31 @@ var CHeader = Class(CContainer,{
         this.data.childs = this.data.childs.concat([this.data.title]);
         this.data.childs = this.data.childs.concat(this.data.right);
 
-
+        // Set Force Design
+        this.forceDesign = {
+            position: 'absolute',
+            top: 0, bottom: 0,
+            width: this.data.itemSize
+        }
+    },
+    applyForceDesign: function(object){
+        var id = object.uid();
+        var leftPos     = this.data.left.indexOf(id);
+        var rightPos    = this.data.right.indexOf(id);
+        if (leftPos >= 0){
+            this.forceDesign['left']    = this.data.itemSize * leftPos;
+            this.forceDesign['right']   = null;
+        }
+        else if (rightPos >= 0){
+            this.forceDesign['left']    = null;
+            this.forceDesign['right']   = this.data.itemSize * rightPos;
+        }
+        else {
+            return;
+        }
+        CHeader.$superp.applyForceDesign.call(this,object);
     }
+
 
 
 });
@@ -2120,7 +2318,8 @@ var CContent = Class(CContainer,{
             classes: 'content',
             bgColor:{
                 color: 'White'
-            }
+            },
+            overflow: 'scrollable'
         },
         DEFAULT_LOGIC: {
         }
@@ -2155,8 +2354,7 @@ var CPage = Class(CContainer,{
             },
             height:'100%',
             width:'100%',
-            position: 'relative',
-            overflow: 'scrollable'
+            position: 'relative'
         },
         DEFAULT_LOGIC: {
         }
@@ -2304,6 +2502,7 @@ var CSlider = Class(CContainer,{
         DEFAULT_DESIGN: {
             height: 300,
             widthSM: 10,
+            widthXS: 10,
             marginRight:1,
             marginLeft:1,
             marginTop:1,

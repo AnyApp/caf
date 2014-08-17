@@ -9,8 +9,7 @@ var CPage = Class(CContainer,{
             },
             height:'100%',
             width:'100%',
-            position: 'relative',
-            overflow: 'scrollable'
+            position: 'relative'
         },
         DEFAULT_LOGIC: {
         }
