@@ -25,8 +25,13 @@ var CStringBuilder = Class({
      *  Build String.
      */
     build: function(separator){
+        if (this.length()<=0)
+            return "";
         separator = separator || "";
         return this.array.join(separator);
+    },
+    length: function(){
+        return this.array.length;
     }
 
 

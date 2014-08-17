@@ -25,15 +25,17 @@ var CTemplator = Class({
 
         var viewBuilder     = currentObject.prepareBuild({view:view});
 
-        var viewStr         = viewBuilder.build(' ');
-        //CLog.dlog(viewStr);
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
         //       and the DOM won't change.
-        CUtils.element(currentObject.getParent()).innerHTML += viewStr;
+        var viewStr = viewBuilder.build(' ');
+        CDom.addChild(currentObject.getParent(),viewStr);
 
         // Build relevant Objects by the order of their build (Parent->Child).
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
+            //Restructure containers children.
+            if (object.isContainer())
+                object.restructureChildren();
             // Apply Logic and Design on the Object.
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);

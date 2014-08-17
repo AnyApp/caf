@@ -3,6 +3,9 @@
  */
 var CAnimations = Class({
     $singleton: true,
+    applyAnimation: function(objectId,anim,duration,onComplete){
+        this[anim](CUtils.element(objectId),duration,onComplete);
+    },
     /* Animate view with fade in or out */
     fadeIn: function(elm,time,onEnter) {
         onEnter = onEnter || function(){};

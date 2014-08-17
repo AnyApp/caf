@@ -37,6 +37,8 @@ var CObject = Class({
         this.lastClasses    = "";
         this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
+        this.enterAnimation = '';
+        this.entered        = false;
     },
     /**
      * Return Unique identifier.
@@ -53,6 +55,12 @@ var CObject = Class({
     },
     getParent: function() {
         return this.parent;
+    },
+    setEnterAnimation: function(enterAnimation) {
+        this.enterAnimation = enterAnimation;
+    },
+    getEnterAnimation: function() {
+        return this.enterAnimation;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -103,11 +111,6 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
-/*
-        forceDesign.classes =
-            (forceDesign.classes || '')+' '+(this.design.classes || '');
-        this.design = CUtils.mergeJSONs(forceDesign,this.design);
-*/
         CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
@@ -147,7 +150,21 @@ var CObject = Class({
 
 
 
+    },
+    isContainer: function(){
+        return false;
+    },
+    showAnimation: function(){
+        if (!this.entered){
+            this.entered = true;
+            CAnimations.applyAnimation(this.uid(),
+                this.logic.anim,this.logic.animDuration,this.logic.animOnComplete);
+        }
+    },
+    hideAnimation: function(){
+
     }
+
 
 
 });

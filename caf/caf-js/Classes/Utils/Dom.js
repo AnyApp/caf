@@ -22,7 +22,11 @@ var CDom = Class({
     },
     addChild: function(parentId,viewStr){
         var node = CUtils.element(parentId);
-        node.innerHTML += viewStr;
+        node.insertAdjacentHTML('beforeend',viewStr);
+    },
+    removeFromDOM: function(nodeId){
+        var node = CUtils.element(nodeId);
+        node.parentElement.removeChild(node);
     },
     /**
      * Move node to index and push all other nodes forward.

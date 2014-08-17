@@ -784,15 +784,17 @@ var CTemplator = Class({
 
         var viewBuilder     = currentObject.prepareBuild({view:view});
 
-        var viewStr         = viewBuilder.build(' ');
-        //CLog.dlog(viewStr);
         // Append the view to the parent in the DOM.
         // Note: If the objects are already in the DOM, viewStr will be empty
         //       and the DOM won't change.
-        CUtils.element(currentObject.getParent()).innerHTML += viewStr;
+        var viewStr = viewBuilder.build(' ');
+        CDom.addChild(currentObject.getParent(),viewStr);
 
         // Build relevant Objects by the order of their build (Parent->Child).
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
+            //Restructure containers children.
+            if (object.isContainer())
+                object.restructureChildren();
             // Apply Logic and Design on the Object.
             CDesign.applyDesign(object);
             CLogic.applyLogic(object);
@@ -870,7 +872,11 @@ var CDom = Class({
     },
     addChild: function(parentId,viewStr){
         var node = CUtils.element(parentId);
-        node.innerHTML += viewStr;
+        node.insertAdjacentHTML('beforeend',viewStr);
+    },
+    removeFromDOM: function(nodeId){
+        var node = CUtils.element(nodeId);
+        node.parentElement.removeChild(node);
     },
     /**
      * Move node to index and push all other nodes forward.
@@ -1025,8 +1031,13 @@ var CStringBuilder = Class({
      *  Build String.
      */
     build: function(separator){
+        if (this.length()<=0)
+            return "";
         separator = separator || "";
         return this.array.join(separator);
+    },
+    length: function(){
+        return this.array.length;
     }
 
 
@@ -1174,7 +1185,17 @@ var CUtils = Class({
         var index = array.indexOf(item);
         if (index >= 0)
             array.splice(index,1);
+    },
+    arrayMove: function(array,oldIndex, newIndex){
+        if (newIndex >= array.length) {
+            var k = newIndex - array.length;
+            while ((k--) + 1) {
+                array.push(undefined);
+            }
+        }
+        array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
     }
+
 });
 
 
@@ -1184,6 +1205,9 @@ var CUtils = Class({
  */
 var CAnimations = Class({
     $singleton: true,
+    applyAnimation: function(objectId,anim,duration,onComplete){
+        this[anim](CUtils.element(objectId),duration,onComplete);
+    },
     /* Animate view with fade in or out */
     fadeIn: function(elm,time,onEnter) {
         onEnter = onEnter || function(){};
@@ -1683,6 +1707,8 @@ var CObject = Class({
         this.lastClasses    = "";
         this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
+        this.enterAnimation = '';
+        this.entered        = false;
     },
     /**
      * Return Unique identifier.
@@ -1699,6 +1725,12 @@ var CObject = Class({
     },
     getParent: function() {
         return this.parent;
+    },
+    setEnterAnimation: function(enterAnimation) {
+        this.enterAnimation = enterAnimation;
+    },
+    getEnterAnimation: function() {
+        return this.enterAnimation;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -1749,11 +1781,6 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
-/*
-        forceDesign.classes =
-            (forceDesign.classes || '')+' '+(this.design.classes || '');
-        this.design = CUtils.mergeJSONs(forceDesign,this.design);
-*/
         CDesign.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
@@ -1793,7 +1820,21 @@ var CObject = Class({
 
 
 
+    },
+    isContainer: function(){
+        return false;
+    },
+    showAnimation: function(){
+        if (!this.entered){
+            this.entered = true;
+            CAnimations.applyAnimation(this.uid(),
+                this.logic.anim,this.logic.animDuration,this.logic.animOnComplete);
+        }
+    },
+    hideAnimation: function(){
+
     }
+
 
 
 });
@@ -1881,14 +1922,25 @@ var CContainer = Class(CObject,{
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
         this.data.childs = this.data.childs || [];
+        this.data.toRemoveChilds = [];
     },
     /**
      *  Build Object.
      */
     prepareBuild: function(data){
+        // Remove to-remove childs.
+        _.each(this.data.toRemoveChilds,function(childID){
+            CDom.removeFromDOM(childID);
+        },this);
+        //Clear.
+        this.data.toRemoveChilds = [];
+
+        // insert new elements.
         var content = new CStringBuilder();
-        // Prepare Build each child.
         _.each(this.data.childs,function(childID){
+            // Check if already exist.
+            /*if (!CUtils.isEmpty(CUtils.element(childID)))
+                return;*/
             var object = CObjectsHandler.object(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
@@ -1902,9 +1954,23 @@ var CContainer = Class(CObject,{
             // Prepare Build Object and merge with the content.
             content.merge(object.prepareBuild({}));
         },this);
+
+
         // Prepare this element - wrap it's children.
         data.view = content;
         CContainer.$superp.prepareBuild.call(this,CUtils.mergeJSONs(data));
+
+        /**
+         * If Container already in the DOM -> append the view.
+         * Notice: If the Container already in the DOM the
+         * view will contain children elements only.
+         */
+        if (CDom.exists(this.uid())) {
+            //.length()>0
+            CDom.addChild(this.uid(),content.build(' '));
+            content = new CStringBuilder(); // Clear content.
+        }
+
         return content;
     },
     applyForceDesign: function(object){
@@ -1915,12 +1981,33 @@ var CContainer = Class(CObject,{
         this.data.childs.push(objectId);
         this.rebuild();
     },
+    addChildInPosition: function(objectId,index){
+        this.data.childs.push(objectId);
+        this.moveChild(objectId,index);
+        this.rebuild();
+    },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
+        this.data.toRemoveChilds.push(objectId);
         this.rebuild();
+    },
+    moveChildFromIndex: function(fromIndex,toIndex){
+         CUtils.arrayMove(this.data.childs,fromIndex,toIndex);
+    },
+    moveChild: function(objectId,toIndex){
+        this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
     },
     rebuild: function(){
         CTemplator.buildFromObject(this.uid());
+    },
+    restructureChildren: function(){
+        for (var index in this.data.childs){
+            var childId = this.data.childs[index];
+            CDom.moveToIndex(childId,index);
+        }
+    },
+    isContainer: function(){
+        return true;
     }
 
 
@@ -1944,7 +2031,7 @@ var  CDialog = Class(CContainer,{
         },
         showDialog: function(parentId){
             if (CUtils.isEmpty(parentId))
-                parentId = 'main-view';//CObjectsHandler.appContainerId;
+                parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
                 design: {

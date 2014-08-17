@@ -15,7 +15,7 @@ var  CDialog = Class(CContainer,{
         },
         showDialog: function(parentId){
             if (CUtils.isEmpty(parentId))
-                parentId = 'main-view';//CObjectsHandler.appContainerId;
+                parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
                 design: {

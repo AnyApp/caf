@@ -23,99 +23,50 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/js/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="78" selection-start="1341" selection-end="1341" vertical-scroll-proportion="0.0" vertical-offset="514" max-vertical-offset="4950">
-              <folding>
-                <element signature="e#1982#2091#0" expanded="true" />
-                <element signature="e#2399#2466#0" expanded="true" />
-                <element signature="e#2777#2844#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Templator.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Templator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="10" selection-start="829" selection-end="829" vertical-scroll-proportion="0.0" vertical-offset="458" max-vertical-offset="1525">
+            <state line="31" column="57" selection-start="1042" selection-end="1042" vertical-scroll-proportion="0.0" vertical-offset="633" max-vertical-offset="1575">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
                 <element signature="e#94#131#0" expanded="true" />
                 <element signature="e#156#307#0" expanded="true" />
                 <element signature="e#313#380#0" expanded="true" />
-                <element signature="e#1243#1387#0" expanded="true" />
-                <element signature="e#1521#1717#0" expanded="true" />
+                <element signature="e#1191#1466#0" expanded="true" />
+                <element signature="e#1600#1796#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index1.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/index1.html">
+      <file leaf-file-name="Object.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="88" column="50" selection-start="5714" selection-end="5714" vertical-scroll-proportion="-11.558824" vertical-offset="1807" max-vertical-offset="7600">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Dialog.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="41" selection-start="445" selection-end="445" vertical-scroll-proportion="-4.435484" vertical-offset="150" max-vertical-offset="1700">
+            <state line="155" column="6" selection-start="4918" selection-end="4918" vertical-scroll-proportion="0.42105263" vertical-offset="3643" max-vertical-offset="4500">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
-                <element signature="e#777#1465#0" expanded="true" />
-                <element signature="e#1284#1346#0" expanded="true" />
-                <element signature="e#1495#1570#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Dom.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Dom.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="20" selection-start="805" selection-end="805" vertical-scroll-proportion="0.0" vertical-offset="474" max-vertical-offset="1225">
-              <folding>
-                <element signature="e#0#41#0" expanded="true" />
-                <element signature="e#108#167#0" expanded="true" />
-                <element signature="e#195#246#0" expanded="true" />
-                <element signature="e#279#337#0" expanded="true" />
-                <element signature="e#368#430#0" expanded="true" />
-                <element signature="e#463#586#0" expanded="true" />
-                <element signature="e#628#715#0" expanded="true" />
-                <element signature="e#874#1188#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Container.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Container.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="59" column="22" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.39591077" vertical-offset="562" max-vertical-offset="1250">
-              <folding>
-                <element signature="e#206#475#0" expanded="true" />
-                <element signature="e#679#1243#0" expanded="true" />
-                <element signature="e#1479#1619#0" expanded="true" />
-                <element signature="e#1765#1851#0" expanded="true" />
-                <element signature="e#1977#2061#0" expanded="true" />
-                <element signature="e#2086#2141#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Utils.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="128" column="34" selection-start="3906" selection-end="3906" vertical-scroll-proportion="0.0" vertical-offset="962" max-vertical-offset="1750">
-              <folding>
-                <element signature="e#746#1358#0" expanded="true" />
-                <element signature="e#3614#3671#0" expanded="true" />
+                <element signature="e#211#305#0" expanded="true" />
+                <element signature="e#359#539#0" expanded="true" />
+                <element signature="e#582#1380#0" expanded="true" />
+                <element signature="e#1386#1520#0" expanded="true" />
+                <element signature="e#1540#1642#0" expanded="true" />
+                <element signature="e#1678#1717#0" expanded="true" />
+                <element signature="e#1745#1780#0" expanded="true" />
+                <element signature="e#1830#1883#0" expanded="true" />
+                <element signature="e#1919#1962#0" expanded="true" />
+                <element signature="e#1996#2055#0" expanded="true" />
+                <element signature="e#2083#2118#0" expanded="true" />
+                <element signature="e#2152#2189#0" expanded="true" />
+                <element signature="e#2222#2416#0" expanded="true" />
+                <element signature="e#2451#2490#0" expanded="true" />
+                <element signature="e#2518#2554#0" expanded="true" />
+                <element signature="e#2584#2622#0" expanded="true" />
+                <element signature="e#2648#2682#0" expanded="true" />
+                <element signature="e#2688#2721#0" expanded="true" />
+                <element signature="e#2754#4859#0" expanded="true" />
+                <element signature="e#4888#4917#0" expanded="true" />
+                <element signature="e#4948#5161#0" expanded="true" />
+                <element signature="e#5192#5200#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -124,8 +75,9 @@
       <file leaf-file-name="Logic.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Logic.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="8" selection-start="3281" selection-end="3281" vertical-scroll-proportion="0.0" vertical-offset="874" max-vertical-offset="1425">
+            <state line="101" column="8" selection-start="3442" selection-end="3442" vertical-scroll-proportion="0.0" vertical-offset="1127" max-vertical-offset="1900">
               <folding>
+                <element signature="e#138#196#0" expanded="true" />
                 <element signature="e#666#796#0" expanded="true" />
                 <element signature="e#717#784#0" expanded="true" />
                 <element signature="e#1276#1332#0" expanded="true" />
@@ -134,17 +86,36 @@
                 <element signature="e#1882#1968#0" expanded="true" />
                 <element signature="e#2946#3264#0" expanded="true" />
                 <element signature="e#3021#3238#0" expanded="true" />
+                <element signature="e#3620#3879#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DropMenu.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/DropMenu/DropMenu.js">
+      <file leaf-file-name="animations.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-css/utils/animations.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="24" selection-start="473" selection-end="473" vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="1500">
+            <state line="153" column="12" selection-start="5171" selection-end="5171" vertical-scroll-proportion="-61.69355" vertical-offset="0" max-vertical-offset="4725">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="caf-ui-dialogs.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/caf-ui-dialogs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="63" column="24" selection-start="2891" selection-end="2891" vertical-scroll-proportion="0.0" vertical-offset="680" max-vertical-offset="1400">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Animations.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Animations.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="6" column="65" selection-start="220" selection-end="220" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="650">
               <folding>
-                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#310#659#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -153,8 +124,57 @@
       <file leaf-file-name="caf.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="93" column="15" selection-start="1709" selection-end="1723" vertical-scroll-proportion="0.0" vertical-offset="2021" max-vertical-offset="42325">
+            <state line="147" column="0" selection-start="2454" selection-end="2454" vertical-scroll-proportion="0.0" vertical-offset="3461" max-vertical-offset="39600">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Dialog.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="22" selection-start="1505" selection-end="1505" vertical-scroll-proportion="0.0" vertical-offset="913" max-vertical-offset="1700">
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#360#720#0" expanded="true" />
+                <element signature="e#763#1451#0" expanded="true" />
+                <element signature="e#1270#1332#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Utils.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="9" selection-start="976" selection-end="976" vertical-scroll-proportion="0.0" vertical-offset="301" max-vertical-offset="1850">
+              <folding>
+                <element signature="e#3963#4215#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Container.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Container.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="79" column="22" selection-start="2501" selection-end="2519" vertical-scroll-proportion="-1.6774193" vertical-offset="1771" max-vertical-offset="2850">
+              <folding>
+                <element signature="e#206#514#0" expanded="true" />
+                <element signature="e#586#2206#0" expanded="true" />
+                <element signature="e#681#733#0" expanded="true" />
+                <element signature="e#923#1612#0" expanded="true" />
+                <element signature="e#1790#1980#0" expanded="true" />
+                <element signature="e#2246#2386#0" expanded="true" />
+                <element signature="e#2423#2495#0" expanded="true" />
+                <element signature="e#2545#2657#0" expanded="true" />
+                <element signature="e#2694#2829#0" expanded="true" />
+                <element signature="e#2882#2952#0" expanded="true" />
+                <element signature="e#2995#3079#0" expanded="true" />
+                <element signature="e#3104#3159#0" expanded="true" />
+                <element signature="e#3196#3354#0" expanded="true" />
+                <element signature="e#3383#3411#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -196,27 +216,30 @@
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Structure/Footer.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/UI.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Structure/Header.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Label.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Logic.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Structure/Content.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Structure/Page.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/SideMenu/SideMenuRight.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/SideMenu/SideMenuLeft.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Swiper.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/DropMenu/DropMenu.js" />
-        <option value="$PROJECT_DIR$/caf/caf-css/caf.css" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js" />
         <option value="$PROJECT_DIR$/caf/caf-css/utils/widths.css" />
-        <option value="$PROJECT_DIR$/caf/compiling/compile.bat" />
         <option value="$PROJECT_DIR$/caf/js/index.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/DOM.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/Dom.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Logic.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/StringBuilder.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/Dom.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Templator.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Container.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js" />
+        <option value="$PROJECT_DIR$/caf/compiling/compile.bat" />
+        <option value="$PROJECT_DIR$/caf/caf-css/caf.css" />
+        <option value="$PROJECT_DIR$/caf/caf-css/utils/animations.css" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Animations.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js" />
       </list>
     </option>
   </component>
@@ -397,6 +420,32 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Utils" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf-js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Classes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="UI" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -699,38 +748,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/caf/caf-css/utils/margins.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1233" column="0" selection-start="12846" selection-end="12846" vertical-scroll-proportion="0.0" vertical-offset="30298" max-vertical-offset="30975">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Button.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="30" selection-start="143" selection-end="143" vertical-scroll-proportion="0.17422867" vertical-offset="4" max-vertical-offset="625">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Network.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="4" selection-start="91" selection-end="91" vertical-scroll-proportion="0.1394052" vertical-offset="0" max-vertical-offset="538">
-          <folding>
-            <element signature="e#124#794#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Platforms.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="14" selection-start="56" selection-end="56" vertical-scroll-proportion="0.1394052" vertical-offset="0" max-vertical-offset="600">
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="36" column="0" selection-start="1181" selection-end="1181" vertical-scroll-proportion="0.0" vertical-offset="590" max-vertical-offset="2925">
@@ -754,15 +771,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27950">
           <folding>
             <element signature="n#!!doc" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/ObjectsHandler.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="4" selection-start="1426" selection-end="1426" vertical-scroll-proportion="0.3401487" vertical-offset="217" max-vertical-offset="850">
-          <folding>
-            <element signature="e#1459#1828#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1031,15 +1039,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/StringBuilder.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="20" selection-start="448" selection-end="448" vertical-scroll-proportion="0.30852994" vertical-offset="5" max-vertical-offset="750">
-          <folding>
-            <element signature="e#571#626#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="19" selection-start="186" selection-end="186" vertical-scroll-proportion="0.25996533" vertical-offset="0" max-vertical-offset="1750">
@@ -1063,17 +1062,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="577">
           <folding>
             <element signature="n#!!doc" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="30" selection-start="1897" selection-end="1897" vertical-scroll-proportion="0.7036395" vertical-offset="219" max-vertical-offset="2775">
-          <folding>
-            <element signature="e#1469#1571#0" expanded="false" />
-            <element signature="e#1830#1865#0" expanded="false" />
-            <element signature="e#2501#4781#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1142,21 +1130,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Label.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="25" selection-start="113" selection-end="113" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="725">
-          <folding>
-            <element signature="e#567#627#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Structure/Header.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="73" column="57" selection-start="2364" selection-end="2364" vertical-scroll-proportion="0.0" vertical-offset="1398" max-vertical-offset="2150">
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
-            <element signature="e#329#1759#0" expanded="true" />
+            <element signature="e#0#41#0" expanded="false" />
+            <element signature="e#329#1759#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1164,20 +1143,6 @@
     <entry file="file://$PROJECT_DIR$/caf/index1.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="88" column="50" selection-start="5714" selection-end="5714" vertical-scroll-proportion="-11.558824" vertical-offset="1807" max-vertical-offset="7600">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="93" column="15" selection-start="1709" selection-end="1723" vertical-scroll-proportion="0.0" vertical-offset="2021" max-vertical-offset="42325">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Clicker.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="0" selection-start="2322" selection-end="2322" vertical-scroll-proportion="0.44503546" vertical-offset="924" max-vertical-offset="2100">
           <folding />
         </state>
       </provider>
@@ -1191,13 +1156,6 @@
             <element signature="e#5421#5463#0" expanded="false" />
             <element signature="e#5573#5934#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/compiling/compile.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="252" selection-start="265" selection-end="265" vertical-scroll-proportion="-0.4032258" vertical-offset="0" max-vertical-offset="375">
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1221,21 +1179,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/ObjectsHandler.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="41" selection-start="445" selection-end="445" vertical-scroll-proportion="-4.435484" vertical-offset="150" max-vertical-offset="1700">
+        <state line="33" column="4" selection-start="895" selection-end="895" vertical-scroll-proportion="0.36479127" vertical-offset="149" max-vertical-offset="750">
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
-            <element signature="e#777#1465#0" expanded="true" />
-            <element signature="e#1284#1346#0" expanded="true" />
-            <element signature="e#1495#1570#0" expanded="true" />
+            <element signature="e#927#974#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Label.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="25" selection-start="113" selection-end="113" vertical-scroll-proportion="0.1814882" vertical-offset="0" max-vertical-offset="675">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Button.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="30" selection-start="143" selection-end="143" vertical-scroll-proportion="0.17422867" vertical-offset="4" max-vertical-offset="625">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/StringBuilder.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="22" selection-start="751" selection-end="751" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="750">
+          <folding>
+            <element signature="e#861#902#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Clicker.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="112" column="42" selection-start="4365" selection-end="4373" vertical-scroll-proportion="0.0" vertical-offset="1449" max-vertical-offset="2100">
+          <folding>
+            <element signature="e#2045#2771#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Dom.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="20" selection-start="805" selection-end="805" vertical-scroll-proportion="0.0" vertical-offset="474" max-vertical-offset="1225">
+        <state line="22" column="12" selection-start="592" selection-end="600" vertical-scroll-proportion="0.0" vertical-offset="367" max-vertical-offset="1325">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
             <element signature="e#108#167#0" expanded="true" />
@@ -1243,16 +1230,113 @@
             <element signature="e#279#337#0" expanded="true" />
             <element signature="e#368#430#0" expanded="true" />
             <element signature="e#463#586#0" expanded="true" />
-            <element signature="e#628#715#0" expanded="true" />
-            <element signature="e#874#1188#0" expanded="true" />
+            <element signature="e#628#734#0" expanded="true" />
+            <element signature="e#771#867#0" expanded="true" />
+            <element signature="e#873#985#0" expanded="true" />
+            <element signature="e#1026#1340#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Container.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="22" selection-start="2501" selection-end="2519" vertical-scroll-proportion="-1.6774193" vertical-offset="1771" max-vertical-offset="2850">
+          <folding>
+            <element signature="e#206#514#0" expanded="true" />
+            <element signature="e#586#2206#0" expanded="true" />
+            <element signature="e#681#733#0" expanded="true" />
+            <element signature="e#923#1612#0" expanded="true" />
+            <element signature="e#1790#1980#0" expanded="true" />
+            <element signature="e#2246#2386#0" expanded="true" />
+            <element signature="e#2423#2495#0" expanded="true" />
+            <element signature="e#2545#2657#0" expanded="true" />
+            <element signature="e#2694#2829#0" expanded="true" />
+            <element signature="e#2882#2952#0" expanded="true" />
+            <element signature="e#2995#3079#0" expanded="true" />
+            <element signature="e#3104#3159#0" expanded="true" />
+            <element signature="e#3196#3354#0" expanded="true" />
+            <element signature="e#3383#3411#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="9" selection-start="976" selection-end="976" vertical-scroll-proportion="0.0" vertical-offset="301" max-vertical-offset="1850">
+          <folding>
+            <element signature="e#3963#4215#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="22" selection-start="1505" selection-end="1505" vertical-scroll-proportion="0.0" vertical-offset="988" max-vertical-offset="1700">
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#360#720#0" expanded="true" />
+            <element signature="e#763#1451#0" expanded="true" />
+            <element signature="e#1270#1332#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/compiling/compile.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="57" selection-start="1552" selection-end="1552" vertical-scroll-proportion="0.37174723" vertical-offset="0" max-vertical-offset="538">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="147" column="0" selection-start="2454" selection-end="2454" vertical-scroll-proportion="0.0" vertical-offset="3461" max-vertical-offset="39600">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-css/utils/animations.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="153" column="12" selection-start="5171" selection-end="5171" vertical-scroll-proportion="-61.69355" vertical-offset="0" max-vertical-offset="4725">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/caf-ui-dialogs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="24" selection-start="2891" selection-end="2891" vertical-scroll-proportion="0.0" vertical-offset="680" max-vertical-offset="1400">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Animations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="65" selection-start="220" selection-end="220" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="650">
+          <folding>
+            <element signature="e#310#659#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Templator.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="57" selection-start="1042" selection-end="1042" vertical-scroll-proportion="0.0" vertical-offset="483" max-vertical-offset="1575">
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#94#131#0" expanded="true" />
+            <element signature="e#156#307#0" expanded="true" />
+            <element signature="e#313#380#0" expanded="true" />
+            <element signature="e#1191#1466#0" expanded="true" />
+            <element signature="e#1600#1796#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Logic.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="8" selection-start="3281" selection-end="3281" vertical-scroll-proportion="0.0" vertical-offset="874" max-vertical-offset="1425">
+        <state line="101" column="8" selection-start="3442" selection-end="3442" vertical-scroll-proportion="0.0" vertical-offset="1127" max-vertical-offset="1900">
           <folding>
+            <element signature="e#138#196#0" expanded="true" />
             <element signature="e#666#796#0" expanded="true" />
             <element signature="e#717#784#0" expanded="true" />
             <element signature="e#1276#1332#0" expanded="true" />
@@ -1261,44 +1345,38 @@
             <element signature="e#1882#1968#0" expanded="true" />
             <element signature="e#2946#3264#0" expanded="true" />
             <element signature="e#3021#3238#0" expanded="true" />
+            <element signature="e#3620#3879#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js">
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="128" column="34" selection-start="3906" selection-end="3906" vertical-scroll-proportion="0.0" vertical-offset="962" max-vertical-offset="1750">
-          <folding>
-            <element signature="e#746#1358#0" expanded="true" />
-            <element signature="e#3614#3671#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Templator.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="10" selection-start="829" selection-end="829" vertical-scroll-proportion="0.0" vertical-offset="458" max-vertical-offset="1525">
+        <state line="155" column="6" selection-start="4918" selection-end="4918" vertical-scroll-proportion="0.42105263" vertical-offset="3643" max-vertical-offset="4500">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
-            <element signature="e#94#131#0" expanded="true" />
-            <element signature="e#156#307#0" expanded="true" />
-            <element signature="e#313#380#0" expanded="true" />
-            <element signature="e#1243#1387#0" expanded="true" />
-            <element signature="e#1521#1717#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Container.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="22" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.39591077" vertical-offset="562" max-vertical-offset="1250">
-          <folding>
-            <element signature="e#206#475#0" expanded="true" />
-            <element signature="e#679#1243#0" expanded="true" />
-            <element signature="e#1479#1619#0" expanded="true" />
-            <element signature="e#1765#1851#0" expanded="true" />
-            <element signature="e#1977#2061#0" expanded="true" />
-            <element signature="e#2086#2141#0" expanded="true" />
+            <element signature="e#211#305#0" expanded="true" />
+            <element signature="e#359#539#0" expanded="true" />
+            <element signature="e#582#1380#0" expanded="true" />
+            <element signature="e#1386#1520#0" expanded="true" />
+            <element signature="e#1540#1642#0" expanded="true" />
+            <element signature="e#1678#1717#0" expanded="true" />
+            <element signature="e#1745#1780#0" expanded="true" />
+            <element signature="e#1830#1883#0" expanded="true" />
+            <element signature="e#1919#1962#0" expanded="true" />
+            <element signature="e#1996#2055#0" expanded="true" />
+            <element signature="e#2083#2118#0" expanded="true" />
+            <element signature="e#2152#2189#0" expanded="true" />
+            <element signature="e#2222#2416#0" expanded="true" />
+            <element signature="e#2451#2490#0" expanded="true" />
+            <element signature="e#2518#2554#0" expanded="true" />
+            <element signature="e#2584#2622#0" expanded="true" />
+            <element signature="e#2648#2682#0" expanded="true" />
+            <element signature="e#2688#2721#0" expanded="true" />
+            <element signature="e#2754#4859#0" expanded="true" />
+            <element signature="e#4888#4917#0" expanded="true" />
+            <element signature="e#4948#5161#0" expanded="true" />
+            <element signature="e#5192#5200#0" expanded="true" />
           </folding>
         </state>
       </provider>
