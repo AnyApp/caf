@@ -1,7 +1,7 @@
 /**
  * Created by dvircn on 16/08/14.
  */
-var CDropMenu = Class(CContainer,{
+var CDropMenu = Class(CDialog,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'dropMenu'
@@ -13,9 +13,14 @@ var CDropMenu = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenu);
-        // Invoke parent's constructor
-        CSideMenu.$super.call(this, values);
+        CObject.mergeWithDefaults(values,CDropMenu);
+        // Set Design.
+
+
+        // Invoke parent's constructor - the design, childs could not be changed
+        // After tha point, because they will be passed to the
+        // dialog container.
+        CDropMenu.$super.call(this, values);
 
         // Set position.
         if (values.data.leftMenu === true)

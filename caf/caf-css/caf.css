@@ -91,6 +91,11 @@ li{
     position: absolute;
     z-index: 10000;
 }
+.cDialogContainer {
+    position: absolute;
+    z-index: 10000;
+    /*box-shadow: rgba(0,0,0,0.4) 0 5px 20px;*/
+}
 .cDialogOverlay{
     position: absolute;
     z-index: -1;
@@ -191,6 +196,10 @@ li{
 .noMargin{
     margin: 0;
 }
+.autoMargin{
+    margin: auto;
+}
+
 .rtl{
     direction: rtl;
 }

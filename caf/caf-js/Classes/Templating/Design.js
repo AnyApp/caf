@@ -156,6 +156,12 @@ var CDesign = Class({
         minHeight: function(data){
             return "mhp"+data;
         },
+        maxHeight: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "maxh"+data.substring(0,data.length-1);
+
+            return "maxhp"+data;
+        },
         maxWidth: function(data){
             return "maxwp"+data;
         },
@@ -170,7 +176,7 @@ var CDesign = Class({
                 return "marginRighted";
             if (data==="to-left")
                 return "marginLefted";
-            return "mt"+data+"mb"+data+"mr"+data+"ml"+data;
+            return "mt"+data+" mb"+data+" mr"+data+" ml"+data;
         },
         marginTop: function(data){
             return "mt"+data;

@@ -465,19 +465,27 @@ var CDesign = Class({
         minHeight: function(data){
             return "mhp"+data;
         },
+        maxHeight: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "maxh"+data.substring(0,data.length-1);
+
+            return "maxhp"+data;
+        },
         maxWidth: function(data){
             return "maxwp"+data;
         },
         margin: function(data){
             if (data==="none")
                 return "noMargin";
+            if (data==="auto")
+                return "autoMargin";
             if (data==="centered")
                 return "marginCentered";
             if (data==="to-right")
                 return "marginRighted";
             if (data==="to-left")
                 return "marginLefted";
-            return "mt"+data+"mb"+data+"mr"+data+"ml"+data;
+            return "mt"+data+" mb"+data+" mr"+data+" ml"+data;
         },
         marginTop: function(data){
             return "mt"+data;
@@ -644,6 +652,9 @@ var CLogic = Class({
                         object.setValue(inputStoredValue);
                 });
             }
+        },
+        init: function(object,value){
+            value();
         }
 
     },
@@ -1197,6 +1208,23 @@ var CUtils = Class({
             }
         }
         array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+    },
+    wndsize: function(){
+        var w = 0;var h = 0;
+        //IE
+        if(!window.innerWidth){
+            if(!(document.documentElement.clientWidth == 0)){
+                //strict mode
+                w = document.documentElement.clientWidth;h = document.documentElement.clientHeight;
+            } else{
+                //quirks mode
+                w = document.body.clientWidth;h = document.body.clientHeight;
+            }
+        } else {
+            //w3c
+            w = window.innerWidth;h = window.innerHeight;
+        }
+        return {width:w,height:h};
     }
 
 });
@@ -1216,8 +1244,6 @@ var CAnimations = Class({
 
     },
     cascadeShow: function(objectsIds){
-        CLog.dlog(objectsIds);
-
         for (var i in objectsIds){
             var index = Number(i);
             var objectId        = objectsIds[index];
@@ -1239,6 +1265,13 @@ var CAnimations = Class({
             CAnimations.show(nextObjectId);
         };
     },
+    hideOrShow: function(objectId){
+        var elm = CUtils.element(objectId);
+        if (CUtils.hasClass(elm,'hidden'))
+            this.show(objectId);
+        else
+            this.hide(objectId);
+    },
     show: function(objectId){
         var object = CObjectsHandler.object(objectId);
         this.init(object);
@@ -1253,7 +1286,6 @@ var CAnimations = Class({
     },
     fade: {
         in: function(elm,duration,onEnter) {
-            CLog.dlog('showing');
             CUtils.addClass(elm,'hidden');
             var clientHeight = elm.clientHeight;
             CUtils.removeClass(elm,'hidden');
@@ -1267,6 +1299,7 @@ var CAnimations = Class({
             CUtils.addClass(elm,'fadeout'+duration);
             window.setTimeout(function(){
                 CUtils.removeClass(elm,'fadeout'+duration);
+                CUtils.addClass(elm,'hidden');
                 onOut();
             },duration);
         }
@@ -1876,6 +1909,10 @@ var CObject = Class({
     },
     hideAnimation: function(){
 
+    },
+    removeSelf: function(){
+        var parentContainer = CObjectsHandler.object(this.parent);
+        parentContainer.removeChild(this.uid());
     }
 
 
@@ -2063,18 +2100,15 @@ var CContainer = Class(CObject,{
 var  CDialogContainer = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'cDialog',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            classes:'cDialogContainer',
             minHeight: 100,
             maxWidth: 400,
+            maxHeight: '70%',
             margin: 'auto',
             round:2,
-            bgColor:{color:'WhiteSmoke',level:-2},
+            bgColor:{color:'White',level:-4},
             border: { all: 1},
-            borderColor:{color:'WhiteSmoke',level:3},
+            borderColor:{color:'WhiteSmoke',level:1},
             overflow: 'scrollable'
         },
         DEFAULT_LOGIC: {
@@ -2088,7 +2122,7 @@ var  CDialogContainer = Class(CContainer,{
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
-
+        this.design.top = CAppConfig.get('headerSize')+20;
     }
 
 });
@@ -2102,10 +2136,11 @@ var  CDialog = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'cDialog',
             top: 0,
+            bottom: 0,
             left: 0,
             right: 0,
-            bottom: 0,
             minHeight: 100
+
 
         },
         DEFAULT_LOGIC: {
@@ -2115,14 +2150,27 @@ var  CDialog = Class(CContainer,{
                 parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
+                data: {
+                    title: 'Confirmation',
+                    topView: 'form-submit-button'
+                },
+                design: {
+                    width: 250,
+                    height:400
+                }
             });
             CObjectsHandler.object(parentId).appendChild(newDialog);
-            CAnimations.show(newDialog);
+            CObjectsHandler.object(newDialog).show();
         }
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
+
+        values.design = values.design || {};
+        // Container design.
+        var containerDesign = CUtils.clone(values.design);
+        values.design = {};
         // Merge Defaults.
         CObject.mergeWithDefaults(values,CDialog);
         // Invoke parent's constructor
@@ -2134,29 +2182,120 @@ var  CDialog = Class(CContainer,{
         this.dialogOverlay = CObjectsHandler.createObject('Object',{
             design: { classes: 'cDialogOverlay' },
             logic: { doStopPropagation: true,
-                onClick: function(){ dialog.switchDialog(); }
+                onClick: function(){ dialog.hide(); }
             }
         });
         // Create Dialog Container.
         this.dialogContainer = CObjectsHandler.createObject('DialogContainer',{
-            data: { childs: this.data.childs || []}
+            data: { childs: this.data.childs || []},
+            design: containerDesign
         });
-
+        // Add to Childs array.
         this.data.childs = [this.dialogContainer,this.dialogOverlay];
 
-         // Add to Childs array.
-        //this.data.childs.push(this.dialogOverlay);
-
         // Set default animation
-        this.data.animation         =  this.data.animation  || 'fade';
-        this.data.animationDuration =  this.data.animationDuration  || 300;
+        this.data.animation         =  this.data.animation          || 'fade';
+        this.data.animationDuration =  this.data.animationDuration  || 100;
 
+        this.data.topView = this.data.topView || CObjectsHandler.appContainerId;
 
+        // Set Destroy on Hide.
+        this.setDestroyOnHide();
+        // Create title view if needed.
+        this.setTitle();
 
+        // Set Position.
+        this.setPosition();
+
+        var dialog = this;
+        this.logic.init = function(){
+            dialog.onResize();
+        }
+    },
+    hide: function(){
+        CAnimations.hide(this.uid());
+    },
+    show: function(){
+        CAnimations.show(this.uid());
     },
     switchDialog: function(){
-        CUtils.hideOrShow(this.uid(),'fadein300','fadeout300',300);
+        CAnimations.hideOrShow(this.uid());
+    },
+    setDestroyOnHide: function(){
+        var object = this;
+        this.data.destroyOnhide = this.data.destroyOnhide || true;
+        if (this.data.destroyOnhide){
+            this.data.onAnimHideComplete = function(){
+                object.removeSelf();
+                CUtils.unbindEvent(window,'resize',object.onResize);
+            };
+        }
+    },
+    setTitle: function(){
+        this.data.title = this.data.title || '';
+        if (CUtils.isEmpty(this.data.title))
+            return;
+        // Create Title.
+        this.dialogTitle = CObjectsHandler.createObject('Object',{
+            design: {
+                color: {color:'Blue',level:0},
+                borderColor: {color:'Blue',level:0},
+                border: { bottom: 2},
+                width:'100%',
+                height: 45,
+                fontSize:18,
+                fontStyle: ['bold'],
+                textAlign: 'center'
+            },
+            logic: {
+                text: this.data.title
+            }
+        });
+
+        CObjectsHandler.object(this.dialogContainer).data.childs.push(this.dialogTitle);
+    },
+    setPosition: function () {
+        var dialog = this;
+        this.onResize = function(){
+            var position        = dialog.data.position || 'center';
+            var container       = CUtils.element(dialog.dialogContainer);
+            var topView         = CUtils.element(dialog.data.topView);
+            var containerRect   = container.getBoundingClientRect();
+            var containerWidth  = containerRect.width;
+            var topViewRect     = topView.getBoundingClientRect();
+            var topViewWidth    = topViewRect.width;
+            var topViewLeft     = topViewRect.left;
+            var windowSize      = CUtils.wndsize();
+            var windowWidth     = windowSize.width;
+
+
+            if (dialog.data.topView===CObjectsHandler.appContainerId)
+                container.style.top = (CAppConfig.get('headerSize')+20)+'px';
+            else {
+                var distanceFromBottom = (windowSize.height-(topViewRect.top+topViewRect.height));
+                if (distanceFromBottom < 100 ){
+
+                }
+                else {
+                    container.style.maxHeight = (windowSize.height-(topViewRect.top+topViewRect.height))+'px'
+                    container.style.top = (topViewRect.top+topViewRect.height)+'px';
+                }
+            }
+
+            // Align Right
+            if (position==='right')
+                container.style.right = (windowWidth-(topViewLeft+topViewWidth))+'px';
+            // Align Left
+            else if (position==='left')
+                container.style.right = (windowWidth-(topViewLeft+topViewWidth) + (topViewWidth-containerWidth))+'px';
+            // Align Center
+            else
+                container.style.right = (windowWidth-(topViewLeft+topViewWidth) + (topViewWidth-containerWidth)/2 )+'px';
+
+        };
+        window.addEventListener('resize',this.onResize);
     }
+
 
 });
 
@@ -2317,7 +2456,7 @@ var CSideMenuRight = Class(CContainer,{
 /**
  * Created by dvircn on 16/08/14.
  */
-var CDropMenu = Class(CContainer,{
+var CDropMenu = Class(CDialog,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'dropMenu'
@@ -2329,9 +2468,14 @@ var CDropMenu = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenu);
-        // Invoke parent's constructor
-        CSideMenu.$super.call(this, values);
+        CObject.mergeWithDefaults(values,CDropMenu);
+        // Set Design.
+
+
+        // Invoke parent's constructor - the design, childs could not be changed
+        // After tha point, because they will be passed to the
+        // dialog container.
+        CDropMenu.$super.call(this, values);
 
         // Set position.
         if (values.data.leftMenu === true)

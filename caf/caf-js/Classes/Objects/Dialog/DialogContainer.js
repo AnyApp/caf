@@ -4,18 +4,15 @@
 var  CDialogContainer = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'cDialog',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            classes:'cDialogContainer',
             minHeight: 100,
             maxWidth: 400,
+            maxHeight: '70%',
             margin: 'auto',
             round:2,
-            bgColor:{color:'WhiteSmoke',level:-2},
+            bgColor:{color:'White',level:-4},
             border: { all: 1},
-            borderColor:{color:'WhiteSmoke',level:3},
+            borderColor:{color:'WhiteSmoke',level:1},
             overflow: 'scrollable'
         },
         DEFAULT_LOGIC: {
@@ -29,7 +26,7 @@ var  CDialogContainer = Class(CContainer,{
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
-
+        this.design.top = CAppConfig.get('headerSize')+20;
     }
 
 });

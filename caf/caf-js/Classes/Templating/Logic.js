@@ -92,6 +92,9 @@ var CLogic = Class({
                         object.setValue(inputStoredValue);
                 });
             }
+        },
+        init: function(object,value){
+            value();
         }
 
     },

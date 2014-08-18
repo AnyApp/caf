@@ -163,6 +163,10 @@ var CObject = Class({
     },
     hideAnimation: function(){
 
+    },
+    removeSelf: function(){
+        var parentContainer = CObjectsHandler.object(this.parent);
+        parentContainer.removeChild(this.uid());
     }
 
 

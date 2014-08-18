@@ -11,8 +11,6 @@ var CAnimations = Class({
 
     },
     cascadeShow: function(objectsIds){
-        CLog.dlog(objectsIds);
-
         for (var i in objectsIds){
             var index = Number(i);
             var objectId        = objectsIds[index];
@@ -34,6 +32,13 @@ var CAnimations = Class({
             CAnimations.show(nextObjectId);
         };
     },
+    hideOrShow: function(objectId){
+        var elm = CUtils.element(objectId);
+        if (CUtils.hasClass(elm,'hidden'))
+            this.show(objectId);
+        else
+            this.hide(objectId);
+    },
     show: function(objectId){
         var object = CObjectsHandler.object(objectId);
         this.init(object);
@@ -48,7 +53,6 @@ var CAnimations = Class({
     },
     fade: {
         in: function(elm,duration,onEnter) {
-            CLog.dlog('showing');
             CUtils.addClass(elm,'hidden');
             var clientHeight = elm.clientHeight;
             CUtils.removeClass(elm,'hidden');
@@ -62,6 +66,7 @@ var CAnimations = Class({
             CUtils.addClass(elm,'fadeout'+duration);
             window.setTimeout(function(){
                 CUtils.removeClass(elm,'fadeout'+duration);
+                CUtils.addClass(elm,'hidden');
                 onOut();
             },duration);
         }
