@@ -314,18 +314,6 @@ var CDesign = Class({
     $singleton: true,
     colors: {
         notLeveled: ['Black', 'White'],
-        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray','WhiteSmoke'],
-        levels: {
-            '-4':   'XXXLight',
-            '-3':   'XXLight',
-            '-2':   'XLight',
-            '-1':   'Light',
-            '0':    '',
-            '1':    'Dark',
-            '2':    'XDark',
-            '3':    'XXDark',
-            '4':    'XXXDark'
-        },
         getColor: function(color,level){
             // Not Leveled Color.
             if (CDesign.colors.notLeveled.indexOf(color)>=0){
@@ -333,7 +321,7 @@ var CDesign = Class({
             }
             if (CUtils.isEmpty(level))  level = 0;
 
-            return CDesign.colors.levels[""+level]+color;
+            return color+level;
         }
     },
     designs: {
@@ -2113,7 +2101,7 @@ var  CDialogContainer = Class(CContainer,{
             maxWidth: 400,
             maxHeight: '70%',
             round:2,
-            bgColor:{color:'White',level:-4},
+            bgColor:{color:'White'},
             border: { all: 1},
             borderColor:{color:'WhiteSmoke',level:1},
             overflow: 'scrollable'
@@ -2272,8 +2260,8 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:'Cyan',level:1},
-                borderColor: {color:'Cyan',level:1},
+                color: {color:'Aqua',level:1},
+                borderColor: {color:'Aqua',level:1},
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
@@ -2384,7 +2372,7 @@ var CDialog = Class(CContainer,{
             paddingRight:7,
             paddingLeft:7,
             textAlign: this.data.textContentAlign,
-            active: { bgColor: { color: 'Cyan',level:0}, color: {color:'White'}}
+            active: { bgColor: { color: 'Aqua',level:0}, color: {color:'White'}}
         };
 
         // Set icon design
@@ -3138,7 +3126,7 @@ var CForm = Class(CContainer,{
                     if (!validationResult.isValid()){
                         // Dialog Color Showcase.
                         //TODO Remove
-                        var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
+                        var colors = ['Blue','Pink','Red','Purple','Orange','Green','Aqua','Gray'];
                         var color = colors[Math.floor(Math.random() * colors.length)];
                         // Show Message.
 /*

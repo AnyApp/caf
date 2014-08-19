@@ -9,7 +9,7 @@ var  CDialogContainer = Class(CContainer,{
             maxWidth: 400,
             maxHeight: '70%',
             round:2,
-            bgColor:{color:'White',level:-4},
+            bgColor:{color:'White'},
             border: { all: 1},
             borderColor:{color:'WhiteSmoke',level:1},
             overflow: 'scrollable'

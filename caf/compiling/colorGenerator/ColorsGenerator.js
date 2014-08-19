@@ -31,8 +31,9 @@ var CColorsGenerator =
             var value = this.colors[c][1];
             for (var level in this.levels){
                 var res = this.setBrightness(value,this.levels[level]);
-                var className = ".bg"+name+level;
-                t += className+"{\n\t"+"background-color: "+res+";\n}\n"
+                t += ".bg"+name+level+"\t{ "+"background-color: "+res+"; \t}\n"
+                t += ".bc"+name+level+"\t{ "+"border-color: "+res+"; \t\t}\n"
+                t += ".c"+name+level+" \t{ "+"color: "+res+"; \t\t\t\t}\n"
                 html+='<div style="width:9%;height:100px;display:inline-block;background-color: '+res+'"><span style="direction:ltr;color: #000000;background-color: #cccccc">'+name+level+'</span></span></div>'
             }
         }

@@ -38,14 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Clicker.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Clicker.js">
+      <file leaf-file-name="Object.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="60" column="31" selection-start="2214" selection-end="2214" vertical-scroll-proportion="0.0" vertical-offset="750" max-vertical-offset="2835">
-              <folding>
-                <element signature="e#3144#3999#0" expanded="true" />
-                <element signature="e#3573#3623#0" expanded="true" />
-              </folding>
+            <state line="39" column="30" selection-start="1304" selection-end="1304" vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1890">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -53,7 +50,7 @@
       <file leaf-file-name="caf.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="96" column="47" selection-start="1819" selection-end="1819" vertical-scroll-proportion="0.0" vertical-offset="14683" max-vertical-offset="44496">
+            <state line="980" column="44" selection-start="26839" selection-end="26839" vertical-scroll-proportion="0.0" vertical-offset="26030" max-vertical-offset="36747">
               <folding />
             </state>
           </provider>
@@ -62,7 +59,7 @@
       <file leaf-file-name="Dialog.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="138" column="50" selection-start="5565" selection-end="5565" vertical-scroll-proportion="0.0" vertical-offset="3373" max-vertical-offset="6345">
+            <state line="249" column="45" selection-start="9198" selection-end="9198" vertical-scroll-proportion="0.0" vertical-offset="5126" max-vertical-offset="6345">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
                 <element signature="e#379#1313#0" expanded="true" />
@@ -73,12 +70,12 @@
                 <element signature="e#4315#4573#0" expanded="true" />
                 <element signature="e#4435#4556#0" expanded="true" />
                 <element signature="e#4631#5258#0" expanded="true" />
+                <element signature="e#5287#5973#0" expanded="true" />
                 <element signature="e#6576#7358#0" expanded="true" />
                 <element signature="e#8086#8140#0" expanded="true" />
                 <element signature="e#8222#8268#0" expanded="true" />
                 <element signature="e#8333#8446#0" expanded="true" />
                 <element signature="e#8527#8681#0" expanded="true" />
-                <element signature="e#8751#9908#0" expanded="true" />
                 <element signature="e#9941#9949#0" expanded="true" />
                 <element signature="e#10050#11808#0" expanded="true" />
               </folding>
@@ -86,13 +83,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AppConfig.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Utils/AppConfig.js">
+      <file leaf-file-name="Form.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="7" selection-start="337" selection-end="340" vertical-scroll-proportion="0.0" vertical-offset="98" max-vertical-offset="675">
-              <folding>
-                <element signature="e#476#657#0" expanded="true" />
-              </folding>
+            <state line="43" column="74" selection-start="1572" selection-end="1578" vertical-scroll-proportion="0.0" vertical-offset="698" max-vertical-offset="1998">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -100,12 +95,23 @@
       <file leaf-file-name="Design.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="17" selection-start="1389" selection-end="1398" vertical-scroll-proportion="0.0" vertical-offset="515" max-vertical-offset="2295">
+            <state line="6" column="39" selection-start="139" selection-end="139" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2241">
               <folding>
-                <element signature="e#1308#1379#0" expanded="true" />
-                <element signature="e#1414#1496#0" expanded="true" />
-                <element signature="e#1530#1611#0" expanded="true" />
+                <element signature="e#179#414#0" expanded="true" />
+                <element signature="e#888#959#0" expanded="true" />
+                <element signature="e#994#1076#0" expanded="true" />
+                <element signature="e#1110#1191#0" expanded="true" />
+                <element signature="e#1224#1315#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DialogContainer.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/DialogContainer.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="26" selection-start="299" selection-end="299" vertical-scroll-proportion="0.0" vertical-offset="126" max-vertical-offset="783">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -113,11 +119,11 @@
       <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="184" column="55" selection-start="7551" selection-end="7594" vertical-scroll-proportion="0.0" vertical-offset="4781" max-vertical-offset="5481">
+            <state line="60" column="48" selection-start="2684" selection-end="2684" vertical-scroll-proportion="-10.82258" vertical-offset="949" max-vertical-offset="5481">
               <folding>
                 <element signature="e#1982#2091#0" expanded="true" />
                 <element signature="e#2399#2466#0" expanded="true" />
-                <element signature="e#2777#2844#0" expanded="true" />
+                <element signature="e#2779#2846#0" expanded="true" />
                 <element signature="n#!!block;n#do#0;n#do#0;n#!!block;n#app#0;n#!!top" expanded="true" />
               </folding>
             </state>
@@ -127,14 +133,14 @@
       <file leaf-file-name="ColorsGenerator.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/caf/compiling/colorGenerator/ColorsGenerator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="186" selection-start="1228" selection-end="1228" vertical-scroll-proportion="0.6113445" vertical-offset="654" max-vertical-offset="1944">
+            <state line="35" column="70" selection-start="1147" selection-end="1147" vertical-scroll-proportion="1.632353" vertical-offset="168" max-vertical-offset="1971">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
                 <element signature="e#107#155#0" expanded="true" />
-                <element signature="e#3731#4312#0" expanded="true" />
-                <element signature="e#4801#4839#0" expanded="true" />
-                <marker date="1408453889596" expanded="true" signature="1077:1138" placeholder="..." />
-                <marker date="1408453889596" expanded="true" signature="1160:1214" placeholder="..." />
+                <element signature="e#3841#4422#0" expanded="true" />
+                <element signature="e#4911#4949#0" expanded="true" />
+                <marker date="1408454136582" expanded="true" signature="1187:1248" placeholder="..." />
+                <marker date="1408454136582" expanded="true" signature="1270:1324" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -159,7 +165,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Caf.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Gallery.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/SliderWrapper.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/SideMenu/MainView.js" />
@@ -193,23 +198,24 @@
         <option value="$PROJECT_DIR$/caf/caf-css/utils/max-heights.css" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Animations.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/DropMenu/DropMenu.js" />
-        <option value="$PROJECT_DIR$/caf/caf-css/caf.css" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Utils/Utils.js" />
         <option value="$PROJECT_DIR$/caf/caf-css/utils/animations.css" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Swiper.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Clicker.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/libs/snap.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/InfoDialog.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Logic.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/DialogContainer.js" />
-        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js" />
-        <option value="$PROJECT_DIR$/caf/js/index.js" />
         <option value="$PROJECT_DIR$/caf/js/ColorsGenerator.js" />
         <option value="$PROJECT_DIR$/caf/index1.html" />
         <option value="$PROJECT_DIR$/caf/compiling/colorGenerator/generator.html" />
         <option value="$PROJECT_DIR$/caf/compiling/colorGenerator/ColorsGenerator.js" />
+        <option value="$PROJECT_DIR$/caf/caf-css/caf.css" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/DialogContainer.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js" />
+        <option value="$PROJECT_DIR$/caf/js/index.js" />
       </list>
     </option>
   </component>
@@ -649,19 +655,19 @@
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32894737" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14848486" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32894737" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14848486" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32894737" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -715,11 +721,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Pagination.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="0" selection-start="152" selection-end="152" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="575" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/SliderSlide.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="34" selection-start="168" selection-end="168" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="550" />
@@ -1093,22 +1094,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="69" selection-start="1477" selection-end="1477" vertical-scroll-proportion="0.0" vertical-offset="399" max-vertical-offset="1825">
-          <folding>
-            <element signature="e#5341#5464#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/UI/Animations.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="56" column="48" selection-start="2108" selection-end="2108" vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="1075">
           <folding>
-            <element signature="e#116#481#0" expanded="true" />
-            <element signature="e#1463#1695#0" expanded="true" />
-            <element signature="e#2247#2348#0" expanded="true" />
+            <element signature="e#116#481#0" expanded="false" />
+            <element signature="e#1463#1695#0" expanded="false" />
+            <element signature="e#2247#2348#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1117,7 +1109,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="54" selection-start="236" selection-end="282" vertical-scroll-proportion="0.0" vertical-offset="2" max-vertical-offset="700">
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#0#41#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1137,24 +1129,6 @@
         <state line="15" column="7" selection-start="337" selection-end="340" vertical-scroll-proportion="0.0" vertical-offset="98" max-vertical-offset="675">
           <folding>
             <element signature="e#476#657#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/DialogContainer.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="29" selection-start="251" selection-end="251" vertical-scroll-proportion="0.0" vertical-offset="206" max-vertical-offset="783">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="17" selection-start="1389" selection-end="1398" vertical-scroll-proportion="0.0" vertical-offset="515" max-vertical-offset="2295">
-          <folding>
-            <element signature="e#1308#1379#0" expanded="true" />
-            <element signature="e#1414#1496#0" expanded="true" />
-            <element signature="e#1530#1611#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1179,50 +1153,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/js/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="184" column="55" selection-start="7551" selection-end="7594" vertical-scroll-proportion="0.0" vertical-offset="4781" max-vertical-offset="5481">
-          <folding>
-            <element signature="e#1982#2091#0" expanded="true" />
-            <element signature="e#2399#2466#0" expanded="true" />
-            <element signature="e#2777#2844#0" expanded="true" />
-            <element signature="n#!!block;n#do#0;n#do#0;n#!!block;n#app#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="47" selection-start="1819" selection-end="1819" vertical-scroll-proportion="0.0" vertical-offset="14683" max-vertical-offset="44496">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="50" selection-start="5565" selection-end="5565" vertical-scroll-proportion="0.0" vertical-offset="3373" max-vertical-offset="6345">
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-            <element signature="e#379#1313#0" expanded="true" />
-            <element signature="e#1356#4059#0" expanded="true" />
-            <element signature="e#4081#4126#0" expanded="true" />
-            <element signature="e#4148#4193#0" expanded="true" />
-            <element signature="e#4223#4274#0" expanded="true" />
-            <element signature="e#4315#4573#0" expanded="true" />
-            <element signature="e#4435#4556#0" expanded="true" />
-            <element signature="e#4631#5258#0" expanded="true" />
-            <element signature="e#6576#7358#0" expanded="true" />
-            <element signature="e#8086#8140#0" expanded="true" />
-            <element signature="e#8222#8268#0" expanded="true" />
-            <element signature="e#8333#8446#0" expanded="true" />
-            <element signature="e#8527#8681#0" expanded="true" />
-            <element signature="e#8751#9908#0" expanded="true" />
-            <element signature="e#9941#9949#0" expanded="true" />
-            <element signature="e#10050#11808#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/caf/index1.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="295" column="0" selection-start="15473" selection-end="15473" vertical-scroll-proportion="0.51593626" vertical-offset="6950" max-vertical-offset="7452">
@@ -1239,16 +1169,94 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-css/caf.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="980" column="44" selection-start="26839" selection-end="26839" vertical-scroll-proportion="0.0" vertical-offset="26030" max-vertical-offset="36747">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Templating/Design.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="39" selection-start="139" selection-end="139" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2241">
+          <folding>
+            <element signature="e#179#414#0" expanded="true" />
+            <element signature="e#888#959#0" expanded="true" />
+            <element signature="e#994#1076#0" expanded="true" />
+            <element signature="e#1110#1191#0" expanded="true" />
+            <element signature="e#1224#1315#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="249" column="45" selection-start="9198" selection-end="9198" vertical-scroll-proportion="0.0" vertical-offset="5126" max-vertical-offset="6345">
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#379#1313#0" expanded="true" />
+            <element signature="e#1356#4059#0" expanded="true" />
+            <element signature="e#4081#4126#0" expanded="true" />
+            <element signature="e#4148#4193#0" expanded="true" />
+            <element signature="e#4223#4274#0" expanded="true" />
+            <element signature="e#4315#4573#0" expanded="true" />
+            <element signature="e#4435#4556#0" expanded="true" />
+            <element signature="e#4631#5258#0" expanded="true" />
+            <element signature="e#5287#5973#0" expanded="true" />
+            <element signature="e#6576#7358#0" expanded="true" />
+            <element signature="e#8086#8140#0" expanded="true" />
+            <element signature="e#8222#8268#0" expanded="true" />
+            <element signature="e#8333#8446#0" expanded="true" />
+            <element signature="e#8527#8681#0" expanded="true" />
+            <element signature="e#9941#9949#0" expanded="true" />
+            <element signature="e#10050#11808#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Object.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="39" column="30" selection-start="1304" selection-end="1304" vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1890">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/DialogContainer.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="26" selection-start="299" selection-end="299" vertical-scroll-proportion="0.0" vertical-offset="126" max-vertical-offset="783">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="74" selection-start="1572" selection-end="1578" vertical-scroll-proportion="0.0" vertical-offset="698" max-vertical-offset="1998">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/js/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="48" selection-start="2684" selection-end="2684" vertical-scroll-proportion="-10.82258" vertical-offset="949" max-vertical-offset="5481">
+          <folding>
+            <element signature="e#1982#2091#0" expanded="true" />
+            <element signature="e#2399#2466#0" expanded="true" />
+            <element signature="e#2779#2846#0" expanded="true" />
+            <element signature="n#!!block;n#do#0;n#do#0;n#!!block;n#app#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/caf/compiling/colorGenerator/ColorsGenerator.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="186" selection-start="1228" selection-end="1228" vertical-scroll-proportion="0.6113445" vertical-offset="654" max-vertical-offset="1944">
+        <state line="35" column="70" selection-start="1147" selection-end="1147" vertical-scroll-proportion="1.632353" vertical-offset="168" max-vertical-offset="1971">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
             <element signature="e#107#155#0" expanded="true" />
-            <element signature="e#3731#4312#0" expanded="true" />
-            <element signature="e#4801#4839#0" expanded="true" />
-            <marker date="1408453889596" expanded="true" signature="1077:1138" placeholder="..." />
-            <marker date="1408453889596" expanded="true" signature="1160:1214" placeholder="..." />
+            <element signature="e#3841#4422#0" expanded="true" />
+            <element signature="e#4911#4949#0" expanded="true" />
+            <marker date="1408454136582" expanded="true" signature="1187:1248" placeholder="..." />
+            <marker date="1408454136582" expanded="true" signature="1270:1324" placeholder="..." />
           </folding>
         </state>
       </provider>

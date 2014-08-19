@@ -5,18 +5,6 @@ var CDesign = Class({
     $singleton: true,
     colors: {
         notLeveled: ['Black', 'White'],
-        leveled:    ['Green', 'Blue', 'Cyan', 'Brown', 'Red', 'Pink', 'Purple', 'Gray','WhiteSmoke'],
-        levels: {
-            '-4':   'XXXLight',
-            '-3':   'XXLight',
-            '-2':   'XLight',
-            '-1':   'Light',
-            '0':    '',
-            '1':    'Dark',
-            '2':    'XDark',
-            '3':    'XXDark',
-            '4':    'XXXDark'
-        },
         getColor: function(color,level){
             // Not Leveled Color.
             if (CDesign.colors.notLeveled.indexOf(color)>=0){
@@ -24,7 +12,7 @@ var CDesign = Class({
             }
             if (CUtils.isEmpty(level))  level = 0;
 
-            return CDesign.colors.levels[""+level]+color;
+            return color+level;
         }
     },
     designs: {

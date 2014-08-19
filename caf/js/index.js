@@ -36,8 +36,8 @@ var app =
             logic: { text: "Label" }
         };
         var mainViewButton = {   uname:  'main-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Cyan',level:1},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Cyan',level:4} }
+            design: { height:40, bgColor:{color:'Aqua',level:1},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Aqua',level:4} }
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
@@ -57,8 +57,8 @@ var app =
             }
         };
         var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
-            design: { bgColor:{color:'Brown',level:1},
-                active: { bgColor:{color:'Brown',level:4} }
+            design: { bgColor:{color:'Orange',level:1},
+                active: { bgColor:{color:'Orange',level:4} }
             },
             logic: { text: "X",
                 onClick: function(){
@@ -82,7 +82,7 @@ var app =
                     onSubmit: function(values) { CLog.log(values); }
             },
             design: { widthSM: 5,widthXS: 10,padding: 5,round:3,marginTop:10,
-                border: {all:1},borderColor:{color:'Gray',level:-2}
+                border: {all:1},borderColor:{color:'Gray',level:0}
             }
         }
         var inputsDesign = {

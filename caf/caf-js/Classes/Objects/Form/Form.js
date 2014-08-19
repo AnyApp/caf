@@ -41,7 +41,7 @@ var CForm = Class(CContainer,{
                     if (!validationResult.isValid()){
                         // Dialog Color Showcase.
                         //TODO Remove
-                        var colors = ['Blue','Pink','Red','Purple','Brown','Green','Cyan','Gray'];
+                        var colors = ['Blue','Pink','Red','Purple','Orange','Green','Aqua','Gray'];
                         var color = colors[Math.floor(Math.random() * colors.length)];
                         // Show Message.
 /*

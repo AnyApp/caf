@@ -135,8 +135,8 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:'Cyan',level:1},
-                borderColor: {color:'Cyan',level:1},
+                color: {color:'Aqua',level:1},
+                borderColor: {color:'Aqua',level:1},
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
@@ -247,7 +247,7 @@ var CDialog = Class(CContainer,{
             paddingRight:7,
             paddingLeft:7,
             textAlign: this.data.textContentAlign,
-            active: { bgColor: { color: 'Cyan',level:0}, color: {color:'White'}}
+            active: { bgColor: { color: 'Aqua',level:0}, color: {color:'White'}}
         };
 
         // Set icon design
