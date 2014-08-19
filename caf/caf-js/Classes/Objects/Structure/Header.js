@@ -7,7 +7,7 @@ var CHeader = Class(CContainer,{
             classes: 'header',
             bgColor:{
                 color: 'Blue',
-                level: 2
+                level: 4
             }
         },
         DEFAULT_LOGIC: {

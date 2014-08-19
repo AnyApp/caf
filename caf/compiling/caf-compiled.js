@@ -1958,7 +1958,7 @@ var CButton = Class(CLabel,{
         DEFAULT_DESIGN: {
             cursor: 'pointer',
             active:{
-                bgColor:{color:'Gray',level:3}
+                bgColor:{color:'Gray',level:6}
             }
         },
         DEFAULT_LOGIC: {
@@ -2103,7 +2103,7 @@ var  CDialogContainer = Class(CContainer,{
             round:2,
             bgColor:{color:'White'},
             border: { all: 1},
-            borderColor:{color:'WhiteSmoke',level:1},
+            borderColor:{color:'Gray',level:2},
             overflow: 'scrollable'
         },
         DEFAULT_LOGIC: {
@@ -2260,8 +2260,8 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:'Aqua',level:1},
-                borderColor: {color:'Aqua',level:1},
+                color: {color:'Aqua',level:5},
+                borderColor: {color:'Aqua',level:4},
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
@@ -2372,7 +2372,7 @@ var CDialog = Class(CContainer,{
             paddingRight:7,
             paddingLeft:7,
             textAlign: this.data.textContentAlign,
-            active: { bgColor: { color: 'Aqua',level:0}, color: {color:'White'}}
+            active: { bgColor: { color: 'Aqua',level:4}, color: {color:'White'}}
         };
 
         // Set icon design
@@ -2556,7 +2556,7 @@ var CSideMenuLeft = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'snap-drawer snap-drawer-left',
-            bgColor:{color:'Gray',level:4},
+            bgColor:{color:'Gray',level:7},
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
@@ -2582,7 +2582,7 @@ var CSideMenuRight = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'snap-drawer snap-drawer-right',
-            bgColor:{color:'Gray',level:4},
+            bgColor:{color:'Gray',level:7},
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
@@ -2673,7 +2673,7 @@ var CFooter = Class(CContainer,{
             bottom:0,
             bgColor:{
                 color: 'Blue',
-                level: 2
+                level: 4
             }
         },
         DEFAULT_LOGIC: {
@@ -2705,7 +2705,7 @@ var CHeader = Class(CContainer,{
             classes: 'header',
             bgColor:{
                 color: 'Blue',
-                level: 2
+                level: 4
             }
         },
         DEFAULT_LOGIC: {

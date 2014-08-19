@@ -8,7 +8,7 @@ var CFooter = Class(CContainer,{
             bottom:0,
             bgColor:{
                 color: 'Blue',
-                level: 2
+                level: 4
             }
         },
         DEFAULT_LOGIC: {

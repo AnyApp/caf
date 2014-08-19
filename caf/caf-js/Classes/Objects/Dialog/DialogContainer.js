@@ -11,7 +11,7 @@ var  CDialogContainer = Class(CContainer,{
             round:2,
             bgColor:{color:'White'},
             border: { all: 1},
-            borderColor:{color:'WhiteSmoke',level:1},
+            borderColor:{color:'Gray',level:2},
             overflow: 'scrollable'
         },
         DEFAULT_LOGIC: {

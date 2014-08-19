@@ -6,7 +6,7 @@ var CButton = Class(CLabel,{
         DEFAULT_DESIGN: {
             cursor: 'pointer',
             active:{
-                bgColor:{color:'Gray',level:3}
+                bgColor:{color:'Gray',level:6}
             }
         },
         DEFAULT_LOGIC: {

@@ -32,12 +32,12 @@ var app =
             data: {  childs: ['main-label','main-button','form','main-gallery'] }
         };
         var mainViewLabel = {   uname:  'main-label', type:   'Label',
-            design: { height:40, bgColor:{color:'Blue',level:1},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2},
+            design: { height:40, bgColor:{color:'Blue',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2},
             logic: { text: "Label" }
         };
         var mainViewButton = {   uname:  'main-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Aqua',level:1},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Aqua',level:4} }
+            design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Aqua',level:6} }
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
@@ -47,8 +47,8 @@ var app =
             }
         };
         var headerButtonRight0 = {   uname:  'header-button-right-0', type:   'Button',
-            design: { bgColor:{color:'Red',level:1},
-                active: { bgColor:{color:'Red',level:4} }
+            design: { bgColor:{color:'Red',level:4},
+                active: { bgColor:{color:'Red',level:6} }
             },
             logic: { text: "dm",
                 onClick: function(){
@@ -57,8 +57,8 @@ var app =
             }
         };
         var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
-            design: { bgColor:{color:'Orange',level:1},
-                active: { bgColor:{color:'Orange',level:4} }
+            design: { bgColor:{color:'Orange',level:4},
+                active: { bgColor:{color:'Orange',level:6} }
             },
             logic: { text: "X",
                 onClick: function(){
@@ -67,8 +67,8 @@ var app =
             }
         };
         var headerButtonLeft0 = {   uname:  'header-button-left-0', type:   'Button',
-            design: { bgColor:{color:'Red',level:1},
-                active: { bgColor:{color:'Red',level:4} }
+            design: { bgColor:{color:'Red',level:4},
+                active: { bgColor:{color:'Red',level:6} }
             },
             logic: { text: "sm",
                 sideMenuSwitch: 'left'
@@ -82,7 +82,7 @@ var app =
                     onSubmit: function(values) { CLog.log(values); }
             },
             design: { widthSM: 5,widthXS: 10,padding: 5,round:3,marginTop:10,
-                border: {all:1},borderColor:{color:'Gray',level:0}
+                border: {all:1},borderColor:{color:'Gray',level:3}
             }
         }
         var inputsDesign = {
@@ -99,32 +99,32 @@ var app =
             logic: {loadInputFromStorage: true}
         }
         var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Green',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Green',level:4} }
+            design: { height:40, bgColor:{color:'Olive',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Olive',level:6} }
             },
             logic: { text: "Submit Form",
                 formSubmitButton: 'form'
             }
         };
         var formSendToURLButton = { uname: 'form-sent-to-url-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Blue',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Blue',level:4} }
+            design: { height:40, bgColor:{color:'Navy',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Blue',level:6} }
             },
             logic: { text: "Send to URL",
                 formSendToUrlButton: 'form'
             }
         };
         var formSaveToLocalStorageButton = { uname: 'form-save-to-local-storage-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Purple',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Purple',level:4} }
+            design: { height:40, bgColor:{color:'Purple',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Purple',level:6} }
             },
             logic: { text: "Save to Local Storage",
                 formSaveToLocalStorageButton: 'form'
             }
         };
         var formClearButton = { uname: 'form-clear-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Red',level:1}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Red',level:4} }
+            design: { height:40, bgColor:{color:'Red',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Red',level:6} }
             },
             logic: { text: "Clear Form",
                 formClearButton: 'form'
@@ -141,7 +141,7 @@ var app =
         };
         var dialog = { uname: 'main-dialog', type: 'Dialog',
             design: {
-                bgColor:{color:'Red',level:1}
+                bgColor:{color:'Red',level:4}
             }
         };
 
