@@ -189,5 +189,10 @@ var app =
             i++;
         }
         caf.log(str);*/
+        app.do();
+    },
+    do: function(){
+
     }
+
 }

@@ -24,14 +24,16 @@ var CDialog = Class(CContainer,{
             var newDialog = CObjectsHandler.createObject('Dialog',{
                 data: {
                     title: 'Confirmation',
-                    topView: 'header-button-left-0',
-                    textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.'
+                    //topView: 'main-button',
+                    //textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.'
+                    list: ['dvir','cohen','tal','levi']
                 },
                 design: {
                     width: 250,
                     height:'auto'
                 }
             });
+
             CObjectsHandler.object(parentId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
             var endLoadObjects  = (new  Date()).getTime();
@@ -56,12 +58,14 @@ var CDialog = Class(CContainer,{
         this.data.animationDuration = this.data.animationDuration   || 300;
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
         this.data.destroyOnhide     = this.data.destroyOnhide       || true;
-        this.data.title             = this.data.title               || '';
+        this.data.titleAlign        = this.data.titleAlign          || 'center';
+        this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.textContent       = this.data.textContent         || '';
         this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.objectContent     = this.data.objectContent       || '';
         this.data.list              = this.data.list                || [];
         this.data.iconsList         = this.data.iconsList           || [];
+        this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
         this.data.listCallbacks     = this.data.listCallbacks       || [];
         this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
         this.data.hideOnListChoose  = this.data.hideOnListChoose    || true;
@@ -131,14 +135,14 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:'Blue',level:0},
-                borderColor: {color:'Blue',level:0},
+                color: {color:'Cyan',level:1},
+                borderColor: {color:'Cyan',level:1},
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
                 fontSize:18,
                 fontStyle: ['bold'],
-                textAlign: 'center'
+                textAlign: this.data.titleAlign
             },
             logic: {
                 text: this.data.title
@@ -186,34 +190,88 @@ var CDialog = Class(CContainer,{
             });
         }
 
-        this.appendContent(contentId);
+        if (contentId!=null)
+            this.appendContent(contentId);
     },
     createList: function () {
         var list            = this.data.list,
             iconsList       = this.data.iconsList,
             listCallbacks   = this.data.listCallbacks,
             chooseCallback  = this.data.chooseCallback,
-            actualCallbacks = [];
+            actualCallbacks = [],
+            dialog          = this;
 
         // Allow create icon only list.
         while (list.length < iconsList.length){
             list.push('');
         }
 
-        // If choose callback is not defined
+        // Set up callbacks.
         for (var i=0;i<list.length;i++) {
+            var index = i;
+            var listCallback = index < listCallbacks.length ?
+                listCallbacks[index] : function(){};
+            var chosenCallback = !CUtils.isEmpty(chooseCallback) ? function() {
+                chooseCallback(index);
+            } : function(){};
+            var hideOnChoose = this.hideOnListChoose ? function(){
+                dialog.hide();
+            } : function(){};
 
+            actualCallbacks[index] = function(){
+                listCallback();
+                chosenCallback();
+                hideOnChoose();
+            };
         }
 
         // Create elements.
         _.each(list,function(text,index){
             var icon = index < iconsList.length ? iconsList[index] : '';
-            this.createListElement(text,icon,listCallbacks[index]);
+            this.createListElement(text,icon,actualCallbacks[index]);
         },this);
 
 
     },
-    createListElement: function (text,icon,chooseCallback) {
+    createListElement: function (text,icon,callback) {
+        var design = {
+            color: {color:'Black'},
+            width:'100%',
+            height: 'auto',
+            boxSizing: 'borderBox',
+            fontSize:16,
+            fontStyle: ['bold'],
+            margin: 'centered',
+            paddingTop:7,
+            paddingBottom:7,
+            paddingRight:7,
+            paddingLeft:7,
+            textAlign: this.data.textContentAlign,
+            active: { bgColor: { color: 'Cyan',level:0}, color: {color:'White'}}
+        };
+
+        // Set icon design
+        if (!CUtils.isEmpty(icon)) {
+            var iconDesign = 'iconOnly';
+            if (!CUtils.isEmpty(text)){
+                if (this.iconsAlign=='left')
+                    iconDesign = 'iconLeft';
+                if (this.iconsAlign=='right')
+                    iconDesign = 'iconRight';
+            }
+            design[iconDesign] = icon;
+        }
+
+
+        var contentId = CObjectsHandler.createObject('Button',{
+                design: design,
+                logic: {
+                    text: text,
+                    onClick: callback
+                }
+            });
+
+        this.appendContent(contentId);
     },
     createButtons: function () {
 
