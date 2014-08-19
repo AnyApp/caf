@@ -26,7 +26,7 @@
       <file leaf-file-name="Dialog.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="217" column="41" selection-start="8306" selection-end="8306" vertical-scroll-proportion="0.4327731" vertical-offset="5653" max-vertical-offset="9207">
+            <state line="275" column="21" selection-start="10349" selection-end="10349" vertical-scroll-proportion="3.3823528" vertical-offset="5815" max-vertical-offset="9180">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
                 <element signature="e#379#1448#0" expanded="true" />
@@ -42,13 +42,13 @@
                 <element signature="e#6329#6736#0" expanded="true" />
                 <element signature="e#6776#6866#0" expanded="true" />
                 <element signature="e#6899#7704#0" expanded="true" />
-                <element signature="e#8574#8633#0" expanded="true" />
-                <element signature="e#8730#8776#0" expanded="true" />
-                <element signature="e#8849#8962#0" expanded="true" />
-                <element signature="e#9038#10327#0" expanded="true" />
-                <element signature="e#10360#10368#0" expanded="true" />
-                <element signature="e#10406#12291#0" expanded="true" />
-                <element signature="e#10469#12227#0" expanded="true" />
+                <element signature="e#7734#8890#0" expanded="true" />
+                <element signature="e#8558#8617#0" expanded="true" />
+                <element signature="e#8714#8760#0" expanded="true" />
+                <element signature="e#10194#10349#0" expanded="true" />
+                <element signature="e#10462#10470#0" expanded="true" />
+                <element signature="e#10508#12393#0" expanded="true" />
+                <element signature="e#10571#12329#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1222,7 +1222,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="217" column="41" selection-start="8306" selection-end="8306" vertical-scroll-proportion="0.4327731" vertical-offset="5653" max-vertical-offset="9207">
+        <state line="275" column="21" selection-start="10349" selection-end="10349" vertical-scroll-proportion="3.3823528" vertical-offset="5815" max-vertical-offset="9180">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
             <element signature="e#379#1448#0" expanded="true" />
@@ -1238,13 +1238,13 @@
             <element signature="e#6329#6736#0" expanded="true" />
             <element signature="e#6776#6866#0" expanded="true" />
             <element signature="e#6899#7704#0" expanded="true" />
-            <element signature="e#8574#8633#0" expanded="true" />
-            <element signature="e#8730#8776#0" expanded="true" />
-            <element signature="e#8849#8962#0" expanded="true" />
-            <element signature="e#9038#10327#0" expanded="true" />
-            <element signature="e#10360#10368#0" expanded="true" />
-            <element signature="e#10406#12291#0" expanded="true" />
-            <element signature="e#10469#12227#0" expanded="true" />
+            <element signature="e#7734#8890#0" expanded="true" />
+            <element signature="e#8558#8617#0" expanded="true" />
+            <element signature="e#8714#8760#0" expanded="true" />
+            <element signature="e#10194#10349#0" expanded="true" />
+            <element signature="e#10462#10470#0" expanded="true" />
+            <element signature="e#10508#12393#0" expanded="true" />
+            <element signature="e#10571#12329#0" expanded="true" />
           </folding>
         </state>
       </provider>

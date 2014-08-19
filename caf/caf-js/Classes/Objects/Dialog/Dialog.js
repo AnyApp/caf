@@ -213,14 +213,13 @@ var CDialog = Class(CContainer,{
 
         // Set up callbacks.
         for (var i=0;i<list.length;i++) {
-            delete index;
             var index = i;
             var text = list[index] || '';
             var icon = index < iconsList.length ? iconsList[index] : '';
 
             var listCallback = index < listCallbacks.length ?
                 listCallbacks[index] : function(){};
-            var chosenCallback = !CUtils.isEmpty(chooseCallback) ? function() {
+            var chosenCallback = !CUtils.isEmpty(chooseCallback) ? function(index,text) {
                 chooseCallback(index,text);
             } : function(){};
 
@@ -228,17 +227,13 @@ var CDialog = Class(CContainer,{
                 dialog.hide();
             } : function(){};
 
-            this.createListElement(text,icon,function(){
-                listCallback();
-                chosenCallback();
-                hideOnChoose();
-            });
+            this.createListElement(index,text,icon,listCallback,chosenCallback,hideOnChoose);
         }
 
 
 
     },
-    createListElement: function (text,icon,callback) {
+    createListElement: function (index,text,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {
             color: {color:this.data.contentColor, level:4},
             width:'100%',
@@ -274,7 +269,11 @@ var CDialog = Class(CContainer,{
                 design: design,
                 logic: {
                     text: text,
-                    onClick: callback
+                    onClick: function(){
+                        listCallback();
+                        chosenCallback(index,text);
+                        hideOnChoose();
+                    }
                 }
             });
 
