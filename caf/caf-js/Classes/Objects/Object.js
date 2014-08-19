@@ -4,6 +4,7 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
+            gpuAccelerated: true
         },
         DEFAULT_LOGIC: {
         },
@@ -39,6 +40,7 @@ var CObject = Class({
         this.parent         = -1; // Object's Container Parent
         this.enterAnimation = '';
         this.entered        = false;
+        this.logic.doStopPropagation = values.logic.doStopPropagation || false;
     },
     /**
      * Return Unique identifier.

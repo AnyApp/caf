@@ -59,7 +59,7 @@ var CClicker = Class({
             if (isRightClick) return false;
 
             e.preventDefault();
-            if (object.doStopPropogation)
+            if (object.logic.doStopPropagation==true)
             {
                 e.stopPropagation();
             }

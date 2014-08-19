@@ -21,6 +21,7 @@ var CLogic = Class({
             CSwiper.addButtonToTabSwiper(object,value);
         },
         sideMenuSwitch: function(object,value){
+            object.logic.doStopPropagation = true;
             CClicker.addOnClick(object,function(){
                 CSwiper.openOrCloseSideMenu(value);
             });
@@ -39,7 +40,7 @@ var CLogic = Class({
             CUtils.element(object.uid()).innerHTML = value;
         },
         doStopPropagation: function(object,value){
-            object.doStopPropagation = true;
+            object.logic.doStopPropagation = true;
         },
         backButton: function(object,value){
             CPager.setBackButton(object.uid());
@@ -55,9 +56,9 @@ var CLogic = Class({
                 CSwiper.initSwiper(value);
             });
         },
-        dropMenuSwitch: function(object,value){
+        dialogSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
-                CUtils.hideOrShow(value,'fadein300','fadeout300',300);
+                CObjectsHandler.object(value).switchDialog();
             });
         },
         formSubmitButton: function(object,value){

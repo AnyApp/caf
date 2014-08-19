@@ -527,6 +527,11 @@ var CDesign = Class({
         },
         right: function(data){
             return "right"+data;
+        },
+        gpuAccelerated: function(data){
+            if (data===true){
+                return "gpuAccelerated";
+            }
         }
 
     },
@@ -581,6 +586,7 @@ var CLogic = Class({
             CSwiper.addButtonToTabSwiper(object,value);
         },
         sideMenuSwitch: function(object,value){
+            object.logic.doStopPropagation = true;
             CClicker.addOnClick(object,function(){
                 CSwiper.openOrCloseSideMenu(value);
             });
@@ -599,7 +605,7 @@ var CLogic = Class({
             CUtils.element(object.uid()).innerHTML = value;
         },
         doStopPropagation: function(object,value){
-            object.doStopPropagation = true;
+            object.logic.doStopPropagation = true;
         },
         backButton: function(object,value){
             CPager.setBackButton(object.uid());
@@ -615,9 +621,9 @@ var CLogic = Class({
                 CSwiper.initSwiper(value);
             });
         },
-        dropMenuSwitch: function(object,value){
+        dialogSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
-                CUtils.hideOrShow(value,'fadein300','fadeout300',300);
+                CObjectsHandler.object(value).switchDialog();
             });
         },
         formSubmitButton: function(object,value){
@@ -1369,7 +1375,7 @@ var CClicker = Class({
             if (isRightClick) return false;
 
             e.preventDefault();
-            if (object.doStopPropogation)
+            if (object.logic.doStopPropagation==true)
             {
                 e.stopPropagation();
             }
@@ -1750,6 +1756,7 @@ var CUI = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
+            gpuAccelerated: true
         },
         DEFAULT_LOGIC: {
         },
@@ -1785,6 +1792,7 @@ var CObject = Class({
         this.parent         = -1; // Object's Container Parent
         this.enterAnimation = '';
         this.entered        = false;
+        this.logic.doStopPropagation = values.logic.doStopPropagation || false;
     },
     /**
      * Return Unique identifier.
@@ -2104,7 +2112,6 @@ var  CDialogContainer = Class(CContainer,{
             minHeight: 100,
             maxWidth: 400,
             maxHeight: '70%',
-            margin: 'auto',
             round:2,
             bgColor:{color:'White',level:-4},
             border: { all: 1},
@@ -2131,7 +2138,7 @@ var  CDialogContainer = Class(CContainer,{
 /**
  * Created by dvircn on 16/08/14.
  */
-var  CDialog = Class(CContainer,{
+var CDialog = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
             classes:'cDialog',
@@ -2139,28 +2146,33 @@ var  CDialog = Class(CContainer,{
             bottom: 0,
             left: 0,
             right: 0,
-            minHeight: 100
+            minHeight: 100,
+            display: 'hidden'
 
 
         },
         DEFAULT_LOGIC: {
         },
         showDialog: function(parentId){
+            var startLoadObjects = (new  Date()).getTime();
             if (CUtils.isEmpty(parentId))
                 parentId = CObjectsHandler.appContainerId;
 
             var newDialog = CObjectsHandler.createObject('Dialog',{
                 data: {
                     title: 'Confirmation',
-                    topView: 'form-submit-button'
+                    topView: 'header-button-left-0',
+                    textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.'
                 },
                 design: {
                     width: 250,
-                    height:400
+                    height:'auto'
                 }
             });
             CObjectsHandler.object(parentId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
+            var endLoadObjects  = (new  Date()).getTime();
+            //alert((endLoadObjects-startLoadObjects)/1000+" Time");
         }
     },
 
@@ -2176,8 +2188,62 @@ var  CDialog = Class(CContainer,{
         // Invoke parent's constructor
         CDialog.$super.call(this, values);
 
-        var dialog = this;
+        // Set defaults
+        this.data.animation         = this.data.animation           || 'fade';
+        this.data.animationDuration = this.data.animationDuration   || 300;
+        this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
+        this.data.destroyOnhide     = this.data.destroyOnhide       || true;
+        this.data.title             = this.data.title               || '';
+        this.data.textContent       = this.data.textContent         || '';
+        this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
+        this.data.objectContent     = this.data.objectContent       || '';
+        this.data.list              = this.data.list                || [];
+        this.data.iconsList         = this.data.iconsList           || [];
+        this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
+        this.data.cancelText        = this.data.cancelText          || '';
+        this.data.cancelCallback    = this.data.cancelCallback      || function(){};
+        this.data.confirmText       = this.data.confirmText         || '';
+        this.data.confirmCallback   = this.data.confirmCallback     || function(){};
+        this.data.extraText         = this.data.extraText           || '';
+        this.data.extraCallback     = this.data.extraCallback       || function(){};
 
+        // Init function.
+        var dialog = this;
+        this.logic.init = function(){ dialog.onResize(); }
+        // Set destroy on hide handler.
+        this.setDestroyOnHideHandler();
+        // Create sub views.
+        this.createContainerAndOverlay(containerDesign);
+        // Create title view if needed.
+        this.createTitle();
+        this.createContainer();
+        this.createContent();
+        this.createList();
+        this.createButtons();
+        // Set Position.
+        this.setPositionHandler();
+
+    },
+    hide: function(){
+        CAnimations.hide(this.uid());
+    },
+    show: function(){
+        CAnimations.show(this.uid());
+    },
+    switchDialog: function(){
+        CAnimations.hideOrShow(this.uid());
+    },
+    setDestroyOnHideHandler: function(){
+        var object = this;
+        if (this.data.destroyOnhide){
+            this.data.onAnimHideComplete = function(){
+                object.removeSelf();
+                CUtils.unbindEvent(window,'resize',object.onResize);
+            };
+        }
+    },
+    createContainerAndOverlay: function(containerDesign){
+        var dialog = this;
         // Create Overlay.
         this.dialogOverlay = CObjectsHandler.createObject('Object',{
             design: { classes: 'cDialogOverlay' },
@@ -2193,46 +2259,8 @@ var  CDialog = Class(CContainer,{
         // Add to Childs array.
         this.data.childs = [this.dialogContainer,this.dialogOverlay];
 
-        // Set default animation
-        this.data.animation         =  this.data.animation          || 'fade';
-        this.data.animationDuration =  this.data.animationDuration  || 100;
-
-        this.data.topView = this.data.topView || CObjectsHandler.appContainerId;
-
-        // Set Destroy on Hide.
-        this.setDestroyOnHide();
-        // Create title view if needed.
-        this.setTitle();
-
-        // Set Position.
-        this.setPosition();
-
-        var dialog = this;
-        this.logic.init = function(){
-            dialog.onResize();
-        }
     },
-    hide: function(){
-        CAnimations.hide(this.uid());
-    },
-    show: function(){
-        CAnimations.show(this.uid());
-    },
-    switchDialog: function(){
-        CAnimations.hideOrShow(this.uid());
-    },
-    setDestroyOnHide: function(){
-        var object = this;
-        this.data.destroyOnhide = this.data.destroyOnhide || true;
-        if (this.data.destroyOnhide){
-            this.data.onAnimHideComplete = function(){
-                object.removeSelf();
-                CUtils.unbindEvent(window,'resize',object.onResize);
-            };
-        }
-    },
-    setTitle: function(){
-        this.data.title = this.data.title || '';
+    createTitle: function(){
         if (CUtils.isEmpty(this.data.title))
             return;
         // Create Title.
@@ -2254,10 +2282,59 @@ var  CDialog = Class(CContainer,{
 
         CObjectsHandler.object(this.dialogContainer).data.childs.push(this.dialogTitle);
     },
-    setPosition: function () {
+    createContainer: function(){
+        if (CUtils.isEmpty(this.data.title))
+            return;
+        // Create Title.
+        this.contentContainer = CObjectsHandler.createObject('Container',{
+            design: {
+                width:'100%',
+                height: 'auto',
+                marginTop: 4
+            }
+        });
+
+        CObjectsHandler.object(this.dialogContainer).data.childs.push(this.contentContainer);
+
+    },
+    appendContent: function(contentId){
+        CObjectsHandler.object(this.contentContainer).data.childs.push(contentId);
+    },
+    createContent: function () {
+        var contentId = null;
+        if (!CUtils.isEmpty(this.data.objectContent))
+            contentId = this.data.objectContent;
+        else if (!CUtils.isEmpty(this.data.textContent)){
+            contentId = CObjectsHandler.createObject('Object',{
+                design: {
+                    color: {color:'Black'},
+                    width:'95%',
+                    height: 'auto',
+                    fontSize:16,
+                    fontStyle: ['bold'],
+                    margin: 'centered',
+                    textAlign: this.data.textContentAlign
+                },
+                logic: {
+                    text: this.data.textContent
+                }
+            });
+        }
+
+        this.appendContent(contentId);
+    },
+    createList: function () {
+
+    },
+    createButtons: function () {
+
+    },
+    setPositionHandler: function () {
         var dialog = this;
         this.onResize = function(){
-            var position        = dialog.data.position || 'center';
+            if (CUtils.isEmpty(CUtils.element(dialog.dialogContainer)))
+                return;
+
             var container       = CUtils.element(dialog.dialogContainer);
             var topView         = CUtils.element(dialog.data.topView);
             var containerRect   = container.getBoundingClientRect();
@@ -2274,23 +2351,25 @@ var  CDialog = Class(CContainer,{
             else {
                 var distanceFromBottom = (windowSize.height-(topViewRect.top+topViewRect.height));
                 if (distanceFromBottom < 100 ){
-
+                    container.style.top = topViewRect.top-containerRect.height+'px';
+                    container.style.maxHeight = (topViewRect.top-10)+'px';
                 }
                 else {
-                    container.style.maxHeight = (windowSize.height-(topViewRect.top+topViewRect.height))+'px'
+                    container.style.maxHeight = (windowSize.height-(topViewRect.top+topViewRect.height)-10)+'px';
                     container.style.top = (topViewRect.top+topViewRect.height)+'px';
                 }
             }
 
-            // Align Right
-            if (position==='right')
-                container.style.right = (windowWidth-(topViewLeft+topViewWidth))+'px';
-            // Align Left
-            else if (position==='left')
-                container.style.right = (windowWidth-(topViewLeft+topViewWidth) + (topViewWidth-containerWidth))+'px';
-            // Align Center
-            else
-                container.style.right = (windowWidth-(topViewLeft+topViewWidth) + (topViewWidth-containerWidth)/2 )+'px';
+            var right = (windowWidth-(topViewLeft+topViewWidth) + (topViewWidth-containerWidth)/2 );
+
+            // Check bounds.
+            if (right<1)
+                right = 1;
+
+            if (right >= (windowWidth-containerRect.width) )
+                right = windowWidth-containerRect.width-1;
+
+            container.style.right = right + 'px';
 
         };
         window.addEventListener('resize',this.onResize);

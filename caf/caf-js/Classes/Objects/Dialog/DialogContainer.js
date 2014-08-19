@@ -8,7 +8,6 @@ var  CDialogContainer = Class(CContainer,{
             minHeight: 100,
             maxWidth: 400,
             maxHeight: '70%',
-            margin: 'auto',
             round:2,
             bgColor:{color:'White',level:-4},
             border: { all: 1},

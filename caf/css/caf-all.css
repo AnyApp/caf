@@ -272,7 +272,11 @@ html, body {
 
 .dialogContent{
 
-}/* Animations */
+}.gpuAccelerated{
+    -webkit-transform: translate3d(0,0,0);
+}
+
+/* Animations */
 .fadein100{
     -webkit-transform: translate3d(0,0,0);
     -webkit-transition: opacity 0.1s ease-in-out;

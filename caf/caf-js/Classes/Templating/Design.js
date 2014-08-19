@@ -218,6 +218,11 @@ var CDesign = Class({
         },
         right: function(data){
             return "right"+data;
+        },
+        gpuAccelerated: function(data){
+            if (data===true){
+                return "gpuAccelerated";
+            }
         }
 
     },
