@@ -41,7 +41,6 @@ var app =
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
-                    CLog.log('Button Clicked');
                     CDialog.showDialog();
                 }
             }

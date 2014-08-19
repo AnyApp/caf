@@ -26,7 +26,10 @@ var CDialog = Class(CContainer,{
                     title: 'Confirmation',
                     //topView: 'main-button',
                     //textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.'
-                    list: ['dvir','cohen','tal','levi']
+                    list: ['dvir','cohen','tal','levi'],
+                    chooseCallback: function(index,value){
+                        CLog.dlog(index+") "+value);
+                    }
                 },
                 design: {
                     width: 250,
@@ -75,6 +78,8 @@ var CDialog = Class(CContainer,{
         this.data.confirmCallback   = this.data.confirmCallback     || function(){};
         this.data.extraText         = this.data.extraText           || '';
         this.data.extraCallback     = this.data.extraCallback       || function(){};
+        this.data.dialogColor       = this.data.dialogColor         || 'Red';
+        this.data.contentColor      = this.data.contentColor        || 'Black';
 
         // Init function.
         var dialog = this;
@@ -135,8 +140,8 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:'Aqua',level:5},
-                borderColor: {color:'Aqua',level:4},
+                color: {color:this.data.dialogColor,level:4},
+                borderColor: {color:this.data.dialogColor,level:4},
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
@@ -176,7 +181,7 @@ var CDialog = Class(CContainer,{
         else if (!CUtils.isEmpty(this.data.textContent)){
             contentId = CObjectsHandler.createObject('Object',{
                 design: {
-                    color: {color:'Black'},
+                    color: {color:this.data.contentColor,level:4},
                     width:'95%',
                     height: 'auto',
                     fontSize:16,
@@ -208,34 +213,34 @@ var CDialog = Class(CContainer,{
 
         // Set up callbacks.
         for (var i=0;i<list.length;i++) {
+            delete index;
             var index = i;
+            var text = list[index] || '';
+            var icon = index < iconsList.length ? iconsList[index] : '';
+
             var listCallback = index < listCallbacks.length ?
                 listCallbacks[index] : function(){};
             var chosenCallback = !CUtils.isEmpty(chooseCallback) ? function() {
-                chooseCallback(index);
+                chooseCallback(index,text);
             } : function(){};
-            var hideOnChoose = this.hideOnListChoose ? function(){
+
+            var hideOnChoose = this.data.hideOnListChoose === true ? function(){
                 dialog.hide();
             } : function(){};
 
-            actualCallbacks[index] = function(){
+            this.createListElement(text,icon,function(){
                 listCallback();
                 chosenCallback();
                 hideOnChoose();
-            };
+            });
         }
 
-        // Create elements.
-        _.each(list,function(text,index){
-            var icon = index < iconsList.length ? iconsList[index] : '';
-            this.createListElement(text,icon,actualCallbacks[index]);
-        },this);
 
 
     },
     createListElement: function (text,icon,callback) {
         var design = {
-            color: {color:'Black'},
+            color: {color:this.data.contentColor, level:4},
             width:'100%',
             height: 'auto',
             boxSizing: 'borderBox',
@@ -246,17 +251,19 @@ var CDialog = Class(CContainer,{
             paddingBottom:7,
             paddingRight:7,
             paddingLeft:7,
+            border: {bottom:1},
+            borderColor: { color: 'Gray',level:1},
             textAlign: this.data.textContentAlign,
-            active: { bgColor: { color: 'Aqua',level:4}, color: {color:'White'}}
+            active: { bgColor: { color: this.data.dialogColor,level:4}, color: {color:'White'}}
         };
 
         // Set icon design
         if (!CUtils.isEmpty(icon)) {
             var iconDesign = 'iconOnly';
             if (!CUtils.isEmpty(text)){
-                if (this.iconsAlign=='left')
+                if (this.data.iconsAlign=='left')
                     iconDesign = 'iconLeft';
-                if (this.iconsAlign=='right')
+                if (this.data.iconsAlign=='right')
                     iconDesign = 'iconRight';
             }
             design[iconDesign] = icon;
