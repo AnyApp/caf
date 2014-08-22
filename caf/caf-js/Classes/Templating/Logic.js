@@ -98,6 +98,9 @@ var CLogic = Class({
         },
         init: function(object,value){
             value();
+        },
+        dynamic: function(object,value){
+            CDynamics
         }
 
     },

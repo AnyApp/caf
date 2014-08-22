@@ -39,12 +39,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            try {
+            //try {
                 this.createObject(type,object);
-            }
-            catch (e){
-                CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            }
+            //}
+            //catch (e){
+                //CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
 
         },this);
     },

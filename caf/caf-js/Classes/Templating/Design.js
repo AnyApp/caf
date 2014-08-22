@@ -11,6 +11,8 @@ var CDesign = Class({
                 return color;
             }
             if (CUtils.isEmpty(level))  level = 0;
+            level = Math.max(level,0);
+            level = Math.min(level,10);
 
             return color+level;
         }

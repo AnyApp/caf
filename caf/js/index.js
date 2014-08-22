@@ -3,7 +3,7 @@ var app =
     initialize: function()
     {
         var appContainer = {   uname:  'app-container', type:   'AppContainer',
-            data: {  childs: ['side-menu','main-view'] }
+            data: {  childs: ['side-menu','main-view','drop-down-menu'] }
         };
         var sideMenu = {   uname:  'side-menu', type:   'SideMenu',
             data: { leftContainer: 'side-menu-left-container', rightContainer:'side-menu-right-container' }
@@ -41,7 +41,24 @@ var app =
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
-                    CDialog.showDialog();
+                    CDialog.showDialog({
+                        title: 'Confirmation',
+                        //topView: 'main-button',
+                        textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.',
+                        list: ['dvir','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi'],
+                        chooseCallback: function(index,value){
+                            CLog.dlog(index+") "+value);
+                        },
+                        listCallbacks:[function(){CLog.dlog('Dvir Clicked')},
+                            function(){CLog.dlog('Cohen Clicked')}],
+                        hideOnListChoose: false,
+                        cancelText: 'Cancel',
+                        cancelCallback: function() { CLog.dlog('Cancel Callback')},
+                        confirmText: 'Confirm',
+                        confirmCallback: function() { CLog.dlog('Confirm Callback')},
+                        extraText: 'Extra Button',
+                        extraCallback: function() { CLog.dlog('Extra Callback')}
+                    });
                 }
             }
         };
@@ -52,7 +69,24 @@ var app =
             logic: { text: "dm",
                 onClick: function(){
                     CLog.log('Button Clicked');
-                }
+                },
+                dialogSwitch: 'drop-down-menu'
+            }
+        };
+        var dropDownMenu = {   uname:  'drop-down-menu', type:   'Dialog',
+            data: {
+                topView: 'header-button-right-0',
+                list: ['dvir','cohen','tal','levi','cohen','tal levi the very very very very very very very very man','levi','cohen'],
+                chooseCallback: function(index,value){
+                    CLog.dlog(index+") "+value);
+                },
+                listCallbacks:[function(){CLog.dlog('Dvir Clicked')},
+                    function(){CLog.dlog('Cohen Clicked')}],
+                dialogColor: {color: 'Blue', level: 4},
+                listBorderColor: {color: 'Gray', level: 6},
+                contentColor: {color: 'White'},
+                bgColor: {color:'Gray', level: 8},
+                dialogWidth: 250
             }
         };
         var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
@@ -138,11 +172,6 @@ var app =
                 pagination: true
             }
         };
-        var dialog = { uname: 'main-dialog', type: 'Dialog',
-            design: {
-                bgColor:{color:'Red',level:4}
-            }
-        };
 
         var objects = [
             appContainer,
@@ -166,7 +195,8 @@ var app =
             mainPage,
             headerButtonRight0,
             headerButtonRight1,
-            headerButtonLeft0
+            headerButtonLeft0,
+            dropDownMenu
 
 
         ];

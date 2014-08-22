@@ -17,50 +17,16 @@ var CDialog = Class(CContainer,{
         DEFAULT_LOGIC: {
         },
         showDialog: function(data,design){
-            data                = data || {};
+            data                = data || {
+                destroyOnHide: true
+            };
             design              = design || {};
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
 
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
-        },
-/*
-        showDialog: function(parentId){
-            if (CUtils.isEmpty(parentId))
-                parentId = CObjectsHandler.appContainerId;
-
-            var newDialog = CObjectsHandler.createObject('Dialog',{
-                data: {
-                    title: 'Confirmation',
-                    //topView: 'main-button',
-                    textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.',
-                    list: ['dvir','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi'],
-                    chooseCallback: function(index,value){
-                        CLog.dlog(index+") "+value);
-                    },
-                    listCallbacks:[function(){CLog.dlog('Dvir Clicked')},
-                        function(){CLog.dlog('Cohen Clicked')}],
-                    hideOnListChoose: false,
-                    cancelText: 'Cancel',
-                    cancelCallback: function() { CLog.dlog('Cancel Callback')},
-                    confirmText: 'Confirm',
-                    confirmCallback: function() { CLog.dlog('Confirm Callback')},
-                    extraText: 'Extra Button',
-                    extraCallback: function() { CLog.dlog('Extra Callback')}
-
-                },
-                design: {
-                    width: 400,
-                    height:'auto'
-                }
-            });
-
-            CObjectsHandler.object(parentId).appendChild(newDialog);
-            CObjectsHandler.object(newDialog).show();
-            var endLoadObjects  = (new  Date()).getTime();
         }
-*/
     },
 
     constructor: function(values) {
@@ -82,13 +48,10 @@ var CDialog = Class(CContainer,{
         this.data.animation         = this.data.animation           || 'fade';
         this.data.animationDuration = this.data.animationDuration   || 300;
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
-        this.data.destroyOnhide     = this.data.destroyOnhide===false? false : true;
+        this.data.destroyOnHide     = this.data.destroyOnHide       || false;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
         this.data.title             = this.data.title               || '';
-        this.data.titleAlign        = this.data.titleAlign          || 'center';
-        this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.textContent       = this.data.textContent         || '';
-        this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.objectContent     = this.data.objectContent       || '';
         this.data.list              = this.data.list                || [];
         this.data.iconsList         = this.data.iconsList           || [];
@@ -103,8 +66,17 @@ var CDialog = Class(CContainer,{
         this.data.confirmCallback   = this.data.confirmCallback     || function(){};
         this.data.extraText         = this.data.extraText           || '';
         this.data.extraCallback     = this.data.extraCallback       || function(){};
-        this.data.dialogColor       = this.data.dialogColor         || 'Aqua';
-        this.data.contentColor      = this.data.contentColor        || 'Black';
+        // Design
+        this.data.dialogColor       = this.data.dialogColor         || {color:'Aqua',level:4};
+        this.data.bgColor           = this.data.bgColor             || {color:'Gray',level:0};
+        this.data.contentColor      = this.data.contentColor        || {color:'Gray',level:10};
+        this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};
+        this.data.titleColor        = this.data.titleColor          || this.data.dialogColor;
+        this.data.titleAlign        = this.data.titleAlign          || 'center';
+        this.data.contentAlign      = this.data.contentAlign        || CAppConfig.get('textAlign') || 'center';
+        this.data.dialogWidth       = this.data.dialogWidth         || 400;
+        containerDesign.width       = this.data.dialogWidth;
+        containerDesign.bgColor     = this.data.bgColor;
 
         // Init function.
         var dialog = this;
@@ -145,7 +117,7 @@ var CDialog = Class(CContainer,{
     },
     setDestroyOnHideHandler: function(){
         var object = this;
-        if (this.data.destroyOnhide){
+        if (this.data.destroyOnHide){
             this.data.onAnimHideComplete = function(){
                 object.removeSelf();
                 CUtils.unbindEvent(window,'resize',object.onResize);
@@ -179,8 +151,8 @@ var CDialog = Class(CContainer,{
         // Create Title.
         this.dialogTitle = CObjectsHandler.createObject('Object',{
             design: {
-                color: {color:this.data.dialogColor,level:4},
-                borderColor: {color:this.data.dialogColor,level:4},
+                color: this.data.titleColor,
+                borderColor: this.data.dialogColor,
                 border: { bottom: 2},
                 width:'100%',
                 height: 45,
@@ -196,17 +168,12 @@ var CDialog = Class(CContainer,{
         CObjectsHandler.object(this.dialogContainer).data.childs.push(this.dialogTitle);
     },
     createContainer: function(){
-        if (CUtils.isEmpty(this.data.title))
-            return;
         // Create container.
         this.contentContainer = CObjectsHandler.createObject('Container',{
             design: {
                 width:'100%',
                 height: 'auto',
-                marginTop: 4,
                 overflow: 'scrollable',
-                paddingTop: 10,
-                paddingBottom: 10,
                 boxSizing: 'borderBox'
             }
         });
@@ -224,13 +191,15 @@ var CDialog = Class(CContainer,{
         else if (!CUtils.isEmpty(this.data.textContent)){
             contentId = CObjectsHandler.createObject('Object',{
                 design: {
-                    color: {color:this.data.contentColor,level:4},
+                    color: this.data.contentColor,
                     width:'95%',
                     height: 'auto',
                     fontSize:17,
                     fontStyle: ['bold'],
                     margin: 'centered',
-                    textAlign: this.data.textContentAlign
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    textAlign: this.data.contentAlign
                 },
                 logic: {
                     text: this.data.textContent
@@ -278,7 +247,7 @@ var CDialog = Class(CContainer,{
     },
     createListElement: function (index,text,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {
-            color: {color:this.data.contentColor, level:4},
+            color: this.data.contentColor,
             width:'100%',
             height: 'auto',
             boxSizing: 'borderBox',
@@ -289,11 +258,14 @@ var CDialog = Class(CContainer,{
             paddingBottom:9,
             paddingRight:7,
             paddingLeft:7,
-            border: {bottom:1},
-            borderColor: { color: 'Gray',level:1},
-            textAlign: this.data.textContentAlign,
-            active: { bgColor: { color: this.data.dialogColor,level:4}, color: {color:'White'}}
+            border: {top:1},
+            borderColor: this.data.listBorderColor,
+            textAlign: this.data.contentAlign,
+            active: { bgColor: this.data.dialogColor, color: {color:'White'}}
         };
+
+        if (index === 0)
+            design.border = {};
 
         // Set icon design
         if (!CUtils.isEmpty(icon)) {
@@ -334,7 +306,7 @@ var CDialog = Class(CContainer,{
          // Create buttons container.
         this.buttonsContainer = CObjectsHandler.createObject('Container',{
             design: {
-                borderColor: {color:this.data.dialogColor,level:4},
+                borderColor: this.data.dialogColor,
                 border: { top: 1},
                 marginTop: 1,
                 width:'100%',
@@ -361,7 +333,7 @@ var CDialog = Class(CContainer,{
     },
     createAndAddButton: function(dialog,currentButton,countButtons,text,callback){
         var design = {
-            color: {color:this.data.dialogColor, level:4},
+            color: this.data.dialogColor,
             width:'100%',
             height: 'auto',
             boxSizing: 'borderBox',
@@ -371,9 +343,9 @@ var CDialog = Class(CContainer,{
             display: 'inlineBlock',
             paddingTop:14,
             paddingBottom:14,
-            borderColor: { color: this.data.dialogColor,level:4},
+            borderColor: this.data.dialogColor,
             textAlign: 'center',
-            active: { bgColor: { color: this.data.dialogColor,level:4}, color: {color:'White'}}
+            active: { bgColor: this.data.dialogColor, color: {color:'White'}}
         };
 
         // Set Borders.

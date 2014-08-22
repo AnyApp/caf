@@ -43,7 +43,7 @@ var CForm = Class(CContainer,{
                             title: validationResult.getTitle(),
                             textContent: validationResult.getMessage(),
                             cancelText: 'OK',
-                            dialogColor: 'Olive'
+                            dialogColor: {color:'Red', level: 4}
                         });
                         throw "Error"; // Return empty result.
                     }
