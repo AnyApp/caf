@@ -16,15 +16,8 @@ var CDialog = Class(CContainer,{
         },
         DEFAULT_LOGIC: {
         },
-        alert: function(title,text,buttonText,data,design){
+        showDialog: function(data,design){
             data                = data || {};
-            if (!CUtils.isEmpty(title))
-                data.title      = title;
-            if (!CUtils.isEmpty(text))
-                data.textContent= text;
-            if (!CUtils.isEmpty(buttonText))
-                data.cancelText = buttonText;
-
             design              = design || {};
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
@@ -32,6 +25,7 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
         },
+/*
         showDialog: function(parentId){
             if (CUtils.isEmpty(parentId))
                 parentId = CObjectsHandler.appContainerId;
@@ -66,6 +60,7 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(newDialog).show();
             var endLoadObjects  = (new  Date()).getTime();
         }
+*/
     },
 
     constructor: function(values) {
@@ -89,6 +84,7 @@ var CDialog = Class(CContainer,{
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
         this.data.destroyOnhide     = this.data.destroyOnhide===false? false : true;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
+        this.data.title             = this.data.title               || '';
         this.data.titleAlign        = this.data.titleAlign          || 'center';
         this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.textContent       = this.data.textContent         || '';

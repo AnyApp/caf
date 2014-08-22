@@ -26,7 +26,20 @@
       <file leaf-file-name="Dialog.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="87" column="45" selection-start="3293" selection-end="3369" vertical-scroll-proportion="0.0" vertical-offset="972" max-vertical-offset="2862">
+            <state line="105" column="29" selection-start="5015" selection-end="5026" vertical-scroll-proportion="0.0" vertical-offset="1461" max-vertical-offset="3105">
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#382#731#0" expanded="true" />
+                <element signature="e#733#2400#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Form.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="47" selection-start="1690" selection-end="1690" vertical-scroll-proportion="0.67021275" vertical-offset="540" max-vertical-offset="1674">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -45,10 +58,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Slider.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Slider.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="58" selection-start="1740" selection-end="1740" vertical-scroll-proportion="0.35008666" vertical-offset="1175" max-vertical-offset="1944">
+            <state line="61" column="39" selection-start="1902" selection-end="1902" vertical-scroll-proportion="0.0" vertical-offset="1175" max-vertical-offset="1944">
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -68,6 +81,8 @@
       <list>
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/UI/Swiper.js" />
         <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js" />
+        <option value="$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js" />
       </list>
     </option>
   </component>
@@ -244,6 +259,36 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="Form" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CAF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="caf-js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Classes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Objects" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="Dialog" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -255,6 +300,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="SearchEverywhereHistory" value=":" />
   </component>
   <component name="RunManager">
     <list size="0" />
@@ -319,18 +365,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="87" column="45" selection-start="3293" selection-end="3369" vertical-scroll-proportion="0.0" vertical-offset="972" max-vertical-offset="2862">
+        <state line="61" column="39" selection-start="1902" selection-end="1902" vertical-scroll-proportion="0.0" vertical-offset="1175" max-vertical-offset="1944">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Slider/Slider.js">
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Dialog/Dialog.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="58" selection-start="1740" selection-end="1740" vertical-scroll-proportion="0.35008666" vertical-offset="1175" max-vertical-offset="1944">
+        <state line="105" column="29" selection-start="5015" selection-end="5026" vertical-scroll-proportion="0.0" vertical-offset="1461" max-vertical-offset="3105">
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#382#731#0" expanded="true" />
+            <element signature="e#733#2400#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/caf/caf-js/Classes/Objects/Form/Form.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="47" selection-start="1690" selection-end="1690" vertical-scroll-proportion="0.67021275" vertical-offset="540" max-vertical-offset="1674">
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>

@@ -2181,15 +2181,8 @@ var CDialog = Class(CContainer,{
         },
         DEFAULT_LOGIC: {
         },
-        alert: function(title,text,buttonText,data,design){
+        showDialog: function(data,design){
             data                = data || {};
-            if (!CUtils.isEmpty(title))
-                data.title      = title;
-            if (!CUtils.isEmpty(text))
-                data.textContent= text;
-            if (!CUtils.isEmpty(buttonText))
-                data.cancelText = buttonText;
-
             design              = design || {};
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
@@ -2197,6 +2190,7 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
         },
+/*
         showDialog: function(parentId){
             if (CUtils.isEmpty(parentId))
                 parentId = CObjectsHandler.appContainerId;
@@ -2231,6 +2225,7 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(newDialog).show();
             var endLoadObjects  = (new  Date()).getTime();
         }
+*/
     },
 
     constructor: function(values) {
@@ -2254,6 +2249,7 @@ var CDialog = Class(CContainer,{
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
         this.data.destroyOnhide     = this.data.destroyOnhide===false? false : true;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
+        this.data.title             = this.data.title               || '';
         this.data.titleAlign        = this.data.titleAlign          || 'center';
         this.data.textContentAlign  = this.data.textContentAlign    || CAppConfig.get('textAlign') || 'center';
         this.data.textContent       = this.data.textContent         || '';
@@ -3204,11 +3200,11 @@ var CSlider = Class(CContainer,{
         });
 
         // Set the wrapper to be the only child.
-        this.data.childs = [this.sliderWrapper,this.pagination];
+        this.data.childs     = [this.sliderWrapper,this.pagination];
 
-        this.data.loop     = this.data.loop     === false ? false : true;
-        this.data.autoPlay = this.data.autoPlay === false ? false : true;
-        this.data.slideTime= this.data.slideTime   || 3000;
+        this.data.loop       = this.data.loop     === false ? false : true;
+        this.data.autoPlay   = this.data.autoPlay === false ? false : true;
+        this.data.slideTime  = this.data.slideTime   || 3000;
 
         this.logic.swipeView = {
             container:  this.uid(),
@@ -3315,7 +3311,12 @@ var CForm = Class(CContainer,{
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
                     if (!validationResult.isValid()){
-                        CDialog.alert(validationResult.getTitle(),validationResult.getMessage(),'OK');
+                        CDialog.showDialog({
+                            title: validationResult.getTitle(),
+                            textContent: validationResult.getMessage(),
+                            cancelText: 'OK',
+                            dialogColor: 'Olive'
+                        });
                         throw "Error"; // Return empty result.
                     }
                 },this);

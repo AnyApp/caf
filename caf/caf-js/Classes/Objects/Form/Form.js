@@ -39,7 +39,12 @@ var CForm = Class(CContainer,{
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
                     if (!validationResult.isValid()){
-                        CDialog.alert(validationResult.getTitle(),validationResult.getMessage(),'OK');
+                        CDialog.showDialog({
+                            title: validationResult.getTitle(),
+                            textContent: validationResult.getMessage(),
+                            cancelText: 'OK',
+                            dialogColor: 'Olive'
+                        });
                         throw "Error"; // Return empty result.
                     }
                 },this);
