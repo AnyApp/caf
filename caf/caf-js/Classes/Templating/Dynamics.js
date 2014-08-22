@@ -3,7 +3,9 @@
  */
 var CDynamics = Class({
     $singleton: true,
-    
+    applyDynamic: function() {
+        
+    }
 
 });
 
