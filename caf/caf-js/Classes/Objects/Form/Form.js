@@ -39,26 +39,7 @@ var CForm = Class(CContainer,{
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
                     if (!validationResult.isValid()){
-                        // Dialog Color Showcase.
-                        //TODO Remove
-                        var colors = ['Blue','Pink','Red','Purple','Orange','Green','Aqua','Gray'];
-                        var color = colors[Math.floor(Math.random() * colors.length)];
-                        // Show Message.
-/*
-                        CDialogs.show({
-                            title: validationResult.getTitle(),
-                            content:validationResult.getMessage(),
-                            closeText:'Close',closeCallback:function(){
-                                CLog.log('Closed..')
-                            },
-                            confirmText:'Confirm',confirmCallback:function(){
-                                CLog.log('Confirmed..')
-                            },
-                            extraText:'Extra',extraCallback:function(){
-                                CLog.log('Extra..')
-                            },
-                            color:color});
-*/
+                        CDialog.alert(validationResult.getTitle(),validationResult.getMessage(),'OK');
                         throw "Error"; // Return empty result.
                     }
                 },this);

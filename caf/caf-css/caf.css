@@ -2,9 +2,10 @@
 body{
     font-family: 'Alef','HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
     overflow: hidden;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
-div{
-
+div,ul,a,body,li,h1,h2,h3,h4,h5,h6,input,textarea{
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 input {
     margin: 0;
@@ -103,7 +104,8 @@ li{
     top: -1000px;
     width: 1000000px;
     height: 100000px;
-    opacity: 0;
+    opacity: 0.3;
+    background-color: #000000;
 }
 
 .dropMenuRight {

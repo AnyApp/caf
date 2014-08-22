@@ -35,7 +35,8 @@ var CClicker = Class({
             startX:-100000,
             startY:-100000,
             lastX:-200000,
-            lastY:-200000
+            lastY:-200000,
+            startTime: 0
         };
         object.events = {onTouchStartEvent:null,onTouchEndEvent:null,onTouchMoveEvent:null};
         object.onClicks = Array();
@@ -55,27 +56,34 @@ var CClicker = Class({
         // Create events.
         object.events.onTouchStartEvent = function(e)
         {
+            //return;
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
-            e.preventDefault();
-            if (object.logic.doStopPropagation==true)
+            //e.preventDefault();
+
+            if (object.logic.doStopPropagation===true)
             {
                 e.stopPropagation();
             }
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
-            object.touchData.startX = pointer.pageX;
-            object.touchData.startY = pointer.pageY;
-            object.touchData.lastX = pointer.pageX;
-            object.touchData.lastY = pointer.pageY;
+            object.touchData.startX     = pointer.pageX;
+            object.touchData.startY     = pointer.pageY;
+            object.touchData.lastX      = pointer.pageX;
+            object.touchData.lastY      = pointer.pageY;
+            object.touchData.startTime  = (new  Date()).getTime();
             CUtils.addClass(element,object.getDesign().active);
             CUtils.removeClass(element,object.getDesign().activeRemove);
         }
         object.events.onTouchMoveEvent = function(e)
         {
-            e.preventDefault();
+            var currentTime = (new  Date()).getTime();
+            if (currentTime - object.touchData.startTime > 100){
+                //e.preventDefault();
+            }
+
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;

@@ -151,6 +151,9 @@ var CDesign = Class({
             return "maxhp"+data;
         },
         maxWidth: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "maxw"+data.substring(0,data.length-1);
+
             return "maxwp"+data;
         },
         margin: function(data){

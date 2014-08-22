@@ -16,6 +16,11 @@ var CDom = Class({
     hasChildren: function(id){
         return CUtils.element(id).children.length > 0;
     },
+    removeAllChildren: function(id){
+        var container = CUtils.element(id);
+        if (container)
+            while (container.firstChild) container.removeChild(container.firstChild);
+    },
     indexInParent: function(id){
         var node = CUtils.element(id);
         return Array.prototype.indexOf.call(node.parentNode.children, node);
@@ -41,7 +46,7 @@ var CDom = Class({
         var beforeIndex = index+1;
         var node = CUtils.element(nodeId);
         node.parentNode.insertBefore(node,node.parentNode.children[beforeIndex]);
-
+        //CLog.dlog(currentIndex+" "+index+" "+this.indexInParent(nodeId));
     }
 
 });

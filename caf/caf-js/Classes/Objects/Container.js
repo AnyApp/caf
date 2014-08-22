@@ -97,10 +97,31 @@ var CContainer = Class(CObject,{
         CTemplator.buildFromObject(this.uid());
     },
     restructureChildren: function(){
+        // Get All Nodes.
+        var childrenIds = this.data.childs || [];
+        var childrenNodes = [];
+        _.each(childrenIds,function(childId){
+            childrenNodes.push(CUtils.element(childId));
+        },this);
+
+        // Remove All.
+        CDom.removeAllChildren(this.uid());
+
+        var container = CUtils.element(this.uid());
+        _.each(childrenNodes,function(child){
+            container.appendChild(child)
+        },this);
+
+/*
+        var orderedChildren = [];
         for (var index in this.data.childs){
+            //CLog.dlog(this.data.childs[index]+" "+index);
             var childId = this.data.childs[index];
+            //orderedChildren.unshift(CUtils.element(childId));
             CDom.moveToIndex(childId,index);
         }
+        CUtils.element(this.uid()).children = orderedChildren;
+*/
     },
     isContainer: function(){
         return true;

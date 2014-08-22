@@ -40,6 +40,8 @@ var CLogic = Class({
             CUtils.element(object.uid()).innerHTML = value;
         },
         doStopPropagation: function(object,value){
+            if (value==false)
+                return;
             object.logic.doStopPropagation = true;
         },
         backButton: function(object,value){

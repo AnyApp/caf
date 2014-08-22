@@ -6,13 +6,12 @@ var  CDialogContainer = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'cDialogContainer',
             minHeight: 100,
-            maxWidth: 400,
-            maxHeight: '70%',
+            maxWidth: '90%',
+            maxHeight: '80%',
             round:2,
             bgColor:{color:'White'},
             border: { all: 1},
-            borderColor:{color:'Gray',level:2},
-            overflow: 'scrollable'
+            borderColor:{color:'Gray',level:2}
         },
         DEFAULT_LOGIC: {
         }
