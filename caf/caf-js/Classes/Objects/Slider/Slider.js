@@ -52,15 +52,16 @@ var CSlider = Class(CContainer,{
         // Set the wrapper to be the only child.
         this.data.childs = [this.sliderWrapper,this.pagination];
 
-
-        var loop = true;
-        if (!CUtils.isEmpty(this.data.loop))
-            loop = this.data.loop;
+        this.data.loop     = this.data.loop     === false ? false : true;
+        this.data.autoPlay = this.data.autoPlay === false ? false : true;
+        this.data.slideTime= this.data.slideTime   || 3000;
 
         this.logic.swipeView = {
-            container: this.uid(),
+            container:  this.uid(),
             pagination: this.pagination,
-            loop: loop
+            loop:       this.data.loop,
+            autoPlay:   this.data.autoPlay,
+            slideTime:  this.data.slideTime
         };
 
 

@@ -19,6 +19,8 @@ var CSwiper = Class({
         }
         if (data.loop===true)
             options.loop=true;
+        if (data.autoPlay===true)
+            options.autoplay = data.slideTime;
 
         options['SlideChangeStart'] = function(swiper){
             var toSlide         = swiper.activeIndex;
