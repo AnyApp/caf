@@ -100,7 +100,7 @@ var CLogic = Class({
             value();
         },
         dynamic: function(object,value){
-            CDynamics
+            CDynamics.applyDynamic(object,value);
         }
 
     },
