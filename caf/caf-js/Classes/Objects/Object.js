@@ -9,11 +9,9 @@ var CObject = Class({
         DEFAULT_LOGIC: {
         },
 
-        CURRENT_ID:   0,
 
         generateID: function() {
-            this.CURRENT_ID += 1;
-            return "CObjectId_"+this.CURRENT_ID;
+            return "c_"+Math.random().toString(36).substring(2);
         },
         mergeWithDefaults: function(values,useClass){
             values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
@@ -90,6 +88,10 @@ var CObject = Class({
     },
     getLogic: function(){
         return this.logic;
+    },
+    clearLastBuild: function(){
+        this.lastClasses = '';
+        this.lastLogic = {};
     },
     /**
      *  Build Object.

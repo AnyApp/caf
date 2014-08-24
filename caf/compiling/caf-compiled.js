@@ -560,7 +560,72 @@ var CDesign = Class({
  * Created by dvircn on 22/08/14.
  */
 var CDynamics = Class({
-    $singleton: true
+    $singleton: true,
+    applyDynamic: function(object,value) {
+        if (CUtils.isEmpty(value) || CUtils.isEmpty(value.url))
+            return;
+        // Do not re-initiate
+        if (this.dynamicApplied(object.uid()))
+            return;
+        // Initialize and set defaults.
+        object.dynamic              = CUtils.clone(value);
+        object.dynamic.url          = object.dynamic.url        || '';
+        object.dynamic.data         = object.dynamic.data       || {};
+        object.dynamic.autoLoad     = object.dynamic.autoLoad   || false;
+        object.dynamic.loaded       = object.dynamic.loaded     || false;
+        object.dynamic.loadTo       = object.dynamic.loadTo     || 'after'; // self/after
+        object.dynamic.duplicates   = object.dynamic.data       || [];
+
+        if (object.dynamic.autoLoad === true)
+            this.load();
+    },
+    dynamicApplied: function(objectId){
+        var object = CObjectsHandler.object(objectId);
+        return !CUtils.isEmpty(object.dynamic);
+    },
+    duplicateWidthData: function (object, data) {
+        if (!CUtils.isArray(data)) // Convert to Array
+            data = [data];
+
+        var duplicatedBaseObject    = CUtils.clone(object);
+        duplicatedBaseObject.uname  = null;
+        duplicatedBaseObject.clearLastBuild();
+        duplicatedBaseObject.dynamic = null;
+
+        _.each(data,function(currentData){
+            var duplicate
+            duplicatedBaseObject.data   = CUtils.mergeJSONs(object.data,currentData);
+        },this);
+        //generateID
+    },
+    loadDataToObject: function (object, data) {
+        object.data     = CUtils.mergeJSONs(object.data,data.data);
+        object.logic    = CUtils.mergeJSONs(object.logic,data.logic);
+        object.design   = CUtils.mergeJSONs(object.design,data.design);
+        CTemplator.buildFromObject(object.uid());
+    },
+    loadObjectWithData: function (objectId, data) {
+        var object = CObjectsHandler.object(objectId);
+        if (object.dynamic.loadTo === 'after')
+            this.duplicateWidthData(object,data);
+        else if (object.dynamic.loadTo === 'self')
+            this.loadDataToObject(object,data);
+
+    },
+    load: function(objectId,queryData) {
+        var object = CObjectsHandler.object(objectId);
+        // Do not rebuild again.
+        if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.data))
+            return;
+
+        object.dynamic.data = queryData;
+
+        // Request.
+        CNetwork.request(object.dynamic.url,object.dynamic.data,
+        function(retrievedData){
+            CDynamics.loadObjectWithData(objectId,retrievedData);
+        });
+    }
 
 });
 
@@ -665,6 +730,9 @@ var CLogic = Class({
         },
         init: function(object,value){
             value();
+        },
+        dynamic: function(object,value){
+            CDynamics.applyDynamic(object,value);
         }
 
     },
@@ -773,6 +841,17 @@ var CObjectsHandler = Class({
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
+    },
+    createFromObject: function(baseObject,data,logic,design){
+        var duplicatedObject        = CUtils.clone(baseObject);
+        duplicatedObject.id         = CObject.generateID();
+        duplicatedObject.uname      = null;
+        duplicatedObject.dynamic    = null;
+        duplicatedObject.data       = CUtils.mergeJSONs(baseObject.data,data);
+        duplicatedObject.logic      = CUtils.mergeJSONs(baseObject.logic,logic);
+        duplicatedObject.design     = CUtils.mergeJSONs(baseObject.design,design);
+        duplicatedObject.clearLastBuild();
+
     }
 
 
@@ -1137,6 +1216,9 @@ var CUtils = Class({
     {
         return (typeof variable == 'string' || variable instanceof String)
             && variable.trim().indexOf("function")!=0;
+    },
+    isArray: function(variable){
+        return Object.prototype.toString.call( variable ) === '[object Array]';
     },
     isStringFunction: function(variable)
     {
@@ -1780,11 +1862,9 @@ var CObject = Class({
         DEFAULT_LOGIC: {
         },
 
-        CURRENT_ID:   0,
 
         generateID: function() {
-            this.CURRENT_ID += 1;
-            return "CObjectId_"+this.CURRENT_ID;
+            return "c_"+Math.random().toString(36).substring(2);
         },
         mergeWithDefaults: function(values,useClass){
             values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
@@ -1861,6 +1941,10 @@ var CObject = Class({
     },
     getLogic: function(){
         return this.logic;
+    },
+    clearLastBuild: function(){
+        this.lastClasses = '';
+        this.lastLogic = {};
     },
     /**
      *  Build Object.

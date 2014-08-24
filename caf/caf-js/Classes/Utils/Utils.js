@@ -51,6 +51,9 @@ var CUtils = Class({
         return (typeof variable == 'string' || variable instanceof String)
             && variable.trim().indexOf("function")!=0;
     },
+    isArray: function(variable){
+        return Object.prototype.toString.call( variable ) === '[object Array]';
+    },
     isStringFunction: function(variable)
     {
         return variable.trim().indexOf("function")==0;

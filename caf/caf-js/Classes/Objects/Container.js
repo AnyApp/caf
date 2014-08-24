@@ -82,10 +82,32 @@ var CContainer = Class(CObject,{
         this.moveChild(objectId,index);
         this.rebuild();
     },
+    appendChildAfterObject: function(afterObjectId,objectId){
+        var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
+        var afterChilds = this.data.childs.splice(afterIndex);
+        this.data.childs.push(objectId);
+        this.data.childs.push.apply(this.data.childs,afterChilds);
+        this.rebuild();
+    },
+    appendChildsAfterObject: function(afterObjectId,objectsIds){
+        var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
+        var afterChilds = this.data.childs.splice(afterIndex);
+        this.data.childs.push.apply(this.data.childs,objectsIds);
+        this.data.childs.push.apply(this.data.childs,afterChilds);
+        this.rebuild();
+    },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
         this.data.toRemoveChilds.push(objectId);
         this.rebuild();
+    },
+    removeChilds: function(objectsIds,rebuild){
+        _.each(objectsIds,function(objectId){
+            CUtils.arrayRemove(this.data.childs,objectId);
+            this.data.toRemoveChilds.push(objectId);
+        },this);
+        if (rebuild!==false)
+            this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){
          CUtils.arrayMove(this.data.childs,fromIndex,toIndex);

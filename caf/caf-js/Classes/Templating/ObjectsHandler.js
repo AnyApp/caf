@@ -54,6 +54,18 @@ var CObjectsHandler = Class({
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
+    },
+    createFromObject: function(baseObject,data,logic,design){
+        var duplicatedObject        = CUtils.clone(baseObject);
+        duplicatedObject.id         = CObject.generateID();
+        duplicatedObject.uname      = null;
+        duplicatedObject.dynamic    = null;
+        duplicatedObject.data       = CUtils.mergeJSONs(baseObject.data,data    || {});
+        duplicatedObject.logic      = CUtils.mergeJSONs(baseObject.logic,logic  || {});
+        duplicatedObject.design     = CUtils.mergeJSONs(baseObject.design,design|| {});
+        duplicatedObject.clearLastBuild();
+
+        return duplicatedObject;
     }
 
 
