@@ -25,16 +25,33 @@ var CDynamics = Class({
         var object = CObjectsHandler.object(objectId);
         return !CUtils.isEmpty(object.dynamic);
     },
-    load: function(objectId) {
+    abstractLoadData: function (object, data) {
+        
+    },
+    loadDataToObject: function (object, data) {
+        object.data = CUtils.mergeJSONs(object.data,data);
+        CTemplator.buildFromObject(object.uid());
+    },
+    loadObjectWithData: function (objectId, data) {
+        var object = CObjectsHandler.object(objectId);
+        if (object.dynamic.abstract === true)
+            this.abstractLoadData(object,data);
+        else
+            this.loadDataToObject(object,data);
+
+    },
+    load: function(objectId,queryData) {
         var object = CObjectsHandler.object(objectId);
         // Do not rebuild again.
-        if (object.dynamic.loaded === true)
+        if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.data))
             return;
+
+        object.dynamic.data = queryData;
 
         // Request.
         CNetwork.request(object.dynamic.url,object.dynamic.data,
-        function(){
-            
+        function(retrievedData){
+            CDynamics.loadObjectWithData(objectId,retrievedData);
         });
     }
 
