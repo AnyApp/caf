@@ -90,6 +90,7 @@ var CContainer = Class(CObject,{
         this.rebuild();
     },
     appendChildsAfterObject: function(afterObjectId,objectsIds){
+        //CLog.dlog(object.dynamic.duplicates);
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);

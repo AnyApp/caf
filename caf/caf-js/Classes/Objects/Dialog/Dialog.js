@@ -22,6 +22,9 @@ var CDialog = Class(CContainer,{
             };
             design              = design || {};
 
+            data                = CUtils.clone(data);
+            design              = CUtils.clone(design);
+
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
 
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
@@ -48,7 +51,7 @@ var CDialog = Class(CContainer,{
         this.data.animation         = this.data.animation           || 'fade';
         this.data.animationDuration = this.data.animationDuration   || 300;
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
-        this.data.destroyOnHide     = this.data.destroyOnHide       || false;
+        this.data.destroyOnHide     = this.data.destroyOnHide===false? false : true;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
         this.data.title             = this.data.title               || '';
         this.data.textContent       = this.data.textContent         || '';

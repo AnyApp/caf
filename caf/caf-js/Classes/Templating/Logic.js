@@ -20,6 +20,11 @@ var CLogic = Class({
         toTab: function(object,value){
             CSwiper.addButtonToTabSwiper(object,value);
         },
+        showDialog: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CDialog.showDialog(value.data || {},value.design || {});
+            });
+        },
         sideMenuSwitch: function(object,value){
             object.logic.doStopPropagation = true;
             CClicker.addOnClick(object,function(){

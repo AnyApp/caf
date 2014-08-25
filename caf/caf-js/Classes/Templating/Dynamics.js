@@ -3,6 +3,7 @@
  */
 var CDynamics = Class({
     $singleton: true,
+    hiddenClass: 'displayNone',
     applyDynamic: function(object,value) {
         if (CUtils.isEmpty(value) || CUtils.isEmpty(value.url))
             return;
@@ -12,14 +13,14 @@ var CDynamics = Class({
         // Initialize and set defaults.
         object.dynamic              = CUtils.clone(value);
         object.dynamic.url          = object.dynamic.url        || '';
-        object.dynamic.data         = object.dynamic.data       || {};
+        object.dynamic.queryData    = object.dynamic.queryData  || {};
         object.dynamic.autoLoad     = object.dynamic.autoLoad   || false;
         object.dynamic.loaded       = object.dynamic.loaded     || false;
         object.dynamic.loadTo       = object.dynamic.loadTo     || 'after'; // self/after
         object.dynamic.duplicates   = object.dynamic.duplicates || [];
 
         if (object.dynamic.autoLoad === true)
-            this.load();
+            this.load(object.uid());
     },
     dynamicApplied: function(objectId){
         var object = CObjectsHandler.object(objectId);
@@ -35,13 +36,14 @@ var CDynamics = Class({
 
         object.dynamic.duplicates = [];
         _.each(data,function(currentData){
-            var duplicate = CObjectsHandler.createFromObject(object,
+            var duplicateId = CObjectsHandler.createFromDynamicObject(object,
                                 currentData.data,currentData.logic,currentData.design);
-            object.dynamic.duplicates.push(duplicate.uid());
+
+            object.dynamic.duplicates.push(duplicateId);
         },this);
 
         // Add duplicates to container after this object.
-        parentContainer.appendChildsAfterObject(object.dynamic.duplicates);
+        parentContainer.appendChildsAfterObject(object.uid(),object.dynamic.duplicates);
     },
     loadDataToObject: function (object, data) {
         object.data     = CUtils.mergeJSONs(object.data,data.data);
@@ -51,22 +53,22 @@ var CDynamics = Class({
     },
     loadObjectWithData: function (objectId, data) {
         var object = CObjectsHandler.object(objectId);
-        if (object.dynamic.loadTo === 'after')
-            this.duplicateWithData(object,data);
-        else if (object.dynamic.loadTo === 'self')
-            this.loadDataToObject(object,data);
+        //if (object.dynamic.loadTo === 'after')
+        this.duplicateWithData(object,data);
+        //else if (object.dynamic.loadTo === 'self')
+        //    this.loadDataToObject(object,data);
 
     },
     load: function(objectId,queryData) {
         var object = CObjectsHandler.object(objectId);
         // Do not rebuild again.
-        if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.data))
+        if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.queryData))
             return;
 
-        object.dynamic.data = queryData;
+        object.dynamic.queryData = queryData;
 
         // Request.
-        CNetwork.request(object.dynamic.url,object.dynamic.data,
+        CNetwork.request(object.dynamic.url,object.dynamic.queryData,
         function(retrievedData){
             CDynamics.loadObjectWithData(objectId,retrievedData);
         });

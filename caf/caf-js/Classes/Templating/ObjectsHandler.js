@@ -39,12 +39,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            //try {
+            try {
                 this.createObject(type,object);
-            //}
-            //catch (e){
-                //CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            //}
+            }
+            catch (e){
+                CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            }
 
         },this);
     },
@@ -55,17 +55,19 @@ var CObjectsHandler = Class({
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromObject: function(baseObject,data,logic,design){
-        var duplicatedObject        = CUtils.clone(baseObject);
-        duplicatedObject.id         = CObject.generateID();
-        duplicatedObject.uname      = null;
-        duplicatedObject.dynamic    = null;
-        duplicatedObject.data       = CUtils.mergeJSONs(baseObject.data,data    || {});
-        duplicatedObject.logic      = CUtils.mergeJSONs(baseObject.logic,logic  || {});
-        duplicatedObject.design     = CUtils.mergeJSONs(baseObject.design,design|| {});
-        duplicatedObject.clearLastBuild();
+    createFromDynamicObject: function(dynamicObject,data,logic,design){
+        var duplicatedObjectBase        = {};
+        for (var key in dynamicObject.data.object){
+            duplicatedObjectBase[key] = CUtils.clone(dynamicObject.data.object[key]);
+        }
 
-        return duplicatedObject;
+        duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
+        duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
+        duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
+
+        var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
+
+        return duplicateId;
     }
 
 

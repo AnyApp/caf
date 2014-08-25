@@ -29,7 +29,7 @@ var app =
             data: {  childs: ['main-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-label','main-button','form','main-gallery'] }
+            data: {  childs: ['main-label','main-button','dynamic-buttons','form','main-gallery'] }
         };
         var mainViewLabel = {   uname:  'main-label', type:   'Label',
             design: { height:40, bgColor:{color:'Blue',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2},
@@ -86,7 +86,8 @@ var app =
                 listBorderColor: {color: 'Gray', level: 6},
                 contentColor: {color: 'White'},
                 bgColor: {color:'Gray', level: 8},
-                dialogWidth: 250
+                dialogWidth: 250,
+                destroyOnHide: false
             }
         };
         var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
@@ -173,6 +174,36 @@ var app =
             }
         };
 
+        var dynamicButtons = {   uname:  'dynamic-buttons',type:   'DynamicObject',
+            data: {
+                object: {
+                    type:   'Button',
+                    design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                        active: { bgColor:{color:'Aqua',level:6} },
+                        activeRemove: {bgColor:{color:'Aqua',level:4}}
+                    },
+                    logic: { text: "$this.data.name",
+                        showDialog: {
+                            data: {
+                                title: '$this.data.name',
+                                //topView: 'main-button',
+                                textContent: '$this.data.message || "default text"',
+                                confirmText: 'Confirm',
+                                confirmCallback: function() { CLog.dlog('Confirm Callback')}
+                            }
+                        }
+                    }
+                }
+            },
+            logic: {
+                dynamic:{
+                    url: 'http://codletech.net/caf2/caf.php',
+                    autoLoad: true
+                }
+            }
+        };
+
+
         var objects = [
             appContainer,
             sideMenu,
@@ -196,7 +227,8 @@ var app =
             headerButtonRight0,
             headerButtonRight1,
             headerButtonLeft0,
-            dropDownMenu
+            dropDownMenu,
+            dynamicButtons
 
 
         ];

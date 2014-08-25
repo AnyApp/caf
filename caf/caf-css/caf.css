@@ -168,6 +168,9 @@ li{
     opacity: 0;
     visibility: hidden;
 }
+.displayNone {
+    display: none;
+}
 .pointer{
     cursor: pointer;
 }

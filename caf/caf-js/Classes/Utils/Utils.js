@@ -76,6 +76,10 @@ var CUtils = Class({
             el.className=el.className.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
         }
     },
+    removeClassFromClasses: function(classes, removeClass)
+    {
+        return classes.replace(new RegExp('(\\s|^)'+removeClass+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
+    },
     unbindEvent: function(elm,eventName,event)
     {
         if (!CUtils.isEmpty(elm) && !CUtils.isEmpty(event))
@@ -108,7 +112,7 @@ var CUtils = Class({
         if (this.isEmpty(base)) return strong || {};
         if (this.isEmpty(strong)) return base;
 
-        var merged = JSON.parse(JSON.stringify(base));
+        var merged = JSONfn.parse(JSONfn.stringify(base));
         for (var key in strong){
             merged[key] = strong[key];
         }
@@ -121,6 +125,8 @@ var CUtils = Class({
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     clone: function(o) {
+        if (o === undefined)
+            return undefined;
         return JSONfn.parse(JSONfn.stringify(o));
     },
     equals: function(o1,o2){

@@ -21,6 +21,7 @@ var CButton = Class(CLabel,{
 
         // Invoke parent's constructor
         CButton.$super.call(this, values);
+
     }
 
 

@@ -228,11 +228,13 @@ var CDesign = Class({
         if (CUtils.isEmpty(design))
             return "";
 
+
         var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
             if (CUtils.isEmpty(CDesign.designs[attribute])){
+                CLog.dlog(design);
                 CLog.error("Design: "+attribute+" doesn't exist.")
                 return "";
             }

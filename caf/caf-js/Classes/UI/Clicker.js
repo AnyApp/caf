@@ -27,9 +27,11 @@ var CClicker = Class({
     setOnClickable: function(object){
         // Init
         var design = object.getDesign();
+        // Check
+        object.clicker = {};
+        object.clicker.activeClasses       = CDesign.designToClasses(object.getDesign().active);
+        object.clicker.activeRemoveClasses = CDesign.designToClasses(object.getDesign().activeRemove);
 
-        design.active       = CDesign.designToClasses(object.getDesign().active);
-        design.activeRemove = CDesign.designToClasses(object.getDesign().activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,
@@ -74,8 +76,8 @@ var CClicker = Class({
             object.touchData.lastX      = pointer.pageX;
             object.touchData.lastY      = pointer.pageY;
             object.touchData.startTime  = (new  Date()).getTime();
-            CUtils.addClass(element,object.getDesign().active);
-            CUtils.removeClass(element,object.getDesign().activeRemove);
+            CUtils.addClass(element,object.clicker.activeClasses);
+            CUtils.removeClass(element,object.clicker.activeRemoveClasses);
         }
         object.events.onTouchMoveEvent = function(e)
         {
@@ -108,8 +110,8 @@ var CClicker = Class({
             object.touchData.startY = -100000;
             object.touchData.lastX = -200000;
             object.touchData.lastY = -200000;
-            CUtils.removeClass(element,object.getDesign().active);
-            CUtils.addClass(element,object.getDesign().activeRemove);
+            CUtils.removeClass(element,object.clicker.activeClasses);
+            CUtils.addClass(element,object.clicker.activeRemoveClasses);
 
         }
 

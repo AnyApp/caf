@@ -39,6 +39,23 @@ var CObject = Class({
         this.enterAnimation = '';
         this.entered        = false;
         this.logic.doStopPropagation = values.logic.doStopPropagation || false;
+
+        // Replace all references.
+        this.applyDynamicVariables(this.logic);
+    },
+    applyDynamicVariables: function(obj) {
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (typeof obj[property] == "object")
+                    this.applyDynamicVariables(obj[property]);
+                else if (typeof obj[property] == 'string' || obj[property] instanceof String){
+                    // Evaluate dynamic data.
+                    if (obj[property].substr(0,6)==="$this.")
+                        obj[property] = eval(obj[property].substr(1));
+                }
+
+            }
+        }
     },
     /**
      * Return Unique identifier.

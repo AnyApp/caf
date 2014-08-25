@@ -37,8 +37,8 @@ var CTemplator = Class({
             if (object.isContainer())
                 object.restructureChildren();
             // Apply Logic and Design on the Object.
-            CDesign.applyDesign(object);
             CLogic.applyLogic(object);
+            CDesign.applyDesign(object);
         },this);
 
         // Clear Whitespaces.
