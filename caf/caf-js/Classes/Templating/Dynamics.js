@@ -61,17 +61,24 @@ var CDynamics = Class({
     },
     load: function(objectId,queryData) {
         var object = CObjectsHandler.object(objectId);
+
+        object.showLoading();
+
         // Do not rebuild again.
         if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.queryData))
             return;
 
         object.dynamic.queryData = queryData;
 
-        // Request.
-        CNetwork.request(object.dynamic.url,object.dynamic.queryData,
-        function(retrievedData){
-            CDynamics.loadObjectWithData(objectId,retrievedData);
-        });
+        window.setTimeout(function(){
+            // Request.
+            CNetwork.request(object.dynamic.url,object.dynamic.queryData,
+                function(retrievedData){
+                    CDynamics.loadObjectWithData(objectId,retrievedData);
+                    object.stopLoading();
+                });
+        },2000);
+
     }
 
 });

@@ -214,6 +214,15 @@ li{
 
 /* End Utils */
 
+/* Loaders */
+.loaderDefault{
+    background-image: url(../images/default-loader.gif);
+    background-repeat: no-repeat;
+    background-size: auto 50%;
+    background-position: 50%;
+}
+/*End Loaders */
+
 /* Font */
 .bold{
     font-weight: bold;

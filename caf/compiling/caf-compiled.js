@@ -621,17 +621,24 @@ var CDynamics = Class({
     },
     load: function(objectId,queryData) {
         var object = CObjectsHandler.object(objectId);
+
+        object.showLoading();
+
         // Do not rebuild again.
         if (object.dynamic.loaded === true && !CUtils.equals(queryData,object.dynamic.queryData))
             return;
 
         object.dynamic.queryData = queryData;
 
-        // Request.
-        CNetwork.request(object.dynamic.url,object.dynamic.queryData,
-        function(retrievedData){
-            CDynamics.loadObjectWithData(objectId,retrievedData);
-        });
+        window.setTimeout(function(){
+            // Request.
+            CNetwork.request(object.dynamic.url,object.dynamic.queryData,
+                function(retrievedData){
+                    CDynamics.loadObjectWithData(objectId,retrievedData);
+                    object.stopLoading();
+                });
+        },2000);
+
     }
 
 });
@@ -745,6 +752,11 @@ var CLogic = Class({
         },
         dynamic: function(object,value){
             CDynamics.applyDynamic(object,value);
+        },
+        buttonReloadDynamic:  function(object,value){
+            CClicker.addOnClick(object,function(){
+                CObjectsHandler.object(value).reload();
+            });
         }
 
     },
@@ -1506,7 +1518,6 @@ var CClicker = Class({
             object.touchData.startTime  = (new  Date()).getTime();
             CUtils.addClass(element,object.clicker.activeClasses);
             CUtils.removeClass(element,object.clicker.activeRemoveClasses);
-            CLog.dlog(object.clicker.activeRemoveClasses);
         }
         object.events.onTouchMoveEvent = function(e)
         {
@@ -2079,8 +2090,12 @@ var CObject = Class({
  */
 var CDynamicObject = Class(CObject,{
     $statics: {
+        gifLoaders:{
+            default: 'loaderDefault'
+        },
         DEFAULT_DESIGN: {
-            classes: 'displayNone'
+            classes: CDynamics.hiddenClass,
+            height: 50
         },
         DEFAULT_LOGIC: {
         }
@@ -2097,9 +2112,17 @@ var CDynamicObject = Class(CObject,{
 
         this.data.object    = this.data.object      || {};
         this.logic.dynamic  = this.logic.dynamic    || {};
+        this.design.classes = this.design.classes   || '';
+        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+' ';
     },
     reload: function(){
         CDynamics.load(this.uid());
+    },
+    showLoading: function(){
+        CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
+    },
+    stopLoading: function(){
+        CUtils.addClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
     }
 
 

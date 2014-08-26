@@ -29,15 +29,19 @@ var app =
             data: {  childs: ['main-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-label','main-button','dynamic-buttons','form','main-gallery'] }
+            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','form','main-gallery'] }
         };
-        var mainViewLabel = {   uname:  'main-label', type:   'Label',
-            design: { height:40, bgColor:{color:'Blue',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2},
-            logic: { text: "Label" }
+        var mainViewReloadDynamic = {   uname:  'main-reload-dynamic', type:   'Button',
+            design: { height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Olive',level:6} }},
+            logic: {
+                text: "Reload",
+                buttonReloadDynamic: 'dynamic-buttons'
+            }
         };
         var mainViewButton = {   uname:  'main-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Aqua',level:6} }
+            design: { height:40, bgColor:{color:'Maroon',level:4},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Maroon',level:6} }
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
@@ -210,7 +214,7 @@ var app =
             sideMenuLeftContainer,
             sideMenuRightContainer,
             mainView,
-            mainViewLabel,
+            mainViewReloadDynamic,
             mainViewButton,
             form,
             inputPhone,

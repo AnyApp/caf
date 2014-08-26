@@ -106,6 +106,11 @@ var CLogic = Class({
         },
         dynamic: function(object,value){
             CDynamics.applyDynamic(object,value);
+        },
+        buttonReloadDynamic:  function(object,value){
+            CClicker.addOnClick(object,function(){
+                CObjectsHandler.object(value).reload();
+            });
         }
 
     },

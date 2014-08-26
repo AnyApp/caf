@@ -3,8 +3,11 @@
  */
 var CDynamicObject = Class(CObject,{
     $statics: {
+        gifLoaders:{
+            default: 'loaderDefault'
+        },
         DEFAULT_DESIGN: {
-            classes: 'displayNone',
+            classes: CDynamics.hiddenClass,
             height: 50
         },
         DEFAULT_LOGIC: {
@@ -22,9 +25,17 @@ var CDynamicObject = Class(CObject,{
 
         this.data.object    = this.data.object      || {};
         this.logic.dynamic  = this.logic.dynamic    || {};
+        this.design.classes = this.design.classes   || '';
+        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+' ';
     },
     reload: function(){
         CDynamics.load(this.uid());
+    },
+    showLoading: function(){
+        CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
+    },
+    stopLoading: function(){
+        CUtils.addClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
     }
 
 
