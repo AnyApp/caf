@@ -26,7 +26,7 @@ var CDynamicObject = Class(CObject,{
         this.data.object    = this.data.object      || {};
         this.logic.dynamic  = this.logic.dynamic    || {};
         this.design.classes = this.design.classes   || '';
-        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+' ';
+        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+ ' ';
     },
     reload: function(){
         CDynamics.load(this.uid());

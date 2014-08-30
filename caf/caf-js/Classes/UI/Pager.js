@@ -8,7 +8,48 @@ var CPager = Class({
     currentPage: "",
     mainPage: '',
     backButtonId: '',
+    pages: {},
 
+    initialize: function(){
+        var base = CAppConfig.basePath();
+        page.base(base);
+        //this.sammy = Sammy();
+
+        // Add all pages names to the router.
+        _.each(this.pages,function(value){
+            var load = function(context){
+                var params = CPager.fetchParams(context);
+                CPager.showPage(value.id,params);
+                CLog.dlog('Loaded: '+value.id);
+            }
+            if (!CUtils.isEmpty(value.name)){
+                // Custom page.
+                page('/'+value.name+'',load);
+                page('/'+value.name+'/*',load);
+            }
+            else {
+                // Main Page.
+                page('',load);
+            }
+        },this);
+        page('*', function() { CLog.dlog('page not found')});
+        this.resetPages();
+        page.start();
+    },
+    fetchParams: function(context) {
+        if (CUtils.isEmpty(context.path))
+            return [];
+
+        var params = context.path.split('/');
+        if (params.length>0 && params[0]=='')
+            params.shift();
+        if (params.length>0 && params[params.length-1]=='')
+            params.pop();
+        return params;
+    },
+    addPage: function(name,data){
+        this.pages[name] = data;
+    },
     setMainPage: function(mainPage) {
         this.mainPage = mainPage;
         this.moveToPage(mainPage);
@@ -64,10 +105,21 @@ var CPager = Class({
         if (!CUtils.isEmpty(holdClass))
             CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
     },
+    dataToPath: function (data) {
+        data = data || {};
+        var path = '';
+        _.each(data,function(value,key){
+            path += '/'+key+'/'+value;
+        },this);
+        return path;
+    },
     /**
      * move to page.
      */
-    moveToPage: function(toPageId,isRealPage,inAnim,outAnim) {
+    moveToPage: function(path/*toPageId,isRealPage,inAnim,outAnim*/) {
+        // convert data to path. Example: {area:'north',side:'r'}=>/area/north/side/r
+
+
         // Check if need to move back.
         if (toPageId == 'move-back') {
             this.moveBack();
@@ -139,18 +191,42 @@ var CPager = Class({
         // Execute onPageLoad.
         onPageLoad();
     },
-    checkAndChangeBackButtonState:function()
-    {
+    checkAndChangeBackButtonState:function() {/**/
         if (CUtils.isEmpty(this.backButtonId)) return;
 
-        if (this.currentPage == this.mainPage)
-        {
+        if (this.currentPage == this.mainPage) {
             CUtils.addClass(document.getElementById(this.backButtonId),'hidden');
         }
-        else
-        {
+        else {
             CUtils.removeClass(document.getElementById(this.backButtonId),'hidden');
         }
+    },
+    showPage: function(id,params){
+        var lastPage            = this.currentPage || '';
+        this.currentPage        = id;
+        var animationOptions    = {};
+        // Initialize animation options
+        if (CUtils.isEmpty(lastPage))
+            animationOptions.animationDuration = 0;
+        // Do not reload the same page over and over again.
+        else if (this.currentPage == lastPage)
+            return;
+
+        // Normal page hide.
+        if (!CUtils.isEmpty(lastPage)){
+            CAnimations.hide(lastPage,animationOptions);
+        }
+
+        // Showing current page.
+        CAnimations.show(this.currentPage,animationOptions);
+
+    },
+    // Immediate hide to all pages on first load.
+    resetPages: function() {
+        // Hide All Pages except current.
+        _.each(this.pages,function(page){
+                CAnimations.quickHide(CObjectsHandler.object(page.id));
+        },this);
     }
 
 

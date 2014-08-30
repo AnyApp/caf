@@ -162,7 +162,29 @@ var CUtils = Class({
             w = window.innerWidth;h = window.innerHeight;
         }
         return {width:w,height:h};
+    },
+    isUrlAbsolute: function(url){
+        return (new RegExp('^(?:[a-z]+:)?//', 'i')).test(url);
+    },
+    isUrlRelative: function(url){
+        return !this.isUrlAbsolute(url);
+    },
+    getUrlParts: function (url) {
+        var a = document.createElement('a');
+        a.href = url;
+
+        return {
+            href: a.href,
+            host: a.host,
+            hostname: a.hostname,
+            port: a.port,
+            pathname: a.pathname,
+            protocol: a.protocol,
+            hash: a.hash,
+            search: a.search
+        };
     }
+
 
 });
 

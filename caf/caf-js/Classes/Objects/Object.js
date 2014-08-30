@@ -73,6 +73,27 @@ var CObject = Class({
     getParent: function() {
         return this.parent;
     },
+    setLink: function(link) {
+        if (CUtils.isUrlRelative(link)) {
+            this.data.link = CAppConfig.baseUrl()+'/'+link;
+        }
+        else {
+            this.data.link = link;
+        }
+
+    },
+    getLink: function() {
+        return this.data.link || '';
+    },
+    hasLink: function(){
+        return !CUtils.isEmpty(this.logic.link);
+    },
+    isLink: function(){
+        return !CUtils.isEmpty(this.logic.link);
+    },
+    isLinkLocal: function(){
+        return this.data.link.indexOf(CAppConfig.baseUrl())>=0;
+    },
     setEnterAnimation: function(enterAnimation) {
         this.enterAnimation = enterAnimation;
     },
@@ -143,14 +164,22 @@ var CObject = Class({
         this.lastClasses = this.classes;
 
         // Create element and add to the dom array.
-        // Custom tag - can be used to insert a,input..
-        tag         = CUtils.isEmpty(tag)? 'div' : tag;
-        var tagOpen = '<'+tag;
         // Extra tag attributes. For example: 'href="http://www.web.com"'
         attributes  = CUtils.isEmpty(attributes)? Array() : attributes;
         // Add class attribute.
         attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
+
+        // Custom tag - can be used to insert a,input..
+        if (this.hasLink()){
+            this.setLink(this.logic.link.path+ CPager.dataToPath(this.logic.link.data));
+            tag = 'a';
+            // Allow outer links only in browser. Avoid links opening inside app.
+            if (this.isLinkLocal() || CPlatforms.isWeb())
+                attributes.push('href="'+this.data.link+'"');
+        }
+        tag         = CUtils.isEmpty(tag)? 'div' : tag;
+        var tagOpen = '<'+tag;
 
         // If tag has inner or not.
         tagHasInner = CUtils.isEmpty(tagHasInner)? true:tagHasInner;

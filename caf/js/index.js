@@ -26,10 +26,27 @@ var app =
         var footer = {   uname:  'footer', type:   'Footer'
         };
         var content = {   uname:  'content', type:   'Content',
-            data: {  childs: ['main-page'] }
+            data: {  childs: ['main-page','form-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','form','main-gallery'] }
+            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','main-gallery'] },
+            logic: {
+                page: {
+                    name: '',
+                    title: 'Main',
+                    onLoad: function() {}
+                }
+            }
+        };
+        var formPage = {   uname:  'form-page', type:   'Page',
+            data: {  childs: ['form'] },
+            logic: {
+                page: {
+                    name: 'form',
+                    title: 'Form',
+                    onLoad: function() {}
+                }
+            }
         };
         var mainViewReloadDynamic = {   uname:  'main-reload-dynamic', type:   'Button',
             design: { height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
@@ -98,9 +115,13 @@ var app =
             design: { bgColor:{color:'Orange',level:4},
                 active: { bgColor:{color:'Orange',level:6} }
             },
-            logic: { text: "X",
+            logic: { text: "X",/*
                 onClick: function(){
                     CLog.log('Button Clicked');
+                },*/
+                link: {
+                    path: 'form',
+                    data: {}
                 }
             }
         };
@@ -201,7 +222,7 @@ var app =
             },
             logic: {
                 dynamic:{
-                    url: 'http://codletech.net/caf2/caf.php',
+                    url: 'http://codletech.net/CAF/caf.php',
                     autoLoad: true
                 }
             }
@@ -232,7 +253,8 @@ var app =
             headerButtonRight1,
             headerButtonLeft0,
             dropDownMenu,
-            dynamicButtons
+            dynamicButtons,
+            formPage
 
 
         ];

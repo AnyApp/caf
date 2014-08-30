@@ -234,7 +234,6 @@ var CDesign = Class({
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
             if (CUtils.isEmpty(CDesign.designs[attribute])){
-                CLog.dlog(design);
                 CLog.error("Design: "+attribute+" doesn't exist.")
                 return "";
             }

@@ -17,6 +17,7 @@ var Caf = Class({
         CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
         CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
+        CPager.initialize();
     }
 
 });

@@ -8,7 +8,7 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isWeb: function() {
-        return CUtils.isEmpty(navigator) && CUtils.isEmpty(device);
+        return CUtils.isEmpty(navigator.app) && window.device===undefined;
     },
     /**
      * Return whether or not the device platform is ios.

@@ -22,7 +22,8 @@ var CClicker = Class({
         if (CUtils.isEmpty(object.onClicks))
             CClicker.setOnClickable(object);
         // Add onclick.
-        object.onClicks.push(onClick);
+        if (onClick)
+            object.onClicks.push(onClick);
     },
     setOnClickable: function(object){
         // Init
@@ -31,7 +32,6 @@ var CClicker = Class({
         object.clicker = {};
         object.clicker.activeClasses       = CDesign.designToClasses(object.getDesign().active);
         object.clicker.activeRemoveClasses = CDesign.designToClasses(object.getDesign().activeRemove);
-
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,
@@ -93,7 +93,8 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
-            e.preventDefault();
+            if (object.onClicks.length>0)
+                e.preventDefault();
 
             var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
             var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);

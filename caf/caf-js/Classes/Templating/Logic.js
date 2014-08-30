@@ -14,8 +14,17 @@ var CLogic = Class({
         },
         toPage: function(object,value){
             CClicker.addOnClick(object,function(){
-                CPager.moveToPage(value);
+                CPager.moveToPage(object.getLink());
             });
+        },
+        link: function(object,value){
+            if (!object.isLinkLocal() && !CPlatforms.isWeb()){
+                CClicker.addOnClick(object,function(){
+                    CUtils.openURL(value);
+                });
+            }
+            CClicker.addOnClick(object,null);
+
         },
         toTab: function(object,value){
             CSwiper.addButtonToTabSwiper(object,value);
@@ -111,6 +120,10 @@ var CLogic = Class({
             CClicker.addOnClick(object,function(){
                 CObjectsHandler.object(value).reload();
             });
+        },
+        page: function(object,value){
+            //CDynamics.applyDynamic(object,value);
+            CPager.addPage(value.name,value);
         }
 
     },

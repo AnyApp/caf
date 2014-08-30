@@ -1,10 +1,12 @@
 /**
  * Created by dvircn on 15/08/14.
  */
-var CImage = Class(CObject,{
+var CZoomedImage = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes: ""
+            classes: "zoomedImage",
+            width: '100%',
+            height: '100%'
         },
         DEFAULT_LOGIC: {
         }
@@ -14,10 +16,10 @@ var CImage = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CImage);
+        CObject.mergeWithDefaults(values,CZoomedImage);
 
         // Invoke parent's constructor
-        CImage.$super.call(this, values);
+        CZoomedImage.$super.call(this, values);
 
         this.data.src = values.data.src || '';
     },
@@ -27,9 +29,7 @@ var CImage = Class(CObject,{
     prepareBuild: function(data){
         // Prepare this element - wrap it's children.
         return CImage.$superp.prepareBuild.call(this,{
-            tag: 'img',
-            attributes: ['src="'+this.data.src+'"'],
-            tagHasInner: false
+            attributes: ['style="background-image: url('+this.data.src+');"']
         });
     }
 

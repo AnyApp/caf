@@ -3,6 +3,24 @@
 }
 
 /* Animations */
+.fadein0{
+    -webkit-transform: translate3d(0,0,0);
+    -webkit-transition: opacity 0.0s ease-in-out;
+    -moz-transition: opacity 0.0s ease-in-out;
+    -ms-transition: opacity 0.0s ease-in-out;
+    -o-transition: opacity 0.0s ease-in-out;
+    transition: opacity 0.0s ease-in-out;
+    opacity: 1;
+}
+.fadeout0{
+    -webkit-transform: translate3d(0,0,0);
+    -webkit-transition: opacity 0.0s ease-in-out;
+    -moz-transition: opacity 0.0s ease-in-out;
+    -ms-transition: opacity 0.0s ease-in-out;
+    -o-transition: opacity 0.0s ease-in-out;
+    transition: opacity 0.0s ease-in-out;
+    opacity: 0;
+}
 .fadein100{
     -webkit-transform: translate3d(0,0,0);
     -webkit-transition: opacity 0.1s ease-in-out;

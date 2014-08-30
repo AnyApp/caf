@@ -70,14 +70,12 @@ var CDynamics = Class({
 
         object.dynamic.queryData = queryData;
 
-        window.setTimeout(function(){
-            // Request.
-            CNetwork.request(object.dynamic.url,object.dynamic.queryData,
-                function(retrievedData){
-                    CDynamics.loadObjectWithData(objectId,retrievedData);
-                    object.stopLoading();
-                });
-        },2000);
+        // Request.
+        CNetwork.request(object.dynamic.url,object.dynamic.queryData,
+            function(retrievedData){
+                CDynamics.loadObjectWithData(objectId,retrievedData);
+                object.stopLoading();
+        });
 
     }
 

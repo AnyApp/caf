@@ -21,6 +21,21 @@ var CDom = Class({
         if (container)
             while (container.firstChild) container.removeChild(container.firstChild);
     },
+    removeAllObjectsChildren: function(id){
+        var container = CUtils.element(id);
+        if (!container) return;
+
+        var children = [];
+        _.each(container.children,function(childElm){
+            children.push(childElm.id);
+        },this);
+
+        _.each(children,function(childId){
+            if (!CUtils.isEmpty(CObjectsHandler.object(childId)))
+                container.removeChild(CUtils.element(childId));
+        },this);
+
+    },
     indexInParent: function(id){
         var node = CUtils.element(id);
         return Array.prototype.indexOf.call(node.parentNode.children, node);

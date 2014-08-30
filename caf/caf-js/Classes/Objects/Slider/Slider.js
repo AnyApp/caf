@@ -7,10 +7,6 @@ var CSlider = Class(CContainer,{
             height: 300,
             widthSM: 10,
             widthXS: 10,
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
-            marginBottom:1,
             classes:'swiper-container'
         },
         DEFAULT_LOGIC: {

@@ -20,7 +20,7 @@ var CGallery = Class(CSlider,{
 
         // Create Images.
         _.each(this.data.images,function(imageSrc){
-            var imageId = CObjectsHandler.createObject('Image',{
+            var imageId = CObjectsHandler.createObject('ZoomedImage',{
                 data: {  src: [imageSrc] }
             });
             this.data.childs.push(imageId);

@@ -17,8 +17,9 @@ var CContainer = Class(CObject,{
 
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
-        this.data.childs = this.data.childs || [];
-        this.data.toRemoveChilds = [];
+        this.data.childs        = this.data.childs || [];
+        this.data.lastChilds    = this.data.lastChilds || [];
+        this.data.toRemoveChilds= [];
     },
     /**
      *  Build Object.
@@ -120,6 +121,9 @@ var CContainer = Class(CObject,{
         CTemplator.buildFromObject(this.uid());
     },
     restructureChildren: function(){
+        if (CUtils.equals(this.data.lastChilds,this.data.childs))
+            return;
+
         // Get All Nodes.
         var childrenIds = this.data.childs || [];
         var childrenNodes = [];
@@ -135,16 +139,7 @@ var CContainer = Class(CObject,{
             container.appendChild(child)
         },this);
 
-/*
-        var orderedChildren = [];
-        for (var index in this.data.childs){
-            //CLog.dlog(this.data.childs[index]+" "+index);
-            var childId = this.data.childs[index];
-            //orderedChildren.unshift(CUtils.element(childId));
-            CDom.moveToIndex(childId,index);
-        }
-        CUtils.element(this.uid()).children = orderedChildren;
-*/
+        this.data.lastChilds = CUtils.clone(childrenIds);
     },
     isContainer: function(){
         return true;

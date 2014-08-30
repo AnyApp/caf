@@ -31,11 +31,15 @@ var CTemplator = Class({
         var viewStr = viewBuilder.build(' ');
         CDom.addChild(currentObject.getParent(),viewStr);
 
-        // Build relevant Objects by the order of their build (Parent->Child).
+        // Restructure before logic is applied.
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
             //Restructure containers children.
             if (object.isContainer())
                 object.restructureChildren();
+        },this);
+
+        // Build relevant Objects by the order of their build (Parent->Child).
+        _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
             CDesign.applyDesign(object);

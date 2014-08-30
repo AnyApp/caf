@@ -7,6 +7,9 @@ body{
 div,ul,a,body,li,h1,h2,h3,h4,h5,h6,input,textarea{
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+a{
+    text-decoration: none;
+}
 input {
     margin: 0;
     font: -webkit-small-control;
@@ -242,7 +245,13 @@ li{
 
 /* End Font */
 
-
+/* Gallery */
+.zoomedImage{
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+/* Gallery end */
 /* Rounded */
 .Rounded0{
     -webkit-border-radius: 0px;
