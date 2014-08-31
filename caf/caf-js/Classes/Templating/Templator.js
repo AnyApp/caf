@@ -3,7 +3,9 @@
  */
 var CTemplator = Class({
     $singleton: true,
-
+    inBuilding: false,
+    waitingCount: 0,
+    current: '',
     /**
      * Build all objects.
      */
@@ -16,6 +18,15 @@ var CTemplator = Class({
      * @param id : Object ID.
      */
     buildFromObject: function(id){
+        if (CTemplator.inBuilding===true && CTemplator.waitingCount<100){
+            CTemplator.waitingCount++;
+            CThreads.run(function(){CTemplator.buildFromObject(id);},50);
+            return;
+        }
+
+        CTemplator.waitingCount = 0;
+        CTemplator.inBuilding = true;
+        CTemplator.current = id;
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();
 
@@ -36,19 +47,20 @@ var CTemplator = Class({
             //Restructure containers children.
             if (object.isContainer())
                 object.restructureChildren();
-        },this);
+        },CTemplator);
 
         // Build relevant Objects by the order of their build (Parent->Child).
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
             CDesign.applyDesign(object);
-        },this);
+        },CTemplator);
 
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
 
-        //CAnimations.cascadeShow(['form-input-name','form-input-phone','form-submit-button','form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button']);
+        CThreads.run(function(){CTemplator.inBuilding = false;;},1000);
+
     },
     objectJSON: function(type,uname,design,logic,data){
         var object = {};

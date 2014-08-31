@@ -118,12 +118,13 @@ var CLogic = Class({
         },
         buttonReloadDynamic:  function(object,value){
             CClicker.addOnClick(object,function(){
-                CObjectsHandler.object(value).reload();
+                CDynamics.load(value.object,value.queryData || {},value.reset || false);
             });
         },
         page: function(object,value){
             //CDynamics.applyDynamic(object,value);
-            CPager.addPage(value.name,value);
+            if (value===true)
+                CPager.addPage(object);
         }
 
     },

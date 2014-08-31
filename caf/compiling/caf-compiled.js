@@ -585,15 +585,16 @@ var CDynamics = Class({
         var object = CObjectsHandler.object(objectId);
         return !CUtils.isEmpty(object.dynamic);
     },
-    duplicateWithData: function (object, data) {
+    duplicateWithData: function (object, data, reset) {
         if (!CUtils.isArray(data)) // Convert to Array
             data = [data];
 
         var parentContainer = CObjectsHandler.object(object.parent);
         // Remove All Previous duplicates.
-        parentContainer.removeChilds(object.dynamic.duplicates);
+        if (reset===true){
+            CDynamics.removeDuplicates(object.uid(),false);
+        }
 
-        object.dynamic.duplicates = [];
         _.each(data,function(currentData){
             var duplicateId = CObjectsHandler.createFromDynamicObject(object,
                                 currentData.data,currentData.logic,currentData.design);
@@ -602,7 +603,17 @@ var CDynamics = Class({
         },this);
 
         // Add duplicates to container after this object.
-        parentContainer.appendChildsAfterObject(object.uid(),object.dynamic.duplicates);
+        parentContainer.appendChildsAfterObject(object.uid(),object.dynamic.duplicates,false);
+        parentContainer.rebuild();
+    },
+    removeDuplicates: function(objectId,rebuild){
+        var object          = CObjectsHandler.object(objectId);
+        var parentContainer = CObjectsHandler.object(object.parent);
+        // Remove All Previous duplicates.
+        parentContainer.removeChilds(object.dynamic.duplicates);
+        object.dynamic.duplicates = [];
+        if (rebuild === true)
+            parentContainer.rebuild();
     },
     loadDataToObject: function (object, data) {
         object.data     = CUtils.mergeJSONs(object.data,data.data);
@@ -610,15 +621,11 @@ var CDynamics = Class({
         object.design   = CUtils.mergeJSONs(object.design,data.design);
         CTemplator.buildFromObject(object.uid());
     },
-    loadObjectWithData: function (objectId, data) {
+    loadObjectWithData: function (objectId, data, reset) {
         var object = CObjectsHandler.object(objectId);
-        //if (object.dynamic.loadTo === 'after')
-        this.duplicateWithData(object,data);
-        //else if (object.dynamic.loadTo === 'self')
-        //    this.loadDataToObject(object,data);
-
+        this.duplicateWithData(object,data, reset);
     },
-    load: function(objectId,queryData) {
+    load: function(objectId,queryData,reset) {
         var object = CObjectsHandler.object(objectId);
 
         object.showLoading();
@@ -632,7 +639,7 @@ var CDynamics = Class({
         // Request.
         CNetwork.request(object.dynamic.url,object.dynamic.queryData,
             function(retrievedData){
-                CDynamics.loadObjectWithData(objectId,retrievedData);
+                CDynamics.loadObjectWithData(objectId,retrievedData,reset);
                 object.stopLoading();
         });
 
@@ -761,12 +768,13 @@ var CLogic = Class({
         },
         buttonReloadDynamic:  function(object,value){
             CClicker.addOnClick(object,function(){
-                CObjectsHandler.object(value).reload();
+                CDynamics.load(value.object,value.queryData || {},value.reset || false);
             });
         },
         page: function(object,value){
             //CDynamics.applyDynamic(object,value);
-            CPager.addPage(value.name,value);
+            if (value===true)
+                CPager.addPage(object);
         }
 
     },
@@ -900,7 +908,9 @@ var CObjectsHandler = Class({
  */
 var CTemplator = Class({
     $singleton: true,
-
+    inBuilding: false,
+    waitingCount: 0,
+    current: '',
     /**
      * Build all objects.
      */
@@ -913,6 +923,15 @@ var CTemplator = Class({
      * @param id : Object ID.
      */
     buildFromObject: function(id){
+        if (CTemplator.inBuilding===true && CTemplator.waitingCount<100){
+            CTemplator.waitingCount++;
+            CThreads.run(function(){CTemplator.buildFromObject(id);},50);
+            return;
+        }
+
+        CTemplator.waitingCount = 0;
+        CTemplator.inBuilding = true;
+        CTemplator.current = id;
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();
 
@@ -933,19 +952,20 @@ var CTemplator = Class({
             //Restructure containers children.
             if (object.isContainer())
                 object.restructureChildren();
-        },this);
+        },CTemplator);
 
         // Build relevant Objects by the order of their build (Parent->Child).
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
             CDesign.applyDesign(object);
-        },this);
+        },CTemplator);
 
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
 
-        //CAnimations.cascadeShow(['form-input-name','form-input-phone','form-submit-button','form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button']);
+        CThreads.run(function(){CTemplator.inBuilding = false;;},1000);
+
     },
     objectJSON: function(type,uname,design,logic,data){
         var object = {};
@@ -1047,7 +1067,9 @@ var CDom = Class({
     },
     removeFromDOM: function(nodeId){
         var node = CUtils.element(nodeId);
-        node.parentElement.removeChild(node);
+        if (!CUtils.isEmpty(node) && !CUtils.isEmpty(node.parentElement))
+            node.parentElement.removeChild(node);
+        //CLog.dlog('Removing: '+nodeId);
     },
     /**
      * Move node to index and push all other nodes forward.
@@ -1110,26 +1132,42 @@ var CLog = Class({
  */
 var CNetwork = Class({
     $singleton: true,
-    send: function(url,data,callback){
-        var xmlhttp = new XMLHttpRequest();
+    requestsStates: {},
+    initializeRequest: function(requestId,xmlhttp,url,data,callback){
+        CNetwork.requestsStates[requestId] = false;
         xmlhttp.onreadystatechange = function(){
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-                var data = xmlhttp.responseText;
+                var origData = xmlhttp.responseText;
+                if (CNetwork.requestsStates[requestId]===true || CUtils.isEmpty(origData))
+                    return;
+                CNetwork.requestsStates[requestId] = true;
+
+                var data = null;
                 // If the response in JSON, Parse it.
                 try {
-                    data = JSON.parse(data);
-                } catch (e) {}
+                    data = JSON.parse(origData);
+                } catch (e) {
+                    data = origData;
+                }
                 if (!CUtils.isEmpty(callback)){
                     callback(data); // callback
                 }
+
             }
         };
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    },
+    send: function(url,data,callback){
+        var xmlhttp = new XMLHttpRequest();
+        CNetwork.initializeRequest(CNetwork.generateID(),xmlhttp,url,data,callback);
         xmlhttp.send(JSON.stringify(data));
     },
     request: function(url,data,callback){
         this.send(url,data,callback);
+    },
+    generateID: function() {
+        return Math.random().toString(36).substring(2);
     }
 
 });/**
@@ -1775,16 +1813,16 @@ var CPager = Class({
         //this.sammy = Sammy();
 
         // Add all pages names to the router.
-        _.each(this.pages,function(value){
+        _.each(this.pages,function(pageId){
+            var currentPage = CObjectsHandler.object(pageId);
             var load = function(context){
                 var params = CPager.fetchParams(context);
-                CPager.showPage(value.id,params);
-                CLog.dlog('Loaded: '+value.id);
+                CPager.showPage(pageId,params);
             }
-            if (!CUtils.isEmpty(value.name)){
+            if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
-                page('/'+value.name+'',load);
-                page('/'+value.name+'/*',load);
+                page('/'+currentPage.getPageName()+'',load);
+                page('/'+currentPage.getPageName()+'/*',load);
             }
             else {
                 // Main Page.
@@ -1806,8 +1844,8 @@ var CPager = Class({
             params.pop();
         return params;
     },
-    addPage: function(name,data){
-        this.pages[name] = data;
+    addPage: function(object){
+        this.pages[object.getPageName()] = object.uid();
     },
     setMainPage: function(mainPage) {
         this.mainPage = mainPage;
@@ -1963,7 +2001,6 @@ var CPager = Class({
     showPage: function(id,params){
         var lastPage            = this.currentPage || '';
         this.currentPage        = id;
-        var animationOptions    = {};
 
         // Do not reload the same page over and over again.
         if (this.currentPage == lastPage)
@@ -1971,7 +2008,16 @@ var CPager = Class({
 
         // Normal page hide.
         if (!CUtils.isEmpty(lastPage))
-            CAnimations.hide(lastPage,animationOptions);
+            CAnimations.hide(lastPage,{});
+
+        var animationOptions    = {};
+        // Page Load.
+        animationOptions.onAnimShowComplete = function() {
+            var page = CObjectsHandler.object(CPager.currentPage);
+            page.reloadWithParams(params);
+        };
+        var page = CObjectsHandler.object(CPager.currentPage);
+        CUI.setTitle(page.getPageTitle());
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
@@ -1983,8 +2029,8 @@ var CPager = Class({
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
-        _.each(this.pages,function(page){
-                CAnimations.quickHide(page.id);
+        _.each(this.pages,function(pageId){
+                CAnimations.quickHide(pageId);
         },this);
     }
 
@@ -2496,7 +2542,6 @@ var CContainer = Class(CObject,{
         },this);
         //Clear.
         this.data.toRemoveChilds = [];
-
         // insert new elements.
         var content = new CStringBuilder();
         _.each(this.data.childs,function(childID){
@@ -2555,13 +2600,18 @@ var CContainer = Class(CObject,{
         this.data.childs.push.apply(this.data.childs,afterChilds);
         this.rebuild();
     },
-    appendChildsAfterObject: function(afterObjectId,objectsIds){
-        //CLog.dlog(object.dynamic.duplicates);
+    appendChildsAfterObject: function(afterObjectId,objectsIds,rebuild){
+        // Remove all duplicates before re-insert.
+        _.each(objectsIds,function(objId){
+            CUtils.arrayRemove(this.data.childs,objId);
+        },this);
+
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
+        if (rebuild === true)
+            this.rebuild();
     },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
@@ -2573,7 +2623,7 @@ var CContainer = Class(CObject,{
             CUtils.arrayRemove(this.data.childs,objectId);
             this.data.toRemoveChilds.push(objectId);
         },this);
-        if (rebuild!==false)
+        if (rebuild===true)
             this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){
@@ -3489,21 +3539,27 @@ var CPage = Class(CContainer,{
         CPage.$super.call(this, values);
 
         // Page properties.
-        this.logic.page         = this.logic.page           || {};
-        this.logic.page.name    = this.logic.page.name      || '';
-        this.logic.page.title   = this.logic.page.title     || '';
-        this.logic.page.onLoad  = this.logic.page.onLoad    || function(){};
-        this.logic.page.id      = this.uid();
-        this.data.params        = [];
+        this.data.page         = this.data.page           || {};
+        this.data.page.name    = this.data.page.name      || '';
+        this.data.page.title   = this.data.page.title     || '';
+        this.data.page.onLoad  = this.data.page.onLoad    || function(){};
+        this.data.page.id      = this.uid();
+        this.data.page.params        = [];
     },
     reloadWithParams: function(params){
         if (!CUtils.equals(this.data.params,params)){
-            this.data.params = params;
+            this.data.page.params = params;
             this.reload();
         }
     },
     reload: function(){
-
+        this.data.page.onLoad(this.data.params);
+    },
+    getPageTitle: function(){
+        return this.data.page.title;
+    },
+    getPageName: function(){
+        return this.data.page.name;
     },
     getParamsAsMap: function(params){
         var map = {};

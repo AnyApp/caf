@@ -31,7 +31,6 @@ var CContainer = Class(CObject,{
         },this);
         //Clear.
         this.data.toRemoveChilds = [];
-
         // insert new elements.
         var content = new CStringBuilder();
         _.each(this.data.childs,function(childID){
@@ -90,13 +89,18 @@ var CContainer = Class(CObject,{
         this.data.childs.push.apply(this.data.childs,afterChilds);
         this.rebuild();
     },
-    appendChildsAfterObject: function(afterObjectId,objectsIds){
-        //CLog.dlog(object.dynamic.duplicates);
+    appendChildsAfterObject: function(afterObjectId,objectsIds,rebuild){
+        // Remove all duplicates before re-insert.
+        _.each(objectsIds,function(objId){
+            CUtils.arrayRemove(this.data.childs,objId);
+        },this);
+
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
+        if (rebuild === true)
+            this.rebuild();
     },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
@@ -108,7 +112,7 @@ var CContainer = Class(CObject,{
             CUtils.arrayRemove(this.data.childs,objectId);
             this.data.toRemoveChilds.push(objectId);
         },this);
-        if (rebuild!==false)
+        if (rebuild===true)
             this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){

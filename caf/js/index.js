@@ -29,31 +29,31 @@ var app =
             data: {  childs: ['main-page','form-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','main-gallery'] },
-            logic: {
+            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
                 page: {
                     name: '',
                     title: 'Main',
                     onLoad: function() {}
                 }
-            }
+            },
+            logic: { page: true }
         };
         var formPage = {   uname:  'form-page', type:   'Page',
-            data: {  childs: ['form'] },
-            logic: {
+            data: {  childs: ['form'],
                 page: {
                     name: 'form',
                     title: 'Form',
                     onLoad: function() {}
                 }
-            }
+            },
+            logic: { page: true }
         };
         var mainViewReloadDynamic = {   uname:  'main-reload-dynamic', type:   'Button',
             design: { height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Olive',level:6} }},
             logic: {
                 text: "Reload",
-                buttonReloadDynamic: 'dynamic-buttons'
+                buttonReloadDynamic: {object: 'dynamic-buttons', reset: true, queryData: {} }
             }
         };
         var mainViewButton = {   uname:  'main-button', type:   'Button',

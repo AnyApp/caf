@@ -16,16 +16,16 @@ var CPager = Class({
         //this.sammy = Sammy();
 
         // Add all pages names to the router.
-        _.each(this.pages,function(value){
+        _.each(this.pages,function(pageId){
+            var currentPage = CObjectsHandler.object(pageId);
             var load = function(context){
                 var params = CPager.fetchParams(context);
-                CPager.showPage(value.id,params);
-                CLog.dlog('Loaded: '+value.id);
+                CPager.showPage(pageId,params);
             }
-            if (!CUtils.isEmpty(value.name)){
+            if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
-                page('/'+value.name+'',load);
-                page('/'+value.name+'/*',load);
+                page('/'+currentPage.getPageName()+'',load);
+                page('/'+currentPage.getPageName()+'/*',load);
             }
             else {
                 // Main Page.
@@ -47,8 +47,8 @@ var CPager = Class({
             params.pop();
         return params;
     },
-    addPage: function(name,data){
-        this.pages[name] = data;
+    addPage: function(object){
+        this.pages[object.getPageName()] = object.uid();
     },
     setMainPage: function(mainPage) {
         this.mainPage = mainPage;
@@ -204,7 +204,6 @@ var CPager = Class({
     showPage: function(id,params){
         var lastPage            = this.currentPage || '';
         this.currentPage        = id;
-        var animationOptions    = {};
 
         // Do not reload the same page over and over again.
         if (this.currentPage == lastPage)
@@ -212,7 +211,16 @@ var CPager = Class({
 
         // Normal page hide.
         if (!CUtils.isEmpty(lastPage))
-            CAnimations.hide(lastPage,animationOptions);
+            CAnimations.hide(lastPage,{});
+
+        var animationOptions    = {};
+        // Page Load.
+        animationOptions.onAnimShowComplete = function() {
+            var page = CObjectsHandler.object(CPager.currentPage);
+            page.reloadWithParams(params);
+        };
+        var page = CObjectsHandler.object(CPager.currentPage);
+        CUI.setTitle(page.getPageTitle());
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
@@ -224,8 +232,8 @@ var CPager = Class({
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
-        _.each(this.pages,function(page){
-                CAnimations.quickHide(page.id);
+        _.each(this.pages,function(pageId){
+                CAnimations.quickHide(pageId);
         },this);
     }
 
