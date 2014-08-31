@@ -3,7 +3,7 @@
  */
 var CAnimations = Class({
     $singleton: true,
-    noDisplay: 'animDisplayNone',
+    noDisplay: 'displayNone',
     defaultAnim: 'rotateCarouselRight',
     inAnim: false,
     anims: {
@@ -74,51 +74,7 @@ var CAnimations = Class({
         easeToBottom: {in:'pt-page-moveFromTop',out:'pt-page-moveToBottomEasing et-page-ontop',duration:700},
         easeToTop: {in:'pt-page-moveFromBottom',out:'pt-page-moveToTopEasing et-page-ontop',duration:700},
         easeToRight: {in:'pt-page-moveFromLeft',out:'pt-page-moveToLeftEasing et-page-ontop',duration:700},
-        easeToLeft: {in:'pt-page-moveFromRight',out:'pt-page-moveToRightEasing et-page-ontop',duration:700},
-
-
-
-
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
+        easeToLeft: {in:'pt-page-moveFromRight',out:'pt-page-moveToRightEasing et-page-ontop',duration:700}
 
     },
     init: function(object){

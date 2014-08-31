@@ -117,15 +117,11 @@ var CDialog = Class(CContainer,{
     },
     show: function(){
         CAnimations.show(this.uid());
-        this.fixPositionOnShow();
+        this.onResize();
     },
     switchDialog: function(){
         CAnimations.hideOrShow(this.uid());
-        this.fixPositionOnShow();
-    },
-    fixPositionOnShow: function(){
-        var dialog = this;
-        window.setTimeout(function(){dialog.onResize();},50);
+        this.onResize();
     },
     setDestroyOnHideHandler: function(){
         var object = this;
