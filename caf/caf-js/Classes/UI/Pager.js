@@ -205,27 +205,27 @@ var CPager = Class({
         var lastPage            = this.currentPage || '';
         this.currentPage        = id;
         var animationOptions    = {};
-        // Initialize animation options
-        if (CUtils.isEmpty(lastPage))
-            animationOptions.animationDuration = 0;
+
         // Do not reload the same page over and over again.
-        else if (this.currentPage == lastPage)
+        if (this.currentPage == lastPage)
             return;
 
         // Normal page hide.
-        if (!CUtils.isEmpty(lastPage)){
+        if (!CUtils.isEmpty(lastPage))
             CAnimations.hide(lastPage,animationOptions);
-        }
 
         // Showing current page.
-        CAnimations.show(this.currentPage,animationOptions);
+        if (CUtils.isEmpty(lastPage))
+            CAnimations.quickShow(this.currentPage);
+        else
+            CAnimations.show(this.currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
         _.each(this.pages,function(page){
-                CAnimations.quickHide(CObjectsHandler.object(page.id));
+                CAnimations.quickHide(page.id);
         },this);
     }
 

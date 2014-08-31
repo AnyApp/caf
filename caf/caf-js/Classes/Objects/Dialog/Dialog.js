@@ -4,13 +4,12 @@
 var CDialog = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'cDialog',
+            classes:'cDialog '+CAnimations.noDisplay,
             top: 0,
             bottom: 0,
             left: 0,
             right: 0,
-            minHeight: 100,
-            display: 'hidden'
+            minHeight: 100
 
 
         },
@@ -49,7 +48,6 @@ var CDialog = Class(CContainer,{
 
         // Set defaults
         this.data.animation         = this.data.animation           || 'fade';
-        this.data.animationDuration = this.data.animationDuration   || 300;
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
         this.data.destroyOnHide     = this.data.destroyOnHide===false? false : true;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
@@ -81,8 +79,13 @@ var CDialog = Class(CContainer,{
         containerDesign.width       = this.data.dialogWidth;
         containerDesign.bgColor     = this.data.bgColor;
 
+
         // Init function.
         var dialog = this;
+
+        // Adnimation handling.
+        this.data.onAnimShowComplete = function(){dialog.onResize();};
+
         this.logic.init = function(){ dialog.onResize(); }
         // Set destroy on hide handler.
         this.setDestroyOnHideHandler();
@@ -114,9 +117,15 @@ var CDialog = Class(CContainer,{
     },
     show: function(){
         CAnimations.show(this.uid());
+        this.fixPositionOnShow();
     },
     switchDialog: function(){
         CAnimations.hideOrShow(this.uid());
+        this.fixPositionOnShow();
+    },
+    fixPositionOnShow: function(){
+        var dialog = this;
+        window.setTimeout(function(){dialog.onResize();},50);
     },
     setDestroyOnHideHandler: function(){
         var object = this;

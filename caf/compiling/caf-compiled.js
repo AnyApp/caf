@@ -1428,50 +1428,63 @@ var CUtils = Class({
  */
 var CAnimations = Class({
     $singleton: true,
-    noDisplay: 'displayNone',
-    defaultAnim: 'scaleUpCenter',
+    noDisplay: 'animDisplayNone',
+    defaultAnim: 'rotateCarouselRight',
     inAnim: false,
     anims: {
+        fade: {in:'pt-page-fadeIn',out:'pt-page-fadeOut et-page-ontop',duration:600},
         rotateFall: {in:'pt-page-scaleUp',out:'pt-page-rotateFall et-page-ontop',duration:1000},
         rotateNewspaper: {in:'pt-page-rotateInNewspaper pt-page-delay500',out:'pt-page-rotateOutNewspaper',duration:1000},
         rotateSlide: {in:'pt-page-rotateSlideIn pt-page-delay200',out:'pt-page-rotateSlideOut',duration:1200},
         rotateSlide2: {in:'pt-page-rotateSlideIn',out:'pt-page-rotateSlideOut',duration:1000},
         rotateCarouselBottom: {in:'pt-page-rotateCarouselBottomIn',out:'pt-page-rotateCarouselBottomOut et-page-ontop',duration:800},
         rotateCarouselTop: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:800},
-        rotateCarouselRight: {in:'pt-page-rotateCarouselRightIn',out:'pt-page-rotateCarouselRightOut et-page-onRight',duration:800},
-        rotateCarouselLeft: {in:'pt-page-rotateCarouselLeftIn',out:'pt-page-rotateCarouselLeftOut et-page-onLeft',duration:800},
+        rotateCarouselRight: {in:'pt-page-rotateCarouselRightIn',out:'pt-page-rotateCarouselRightOut et-page-ontop',duration:800},
+        rotateCarouselLeft: {in:'pt-page-rotateCarouselLeftIn',out:'pt-page-rotateCarouselLeftOut et-page-ontop',duration:800},
         rotateCubeBottom: {in:'pt-page-rotateCubeBottomIn',out:'pt-page-rotateCubeBottomOut et-page-ontop',duration:600},
         rotateCubeTop: {in:'pt-page-rotateCubeTopIn',out:'pt-page-rotateCubeTopOut et-page-ontop',duration:600},
-        rotateCubeRight: {in:'pt-page-rotateCubeRightIn',out:'pt-page-rotateCubeRightOut et-page-onRight',duration:600},
+        rotateCubeRight: {in:'pt-page-rotateCubeRightIn',out:'pt-page-rotateCubeRightOut et-page-ontop',duration:600},
         rotateCubeLeft: {in:'pt-page-rotateCubeLeftIn',out:'pt-page-rotateCubeLeftOut et-page-ontop',duration:600},
         rotateRoomBottom: {in:'pt-page-rotateRoomBottomIn',out:'pt-page-rotateRoomBottomOut et-page-ontop',duration:800},
         rotateRoomTop: {in:'pt-page-rotateRoomTopIn',out:'pt-page-rotateRoomTopOut et-page-ontop',duration:800},
-        rotateRoomRight: {in:'pt-page-rotateRoomRightIn',out:'pt-page-rotateRoomRightOut et-page-onRight',duration:800},
+        rotateRoomRight: {in:'pt-page-rotateRoomRightIn',out:'pt-page-rotateRoomRightOut et-page-ontop',duration:800},
         rotateRoomLeft: {in:'pt-page-rotateRoomLeftIn',out:'pt-page-rotateRoomLeftOut et-page-ontop',duration:800},
         rotateUnfoldBottom: {in:'pt-page-rotateUnfoldBottom',out:'pt-page-moveToTopFade',duration:700},
         rotateUnfoldTop: {in:'pt-page-rotateUnfoldTop',out:'pt-page-moveToBottomFade',duration:700},
         rotateUnfoldRight: {in:'pt-page-rotateUnfoldRight',out:'pt-page-moveToLeftFade',duration:700},
         rotateUnfoldLeft: {in:'pt-page-rotateUnfoldLeft',out:'pt-page-moveToRightFade',duration:700},
-        moveFromBottomFade: {in:'pt-page-moveFromBottomFade',out:'pt-page-rotateFoldTop',duration:700},
-        moveFromTopFade: {in:'pt-page-moveFromTopFade',out:'pt-page-rotateFoldBottom',duration:700},
-        moveFromLeftFade: {in:'pt-page-moveFromLeftFade',out:'pt-page-rotateFoldRight',duration:700},
-        moveFromRightFade: {in:'pt-page-moveFromRightFade',out:'pt-page-rotateFoldLeft',duration:700},
+        moveToTopFade: {in:'pt-page-moveFromBottomFade',out:'pt-page-rotateFoldTop',duration:700},
+        moveToBottomFade: {in:'pt-page-moveFromTopFade',out:'pt-page-rotateFoldBottom',duration:700},
+        moveToRightFade: {in:'pt-page-moveFromLeftFade',out:'pt-page-rotateFoldRight',duration:700},
+        moveToLeftFade: {in:'pt-page-moveFromRightFade',out:'pt-page-rotateFoldLeft',duration:700},
+        moveToTopFade2: {in:'pt-page-moveFromBottomFade',out:'pt-page-moveToTopFade',duration:700},
+        moveToBottomFade2: {in:'pt-page-moveFromTopFade',out:'pt-page-moveToBottomFade',duration:700},
+        moveToRightFade2: {in:'pt-page-moveFromLeftFade',out:'pt-page-moveToRightFade',duration:700},
+        moveToLeftFade2: {in:'pt-page-moveFromRightFade',out:'pt-page-moveToLeftFade',duration:700},
+        moveToTopFade3: {in:'pt-page-moveFromBottom',out:'pt-page-fade',duration:700},
+        moveToBottomFade3: {in:'pt-page-moveFromTop',out:'pt-page-fade',duration:700},
+        moveToRightFade3: {in:'pt-page-moveFromLeft',out:'pt-page-fade',duration:700},
+        moveToLeftFade3: {in:'pt-page-moveFromRight',out:'pt-page-fade',duration:700},
         rotatePullBottom: {in:'pt-page-rotatePullBottom pt-page-delay180',out:'pt-page-rotatePushBottom',duration:800},
         rotatePullTop: {in:'pt-page-rotatePullTop pt-page-delay180',out:'pt-page-rotatePushTop',duration:800},
         rotatePullRight: {in:'pt-page-rotatePullRight pt-page-delay180',out:'pt-page-rotatePushRight',duration:800},
         rotatePullLeft: {in:'pt-page-rotatePullLeft pt-page-delay180',out:'pt-page-rotatePushLeft',duration:800},
-        moveFromBottom2: {in:'pt-page-moveFromBottom',out:'pt-page-rotatePushTop',duration:800},
-        moveFromTop2: {in:'pt-page-moveFromTop',out:'pt-page-rotatePushBottom',duration:800},
-        moveFromLeft2: {in:'pt-page-moveFromLeft',out:'pt-page-rotatePushRight',duration:800},
-        moveFromRight2: {in:'pt-page-moveFromRight',out:'pt-page-rotatePushLeft',duration:800},
         flipBottom: {in:'pt-page-flipInBottom pt-page-delay500',out:'pt-page-flipOutTop',duration:1000},
         flipTop: {in:'pt-page-flipInTop pt-page-delay500',out:'pt-page-flipOutBottom',duration:1000},
         flipLeft: {in:'pt-page-flipInLeft pt-page-delay500',out:'pt-page-flipOutRight',duration:1000},
         flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        moveFromBottom: {in:'pt-page-moveFromBottom pt-page-delay20 et-page-ontop',out:'pt-page-rotateBottomSideFirst',duration:800},
-        moveFromTop: {in:'pt-page-moveFromTop pt-page-delay20 et-page-ontop',out:'pt-page-rotateTopSideFirst',duration:800},
-        moveFromLeft: {in:'pt-page-moveFromLeft pt-page-delay20 et-page-ontop',out:'pt-page-rotateLeftSideFirst',duration:800},
-        moveFromRight: {in:'pt-page-moveFromRight pt-page-delay20 et-page-ontop',out:'pt-page-rotateRightSideFirst',duration:800},
+        moveToTop: {in:'pt-page-moveFromBottom pt-page-delay20 et-page-ontop',out:'pt-page-rotateBottomSideFirst',duration:800},
+        moveToBottom: {in:'pt-page-moveFromTop pt-page-delay20 et-page-ontop',out:'pt-page-rotateTopSideFirst',duration:800},
+        moveToRight: {in:'pt-page-moveFromLeft pt-page-delay20 et-page-ontop',out:'pt-page-rotateLeftSideFirst',duration:800},
+        moveToLeft: {in:'pt-page-moveFromRight pt-page-delay20 et-page-ontop',out:'pt-page-rotateRightSideFirst',duration:800},
+        moveToTop2: {in:'pt-page-moveFromBottom',out:'pt-page-rotatePushTop',duration:800},
+        moveToBottom2: {in:'pt-page-moveFromTop',out:'pt-page-rotatePushBottom',duration:800},
+        moveToRight2: {in:'pt-page-moveFromLeft',out:'pt-page-rotatePushRight',duration:800},
+        moveToLeft2: {in:'pt-page-moveFromRight',out:'pt-page-rotatePushLeft',duration:800},
+        moveToTop3: {in:'pt-page-moveFromBottom',out:'pt-page-moveToTop',duration:600},
+        moveToBottom3: {in:'pt-page-moveFromTop',out:'pt-page-moveToBottom',duration:600},
+        moveToRight3: {in:'pt-page-moveFromLeft',out:'pt-page-moveToRight',duration:600},
+        moveToLeft3: {in:'pt-page-moveFromRight',out:'pt-page-moveToLeft',duration:600},
         scaleUpCenter: {in:'pt-page-scaleUpCenter pt-page-delay400',out:'pt-page-scaleDownCenter',duration:800},
         scaleUpToBottom: {in:'pt-page-scaleUp et-page-ontop',out:'pt-page-moveToBottom',duration:700},
         scaleUpToTop: {in:'pt-page-scaleUp et-page-ontop',out:'pt-page-moveToTop',duration:700},
@@ -1481,6 +1494,12 @@ var CAnimations = Class({
         scaleDownFromTop: {in:'pt-page-moveFromTop et-page-ontop',out:'pt-page-scaleDown',duration:700},
         scaleDownFromLeft: {in:'pt-page-moveFromLeft et-page-ontop',out:'pt-page-scaleDown',duration:700},
         scaleDownFromRight: {in:'pt-page-moveFromRight et-page-ontop',out:'pt-page-scaleDown',duration:700},
+        scaleDownUp: {in:'pt-page-scaleUp pt-page-delay300',out:'pt-page-scaleDownUp',duration:1000},
+        scaleUpDown: {in:'pt-page-scaleUpDown pt-page-delay300',out:'pt-page-scaleDown',duration:1000},
+        easeToBottom: {in:'pt-page-moveFromTop',out:'pt-page-moveToBottomEasing et-page-ontop',duration:700},
+        easeToTop: {in:'pt-page-moveFromBottom',out:'pt-page-moveToTopEasing et-page-ontop',duration:700},
+        easeToRight: {in:'pt-page-moveFromLeft',out:'pt-page-moveToLeftEasing et-page-ontop',duration:700},
+        easeToLeft: {in:'pt-page-moveFromRight',out:'pt-page-moveToRightEasing et-page-ontop',duration:700},
 
 
 
@@ -1528,8 +1547,7 @@ var CAnimations = Class({
 
     },
     init: function(object){
-        object.data.animation           = object.data.animation             || this.defaultAnim;
-        object.data.animationDuration   = object.data.animationDuration     || 300;
+        object.data.animation           = object.data.animation             || CAnimations.defaultAnim;
         object.data.onAnimShowComplete  = object.data.onAnimShowComplete    || function(){};
         object.data.onAnimHideComplete  = object.data.onAnimHideComplete    || function(){};
         object.data.inAnim              = true;
@@ -1546,7 +1564,7 @@ var CAnimations = Class({
 
             var nextObjectId    = objectsIds[index+1];
             var object          = CObjectsHandler.object(objectId);
-            object.data.onAnimShowComplete = this.createCascadeFunction(nextObjectId);
+            object.data.onAnimShowComplete = CAnimations.createCascadeFunction(nextObjectId);
         }
 
         CAnimations.show(objectsIds[0]);
@@ -1556,98 +1574,76 @@ var CAnimations = Class({
             CAnimations.show(nextObjectId);
         };
     },
-    hideOrShow: function(objectId){
+    prepareObjectAnimation: function(caller,objectId,options){
+        var object = CObjectsHandler.object(objectId);
+        // Wait until current animation is finished.
+        if (object.data.inAnim===true){
+            CThreads.run(function(){caller(objectId,options);},100);
+            return null;
+        }
+
+        CAnimations.init(object);
+        options                          = options || {};
+        var finalOptions                 = {};
+        finalOptions.animation           = options.animation             || object.data.animation;
+        finalOptions.onAnimShowComplete  = options.onAnimShowComplete    || object.data.onAnimShowComplete;
+        finalOptions.onAnimHideComplete  = options.onAnimHideComplete    || object.data.onAnimHideComplete;
+        finalOptions.object              = object;
+        return finalOptions;
+    },
+    hideOrShow: function(objectId,options){
+        options = options || {};
         var elm = CUtils.element(objectId);
-        if (CUtils.hasClass(elm,'hidden'))
-            this.show(objectId);
+        if (CUtils.hasClass(elm,CAnimations.noDisplay))
+            CAnimations.show(objectId,options);
         else
-            this.hide(objectId);
+            CAnimations.hide(objectId,options);
     },
     show: function(objectId,options){
-        var object = CObjectsHandler.object(objectId);
-        // Wait until current animation is finished.
-        if (object.data.inAnim===true){
-            CThreads.run(function(){CAnimations.show(objectId,options);},100);
-            return;
-        }
-
-        this.init(object);
-        options                          = options || {};
-        var finalOptions                 = {};
-        finalOptions.animation           = options.animation             || object.data.animation;
-        finalOptions.animationDuration   = options.animationDuration     || options.animationDuration===0 ? 0 : object.data.animationDuration;
-        finalOptions.onAnimShowComplete  = options.onAnimShowComplete    || object.data.onAnimShowComplete;
-
-        if (finalOptions.animationDuration === 0)
-            this.quickShow(object);
-        else
-            this.animateIn(object,CUtils.element(object.uid()),finalOptions.animation,function(){});
+        var fOptions = CAnimations.prepareObjectAnimation(CAnimations.show,objectId,options);
+        if (!CUtils.isEmpty(fOptions))
+            CAnimations.animateIn(fOptions.object,CUtils.element(objectId),fOptions.animation,fOptions.onAnimShowComplete);
     },
     hide: function(objectId,options){
-        var object = CObjectsHandler.object(objectId);
-        // Wait until current animation is finished.
-        if (object.data.inAnim===true){
-            CThreads.run(function(){CAnimations.hide(objectId,options);},100);
-            return;
+        var fOptions = CAnimations.prepareObjectAnimation(CAnimations.hide,objectId,options);
+        if (!CUtils.isEmpty(fOptions))
+            CAnimations.animateOut(fOptions.object,CUtils.element(objectId),fOptions.animation,fOptions.onAnimHideComplete);
+    },
+    quickShow: function(objectId,options){
+        var fOptions = CAnimations.prepareObjectAnimation(CAnimations.quickShow,objectId,options);
+        if (!CUtils.isEmpty(fOptions)){
+            CUtils.removeClass(CUtils.element(objectId),CAnimations.noDisplay);
+            fOptions.object.data.inAnim = false;
         }
-
-        this.init(object);
-        options                          = options || {};
-        var finalOptions                 = {};
-        finalOptions.animation           = options.animation             || object.data.animation;
-        finalOptions.animationDuration   = options.animationDuration     || options.animationDuration===0 ? 0 : object.data.animationDuration;
-        finalOptions.onAnimHideComplete  = options.onAnimHideComplete    || object.data.onAnimHideComplete;
-
-        if (finalOptions.animationDuration === 0)
-            this.quickHide(object);
-        else
-            this.animateOut(object,CUtils.element(object.uid()),finalOptions.animation,function(){});
     },
-    quickShow: function(object){
-        CUtils.removeClass(CUtils.element(object.uid()),CAnimations.noDisplay);
-        object.data.inAnim = false;
-    },
-    quickHide: function(object){
-        CUtils.addClass(CUtils.element(object.uid()),CAnimations.noDisplay);
-        object.data.inAnim = false;
-    },
-    fade: {
-        in: function(elm,duration,onEnter) {
-            CUtils.addClass(elm,'hidden');
-            var clientHeight = elm.clientHeight;
-            CUtils.removeClass(elm,'hidden');
-            CUtils.addClass(elm,'fadein'+duration);
-            window.setTimeout(function(){
-                CUtils.removeClass(elm,'fadein'+duration);
-                onEnter();
-            },duration);
-        },
-        out: function(elm,duration,onOut) {
-            CUtils.addClass(elm,'fadeout'+duration);
-            window.setTimeout(function(){
-                CUtils.removeClass(elm,'fadeout'+duration);
-                CUtils.addClass(elm,'hidden');
-                onOut();
-            },duration);
+    quickHide: function(objectId,options){
+        var fOptions = CAnimations.prepareObjectAnimation(CAnimations.quickHide,objectId,options);
+        if (!CUtils.isEmpty(fOptions)){
+            CUtils.addClass(CUtils.element(objectId),CAnimations.noDisplay);
+            fOptions.object.data.inAnim = false;
         }
     },
     animateIn: function(object,elm,anim,onFinish){
-        CUtils.removeClass(elm,this.anims[anim].out);
         CUtils.removeClass(elm,CAnimations.noDisplay);
-        CUtils.addClass(elm,this.anims[anim].in);
+        CUtils.removeClass(elm,CAnimations.anims[anim].out);
+
+        CUtils.addClass(elm,CAnimations.anims[anim].in);
+
         window.setTimeout(function(){
             object.data.inAnim = false;
+            CUtils.removeClass(elm,CAnimations.anims[anim].in);
             onFinish();
-        },this.anims[anim].duration);
+        },CAnimations.anims[anim].duration+200);
     },
     animateOut: function(object,elm,anim,onFinish){
-        CUtils.removeClass(elm,this.anims[anim].in);
-        CUtils.addClass(elm,this.anims[anim].out);
+        CUtils.removeClass(elm,CAnimations.anims[anim].in);
+        CUtils.addClass(elm,CAnimations.anims[anim].out);
         window.setTimeout(function(){
             object.data.inAnim = false;
             CUtils.addClass(elm,CAnimations.noDisplay);
+            CUtils.removeClass(elm,CAnimations.anims[anim].out);
             onFinish();
-        },this.anims[anim].duration);
+        },CAnimations.anims[anim].duration);
     }
 
     
@@ -2012,27 +2008,27 @@ var CPager = Class({
         var lastPage            = this.currentPage || '';
         this.currentPage        = id;
         var animationOptions    = {};
-        // Initialize animation options
-        if (CUtils.isEmpty(lastPage))
-            animationOptions.animationDuration = 0;
+
         // Do not reload the same page over and over again.
-        else if (this.currentPage == lastPage)
+        if (this.currentPage == lastPage)
             return;
 
         // Normal page hide.
-        if (!CUtils.isEmpty(lastPage)){
+        if (!CUtils.isEmpty(lastPage))
             CAnimations.hide(lastPage,animationOptions);
-        }
 
         // Showing current page.
-        CAnimations.show(this.currentPage,animationOptions);
+        if (CUtils.isEmpty(lastPage))
+            CAnimations.quickShow(this.currentPage);
+        else
+            CAnimations.show(this.currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
         _.each(this.pages,function(page){
-                CAnimations.quickHide(CObjectsHandler.object(page.id));
+                CAnimations.quickHide(page.id);
         },this);
     }
 
@@ -2700,13 +2696,12 @@ var  CDialogContainer = Class(CContainer,{
 var CDialog = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            classes:'cDialog',
+            classes:'cDialog '+CAnimations.noDisplay,
             top: 0,
             bottom: 0,
             left: 0,
             right: 0,
-            minHeight: 100,
-            display: 'hidden'
+            minHeight: 100
 
 
         },
@@ -2745,7 +2740,6 @@ var CDialog = Class(CContainer,{
 
         // Set defaults
         this.data.animation         = this.data.animation           || 'fade';
-        this.data.animationDuration = this.data.animationDuration   || 300;
         this.data.topView           = this.data.topView             || CObjectsHandler.appContainerId;
         this.data.destroyOnHide     = this.data.destroyOnHide===false? false : true;
         this.data.hideOnOutClick    = this.data.hideOnOutClick===false? false : true;
@@ -2777,8 +2771,13 @@ var CDialog = Class(CContainer,{
         containerDesign.width       = this.data.dialogWidth;
         containerDesign.bgColor     = this.data.bgColor;
 
+
         // Init function.
         var dialog = this;
+
+        // Adnimation handling.
+        this.data.onAnimShowComplete = function(){dialog.onResize();};
+
         this.logic.init = function(){ dialog.onResize(); }
         // Set destroy on hide handler.
         this.setDestroyOnHideHandler();
@@ -2810,9 +2809,15 @@ var CDialog = Class(CContainer,{
     },
     show: function(){
         CAnimations.show(this.uid());
+        this.fixPositionOnShow();
     },
     switchDialog: function(){
         CAnimations.hideOrShow(this.uid());
+        this.fixPositionOnShow();
+    },
+    fixPositionOnShow: function(){
+        var dialog = this;
+        window.setTimeout(function(){dialog.onResize();},50);
     },
     setDestroyOnHideHandler: function(){
         var object = this;

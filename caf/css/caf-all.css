@@ -294,7 +294,12 @@ html, body {
   cursor: pointer;
 }
 
-
+.animationPaused{
+    -webkit-animation-play-state:paused;
+    -moz-animation-play-state:paused;
+    -o-animation-play-state:paused;
+    animation-play-state:paused;
+}
 
 /* animation sets */
 
@@ -351,9 +356,21 @@ html, body {
 /* fade */
 
 .pt-page-fade {
-	-webkit-animation: fade .7s ease both;
-	-moz-animation: fade .7s ease both;
-	animation: fade .7s ease both;
+    -webkit-animation: fade .7s ease both;
+    -moz-animation: fade .7s ease both;
+    animation: fade .7s ease both;
+}
+
+.pt-page-fadeIn {
+    -webkit-animation: fadeIn .6s ease both;
+    -moz-animation: fadeIn .6s ease both;
+    animation: fadeIn .6s ease both;
+}
+
+.pt-page-fadeOut {
+    -webkit-animation: fadeOut .6s ease both;
+    -moz-animation: fadeOut .6s ease both;
+    animation: fadeOut .6s ease both;
 }
 
 /* move from / to and fade */
@@ -516,13 +533,36 @@ html, body {
 /* fade */
 
 @-webkit-keyframes fade {
-	to { opacity: 0.3; }
+    to { opacity: 0.3; }
 }
 @-moz-keyframes fade {
-	to { opacity: 0.3; }
+    to { opacity: 0.3; }
 }
 @keyframes fade {
-	to { opacity: 0.3; }
+    to { opacity: 0.3; }
+}
+
+@-webkit-keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@-moz-keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@-webkit-keyframes fadeOut {
+    to { opacity: 0; }
+}
+@-moz-keyframes fadeOut {
+    to { opacity: 0; }
+}
+@keyframes fadeOut {
+    to { opacity: 0; }
 }
 
 /* move from / to and fade */
@@ -1950,6 +1990,14 @@ html, body {
 
 }.gpuAccelerated{
     -webkit-transform: translate3d(0,0,0);
+}
+
+.animDisplayNone{
+    display: none;
+}
+
+.noOpacity {
+    opacity: 0;
 }
 
 /* Animations */
