@@ -201,7 +201,7 @@ var app =
 
         var dynamicButtons = {   uname:  'dynamic-buttons',type:   'DynamicObject',
             data: {
-                object: {
+                abstractObject: {
                     type:   'Button',
                     design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
                         active: { bgColor:{color:'Aqua',level:6} },

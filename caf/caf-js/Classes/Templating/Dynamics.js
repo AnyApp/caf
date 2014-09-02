@@ -36,11 +36,15 @@ var CDynamics = Class({
             CDynamics.removeDuplicates(object.uid(),false);
         }
 
+        // For each row in data.
         _.each(data,function(currentData){
-            var duplicateId = CObjectsHandler.createFromDynamicObject(object,
-                                currentData.data,currentData.logic,currentData.design);
+            // For each abstract object in the dynamic object.
+            _.each(object.data.abstractObjects,function(abstractObject){
+                var duplicateId = CObjectsHandler.createFromDynamicObject(abstractObject,
+                    currentData.data,currentData.logic,currentData.design);
 
-            object.dynamic.duplicates.push(duplicateId);
+                object.dynamic.duplicates.push(duplicateId);
+            },this);
         },this);
 
         // Add duplicates to container after this object.
@@ -56,6 +60,7 @@ var CDynamics = Class({
         if (rebuild === true)
             parentContainer.rebuild();
     },
+    // Currently Not Used
     loadDataToObject: function (object, data) {
         object.data     = CUtils.mergeJSONs(object.data,data.data);
         object.logic    = CUtils.mergeJSONs(object.logic,data.logic);

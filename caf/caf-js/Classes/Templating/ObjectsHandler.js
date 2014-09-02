@@ -55,16 +55,16 @@ var CObjectsHandler = Class({
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromDynamicObject: function(dynamicObject,data,logic,design){
+    createFromDynamicObject: function(abstractObject,data,logic,design){
         var duplicatedObjectBase        = {};
-        for (var key in dynamicObject.data.object){
-            duplicatedObjectBase[key] = CUtils.clone(dynamicObject.data.object[key]);
+        for (var key in abstractObject){
+            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
-
+        CLog.dlog(duplicatedObjectBase);
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
         duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
         duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
-
+        CLog.dlog(duplicatedObjectBase);
         var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
 
         return duplicateId;

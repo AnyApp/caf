@@ -25,7 +25,6 @@ var CDialog = Class(CContainer,{
             design              = CUtils.clone(design);
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
-            CLog.dlog()
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
         }

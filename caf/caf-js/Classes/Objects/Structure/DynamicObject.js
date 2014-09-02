@@ -23,10 +23,13 @@ var CDynamicObject = Class(CObject,{
         // Invoke parent's constructor
         CDynamicObject.$super.call(this, values);
 
-        this.data.object    = this.data.object      || {};
-        this.logic.dynamic  = this.logic.dynamic    || {};
-        this.design.classes = this.design.classes   || '';
-        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+ ' ';
+        this.logic.dynamic          = this.logic.dynamic            || {};
+        this.design.classes         = this.design.classes           || '';
+        this.design.classes         += ' ' +CDynamicObject.gifLoaders.default+ ' ';
+        this.data.abstractObjects   = this.data.abstractObjects     || [];
+        this.data.abstractObject    = this.data.abstractObject      || null;
+        if (!CUtils.isEmpty(this.data.abstractObject)) // Allow syntactic sugar.
+            this.data.abstractObjects.push(this.data.abstractObject);
     },
     reload: function(){
         CDynamics.load(this.uid());

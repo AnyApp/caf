@@ -59,7 +59,8 @@ var CTemplator = Class({
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
 
-        CThreads.run(function(){CTemplator.inBuilding = false;;},1000);
+
+        CTemplator.inBuilding = false;
 
     },
     objectJSON: function(type,uname,design,logic,data){
@@ -69,6 +70,22 @@ var CTemplator = Class({
         object.design   = design;
         object.logic    = logic;
         object.data     = data;
+    },
+    forceRedraw: function(element){
+        //CUtils.element(id).style.display = 'none';
+        //CUtils.element(id).style.display = '';
+        if (!element) { return; }
+
+        var n = document.createTextNode(' ');
+        var disp = element.style.display;  // don't worry about previous display style
+
+        element.appendChild(n);
+        element.style.display = 'none';
+
+        setTimeout(function(){
+            element.style.display = disp;
+            n.parentNode.removeChild(n);
+        },0); // you can play with this timeout to make it as short as possible
     }
 
 

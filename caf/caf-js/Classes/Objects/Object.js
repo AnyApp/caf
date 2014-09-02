@@ -42,25 +42,19 @@ var CObject = Class({
         // Replace all references.
         this.applyDynamicVariables(this.logic);
         // don't apply dynamic variables on dynamic data.
-/*
-        if (!CUtils.isEmpty(this.data.dynamicObject)) {
-*/
-/*
-            var dynamicData = this.data.dynamicObject;
-            CLog.dlog(this.data.dynamicObject);
-            this.data.dynamicObject = null;
-            CLog.dlog(this.data.dynamicObject);
-            this.applyDynamicVariables(this.data);
-            this.data.dynamicObject = dynamicData;
-            CLog.dlog(this.data.dynamicObject);
-            CLog.dlog(CUtils.equals(this.data.dynamicObject,dynamicData));
-*//*
 
+/*
+        if (!CUtils.isEmpty(this.data.abstractObjects)) {
+            var dynamicData = this.data.abstractObjects;
+            this.data.abstractObjects = null;
+            this.applyDynamicVariables(this.data);
+            this.data.abstractObjects = dynamicData;
         }
         else{
-            //this.applyDynamicVariables(this.data);
+            this.applyDynamicVariables(this.data);
         }
 */
+
     },
     applyDynamicVariables: function(obj) {
         for (var property in obj) {

@@ -595,11 +595,15 @@ var CDynamics = Class({
             CDynamics.removeDuplicates(object.uid(),false);
         }
 
+        // For each row in data.
         _.each(data,function(currentData){
-            var duplicateId = CObjectsHandler.createFromDynamicObject(object,
-                                currentData.data,currentData.logic,currentData.design);
+            // For each abstract object in the dynamic object.
+            _.each(object.data.abstractObjects,function(abstractObject){
+                var duplicateId = CObjectsHandler.createFromDynamicObject(abstractObject,
+                    currentData.data,currentData.logic,currentData.design);
 
-            object.dynamic.duplicates.push(duplicateId);
+                object.dynamic.duplicates.push(duplicateId);
+            },this);
         },this);
 
         // Add duplicates to container after this object.
@@ -615,6 +619,7 @@ var CDynamics = Class({
         if (rebuild === true)
             parentContainer.rebuild();
     },
+    // Currently Not Used
     loadDataToObject: function (object, data) {
         object.data     = CUtils.mergeJSONs(object.data,data.data);
         object.logic    = CUtils.mergeJSONs(object.logic,data.logic);
@@ -884,16 +889,16 @@ var CObjectsHandler = Class({
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromDynamicObject: function(dynamicObject,data,logic,design){
+    createFromDynamicObject: function(abstractObject,data,logic,design){
         var duplicatedObjectBase        = {};
-        for (var key in dynamicObject.data.object){
-            duplicatedObjectBase[key] = CUtils.clone(dynamicObject.data.object[key]);
+        for (var key in abstractObject){
+            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
-
+        CLog.dlog(duplicatedObjectBase);
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
         duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
         duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
-
+        CLog.dlog(duplicatedObjectBase);
         var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
 
         return duplicateId;
@@ -964,7 +969,8 @@ var CTemplator = Class({
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
 
-        CThreads.run(function(){CTemplator.inBuilding = false;;},1000);
+
+        CTemplator.inBuilding = false;
 
     },
     objectJSON: function(type,uname,design,logic,data){
@@ -974,6 +980,22 @@ var CTemplator = Class({
         object.design   = design;
         object.logic    = logic;
         object.data     = data;
+    },
+    forceRedraw: function(element){
+        //CUtils.element(id).style.display = 'none';
+        //CUtils.element(id).style.display = '';
+        if (!element) { return; }
+
+        var n = document.createTextNode(' ');
+        var disp = element.style.display;  // don't worry about previous display style
+
+        element.appendChild(n);
+        element.style.display = 'none';
+
+        setTimeout(function(){
+            element.style.display = disp;
+            n.parentNode.removeChild(n);
+        },0); // you can play with this timeout to make it as short as possible
     }
 
 
@@ -2221,25 +2243,19 @@ var CObject = Class({
         // Replace all references.
         this.applyDynamicVariables(this.logic);
         // don't apply dynamic variables on dynamic data.
-/*
-        if (!CUtils.isEmpty(this.data.dynamicObject)) {
-*/
-/*
-            var dynamicData = this.data.dynamicObject;
-            CLog.dlog(this.data.dynamicObject);
-            this.data.dynamicObject = null;
-            CLog.dlog(this.data.dynamicObject);
-            this.applyDynamicVariables(this.data);
-            this.data.dynamicObject = dynamicData;
-            CLog.dlog(this.data.dynamicObject);
-            CLog.dlog(CUtils.equals(this.data.dynamicObject,dynamicData));
-*//*
 
+/*
+        if (!CUtils.isEmpty(this.data.abstractObjects)) {
+            var dynamicData = this.data.abstractObjects;
+            this.data.abstractObjects = null;
+            this.applyDynamicVariables(this.data);
+            this.data.abstractObjects = dynamicData;
         }
         else{
-            //this.applyDynamicVariables(this.data);
+            this.applyDynamicVariables(this.data);
         }
 */
+
     },
     applyDynamicVariables: function(obj) {
         for (var property in obj) {
@@ -2449,10 +2465,13 @@ var CDynamicObject = Class(CObject,{
         // Invoke parent's constructor
         CDynamicObject.$super.call(this, values);
 
-        this.data.object    = this.data.object      || {};
-        this.logic.dynamic  = this.logic.dynamic    || {};
-        this.design.classes = this.design.classes   || '';
-        this.design.classes += ' ' +CDynamicObject.gifLoaders.default+ ' ';
+        this.logic.dynamic          = this.logic.dynamic            || {};
+        this.design.classes         = this.design.classes           || '';
+        this.design.classes         += ' ' +CDynamicObject.gifLoaders.default+ ' ';
+        this.data.abstractObjects   = this.data.abstractObjects     || [];
+        this.data.abstractObject    = this.data.abstractObject      || null;
+        if (!CUtils.isEmpty(this.data.abstractObject)) // Allow syntactic sugar.
+            this.data.abstractObjects.push(this.data.abstractObject);
     },
     reload: function(){
         CDynamics.load(this.uid());
@@ -2742,7 +2761,6 @@ var CDialog = Class(CContainer,{
             design              = CUtils.clone(design);
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
-
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
             CObjectsHandler.object(newDialog).show();
         }
