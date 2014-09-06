@@ -1,14 +1,13 @@
 /**
  * Created by dvircn on 25/08/14.
  */
-var CDynamicContainer = Class(CObject,{
+var CDynamicPage = Class([CPage,CDynamicObject],{
     $statics: {
         gifLoaders:{
             default: 'loaderDefault'
         },
         DEFAULT_DESIGN: {
-            classes: CDynamics.hiddenClass,
-            height: 50
+            classes: CDynamics.hiddenClass
         },
         DEFAULT_LOGIC: {
         }
@@ -22,22 +21,18 @@ var CDynamicContainer = Class(CObject,{
 
         // Invoke parent's constructor
         CDynamicPage.$super.call(this, values);
+        CDynamicObject.prototype.constructor.call(this, values);
+        // Set that there is a page container for the abstract objects.
+        this.data.container             = this.data.container      || {};
+        this.data.container.data        = this.data.container.data || {};
+        this.data.container.data.page   = this.data.container.data.page || this.data.page || {};
+        //this.data.page                  = null;
+        this.data.container.type        = 'Page';
 
-        this.data.object    = this.data.object      || {};
-        this.logic.dynamic  = this.logic.dynamic    || {};
-        this.design.classes = this.design.classes   || '';
-        this.design.classes += ' ' +CDynamicPage.gifLoaders.default+ ' ';
-    },
-    reload: function(){
-        CDynamics.load(this.uid());
-    },
-    showLoading: function(){
-        CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
-    },
-    stopLoading: function(){
-        CUtils.addClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
     }
 
 
 });
+
+
 

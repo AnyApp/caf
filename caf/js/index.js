@@ -26,10 +26,10 @@ var app =
         var footer = {   uname:  'footer', type:   'Footer'
         };
         var content = {   uname:  'content', type:   'Content',
-            data: {  childs: ['main-page','form-page'] }
+            data: {  childs: ['main-page','form-page','category-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
+            data: {  childs: ['to-category-button','to-category-dvir-button','main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
                 page: {
                     name: '',
                     title: 'Main',
@@ -56,6 +56,30 @@ var app =
                 buttonReloadDynamic: {object: 'dynamic-buttons', reset: true, queryData: {} }
             }
         };
+        var toCategoryButton = {   uname:  'to-category-button', type:   'Button',
+            design: { height:40, bgColor:{color:'Lime',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Lime',level:6} }
+            },
+            logic: {
+                text:'Category',
+                link: {
+                    path: 'category',
+                    data: {}
+                }
+            }
+        }
+        var toCategoryDvirButton = {   uname:  'to-category-dvir-button', type:   'Button',
+            design: { height:40, bgColor:{color:'Lime',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Lime',level:6} }
+            },
+            logic: {
+                text:'Category Dvir',
+                link: {
+                    path: 'category/dvir',
+                    data: {}
+                }
+            }
+        }
         var mainViewButton = {   uname:  'main-button', type:   'Button',
             design: { height:40, bgColor:{color:'Maroon',level:4},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Maroon',level:6} }
@@ -115,7 +139,7 @@ var app =
             design: { bgColor:{color:'Orange',level:4},
                 active: { bgColor:{color:'Orange',level:6} }
             },
-            logic: { text: "X",/*
+            logic: { text: "Form",/*
                 onClick: function(){
                     CLog.log('Button Clicked');
                 },*/
@@ -201,24 +225,34 @@ var app =
 
         var dynamicButtons = {   uname:  'dynamic-buttons',type:   'DynamicObject',
             data: {
-                abstractObject: {
-                    type:   'Button',
-                    design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                        active: { bgColor:{color:'Aqua',level:6} },
-                        activeRemove: {bgColor:{color:'Aqua',level:4}}
+                abstractObjects:[
+                    {
+                        type:   'Label',
+                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Red',level:6} },
+                            activeRemove: {bgColor:{color:'Red',level:4}}
+                        },
+                        logic: { text: "Title: $this.data.name" }
                     },
-                    logic: { text: "$this.data.name",
-                        showDialog: {
-                            data: {
-                                title: '$this.data.name',
-                                //topView: 'main-button',
-                                textContent: '$this.data.message || "default text"',
-                                confirmText: 'Confirm',
-                                confirmCallback: function() { CLog.dlog('Confirm Callback')}
+                    {
+                        type:   'Button',
+                        design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Aqua',level:6} },
+                            activeRemove: {bgColor:{color:'Aqua',level:4}}
+                        },
+                        logic: { text: "Welcome $this.data.name",
+                            showDialog: {
+                                data: {
+                                    title: 'Hello $this.data.name !',
+                                    //topView: 'main-button',
+                                    textContent: '$this.data.message',
+                                    confirmText: 'Confirm',
+                                    confirmCallback: function() { CLog.dlog('Confirm Callback')}
+                                }
                             }
                         }
                     }
-                }
+                ]
             },
             logic: {
                 dynamic:{
@@ -227,6 +261,33 @@ var app =
                 }
             }
         };
+
+
+        var categoryPage = {   uname:  'category-page',type:   'DynamicPage',
+            data: {
+                childs: [],
+                page: {
+                    name: 'category',
+                    title: 'Category Page',
+                    onLoad: function(params) {CLog.dlog(params);}
+                },
+                abstractObjects:[
+                    {
+                        type:   'Label',
+                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Red',level:6} },
+                            activeRemove: {bgColor:{color:'Red',level:4}}
+                        },
+                        logic: { text: "Title:" }
+                    }
+                ]
+            },
+            logic: {
+                dynamic:{},
+                page: true
+            }
+        };
+
 
 
         var objects = [
@@ -254,7 +315,10 @@ var app =
             headerButtonLeft0,
             dropDownMenu,
             dynamicButtons,
-            formPage
+            formPage,
+            categoryPage,
+            toCategoryButton,
+            toCategoryDvirButton
 
 
         ];

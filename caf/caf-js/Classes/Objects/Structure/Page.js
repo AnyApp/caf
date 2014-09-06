@@ -32,36 +32,32 @@ var CPage = Class(CContainer,{
         this.data.page.title   = this.data.page.title     || '';
         this.data.page.onLoad  = this.data.page.onLoad    || function(){};
         this.data.page.id      = this.uid();
-        this.data.page.params        = [];
+        this.data.page.loaded  = false;
+        this.data.page.params  = [];
     },
-    reloadWithParams: function(params){
-        if (!CUtils.equals(this.data.params,params)){
-            this.data.page.params = params;
+    reloadWithParams: function(params,force){
+        force = force || false;
+        var mapParams = CPager.getParamsAsMap(params);
+        var notLoaded = this.data.page.loaded===false;
+        if (notLoaded || force || !CUtils.equals(this.data.page.params,mapParams)){
+            this.data.page.params = mapParams;
             this.reload();
         }
     },
-    reload: function(){
-        this.data.page.onLoad(this.data.params);
+    reload: function(force){
+        force = force || false;
+        if (this.data.page.loaded===false || force ===true) {
+            this.data.page.loaded = true;
+            this.data.page.onLoad(this.data.page.params);
+        }
     },
     getPageTitle: function(){
         return this.data.page.title;
     },
     getPageName: function(){
         return this.data.page.name;
-    },
-    getParamsAsMap: function(params){
-        var map = {};
-        var cParams = CUtils.clone(params);
-        // If there is no argument for the page name -
-        if (cParams.length%2 ==1) {
-            map[cParams.shift()] = '';
-        }
-        // Iterate and put.
-        for (var i=0; i < cParams.length; i+=2){
-            map[cParams[i]] = cParams[i+1];
-        }
-        return map;
     }
+
 
 
 });

@@ -75,21 +75,18 @@ var CContainer = Class(CObject,{
     },
     appendChild: function(objectId){
         this.data.childs.push(objectId);
-        this.rebuild();
     },
     addChildInPosition: function(objectId,index){
         this.data.childs.push(objectId);
         this.moveChild(objectId,index);
-        this.rebuild();
     },
     appendChildAfterObject: function(afterObjectId,objectId){
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push(objectId);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
     },
-    appendChildsAfterObject: function(afterObjectId,objectsIds,rebuild){
+    appendChildsAfterObject: function(afterObjectId,objectsIds){
         // Remove all duplicates before re-insert.
         _.each(objectsIds,function(objId){
             CUtils.arrayRemove(this.data.childs,objId);
@@ -99,21 +96,16 @@ var CContainer = Class(CObject,{
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        if (rebuild === true)
-            this.rebuild();
     },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
         this.data.toRemoveChilds.push(objectId);
-        this.rebuild();
     },
     removeChilds: function(objectsIds,rebuild){
         _.each(objectsIds,function(objectId){
             CUtils.arrayRemove(this.data.childs,objectId);
             this.data.toRemoveChilds.push(objectId);
         },this);
-        if (rebuild===true)
-            this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){
          CUtils.arrayMove(this.data.childs,fromIndex,toIndex);
@@ -121,8 +113,8 @@ var CContainer = Class(CObject,{
     moveChild: function(objectId,toIndex){
         this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
     },
-    rebuild: function(){
-        CTemplator.buildFromObject(this.uid());
+    rebuild: function(onFinish){
+        CTemplator.buildFromObject(this.uid(),onFinish);
     },
     restructureChildren: function(){
         if (CUtils.equals(this.data.lastChilds,this.data.childs))

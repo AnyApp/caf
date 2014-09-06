@@ -39,12 +39,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            try {
+            //try {
                 this.createObject(type,object);
-            }
-            catch (e){
-                CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            }
+            //}
+            //catch (e){
+            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
 
         },this);
     },
@@ -60,11 +60,11 @@ var CObjectsHandler = Class({
         for (var key in abstractObject){
             duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
-        CLog.dlog(duplicatedObjectBase);
+
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
         duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
         duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
-        CLog.dlog(duplicatedObjectBase);
+
         var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
 
         return duplicateId;

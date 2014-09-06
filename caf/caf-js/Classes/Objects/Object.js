@@ -35,8 +35,8 @@ var CObject = Class({
         this.lastClasses    = "";
         this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
-        this.enterAnimation = '';
-        this.entered        = false;
+        this.relativeParent = -1; // This object relative parent.
+        this.relative       = false; // Is this object relative.
         this.logic.doStopPropagation = values.logic.doStopPropagation || false;
 
         // Replace all references.
@@ -56,20 +56,6 @@ var CObject = Class({
 */
 
     },
-    applyDynamicVariables: function(obj) {
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (typeof obj[property] == "object")
-                    this.applyDynamicVariables(obj[property]);
-                else if (typeof obj[property] == 'string' || obj[property] instanceof String){
-                    // Evaluate dynamic data.
-                    if (obj[property].substr(0,6)==="$this.")
-                        obj[property] = eval(obj[property].substr(1));
-                }
-
-            }
-        }
-    },
     /**
      * Return Unique identifier.
      * Enabling giving readable unique name to object.
@@ -85,6 +71,28 @@ var CObject = Class({
     },
     getParent: function() {
         return this.parent;
+    },
+    getRelativeParent: function() {
+        if (this.relativeParent !== -1)
+            return this.relativeParent;
+        var parentObject     = CObjectsHandler.object(this.parent);
+        this.relativeParent  = null;
+        while (!CUtils.isEmpty(parentObject)){
+            if (parentObject.isRelative()){
+                this.relativeParent = parentObject;
+                break;
+            }
+            else {
+                parentObject = CObjectsHandler.object(parentObject.parent);
+            }
+        }
+        return this.relativeParent;
+    },
+    isRelative: function() {
+        return this.relative;
+    },
+    setRelative: function(relative) {
+        this.relative = relative;
     },
     setLink: function(link) {
         if (CUtils.isUrlRelative(link)) {
@@ -106,12 +114,6 @@ var CObject = Class({
     },
     isLinkLocal: function(){
         return this.data.link.indexOf(CAppConfig.baseUrl())>=0;
-    },
-    setEnterAnimation: function(enterAnimation) {
-        this.enterAnimation = enterAnimation;
-    },
-    getEnterAnimation: function() {
-        return this.enterAnimation;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -144,10 +146,98 @@ var CObject = Class({
         this.lastClasses = '';
         this.lastLogic = {};
     },
+    parseReferences: function(obj) {
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (typeof obj[property] == "object")
+                    this.applyDynamicVariables(obj[property]);
+                else if (typeof obj[property] == 'string' || obj[property] instanceof String){
+                    // Evaluate dynamic data.
+                    var evaluated   = this.replaceLocalReferencesInString(obj[property]);
+                    evaluated       = this.replaceRelativeReferencesInString(obj[property]);
+                    obj[property] = evaluated;
+                }
+
+            }
+        }
+    },
+    replaceLocalReferencesInString: function(str) {
+        if (CUtils.isEmpty(str))
+            return '';
+        if (str.indexOf('$this.') < 0)
+            return str;
+
+        // One reference only case.
+        if (str.substr(0,6)==="$this." && str.indexOf(' ')<0)
+            return eval(str.substr(1)) || '';
+
+        // Multiple reference.
+        var finalStr = str+' ';
+        var index = finalStr.indexOf('$this.');
+
+        while (index >= 0) {
+            var currentIndexEnd = finalStr.indexOf(' ',index);
+            var reference = finalStr.substring(index,currentIndexEnd);
+            var evaluation = eval(reference.substr(1)) +'';
+            if (evaluation=='undefined' || evaluation=='null')
+                evaluation = '';
+            finalStr = finalStr.replace(reference,evaluation);
+            index = finalStr.indexOf('$this.');
+        }
+        // Try to evaluate.
+        try {
+            var finalEvaluated = eval(finalStr);
+            return finalEvaluated;
+        }catch(e){}
+
+        if (finalStr.length>0)
+            return finalStr.substr(0,finalStr.length-1);
+        else
+            return '';
+    },
+    replaceRelativeReferencesInString: function(str) {
+        if (CUtils.isEmpty(str))
+            return '';
+        if (str.indexOf('#') < 0)
+            return str;
+
+        // One reference only case.
+        if (str.substr(0,6)==="$this." && str.indexOf(' ')<0)
+            return eval(str.substr(1)) || '';
+
+        // Multiple reference.
+        var finalStr = str+' ';
+        var index = finalStr.indexOf('$this.');
+
+        while (index >= 0) {
+            var currentIndexEnd = finalStr.indexOf(' ',index);
+            var reference = finalStr.substring(index,currentIndexEnd);
+            var evaluation = eval(reference.substr(1)) +'';
+            if (evaluation=='undefined' || evaluation=='null')
+                evaluation = '';
+            finalStr = finalStr.replace(reference,evaluation);
+            index = finalStr.indexOf('$this.');
+        }
+        // Try to evaluate.
+        try {
+            var finalEvaluated = eval(finalStr);
+            return finalEvaluated;
+        }catch(e){}
+
+        if (finalStr.length>0)
+            return finalStr.substr(0,finalStr.length-1);
+        else
+            return '';
+    },
     /**
      *  Build Object.
      */
     prepareBuild: function(data){
+        // Retrieve relative and local references.
+        this.parseReferences(this.data);
+        this.parseReferences(this.logic);
+        this.parseReferences(data);
+
         var view        = data['view'] || new CStringBuilder(),
             tag         = data['tag'],
             attributes  = data['attributes'],
@@ -217,19 +307,10 @@ var CObject = Class({
     isContainer: function(){
         return false;
     },
-    showAnimation: function(){
-        if (!this.entered){
-            this.entered = true;
-            CAnimations.applyAnimation(this.uid(),
-                this.logic.anim,this.logic.animDuration,this.logic.animOnComplete);
-        }
-    },
-    hideAnimation: function(){
-
-    },
     removeSelf: function(){
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
+        parentContainer.rebuild();
     }
 
 

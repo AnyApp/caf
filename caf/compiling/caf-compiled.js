@@ -564,8 +564,7 @@ var CDynamics = Class({
     $singleton: true,
     hiddenClass: 'displayNone',
     applyDynamic: function(object,value) {
-        if (CUtils.isEmpty(value) || CUtils.isEmpty(value.url))
-            return;
+        value = value || {};
         // Do not re-initiate
         if (this.dynamicApplied(object.uid()))
             return;
@@ -585,7 +584,11 @@ var CDynamics = Class({
         var object = CObjectsHandler.object(objectId);
         return !CUtils.isEmpty(object.dynamic);
     },
-    duplicateWithData: function (object, data, reset) {
+    objectHasDynamic: function(objectId) {
+        var object = CObjectsHandler.object(objectId);
+        return !CUtils.isEmpty(object.logic.dynamic);
+    },
+    duplicateWithData: function (object, data, onFinish, reset) {
         if (!CUtils.isArray(data)) // Convert to Array
             data = [data];
 
@@ -597,18 +600,22 @@ var CDynamics = Class({
 
         // For each row in data.
         _.each(data,function(currentData){
+            // Create container.
+            var containerData = CUtils.clone(object.data.container);
+            var containerId = CObjectsHandler.createObject(containerData.type,containerData);
+            object.dynamic.duplicates.push(containerId);
+            var container   = CObjectsHandler.object(containerId);
             // For each abstract object in the dynamic object.
             _.each(object.data.abstractObjects,function(abstractObject){
                 var duplicateId = CObjectsHandler.createFromDynamicObject(abstractObject,
                     currentData.data,currentData.logic,currentData.design);
-
-                object.dynamic.duplicates.push(duplicateId);
+                container.appendChild(duplicateId);
             },this);
         },this);
 
         // Add duplicates to container after this object.
         parentContainer.appendChildsAfterObject(object.uid(),object.dynamic.duplicates,false);
-        parentContainer.rebuild();
+        parentContainer.rebuild(onFinish);
     },
     removeDuplicates: function(objectId,rebuild){
         var object          = CObjectsHandler.object(objectId);
@@ -626,11 +633,22 @@ var CDynamics = Class({
         object.design   = CUtils.mergeJSONs(object.design,data.design);
         CTemplator.buildFromObject(object.uid());
     },
-    loadObjectWithData: function (objectId, data, reset) {
+    loadObjectWithData: function (objectId, data, onFinish, reset) {
         var object = CObjectsHandler.object(objectId);
-        this.duplicateWithData(object,data, reset);
+        this.duplicateWithData(object,data, onFinish, reset);
     },
-    load: function(objectId,queryData,reset) {
+    getDuplicates: function (objectId) {
+        if (CDynamics.dynamicApplied(objectId))
+            return CObjectsHandler.object(objectId).dynamic.duplicates||[];
+    },
+    lastDuplicate: function (objectId) {
+        if (!CDynamics.dynamicApplied(objectId))
+            return null;
+        var duplicates = CDynamics.getDuplicates(objectId);
+        return duplicates[duplicates.length-1];
+
+    },
+    load: function(objectId, queryData, onFinish, reset) {
         var object = CObjectsHandler.object(objectId);
 
         object.showLoading();
@@ -644,7 +662,7 @@ var CDynamics = Class({
         // Request.
         CNetwork.request(object.dynamic.url,object.dynamic.queryData,
             function(retrievedData){
-                CDynamics.loadObjectWithData(objectId,retrievedData,reset);
+                CDynamics.loadObjectWithData(objectId, retrievedData, onFinish, reset);
                 object.stopLoading();
         });
 
@@ -773,7 +791,7 @@ var CLogic = Class({
         },
         buttonReloadDynamic:  function(object,value){
             CClicker.addOnClick(object,function(){
-                CDynamics.load(value.object,value.queryData || {},value.reset || false);
+                CDynamics.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
             });
         },
         page: function(object,value){
@@ -873,12 +891,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            try {
+            //try {
                 this.createObject(type,object);
-            }
-            catch (e){
-                CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            }
+            //}
+            //catch (e){
+            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
 
         },this);
     },
@@ -894,11 +912,11 @@ var CObjectsHandler = Class({
         for (var key in abstractObject){
             duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
-        CLog.dlog(duplicatedObjectBase);
+
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
         duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
         duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
-        CLog.dlog(duplicatedObjectBase);
+
         var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
 
         return duplicateId;
@@ -919,20 +937,22 @@ var CTemplator = Class({
     /**
      * Build all objects.
      */
-    buildAll: function(){
+    buildAll: function(onFinish){
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.buildFromObject(CObjectsHandler.appContainerId);
+        this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
     },
     /**
      * Build from object.
      * @param id : Object ID.
      */
-    buildFromObject: function(id){
+    buildFromObject: function(id,onFinish){
         if (CTemplator.inBuilding===true && CTemplator.waitingCount<100){
             CTemplator.waitingCount++;
-            CThreads.run(function(){CTemplator.buildFromObject(id);},50);
+            CThreads.run(function(){CTemplator.buildFromObject(id,onFinish);},50);
             return;
         }
+
+        onFinish = onFinish || function(){};
 
         CTemplator.waitingCount = 0;
         CTemplator.inBuilding = true;
@@ -971,6 +991,9 @@ var CTemplator = Class({
 
 
         CTemplator.inBuilding = false;
+
+        if (!CUtils.isEmpty(onFinish))
+            onFinish();
 
     },
     objectJSON: function(type,uname,design,logic,data){
@@ -1567,6 +1590,8 @@ var CAnimations = Class({
         object.data.onAnimShowComplete  = object.data.onAnimShowComplete    || function(){};
         object.data.onAnimHideComplete  = object.data.onAnimHideComplete    || function(){};
         object.data.inAnim              = true;
+        object.data.lastOnEnd           = 0;
+        object.data.lastOnStart         = 0;
     },
     cascadeShow: function(objectsIds){
         for (var i in objectsIds){
@@ -1644,22 +1669,53 @@ var CAnimations = Class({
         CUtils.removeClass(elm,CAnimations.anims[anim].out);
 
         CUtils.addClass(elm,CAnimations.anims[anim].in);
-
-        window.setTimeout(function(){
+        //window.setTimeout(,CAnimations.anims[anim].duration);
+        var animEnd = function(){
+            // Make sure this function called once per event end.
+            var time = (new Date()).getTime();
+            if (time-object.data.lastOnEnd<30)
+                return;
+            object.data.lastOnEnd = time;
             object.data.inAnim = false;
             CUtils.removeClass(elm,CAnimations.anims[anim].in);
             onFinish();
-        },CAnimations.anims[anim].duration+200);
+            CAnimations.unbindAnimationEnd(object,elm);
+        };
+        this.bindAnimationEnd(object,elm,animEnd);
     },
     animateOut: function(object,elm,anim,onFinish){
         CUtils.removeClass(elm,CAnimations.anims[anim].in);
         CUtils.addClass(elm,CAnimations.anims[anim].out);
-        window.setTimeout(function(){
+
+        var animEnd = function(){
+            // Make sure this function called once per event end.
+            var time = (new Date()).getTime();
+            if (time-object.data.lastOnEnd<30)
+                return;
+            object.data.lastOnEnd = time;
             object.data.inAnim = false;
             CUtils.addClass(elm,CAnimations.noDisplay);
             CUtils.removeClass(elm,CAnimations.anims[anim].out);
             onFinish();
-        },CAnimations.anims[anim].duration);
+            CAnimations.unbindAnimationEnd(object,elm);
+        };
+        this.bindAnimationEnd(object,elm,animEnd);
+    },
+    bindAnimationEnd: function(object,elm,callback){
+        elm.addEventListener("animationend", callback, false);
+        elm.addEventListener("webkitAnimationEnd", callback, false);
+        elm.addEventListener("oanimationend", callback, false);
+        elm.addEventListener("MSAnimationEnd", callback, false);
+        object.data.animationEndCallback = callback;
+    },
+    unbindAnimationEnd: function(object,elm){
+        var callback = object.data.animationEndCallback || function(){};
+        CUtils.unbindEvent(elm,"animationend", callback, false);
+        CUtils.unbindEvent(elm,"webkitAnimationEnd", callback, false);
+        CUtils.unbindEvent(elm,"oanimationend", callback, false);
+        CUtils.unbindEvent(elm,"MSAnimationEnd", callback, false);
+
+        object.data.animationEndCallback = null;
     }
 
     
@@ -1835,11 +1891,11 @@ var CPager = Class({
         //this.sammy = Sammy();
 
         // Add all pages names to the router.
-        _.each(this.pages,function(pageId){
+        _.each(this.pages,function(pageId,name){
             var currentPage = CObjectsHandler.object(pageId);
             var load = function(context){
                 var params = CPager.fetchParams(context);
-                CPager.showPage(pageId,params);
+                CPager.showPage(name,params);
             }
             if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
@@ -1908,7 +1964,7 @@ var CPager = Class({
         if (!CUtils.isEmpty(toSlide))
             CSwiper.moveSwiperToSlide(swiperId,toSlide);
 
-
+/**/
     },
     addHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;
@@ -1925,11 +1981,11 @@ var CPager = Class({
             CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
     },
     dataToPath: function (data) {
-        data = data || {};
+        data = data || [];
         var path = '';
-        _.each(data,function(value,key){
-            path += '/'+key+'/'+value;
-        },this);
+        _.each(data,function(value){
+            path += '/'+value;
+        },CPager);
         return path;
     },
     /**
@@ -2020,12 +2076,43 @@ var CPager = Class({
             CUtils.removeClass(document.getElementById(this.backButtonId),'hidden');
         }
     },
-    showPage: function(id,params){
-        var lastPage            = this.currentPage || '';
-        this.currentPage        = id;
+    getPagePath: function(name,params){
+        return name+CPager.dataToPath(params);
+    },
+    showPage: function(name,params){
+        // Check if the page need to be reloaded with dynamic data
+        // or already loaded dynamic page.
+        var id                  = CPager.pages[name];
+        if (!CUtils.isEmpty(params)) {
+            var pagePath = CPager.getPagePath(name,params);
+            id = CPager.pages[pagePath];
+            if (CUtils.isEmpty(id)) {
+                id = CPager.pages[name];
+                // Check if dynamic.
+                if (CDynamics.objectHasDynamic(id)) {
+                    CPager.tempPageId     = id;
+                    CPager.tempPagePath   = pagePath;
+                    var onFinish = function(){
+                        var pageId = CDynamics.lastDuplicate(CPager.tempPageId);
+                        if (!CUtils.isEmpty(pageId)) {
+                            CPager.pages[CPager.tempPagePath] = pageId;
+                            CPager.showPage(name,params); // show page.
+                        }
+
+                        CPager.tempPageId     = '';
+                        CPager.tempPagePath   = '';
+                    };
+                    CDynamics.loadObjectWithData(id,CPager.getParamsAsMap(params),onFinish);
+                    return; // Return and move when page created callback.
+                }
+            }
+        }
+
+        var lastPage            = CPager.currentPage || '';
+        CPager.currentPage      = id;
 
         // Do not reload the same page over and over again.
-        if (this.currentPage == lastPage)
+        if (CPager.currentPage == lastPage)
             return;
 
         // Normal page hide.
@@ -2043,17 +2130,30 @@ var CPager = Class({
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
-            CAnimations.quickShow(this.currentPage);
+            CAnimations.quickShow(CPager.currentPage);
         else
-            CAnimations.show(this.currentPage,animationOptions);
+            CAnimations.show(CPager.currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
-        _.each(this.pages,function(pageId){
+        _.each(CPager.pages,function(pageId){
                 CAnimations.quickHide(pageId);
-        },this);
+        },CPager);
+    },
+    getParamsAsMap: function(params){
+        var map = {};
+        var cParams = CUtils.clone(params);
+        // If there is no argument for the page name -
+        if (cParams.length%2 ==1) {
+            map[cParams.shift()] = '';
+        }
+        // Iterate and put.
+        for (var i=0; i < cParams.length; i+=2){
+            map[cParams[i]] = cParams[i+1];
+        }
+        return map;
     }
 
 
@@ -2264,12 +2364,46 @@ var CObject = Class({
                     this.applyDynamicVariables(obj[property]);
                 else if (typeof obj[property] == 'string' || obj[property] instanceof String){
                     // Evaluate dynamic data.
-                    if (obj[property].substr(0,6)==="$this.")
-                        obj[property] = eval(obj[property].substr(1));
+                    var evaluated = this.replaceLocalReferencesInString(obj[property]);
+                    obj[property] = evaluated;
                 }
 
             }
         }
+    },
+    replaceLocalReferencesInString: function(str) {
+        if (CUtils.isEmpty(str))
+            return '';
+        if (str.indexOf('$this.') < 0)
+            return str;
+
+        // One reference only case.
+        if (str.substr(0,6)==="$this." && str.indexOf(' ')<0)
+            return eval(str.substr(1)) || '';
+
+        // Multiple reference.
+        var finalStr = str+' ';
+        var index = finalStr.indexOf('$this.');
+
+        while (index >= 0) {
+            var currentIndexEnd = finalStr.indexOf(' ',index);
+            var reference = finalStr.substring(index,currentIndexEnd);
+            var evaluation = eval(reference.substr(1)) +'';
+            if (evaluation=='undefined' || evaluation=='null')
+                evaluation = '';
+            finalStr = finalStr.replace(reference,evaluation);
+            index = finalStr.indexOf('$this.');
+        }
+        // Try to evaluate.
+        try {
+            var finalEvaluated = eval(finalStr);
+            return finalEvaluated;
+        }catch(e){}
+
+        if (finalStr.length>0)
+            return finalStr.substr(0,finalStr.length-1);
+        else
+            return '';
     },
     /**
      * Return Unique identifier.
@@ -2431,6 +2565,7 @@ var CObject = Class({
     removeSelf: function(){
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
+        parentContainer.rebuild();
     }
 
 
@@ -2472,9 +2607,7 @@ var CDynamicObject = Class(CObject,{
         this.data.abstractObject    = this.data.abstractObject      || null;
         if (!CUtils.isEmpty(this.data.abstractObject)) // Allow syntactic sugar.
             this.data.abstractObjects.push(this.data.abstractObject);
-    },
-    reload: function(){
-        CDynamics.load(this.uid());
+        this.data.container         = this.data.container           || {type:'Container'};
     },
     showLoading: function(){
         CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);
@@ -2624,21 +2757,18 @@ var CContainer = Class(CObject,{
     },
     appendChild: function(objectId){
         this.data.childs.push(objectId);
-        this.rebuild();
     },
     addChildInPosition: function(objectId,index){
         this.data.childs.push(objectId);
         this.moveChild(objectId,index);
-        this.rebuild();
     },
     appendChildAfterObject: function(afterObjectId,objectId){
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push(objectId);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
     },
-    appendChildsAfterObject: function(afterObjectId,objectsIds,rebuild){
+    appendChildsAfterObject: function(afterObjectId,objectsIds){
         // Remove all duplicates before re-insert.
         _.each(objectsIds,function(objId){
             CUtils.arrayRemove(this.data.childs,objId);
@@ -2648,21 +2778,16 @@ var CContainer = Class(CObject,{
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        if (rebuild === true)
-            this.rebuild();
     },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
         this.data.toRemoveChilds.push(objectId);
-        this.rebuild();
     },
     removeChilds: function(objectsIds,rebuild){
         _.each(objectsIds,function(objectId){
             CUtils.arrayRemove(this.data.childs,objectId);
             this.data.toRemoveChilds.push(objectId);
         },this);
-        if (rebuild===true)
-            this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){
          CUtils.arrayMove(this.data.childs,fromIndex,toIndex);
@@ -2670,8 +2795,8 @@ var CContainer = Class(CObject,{
     moveChild: function(objectId,toIndex){
         this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
     },
-    rebuild: function(){
-        CTemplator.buildFromObject(this.uid());
+    rebuild: function(onFinish){
+        CTemplator.buildFromObject(this.uid(),onFinish);
     },
     restructureChildren: function(){
         if (CUtils.equals(this.data.lastChilds,this.data.childs))
@@ -2762,7 +2887,8 @@ var CDialog = Class(CContainer,{
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
-            CObjectsHandler.object(newDialog).show();
+            var onBuildFinish = function() {CObjectsHandler.object(newDialog).show();};
+            CObjectsHandler.object(CObjectsHandler.appContainerId).rebuild(onBuildFinish);
         }
     },
 
@@ -3581,39 +3707,73 @@ var CPage = Class(CContainer,{
         this.data.page.title   = this.data.page.title     || '';
         this.data.page.onLoad  = this.data.page.onLoad    || function(){};
         this.data.page.id      = this.uid();
-        this.data.page.params        = [];
+        this.data.page.loaded  = false;
+        this.data.page.params  = [];
     },
-    reloadWithParams: function(params){
-        if (!CUtils.equals(this.data.params,params)){
-            this.data.page.params = params;
+    reloadWithParams: function(params,force){
+        force = force || false;
+        var mapParams = CPager.getParamsAsMap(params);
+        var notLoaded = this.data.page.loaded===false;
+        if (notLoaded || force || !CUtils.equals(this.data.page.params,mapParams)){
+            this.data.page.params = mapParams;
             this.reload();
         }
     },
-    reload: function(){
-        this.data.page.onLoad(this.data.params);
+    reload: function(force){
+        force = force || false;
+        if (this.data.page.loaded===false || force ===true) {
+            this.data.page.loaded = true;
+            this.data.page.onLoad(this.data.page.params);
+        }
     },
     getPageTitle: function(){
         return this.data.page.title;
     },
     getPageName: function(){
         return this.data.page.name;
+    }
+
+
+
+});
+
+/**
+ * Created by dvircn on 25/08/14.
+ */
+var CDynamicPage = Class([CPage,CDynamicObject],{
+    $statics: {
+        gifLoaders:{
+            default: 'loaderDefault'
+        },
+        DEFAULT_DESIGN: {
+            classes: CDynamics.hiddenClass
+        },
+        DEFAULT_LOGIC: {
+        }
+
     },
-    getParamsAsMap: function(params){
-        var map = {};
-        var cParams = CUtils.clone(params);
-        // If there is no argument for the page name -
-        if (cParams.length%2 ==1) {
-            map[cParams.shift()] = '';
-        }
-        // Iterate and put.
-        for (var i=0; i < cParams.length; i+=2){
-            map[cParams[i]] = cParams[i+1];
-        }
-        return map;
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CDynamicPage);
+
+        // Invoke parent's constructor
+        CDynamicPage.$super.call(this, values);
+        CDynamicObject.prototype.constructor.call(this, values);
+        // Set that there is a page container for the abstract objects.
+        this.data.container             = this.data.container      || {};
+        this.data.container.data        = this.data.container.data || {};
+        this.data.container.data.page   = this.data.container.data.page || this.data.page || {};
+        //this.data.page                  = null;
+        this.data.container.type        = 'Page';
+
     }
 
 
 });
+
+
 
 /**
  * Created by dvircn on 15/08/14.
@@ -6438,6 +6598,7 @@ var Swiper = function (selector, params) {
     var allowMomentumBounce = true;
     function onTouchStart(event) {
         if (CSwiper.isSideMenuOpen()) return false;
+        event.stopPropagation();
 
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched

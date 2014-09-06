@@ -30,9 +30,7 @@ var CDynamicObject = Class(CObject,{
         this.data.abstractObject    = this.data.abstractObject      || null;
         if (!CUtils.isEmpty(this.data.abstractObject)) // Allow syntactic sugar.
             this.data.abstractObjects.push(this.data.abstractObject);
-    },
-    reload: function(){
-        CDynamics.load(this.uid());
+        this.data.container         = this.data.container           || {type:'Container'};
     },
     showLoading: function(){
         CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);

@@ -118,7 +118,7 @@ var CLogic = Class({
         },
         buttonReloadDynamic:  function(object,value){
             CClicker.addOnClick(object,function(){
-                CDynamics.load(value.object,value.queryData || {},value.reset || false);
+                CDynamics.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
             });
         },
         page: function(object,value){

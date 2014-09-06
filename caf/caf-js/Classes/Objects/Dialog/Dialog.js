@@ -26,7 +26,8 @@ var CDialog = Class(CContainer,{
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
-            CObjectsHandler.object(newDialog).show();
+            var onBuildFinish = function() {CObjectsHandler.object(newDialog).show();};
+            CObjectsHandler.object(CObjectsHandler.appContainerId).rebuild(onBuildFinish);
         }
     },
 

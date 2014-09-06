@@ -9,20 +9,22 @@ var CTemplator = Class({
     /**
      * Build all objects.
      */
-    buildAll: function(){
+    buildAll: function(onFinish){
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.buildFromObject(CObjectsHandler.appContainerId);
+        this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
     },
     /**
      * Build from object.
      * @param id : Object ID.
      */
-    buildFromObject: function(id){
+    buildFromObject: function(id,onFinish){
         if (CTemplator.inBuilding===true && CTemplator.waitingCount<100){
             CTemplator.waitingCount++;
-            CThreads.run(function(){CTemplator.buildFromObject(id);},50);
+            CThreads.run(function(){CTemplator.buildFromObject(id,onFinish);},50);
             return;
         }
+
+        onFinish = onFinish || function(){};
 
         CTemplator.waitingCount = 0;
         CTemplator.inBuilding = true;
@@ -61,6 +63,9 @@ var CTemplator = Class({
 
 
         CTemplator.inBuilding = false;
+
+        if (!CUtils.isEmpty(onFinish))
+            onFinish();
 
     },
     objectJSON: function(type,uname,design,logic,data){
