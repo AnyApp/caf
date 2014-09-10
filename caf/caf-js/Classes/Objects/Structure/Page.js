@@ -34,20 +34,19 @@ var CPage = Class(CContainer,{
         this.data.page.id      = this.uid();
         this.data.page.loaded  = false;
         this.data.page.params  = [];
+        this.data.page.paramsChanged  = false;
     },
-    reloadWithParams: function(params,force){
-        force = force || false;
-        var mapParams = CPager.getParamsAsMap(params);
-        var notLoaded = this.data.page.loaded===false;
-        if (notLoaded || force || !CUtils.equals(this.data.page.params,mapParams)){
-            this.data.page.params = mapParams;
-            this.reload();
+    setParams: function(params){
+        if ( !CUtils.equals(this.data.page.params,params)){
+            this.data.page.params = params;
+            this.data.page.paramsChanged = true;
         }
     },
     reload: function(force){
         force = force || false;
-        if (this.data.page.loaded===false || force ===true) {
+        if (this.data.page.loaded===false || this.data.page.paramsChanged || force ===true) {
             this.data.page.loaded = true;
+            this.data.page.paramsChanged = false;
             this.data.page.onLoad(this.data.page.params);
         }
     },

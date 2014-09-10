@@ -29,11 +29,17 @@ var CTemplator = Class({
         CTemplator.waitingCount = 0;
         CTemplator.inBuilding = true;
         CTemplator.current = id;
+
+        // Get root object.
+        var currentObject   = CObjectsHandler.object(id);
+
+        // Assign References.
+        currentObject.assignReferences();
+
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();
 
         // Prepare for build and get the view (If the objects aren't in the DOM).
-        var currentObject   = CObjectsHandler.object(id);
         var view            = new CStringBuilder();
 
         var viewBuilder     = currentObject.prepareBuild({view:view});

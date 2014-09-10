@@ -42,19 +42,19 @@ var CDynamics = Class({
         // For each row in data.
         _.each(data,function(currentData){
             // Create container.
-            var containerData = CUtils.clone(object.data.container);
+            var containerData   = CUtils.clone(object.data.abstractContainer);
+            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
             var containerId = CObjectsHandler.createObject(containerData.type,containerData);
             object.dynamic.duplicates.push(containerId);
             var container   = CObjectsHandler.object(containerId);
             // For each abstract object in the dynamic object.
             _.each(object.data.abstractObjects,function(abstractObject){
                 var duplicateId = CObjectsHandler.createFromDynamicObject(abstractObject,
-                    currentData.data,currentData.logic,currentData.design);
+                    currentData.data||{},currentData.logic||{},currentData.design||{});
                 container.appendChild(duplicateId);
             },this);
-        },this);
 
-        // Add duplicates to container after this object.
+        },this);
         parentContainer.appendChildsAfterObject(object.uid(),object.dynamic.duplicates,false);
         parentContainer.rebuild(onFinish);
     },

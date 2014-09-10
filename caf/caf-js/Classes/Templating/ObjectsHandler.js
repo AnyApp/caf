@@ -28,6 +28,13 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    updateUname: function(last,current){
+        if (last === current)
+            return;
+        var object = this.object(last);
+        //delete this.objectsById[last];
+        this.objectsById[current] = object;
+    },
     getPreparedObjects: function(){
         return this.preparedObjects;
     },

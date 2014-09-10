@@ -228,11 +228,12 @@ var app =
                 abstractObjects:[
                     {
                         type:   'Label',
+                        uname: '#/label',
                         design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
                             active: { bgColor:{color:'Red',level:6} },
                             activeRemove: {bgColor:{color:'Red',level:4}}
                         },
-                        logic: { text: "Title: $this.data.name" }
+                        logic: { text: "Title: #this.data.name" }
                     },
                     {
                         type:   'Button',
@@ -240,12 +241,12 @@ var app =
                             active: { bgColor:{color:'Aqua',level:6} },
                             activeRemove: {bgColor:{color:'Aqua',level:4}}
                         },
-                        logic: { text: "Welcome $this.data.name",
+                        logic: { text: "Welcome #.data.name",
                             showDialog: {
                                 data: {
-                                    title: 'Hello $this.data.name !',
+                                    title: 'Hello #.data.name !',
                                     //topView: 'main-button',
-                                    textContent: '$this.data.message',
+                                    textContent: '#.data.message',
                                     confirmText: 'Confirm',
                                     confirmCallback: function() { CLog.dlog('Confirm Callback')}
                                 }
@@ -278,7 +279,7 @@ var app =
                             active: { bgColor:{color:'Red',level:6} },
                             activeRemove: {bgColor:{color:'Red',level:4}}
                         },
-                        logic: { text: "Title:" }
+                        logic: { text: "Title: #.data.category" }
                     }
                 ]
             },

@@ -30,7 +30,11 @@ var CDynamicObject = Class(CObject,{
         this.data.abstractObject    = this.data.abstractObject      || null;
         if (!CUtils.isEmpty(this.data.abstractObject)) // Allow syntactic sugar.
             this.data.abstractObjects.push(this.data.abstractObject);
-        this.data.container         = this.data.container           || {type:'Container'};
+        this.data.abstractContainer = this.data.abstractContainer   || {type:'Container'};
+        this.data.abstractContainer.relative    = true;
+        this.data.abstractContainer.data        = this.data.abstractContainer.data  || {};
+        this.data.abstractContainer.logic       = this.data.abstractContainer.logic || {};
+        this.data.abstractContainer.design      = this.data.abstractContainer.design|| {};
     },
     showLoading: function(){
         CUtils.removeClass(CUtils.element(this.uid()),CDynamics.hiddenClass);

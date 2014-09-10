@@ -36,7 +36,7 @@ var CContainer = Class(CObject,{
         _.each(this.data.childs,function(childID){
             // Check if already exist.
             /*if (!CUtils.isEmpty(CUtils.element(childID)))
-                return;*/
+             return;*/
             var object = CObjectsHandler.object(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
@@ -68,6 +68,16 @@ var CContainer = Class(CObject,{
         }
 
         return content;
+    },
+    assignReferences: function(){
+        _.each(this.data.childs,function(childID){
+            var object = CObjectsHandler.object(childID);
+            //Set parent to this Object.
+            object.setParent(this.uid());
+            object.assignReferences();
+        },this);
+
+        CContainer.$superp.assignReferences.call(this);
     },
     applyForceDesign: function(object){
         if (!CUtils.isEmpty(this.forceDesign))
@@ -124,6 +134,12 @@ var CContainer = Class(CObject,{
         var childrenIds = this.data.childs || [];
         var childrenNodes = [];
         _.each(childrenIds,function(childId){
+/*
+            CLog.dlog('------');
+            CLog.dlog(childId);
+            CLog.dlog(CUtils.element(childId));
+            CLog.dlog('------');
+*/
             childrenNodes.push(CUtils.element(childId));
         },this);
 

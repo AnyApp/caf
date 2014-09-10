@@ -248,10 +248,11 @@ var CPager = Class({
         // Page Load.
         animationOptions.onAnimShowComplete = function() {
             var page = CObjectsHandler.object(CPager.currentPage);
-            page.reloadWithParams(params);
+            page.reload();
         };
         var page = CObjectsHandler.object(CPager.currentPage);
         CUI.setTitle(page.getPageTitle());
+        page.setParams(this.getParamsAsMap(params));
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))

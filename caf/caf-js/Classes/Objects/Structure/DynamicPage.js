@@ -23,11 +23,9 @@ var CDynamicPage = Class([CPage,CDynamicObject],{
         CDynamicPage.$super.call(this, values);
         CDynamicObject.prototype.constructor.call(this, values);
         // Set that there is a page container for the abstract objects.
-        this.data.container             = this.data.container      || {};
-        this.data.container.data        = this.data.container.data || {};
-        this.data.container.data.page   = this.data.container.data.page || this.data.page || {};
+        this.data.abstractContainer.data.page   = this.data.abstractContainer.data.page || this.data.page || {};
         //this.data.page                  = null;
-        this.data.container.type        = 'Page';
+        this.data.abstractContainer.type        = 'Page';
 
     }
 
