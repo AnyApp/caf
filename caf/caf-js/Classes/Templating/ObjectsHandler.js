@@ -28,6 +28,13 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    updateUname: function(last,current){
+        if (last === current)
+            return;
+        var object = this.object(last);
+        //delete this.objectsById[last];
+        this.objectsById[current] = object;
+    },
     getPreparedObjects: function(){
         return this.preparedObjects;
     },
@@ -39,12 +46,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            try {
+            //try {
                 this.createObject(type,object);
-            }
-            catch (e){
-                CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            }
+            //}
+            //catch (e){
+            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
 
         },this);
     },
@@ -55,10 +62,10 @@ var CObjectsHandler = Class({
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromDynamicObject: function(dynamicObject,data,logic,design){
+    createFromDynamicObject: function(abstractObject,data,logic,design){
         var duplicatedObjectBase        = {};
-        for (var key in dynamicObject.data.object){
-            duplicatedObjectBase[key] = CUtils.clone(dynamicObject.data.object[key]);
+        for (var key in abstractObject){
+            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
 
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);

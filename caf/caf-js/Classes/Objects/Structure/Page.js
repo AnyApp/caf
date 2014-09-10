@@ -27,35 +27,36 @@ var CPage = Class(CContainer,{
         CPage.$super.call(this, values);
 
         // Page properties.
-        this.logic.page         = this.logic.page           || {};
-        this.logic.page.name    = this.logic.page.name      || '';
-        this.logic.page.title   = this.logic.page.title     || '';
-        this.logic.page.onLoad  = this.logic.page.onLoad    || function(){};
-        this.logic.page.id      = this.uid();
-        this.data.params        = [];
+        this.data.page         = this.data.page           || {};
+        this.data.page.name    = this.data.page.name      || '';
+        this.data.page.title   = this.data.page.title     || '';
+        this.data.page.onLoad  = this.data.page.onLoad    || function(){};
+        this.data.page.id      = this.uid();
+        this.data.page.loaded  = false;
+        this.data.page.params  = [];
+        this.data.page.paramsChanged  = false;
     },
-    reloadWithParams: function(params){
-        if (!CUtils.equals(this.data.params,params)){
-            this.data.params = params;
-            this.reload();
+    setParams: function(params){
+        if ( !CUtils.equals(this.data.page.params,params)){
+            this.data.page.params = params;
+            this.data.page.paramsChanged = true;
         }
     },
-    reload: function(){
-
+    reload: function(force){
+        force = force || false;
+        if (this.data.page.loaded===false || this.data.page.paramsChanged || force ===true) {
+            this.data.page.loaded = true;
+            this.data.page.paramsChanged = false;
+            this.data.page.onLoad(this.data.page.params);
+        }
     },
-    getParamsAsMap: function(params){
-        var map = {};
-        var cParams = CUtils.clone(params);
-        // If there is no argument for the page name -
-        if (cParams.length%2 ==1) {
-            map[cParams.shift()] = '';
-        }
-        // Iterate and put.
-        for (var i=0; i < cParams.length; i+=2){
-            map[cParams[i]] = cParams[i+1];
-        }
-        return map;
+    getPageTitle: function(){
+        return this.data.page.title;
+    },
+    getPageName: function(){
+        return this.data.page.name;
     }
+
 
 
 });

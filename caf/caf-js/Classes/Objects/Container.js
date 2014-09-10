@@ -31,13 +31,12 @@ var CContainer = Class(CObject,{
         },this);
         //Clear.
         this.data.toRemoveChilds = [];
-
         // insert new elements.
         var content = new CStringBuilder();
         _.each(this.data.childs,function(childID){
             // Check if already exist.
             /*if (!CUtils.isEmpty(CUtils.element(childID)))
-                return;*/
+             return;*/
             var object = CObjectsHandler.object(childID);
             // Case object doesn't exist.
             if (CUtils.isEmpty(object)){
@@ -70,46 +69,53 @@ var CContainer = Class(CObject,{
 
         return content;
     },
+    assignReferences: function(){
+        _.each(this.data.childs,function(childID){
+            var object = CObjectsHandler.object(childID);
+            //Set parent to this Object.
+            object.setParent(this.uid());
+            object.assignReferences();
+        },this);
+
+        CContainer.$superp.assignReferences.call(this);
+    },
     applyForceDesign: function(object){
         if (!CUtils.isEmpty(this.forceDesign))
             object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));
     },
     appendChild: function(objectId){
         this.data.childs.push(objectId);
-        this.rebuild();
     },
     addChildInPosition: function(objectId,index){
         this.data.childs.push(objectId);
         this.moveChild(objectId,index);
-        this.rebuild();
     },
     appendChildAfterObject: function(afterObjectId,objectId){
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push(objectId);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
     },
     appendChildsAfterObject: function(afterObjectId,objectsIds){
-        //CLog.dlog(object.dynamic.duplicates);
+        // Remove all duplicates before re-insert.
+        _.each(objectsIds,function(objId){
+            CUtils.arrayRemove(this.data.childs,objId);
+        },this);
+
         var afterIndex = this.data.childs.indexOf(afterObjectId)+1;
         var afterChilds = this.data.childs.splice(afterIndex);
         this.data.childs.push.apply(this.data.childs,objectsIds);
         this.data.childs.push.apply(this.data.childs,afterChilds);
-        this.rebuild();
     },
     removeChild: function(objectId){
         CUtils.arrayRemove(this.data.childs,objectId);
         this.data.toRemoveChilds.push(objectId);
-        this.rebuild();
     },
     removeChilds: function(objectsIds,rebuild){
         _.each(objectsIds,function(objectId){
             CUtils.arrayRemove(this.data.childs,objectId);
             this.data.toRemoveChilds.push(objectId);
         },this);
-        if (rebuild!==false)
-            this.rebuild();
     },
     moveChildFromIndex: function(fromIndex,toIndex){
          CUtils.arrayMove(this.data.childs,fromIndex,toIndex);
@@ -117,8 +123,8 @@ var CContainer = Class(CObject,{
     moveChild: function(objectId,toIndex){
         this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
     },
-    rebuild: function(){
-        CTemplator.buildFromObject(this.uid());
+    rebuild: function(onFinish){
+        CTemplator.buildFromObject(this.uid(),onFinish);
     },
     restructureChildren: function(){
         if (CUtils.equals(this.data.lastChilds,this.data.childs))
@@ -128,6 +134,12 @@ var CContainer = Class(CObject,{
         var childrenIds = this.data.childs || [];
         var childrenNodes = [];
         _.each(childrenIds,function(childId){
+/*
+            CLog.dlog('------');
+            CLog.dlog(childId);
+            CLog.dlog(CUtils.element(childId));
+            CLog.dlog('------');
+*/
             childrenNodes.push(CUtils.element(childId));
         },this);
 

@@ -3,24 +3,43 @@
  */
 var CTemplator = Class({
     $singleton: true,
-
+    inBuilding: false,
+    waitingCount: 0,
+    current: '',
     /**
      * Build all objects.
      */
-    buildAll: function(){
+    buildAll: function(onFinish){
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.buildFromObject(CObjectsHandler.appContainerId);
+        this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
     },
     /**
      * Build from object.
      * @param id : Object ID.
      */
-    buildFromObject: function(id){
+    buildFromObject: function(id,onFinish){
+        if (CTemplator.inBuilding===true && CTemplator.waitingCount<100){
+            CTemplator.waitingCount++;
+            CThreads.run(function(){CTemplator.buildFromObject(id,onFinish);},50);
+            return;
+        }
+
+        onFinish = onFinish || function(){};
+
+        CTemplator.waitingCount = 0;
+        CTemplator.inBuilding = true;
+        CTemplator.current = id;
+
+        // Get root object.
+        var currentObject   = CObjectsHandler.object(id);
+
+        // Assign References.
+        currentObject.assignReferences();
+
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();
 
         // Prepare for build and get the view (If the objects aren't in the DOM).
-        var currentObject   = CObjectsHandler.object(id);
         var view            = new CStringBuilder();
 
         var viewBuilder     = currentObject.prepareBuild({view:view});
@@ -36,19 +55,24 @@ var CTemplator = Class({
             //Restructure containers children.
             if (object.isContainer())
                 object.restructureChildren();
-        },this);
+        },CTemplator);
 
         // Build relevant Objects by the order of their build (Parent->Child).
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
             CDesign.applyDesign(object);
-        },this);
+        },CTemplator);
 
         // Clear Whitespaces.
         CUtils.cleanWhitespace();
 
-        //CAnimations.cascadeShow(['form-input-name','form-input-phone','form-submit-button','form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button']);
+
+        CTemplator.inBuilding = false;
+
+        if (!CUtils.isEmpty(onFinish))
+            onFinish();
+
     },
     objectJSON: function(type,uname,design,logic,data){
         var object = {};
@@ -57,6 +81,22 @@ var CTemplator = Class({
         object.design   = design;
         object.logic    = logic;
         object.data     = data;
+    },
+    forceRedraw: function(element){
+        //CUtils.element(id).style.display = 'none';
+        //CUtils.element(id).style.display = '';
+        if (!element) { return; }
+
+        var n = document.createTextNode(' ');
+        var disp = element.style.display;  // don't worry about previous display style
+
+        element.appendChild(n);
+        element.style.display = 'none';
+
+        setTimeout(function(){
+            element.style.display = disp;
+            n.parentNode.removeChild(n);
+        },0); // you can play with this timeout to make it as short as possible
     }
 
 

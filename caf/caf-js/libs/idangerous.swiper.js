@@ -1300,6 +1300,7 @@ var Swiper = function (selector, params) {
     var allowMomentumBounce = true;
     function onTouchStart(event) {
         if (CSwiper.isSideMenuOpen()) return false;
+        event.stopPropagation();
 
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched

@@ -2,14 +2,6 @@
     -webkit-transform: translate3d(0,0,0);
 }
 
-.animDisplayNone{
-    display: none;
-}
-
-.noOpacity {
-    opacity: 0;
-}
-
 /* Animations */
 .fadein0{
     -webkit-transform: translate3d(0,0,0);

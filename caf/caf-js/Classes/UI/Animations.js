@@ -3,7 +3,7 @@
  */
 var CAnimations = Class({
     $singleton: true,
-    noDisplay: 'animDisplayNone',
+    noDisplay: 'displayNone',
     defaultAnim: 'rotateCarouselRight',
     inAnim: false,
     anims: {
@@ -74,51 +74,7 @@ var CAnimations = Class({
         easeToBottom: {in:'pt-page-moveFromTop',out:'pt-page-moveToBottomEasing et-page-ontop',duration:700},
         easeToTop: {in:'pt-page-moveFromBottom',out:'pt-page-moveToTopEasing et-page-ontop',duration:700},
         easeToRight: {in:'pt-page-moveFromLeft',out:'pt-page-moveToLeftEasing et-page-ontop',duration:700},
-        easeToLeft: {in:'pt-page-moveFromRight',out:'pt-page-moveToRightEasing et-page-ontop',duration:700},
-
-
-
-
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-rotateCarouselTopIn',out:'pt-page-rotateCarouselTopOut et-page-ontop',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
-        flipRight: {in:'pt-page-flipInRight pt-page-delay500',out:'pt-page-flipOutLeft',duration:1000},
+        easeToLeft: {in:'pt-page-moveFromRight',out:'pt-page-moveToRightEasing et-page-ontop',duration:700}
 
     },
     init: function(object){
@@ -126,6 +82,8 @@ var CAnimations = Class({
         object.data.onAnimShowComplete  = object.data.onAnimShowComplete    || function(){};
         object.data.onAnimHideComplete  = object.data.onAnimHideComplete    || function(){};
         object.data.inAnim              = true;
+        object.data.lastOnEnd           = 0;
+        object.data.lastOnStart         = 0;
     },
     cascadeShow: function(objectsIds){
         for (var i in objectsIds){
@@ -203,22 +161,53 @@ var CAnimations = Class({
         CUtils.removeClass(elm,CAnimations.anims[anim].out);
 
         CUtils.addClass(elm,CAnimations.anims[anim].in);
-
-        window.setTimeout(function(){
+        //window.setTimeout(,CAnimations.anims[anim].duration);
+        var animEnd = function(){
+            // Make sure this function called once per event end.
+            var time = (new Date()).getTime();
+            if (time-object.data.lastOnEnd<30)
+                return;
+            object.data.lastOnEnd = time;
             object.data.inAnim = false;
             CUtils.removeClass(elm,CAnimations.anims[anim].in);
             onFinish();
-        },CAnimations.anims[anim].duration+200);
+            CAnimations.unbindAnimationEnd(object,elm);
+        };
+        this.bindAnimationEnd(object,elm,animEnd);
     },
     animateOut: function(object,elm,anim,onFinish){
         CUtils.removeClass(elm,CAnimations.anims[anim].in);
         CUtils.addClass(elm,CAnimations.anims[anim].out);
-        window.setTimeout(function(){
+
+        var animEnd = function(){
+            // Make sure this function called once per event end.
+            var time = (new Date()).getTime();
+            if (time-object.data.lastOnEnd<30)
+                return;
+            object.data.lastOnEnd = time;
             object.data.inAnim = false;
             CUtils.addClass(elm,CAnimations.noDisplay);
             CUtils.removeClass(elm,CAnimations.anims[anim].out);
             onFinish();
-        },CAnimations.anims[anim].duration);
+            CAnimations.unbindAnimationEnd(object,elm);
+        };
+        this.bindAnimationEnd(object,elm,animEnd);
+    },
+    bindAnimationEnd: function(object,elm,callback){
+        elm.addEventListener("animationend", callback, false);
+        elm.addEventListener("webkitAnimationEnd", callback, false);
+        elm.addEventListener("oanimationend", callback, false);
+        elm.addEventListener("MSAnimationEnd", callback, false);
+        object.data.animationEndCallback = callback;
+    },
+    unbindAnimationEnd: function(object,elm){
+        var callback = object.data.animationEndCallback || function(){};
+        CUtils.unbindEvent(elm,"animationend", callback, false);
+        CUtils.unbindEvent(elm,"webkitAnimationEnd", callback, false);
+        CUtils.unbindEvent(elm,"oanimationend", callback, false);
+        CUtils.unbindEvent(elm,"MSAnimationEnd", callback, false);
+
+        object.data.animationEndCallback = null;
     }
 
     

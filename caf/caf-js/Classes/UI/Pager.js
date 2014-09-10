@@ -16,16 +16,16 @@ var CPager = Class({
         //this.sammy = Sammy();
 
         // Add all pages names to the router.
-        _.each(this.pages,function(value){
+        _.each(this.pages,function(pageId,name){
+            var currentPage = CObjectsHandler.object(pageId);
             var load = function(context){
                 var params = CPager.fetchParams(context);
-                CPager.showPage(value.id,params);
-                CLog.dlog('Loaded: '+value.id);
+                CPager.showPage(name,params);
             }
-            if (!CUtils.isEmpty(value.name)){
+            if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
-                page('/'+value.name+'',load);
-                page('/'+value.name+'/*',load);
+                page('/'+currentPage.getPageName()+'',load);
+                page('/'+currentPage.getPageName()+'/*',load);
             }
             else {
                 // Main Page.
@@ -47,8 +47,8 @@ var CPager = Class({
             params.pop();
         return params;
     },
-    addPage: function(name,data){
-        this.pages[name] = data;
+    addPage: function(object){
+        this.pages[object.getPageName()] = object.uid();
     },
     setMainPage: function(mainPage) {
         this.mainPage = mainPage;
@@ -89,7 +89,7 @@ var CPager = Class({
         if (!CUtils.isEmpty(toSlide))
             CSwiper.moveSwiperToSlide(swiperId,toSlide);
 
-
+/**/
     },
     addHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;
@@ -106,11 +106,11 @@ var CPager = Class({
             CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
     },
     dataToPath: function (data) {
-        data = data || {};
+        data = data || [];
         var path = '';
-        _.each(data,function(value,key){
-            path += '/'+key+'/'+value;
-        },this);
+        _.each(data,function(value){
+            path += '/'+value;
+        },CPager);
         return path;
     },
     /**
@@ -201,32 +201,85 @@ var CPager = Class({
             CUtils.removeClass(document.getElementById(this.backButtonId),'hidden');
         }
     },
-    showPage: function(id,params){
-        var lastPage            = this.currentPage || '';
-        this.currentPage        = id;
-        var animationOptions    = {};
+    getPagePath: function(name,params){
+        return name+CPager.dataToPath(params);
+    },
+    showPage: function(name,params){
+        // Check if the page need to be reloaded with dynamic data
+        // or already loaded dynamic page.
+        var id                  = CPager.pages[name];
+        if (!CUtils.isEmpty(params)) {
+            var pagePath = CPager.getPagePath(name,params);
+            id = CPager.pages[pagePath];
+            if (CUtils.isEmpty(id)) {
+                id = CPager.pages[name];
+                // Check if dynamic.
+                if (CDynamics.objectHasDynamic(id)) {
+                    CPager.tempPageId     = id;
+                    CPager.tempPagePath   = pagePath;
+                    var onFinish = function(){
+                        var pageId = CDynamics.lastDuplicate(CPager.tempPageId);
+                        if (!CUtils.isEmpty(pageId)) {
+                            CPager.pages[CPager.tempPagePath] = pageId;
+                            CPager.showPage(name,params); // show page.
+                        }
+
+                        CPager.tempPageId     = '';
+                        CPager.tempPagePath   = '';
+                    };
+                    CDynamics.loadObjectWithData(id,CPager.getParamsAsMap(params),onFinish);
+                    return; // Return and move when page created callback.
+                }
+            }
+        }
+
+        var lastPage            = CPager.currentPage || '';
+        CPager.currentPage      = id;
 
         // Do not reload the same page over and over again.
-        if (this.currentPage == lastPage)
+        if (CPager.currentPage == lastPage)
             return;
 
         // Normal page hide.
         if (!CUtils.isEmpty(lastPage))
-            CAnimations.hide(lastPage,animationOptions);
+            CAnimations.hide(lastPage,{});
+
+        var animationOptions    = {};
+        // Page Load.
+        animationOptions.onAnimShowComplete = function() {
+            var page = CObjectsHandler.object(CPager.currentPage);
+            page.reload();
+        };
+        var page = CObjectsHandler.object(CPager.currentPage);
+        CUI.setTitle(page.getPageTitle());
+        page.setParams(this.getParamsAsMap(params));
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
-            CAnimations.quickShow(this.currentPage);
+            CAnimations.quickShow(CPager.currentPage);
         else
-            CAnimations.show(this.currentPage,animationOptions);
+            CAnimations.show(CPager.currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {
         // Hide All Pages except current.
-        _.each(this.pages,function(page){
-                CAnimations.quickHide(page.id);
-        },this);
+        _.each(CPager.pages,function(pageId){
+                CAnimations.quickHide(pageId);
+        },CPager);
+    },
+    getParamsAsMap: function(params){
+        var map = {};
+        var cParams = CUtils.clone(params);
+        // If there is no argument for the page name -
+        if (cParams.length%2 ==1) {
+            map[cParams.shift()] = '';
+        }
+        // Iterate and put.
+        for (var i=0; i < cParams.length; i+=2){
+            map[cParams[i]] = cParams[i+1];
+        }
+        return map;
     }
 
 

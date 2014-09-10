@@ -25,9 +25,9 @@ var CDialog = Class(CContainer,{
             design              = CUtils.clone(design);
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
-
             CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
-            CObjectsHandler.object(newDialog).show();
+            var onBuildFinish = function() {CObjectsHandler.object(newDialog).show();};
+            CObjectsHandler.object(CObjectsHandler.appContainerId).rebuild(onBuildFinish);
         }
     },
 
@@ -117,15 +117,11 @@ var CDialog = Class(CContainer,{
     },
     show: function(){
         CAnimations.show(this.uid());
-        this.fixPositionOnShow();
+        this.onResize();
     },
     switchDialog: function(){
         CAnimations.hideOrShow(this.uid());
-        this.fixPositionOnShow();
-    },
-    fixPositionOnShow: function(){
-        var dialog = this;
-        window.setTimeout(function(){dialog.onResize();},50);
+        this.onResize();
     },
     setDestroyOnHideHandler: function(){
         var object = this;
