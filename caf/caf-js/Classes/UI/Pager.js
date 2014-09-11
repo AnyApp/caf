@@ -5,7 +5,8 @@ var CPager = Class({
     $singleton: true,
     firstLoad: true,
     historyStack: new Array(),
-    currentPage: "",
+    currentPageNumber: 0,
+    maxPageNumber: 0,
     mainPage: '',
     backButtonId: '',
     pages: {},
@@ -19,6 +20,11 @@ var CPager = Class({
         _.each(this.pages,function(pageId,name){
             var currentPage = CObjectsHandler.object(pageId);
             var load = function(context){
+                if (CUtils.isEmpty(context.state.pageNumber)) {
+                    CPager.maxPageNumber += 1;
+                    context.state.pageNumber = CPager.maxPageNumber;
+                }
+                CPager.currentPageNumber = context.state.pageNumber;
                 var params = CPager.fetchParams(context);
                 CPager.showPage(name,params);
             }
@@ -156,33 +162,7 @@ var CPager = Class({
 
     },
     moveBack: function() {
-        if (this.historyStack.length <= 1) {
-            // TODO: Ask to leave app.
-            return;
-        }
-
-        //Remove last page from the history.
-        var toRemovePageId = this.historyStack.pop();
-        var toPageId = this.historyStack.pop();
-
-        //Replace current page.
-        this.currentPage = toPageId;
-        this.insertPageToStack(toPageId);
-        this.restructure();
-
-        var lastPageDiv = document.getElementById(toRemovePageId);
-        var toPageDiv = document.getElementById(toPageId);
-
-        CAnimations.fadeOut(lastPageDiv,300,function() { lastPageDiv.style.zIndex = 0;});
-
-        // on load page.
-        CPager.onLoadPage(toPageDiv);
-        // Hide back button if needed.
-
-        this.checkAndChangeBackButtonState();
-
-
-
+        history.back();
     },
     onLoadPage: function(pageId) {
         var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
@@ -191,14 +171,14 @@ var CPager = Class({
         // Execute onPageLoad.
         onPageLoad();
     },
-    checkAndChangeBackButtonState:function() {/**/
+    checkAndChangeBackButtonState:function() {
         if (CUtils.isEmpty(this.backButtonId)) return;
 
-        if (this.currentPage == this.mainPage) {
-            CUtils.addClass(document.getElementById(this.backButtonId),'hidden');
+        if (this.currentPageNumber <= 1) {
+            CUtils.addClass(CUtils.element(this.backButtonId),'hidden');
         }
         else {
-            CUtils.removeClass(document.getElementById(this.backButtonId),'hidden');
+            CUtils.removeClass(CUtils.element(this.backButtonId),'hidden');
         }
     },
     getPagePath: function(name,params){
@@ -259,6 +239,8 @@ var CPager = Class({
             CAnimations.quickShow(CPager.currentPage);
         else
             CAnimations.show(CPager.currentPage,animationOptions);
+
+        this.checkAndChangeBackButtonState();
 
     },
     // Immediate hide to all pages on first load.

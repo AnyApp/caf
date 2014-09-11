@@ -59,7 +59,12 @@ var CLogic = Class({
             object.logic.doStopPropagation = true;
         },
         backButton: function(object,value){
+            if (value !== true)
+                return;
             CPager.setBackButton(object.uid());
+            CClicker.addOnClick(object,function(){
+                CPager.moveBack();
+            });
         },
         mainPage: function(object,value){
             CPager.setMainPage(value);

@@ -165,7 +165,6 @@ var CObject = Class({
     },
     parseRelativeReference: function(str){
         var relativeParentId = this.getRelativeParent();
-        CLog.dlog(relativeParentId);
         if (!CUtils.isEmpty(relativeParentId)){
             var relativeParent = CObjectsHandler.object(relativeParentId);
             return eval('relativeParent'+str);

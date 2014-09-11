@@ -19,7 +19,7 @@ var app =
         };
         var header = {   uname:  'header', type:   'Header',
             data: {
-                left: ['header-button-left-0'],
+                left: ['header-button-left-0','header-button-back'],
                 right: ['header-button-right-0','header-button-right-1']
             }
         };
@@ -157,6 +157,16 @@ var app =
                 sideMenuSwitch: 'left'
             }
         };
+        var headerBackButton = {   uname:  'header-button-back', type:   'Button',
+            design: { bgColor:{color:'Purple',level:4},
+                active: { bgColor:{color:'Purple',level:6} }
+            },
+            logic: {
+                text: "bk",
+                backButton: true
+            }
+        };
+
         var form = { uname: 'form', type: 'Form',
             data: { inputs: ['form-input-name','form-input-phone'],
                     childs: ['form-input-name','form-input-phone',
@@ -319,7 +329,8 @@ var app =
             formPage,
             categoryPage,
             toCategoryButton,
-            toCategoryDvirButton
+            toCategoryDvirButton,
+            headerBackButton
 
 
         ];
