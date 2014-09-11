@@ -26,10 +26,10 @@ var app =
         var footer = {   uname:  'footer', type:   'Footer'
         };
         var content = {   uname:  'content', type:   'Content',
-            data: {  childs: ['main-page','form-page','category-page'] }
+            data: {  childs: ['main-page','form-page','category-page','tabs-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['to-category-button','to-category-dvir-button','main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
+            data: {  childs: ['to-tabs-button','to-category-button','to-category-dvir-button','main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
                 page: {
                     name: '',
                     title: 'Main',
@@ -48,6 +48,41 @@ var app =
             },
             logic: { page: true }
         };
+        var tabsPage = {   uname:  'tabs-page', type:   'Page',
+            data: {  childs: ['tabber'],
+                page: {
+                    name: 'tabs',
+                    title: 'Tabs',
+                    onLoad: function() {}
+                }
+            },
+            logic: { page: true }
+        };
+        var categoryPage = {   uname:  'category-page',type:   'DynamicPage',
+            data: {
+                childs: [],
+                page: {
+                    name: 'category',
+                    title: 'Category Page',
+                    onLoad: function(params) {CLog.dlog(params);}
+                },
+                abstractObjects:[
+                    {
+                        type:   'Label',
+                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Red',level:6} },
+                            activeRemove: {bgColor:{color:'Red',level:4}}
+                        },
+                        logic: { text: "Title: #.data.category" }
+                    }
+                ]
+            },
+            logic: {
+                dynamic:{},
+                page: true
+            }
+        };
+
         var mainViewReloadDynamic = {   uname:  'main-reload-dynamic', type:   'Button',
             design: { height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Olive',level:6} }},
@@ -56,6 +91,18 @@ var app =
                 buttonReloadDynamic: {object: 'dynamic-buttons', reset: true, queryData: {} }
             }
         };
+        var toTabsButton = {   uname:  'to-tabs-button', type:   'Button',
+            design: { height:40, bgColor:{color:'Maroon',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Maroon',level:6} }
+            },
+            logic: {
+                text:'Tabs',
+                link: {
+                    path: 'tabs',
+                    data: {}
+                }
+            }
+        }
         var toCategoryButton = {   uname:  'to-category-button', type:   'Button',
             design: { height:40, bgColor:{color:'Lime',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Lime',level:6} }
@@ -273,31 +320,13 @@ var app =
             }
         };
 
-
-        var categoryPage = {   uname:  'category-page',type:   'DynamicPage',
-            data: {
-                childs: [],
-                page: {
-                    name: 'category',
-                    title: 'Category Page',
-                    onLoad: function(params) {CLog.dlog(params);}
-                },
-                abstractObjects:[
-                    {
-                        type:   'Label',
-                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                            active: { bgColor:{color:'Red',level:6} },
-                            activeRemove: {bgColor:{color:'Red',level:4}}
-                        },
-                        logic: { text: "Title: #.data.category" }
-                    }
-                ]
-            },
+        var tabber = { uname: 'tabber', type: 'Button',
             logic: {
-                dynamic:{},
-                page: true
+                text: "tabber"
             }
         };
+
+
 
 
 
@@ -330,7 +359,10 @@ var app =
             categoryPage,
             toCategoryButton,
             toCategoryDvirButton,
-            headerBackButton
+            headerBackButton,
+            tabsPage,
+            toTabsButton,
+            tabber
 
 
         ];
@@ -352,10 +384,6 @@ var app =
             i++;
         }
         caf.log(str);*/
-        app.do();
-    },
-    do: function(){
-
     }
 
 }

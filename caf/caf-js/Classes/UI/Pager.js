@@ -64,24 +64,6 @@ var CPager = Class({
         this.backButtonId = backButtonId;
         this.checkAndChangeBackButtonState();
     },
-    insertPageToStack: function(pageId) {
-        for (var i=this.historyStack.length-1; i>=0; i--) {
-            if (this.historyStack[i] === pageId) {
-                this.historyStack.splice(i, 1);
-                // break;       //<-- Uncomment  if only the first term has to be removed
-            }
-        }
-        this.historyStack.push(pageId);
-    },
-    /**
-     * Restructure that pages z-index as their position in the history.
-     * Recent page equals greater z-index.
-     */
-    restructure: function() {
-        for (var i=this.historyStack.length-1; i>=0; i--) {
-            CUtils.element(this.historyStack[i]).style.zIndex = (i+1)*10;
-        }
-    },
     moveToTab: function(tabButtonId,toSlide,swiperId) {
         // Get Tabs.
         var tabs = CSwiper.getSwiperButtons(swiperId);
@@ -95,7 +77,6 @@ var CPager = Class({
         if (!CUtils.isEmpty(toSlide))
             CSwiper.moveSwiperToSlide(swiperId,toSlide);
 
-/**/
     },
     addHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;

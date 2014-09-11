@@ -757,6 +757,11 @@ var CLogic = Class({
                 CSwiper.initSwiper(value);
             });
         },
+        tabberButtons: function(object,value){
+            _.each(value,function(buttonId){
+                CSwiper.addButtonToTabSwiper(buttonId,object.uid());
+            });
+        },
         dialogSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
                 CObjectsHandler.object(value).switchDialog();
@@ -1964,24 +1969,6 @@ var CPager = Class({
         this.backButtonId = backButtonId;
         this.checkAndChangeBackButtonState();
     },
-    insertPageToStack: function(pageId) {
-        for (var i=this.historyStack.length-1; i>=0; i--) {
-            if (this.historyStack[i] === pageId) {
-                this.historyStack.splice(i, 1);
-                // break;       //<-- Uncomment  if only the first term has to be removed
-            }
-        }
-        this.historyStack.push(pageId);
-    },
-    /**
-     * Restructure that pages z-index as their position in the history.
-     * Recent page equals greater z-index.
-     */
-    restructure: function() {
-        for (var i=this.historyStack.length-1; i>=0; i--) {
-            CUtils.element(this.historyStack[i]).style.zIndex = (i+1)*10;
-        }
-    },
     moveToTab: function(tabButtonId,toSlide,swiperId) {
         // Get Tabs.
         var tabs = CSwiper.getSwiperButtons(swiperId);
@@ -1995,7 +1982,6 @@ var CPager = Class({
         if (!CUtils.isEmpty(toSlide))
             CSwiper.moveSwiperToSlide(swiperId,toSlide);
 
-/**/
     },
     addHoldClass: function(tabButtonId) {
         if (CUtils.isEmpty(tabButtonId))    return;
@@ -2224,17 +2210,17 @@ var CSwiper = Class({
      * @param object
      * @param swiperId
      */
-    addButtonToTabSwiper: function(object,swiperId){
+    addButtonToTabSwiper: function(objectId,swiperId){
         var swiperButtons       = this.mSwipers[swiperId].swiperTabButtons;
         var currentSlideNumber  = swiperButtons.length;
-        this.mSwipers[swiperId].swiperTabButtons.push(object.uid());
+        this.mSwipers[swiperId].swiperTabButtons.push(objectId);
 
         CClicker.addOnClick(object,function(){
-            CPager.moveToTab(object.uid(),currentSlideNumber,swiperId);
+            CPager.moveToTab(objectId,currentSlideNumber,swiperId);
         });
 
         if (swiperId == 0){
-            CPager.addHoldClass(object.uid());
+            CPager.addHoldClass(objectId);
         }
     },
     getSwiperButtons: function(swiperId){
@@ -4108,11 +4094,61 @@ var CGallery = Class(CSlider,{
  * Created by dvircn on 06/08/14.
  */
 /**
- * Created by dvircn on 06/08/14.
+ * Created by dvircn on 15/08/14.
  */
-/**
- * Created by dvircn on 06/08/14.
- */
+var CTabber = Class(CSlider,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: ""
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.mergeWithDefaults(values,CImage);
+
+        // Invoke parent's constructor
+        CImage.$super.call(this, values);
+
+        this.data.tabberButtons     = this.data.tabberButtons || [];
+        this.logic.tabberButtons    = this.data.tabberButtons;
+    },
+    moveToTab: function(tabButtonId,toSlide,swiperId) {
+        // Get Tabs.
+        var tabs = CSwiper.getSwiperButtons(swiperId);
+        _.each(tabs,function(buttonId){
+            // Remove hold mark.
+            this.removeHoldClass(buttonId);
+        },this);
+
+        this.addHoldClass(tabButtonId);
+
+        if (!CUtils.isEmpty(toSlide))
+            CSwiper.moveSwiperToSlide(swiperId,toSlide);
+
+    },
+    addHoldClass: function(tabButtonId) {
+        if (CUtils.isEmpty(tabButtonId))    return;
+
+        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
+        if (!CUtils.isEmpty(holdClass))
+            CUtils.addClass(CUtils.element(tabButtonId),holdClass);
+    },
+    removeHoldClass: function(tabButtonId) {
+        if (CUtils.isEmpty(tabButtonId))    return;
+
+        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
+        if (!CUtils.isEmpty(holdClass))
+            CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
+    }
+
+
+});
+
 /**
  * Created by dvircn on 12/08/14.
  */

@@ -77,6 +77,11 @@ var CLogic = Class({
                 CSwiper.initSwiper(value);
             });
         },
+        tabberButtons: function(object,value){
+            _.each(value,function(buttonId){
+                CSwiper.addButtonToTabSwiper(buttonId,object.uid());
+            });
+        },
         dialogSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
                 CObjectsHandler.object(value).switchDialog();
