@@ -230,7 +230,6 @@ var Swiper = function (selector, params) {
     var desktopEvents = ['mousedown', 'mousemove', 'mouseup'];
     if (_this.browser.ie10) desktopEvents = ['MSPointerDown', 'MSPointerMove', 'MSPointerUp'];
     if (_this.browser.ie11) desktopEvents = ['pointerdown', 'pointermove', 'pointerup'];
-
     _this.touchEvents = {
         touchStart : _this.support.touch || !params.simulateTouch  ? 'touchstart' : desktopEvents[0],
         touchMove : _this.support.touch || !params.simulateTouch ? 'touchmove' : desktopEvents[1],
@@ -887,8 +886,8 @@ var Swiper = function (selector, params) {
             }
             if (params.simulateTouch) {
                 bind(eventTarget, 'mousedown', onTouchStart);
-                bind(document, 'mousemove', onTouchMove);
-                bind(document, 'mouseup', onTouchEnd);
+                bind(eventTarget, 'mousemove', onTouchMove);
+                bind(eventTarget, 'mouseup', onTouchEnd);
             }
         }
         else {
@@ -1300,7 +1299,7 @@ var Swiper = function (selector, params) {
     var allowMomentumBounce = true;
     function onTouchStart(event) {
         if (CSwiper.isSideMenuOpen()) return false;
-        event.stopPropagation();
+        //event.stopPropagation();
 
         if (params.preventLinks) _this.allowLinks = true;
         //Exit if slider is already was touched
@@ -1322,6 +1321,9 @@ var Swiper = function (selector, params) {
         //Check For Nested Swipers
         _this.isTouched = true;
         isTouchEvent = event.type === 'touchstart';// || event.type === 'mousedown';
+
+        // prevent user enter with right and the swiper move (needs isTouchEvent)
+        if (!isTouchEvent && 'which' in event && event.which === 3) return false;
 
         if (!isTouchEvent || event.targetTouches.length === 1) {
             _this.callPlugins('onTouchStartBegin');
@@ -1368,8 +1370,8 @@ var Swiper = function (selector, params) {
     }
     var velocityPrevPosition, velocityPrevTime;
     function onTouchMove(event) {
-
-        if (CSwiper.isSideMenuOpen()) return;
+        //event.stopPropagation();
+        //if (CSwiper.isSideMenuOpen()) return;
         // If slider is not touched - exit
         if (!_this.isTouched || params.onlyExternal) return;
         //if (isTouchEvent && event.type === 'mousemove') return;
@@ -1487,7 +1489,6 @@ var Swiper = function (selector, params) {
                     _this.positions.current = -maxWrapperPosition();
                     toStopPropogation = false;
                 }
-
                 if (toStopPropogation) event.stopPropagation();
             }
             //Move Slides
@@ -2762,10 +2763,10 @@ Swiper.prototype = {
     ====================================================*/
     support: {
 
-        touch : (window.Modernizr && Modernizr.touch === true) || (function () {
+        touch : CUtils.isTouchDevice(),/*(window.Modernizr && Modernizr.touch === true) || (function () {
             'use strict';
             return !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
-        })(),
+        })(),*/
 
         transforms3d : (window.Modernizr && Modernizr.csstransforms3d === true) || (function () {
             'use strict';

@@ -49,6 +49,7 @@ var CPage = Class(CContainer,{
             this.data.page.paramsChanged = false;
             this.data.page.onLoad(this.data.page.params);
         }
+        CSwiper.resizeFix();
     },
     getPageTitle: function(){
         return this.data.page.title;

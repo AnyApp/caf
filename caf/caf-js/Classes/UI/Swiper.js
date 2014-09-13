@@ -6,6 +6,7 @@ var CSwiper = Class({
     mSwipers: {},
     sideMenu: null,
     sideMenuSide: 'left',
+
     initSwiper: function(data) {
         var swiperId = data.container;
         var options = {
@@ -16,44 +17,57 @@ var CSwiper = Class({
             options.pagination = '#'+data.pagination;
             options.paginationClickable= true;
         }
-        if (data.loop===true)
-            options.loop=true;
-        if (data.autoPlay===true)
+        if (data.loop === true)
+            options.loop = true;
+        if (data.autoPlay === true)
             options.autoplay = data.slideTime;
+        if (data.centeredSlides === true)
+            options.centeredSlides = true;
+        if (!CUtils.isEmpty(data.slidesPerView))
+            options.slidesPerView = data.slidesPerView;
 
-        options['SlideChangeStart'] = this.createSlideChangeStartCallback(swiperId);
+        options['onSlideChangeStart'] =  this.createSlideChangeStartCallback(swiperId);
+
+        var slidesOnLoads   = data.onLoads      || [];
+        var onSlideLoad     = data.onSlideLoad  || function(){};
 
         // Fix Pagination disappear.
-        options['SlideChangeEnd']   = this.createSlideChangeEndCallback(swiperId);
+        options['onSlideChangeEnd']   = this.createSlideChangeEndCallback(swiperId,onSlideLoad,slidesOnLoads);
 
         this.mSwipers[swiperId] = new Swiper('#'+swiperId,options);
 
         this.mSwipers[swiperId].swiperTabButtons = Array();
+        // Add buttons.
+        _.each(data.tabberButtons,function(buttonId){
+            this.addButtonToTabSwiper(buttonId,swiperId);
+        },this);
     },
     createSlideChangeStartCallback: function(swiperId){
         return function(swiper){
             var toSlide         = swiper.activeIndex;
-            var swiperButtons   = this.mSwipers[swiperId].swiperTabButtons;
+            var swiperButtons   = CSwiper.mSwipers[swiperId].swiperTabButtons;
             var tabRelatedButton= swiperButtons[toSlide];
             if (!CUtils.isEmpty(tabRelatedButton)){
-                var object = CObjectsHandler.object(swiperId);
-                object.moveToTab(tabRelatedButton,null,swiperId);
+                CTabber.moveToTab(tabRelatedButton,null,swiperId);
             }
 
+/*
             window.setTimeout(function() {
                 var height = CUtils.element(swiperId).style.height;
                 CUtils.element(swiperId).style.height = '0px';
                 CUtils.element(swiperId).clientHeight;
                 CUtils.element(swiperId).style.height = height;
-            },100);
+            },1000);
+*/
         };
     },
-    createSlideChangeEndCallback: function(swiperId){
+    createSlideChangeEndCallback: function(swiperId,onSlideLoad,slidesOnLoads){
         return function(swiper){
-            var height = document.getElementById(swiperId).style.height;
-            CUtils.element(swiperId).style.height = '0px';
-            CUtils.element(swiperId).clientHeight;
-            CUtils.element(swiperId).style.height = height;
+
+            // On load callbacks.
+            onSlideLoad(swiper.activeIndex);
+            if (swiper.activeIndex < slidesOnLoads.length)
+                slidesOnLoads[swiper.activeIndex]();
         };
     },
     /**
@@ -67,17 +81,29 @@ var CSwiper = Class({
         this.mSwipers[swiperId].swiperTabButtons.push(objectId);
 
         CClicker.addOnClick(CObjectsHandler.object(objectId),function(){
-            var object = CObjectsHandler.object(objectId);
-            object.moveToTab(objectId,currentSlideNumber,swiperId);
+            CTabber.moveToTab(objectId,currentSlideNumber,swiperId);
         });
 
-        if (swiperId == 0){
-            var object = CObjectsHandler.object(objectId);
-            object.addHoldClass(objectId);
+        if (currentSlideNumber == 0){
+            CTabber.addHoldClass(objectId);
         }
+    },
+    resizeFix: function(){
+        window.setTimeout(function(){
+            _.each(CSwiper.mSwipers,function(swiper){
+                swiper.resizeFix();
+            },CSwiper);
+        },0);
+
     },
     getSwiperButtons: function(swiperId){
         return this.mSwipers[swiperId].swiperTabButtons;
+    },
+    getSwiperCurrentSlide: function(swiperId){
+        return this.mSwipers[swiperId].activeIndex;
+    },
+    getSwiperPreviousSlide: function(swiperId){
+        return this.mSwipers[swiperId].previousIndex;
     },
     next: function(swiperName) {
         this.mSwipers[swiperName].swipeNext();

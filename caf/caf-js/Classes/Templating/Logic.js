@@ -26,9 +26,6 @@ var CLogic = Class({
             CClicker.addOnClick(object,null);
 
         },
-        toTab: function(object,value){
-            CSwiper.addButtonToTabSwiper(object,value);
-        },
         showDialog: function(object,value){
             CClicker.addOnClick(object,function(){
                 CDialog.showDialog(value.data || {},value.design || {});
@@ -73,14 +70,9 @@ var CLogic = Class({
             CSwiper.initSideMenu(value.positions);
         },
         swipeView: function(object,value){
-            CThreads.start(function(){
+            //CThreads.start(function(){
                 CSwiper.initSwiper(value);
-            });
-        },
-        tabberButtons: function(object,value){
-            _.each(value,function(buttonId){
-                CSwiper.addButtonToTabSwiper(buttonId,object.uid());
-            });
+            //});
         },
         dialogSwitch: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -150,6 +142,10 @@ var CLogic = Class({
             // Apply only if the logic have changed / never applied before.
             if (CUtils.equals(logic[attribute],lastLogic[attribute]))
                 return;
+            if (CUtils.isEmpty(this.logics[attribute])){
+                CLog.error('Logic does not exist: "'+attribute+'".');
+                return;
+            }
             // Apply Logic.
             this.logics[attribute](object,value);
         },this);

@@ -183,6 +183,14 @@ var CUtils = Class({
             hash: a.hash,
             search: a.search
         };
+    },
+    isTouchDevice: function() {
+        try {
+            document.createEvent("TouchEvent");
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
 

@@ -96,7 +96,7 @@ var app =
                 active: { bgColor:{color:'Maroon',level:6} }
             },
             logic: {
-                text:'Tabs',
+                text:'<i class="flaticon-airplane49"></i>Tabs',
                 link: {
                     path: 'tabs',
                     data: {}
@@ -239,32 +239,32 @@ var app =
             logic: {loadInputFromStorage: true}
         }
         var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Olive',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Olive',level:6} }
+            design: { height:40, bgColor:{color:'Olive',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Olive',level:5} }
             },
             logic: { text: "Submit Form",
                 formSubmitButton: 'form'
             }
         };
         var formSendToURLButton = { uname: 'form-sent-to-url-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Navy',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Blue',level:6} }
+            design: { height:40, bgColor:{color:'Navy',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Blue',level:5} }
             },
             logic: { text: "Send to URL",
                 formSendToUrlButton: 'form'
             }
         };
         var formSaveToLocalStorageButton = { uname: 'form-save-to-local-storage-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Purple',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Purple',level:6} }
+            design: { height:40, bgColor:{color:'Purple',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Purple',level:5} }
             },
             logic: { text: "Save to Local Storage",
                 formSaveToLocalStorageButton: 'form'
             }
         };
         var formClearButton = { uname: 'form-clear-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Red',level:4}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Red',level:6} }
+            design: { height:40, bgColor:{color:'Red',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Red',level:5} }
             },
             logic: { text: "Clear Form",
                 formClearButton: 'form'
@@ -320,9 +320,37 @@ var app =
             }
         };
 
-        var tabber = { uname: 'tabber', type: 'Button',
-            logic: {
-                text: "tabber"
+        var tabber = { uname: 'tabber', type: 'Tabber',
+            data: {
+                tabs: ['tab-aqua','tab-red','tab-green'],
+                buttons: {
+                    perView: 2,
+                    texts:['Aqua','Red','Green'],
+                    design:{
+                        bgColor: {color:'Maroon',level:3},
+                        active: {
+                            bgColor: {color:'Maroon',level:4}
+                        },
+                        hold: {
+                            bgColor: {color:'Maroon',level:6}
+                        }
+                    }
+                }
+            }
+        };
+        var tabAqua = { uname: 'tab-aqua', type: 'Tab',
+            design:{
+                bgColor:{color:'Aqua',level:4}
+            }
+        };
+        var tabRed = { uname: 'tab-red', type: 'Tab',
+            design: {
+                bgColor:{color:'Red',level:4}
+            }
+        };
+        var tabGreen = { uname: 'tab-green', type: 'Tab',
+            design: {
+                bgColor:{color:'Green',level:4}
             }
         };
 
@@ -362,7 +390,10 @@ var app =
             headerBackButton,
             tabsPage,
             toTabsButton,
-            tabber
+            tabber,
+            tabAqua,
+            tabRed,
+            tabGreen
 
 
         ];
