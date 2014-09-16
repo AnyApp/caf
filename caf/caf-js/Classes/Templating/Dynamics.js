@@ -15,7 +15,6 @@ var CDynamics = Class({
         object.dynamic.queryData    = object.dynamic.queryData  || {};
         object.dynamic.autoLoad     = object.dynamic.autoLoad   || false;
         object.dynamic.loaded       = object.dynamic.loaded     || false;
-        object.dynamic.loadTo       = object.dynamic.loadTo     || 'after'; // self/after
         object.dynamic.duplicates   = object.dynamic.duplicates || [];
 
         if (object.dynamic.autoLoad === true)

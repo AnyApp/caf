@@ -7,16 +7,6 @@ var CLogic = Class({
         onClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
-        toUrl: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CUtils.openURL(value);
-            });
-        },
-        toPage: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CPager.moveToPage(object.getLink());
-            });
-        },
         link: function(object,value){
             if (!object.isLinkLocal() && !CPlatforms.isWeb()){
                 CClicker.addOnClick(object,function(){
@@ -48,7 +38,23 @@ var CLogic = Class({
             });
         },
         text: function(object,value){
-            CUtils.element(object.uid()).innerHTML = value;
+            CUtils.element(object.uid()).innerHTML += value;
+        },
+        icon: function(object,value){
+            var size    = CUtils.isEmpty(value.size)?'': ' iconSize'+value.size;
+            var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
+            var iconElmText = '<i class="flaticon-'+value.name+size+align+'"></i>';
+
+            var elm = CUtils.element(object.uid());
+            elm.innerHTML = iconElmText+elm.innerHTML;
+        },
+        iconLeft: function(object,value){
+            value.align = 'left';
+            CLogic.logics.icon(object,value);
+        },
+        iconRight: function(object,value){
+            value.align = 'right';
+            CLogic.logics.icon(object,value);
         },
         doStopPropagation: function(object,value){
             if (value==false)
@@ -62,9 +68,6 @@ var CLogic = Class({
             CClicker.addOnClick(object,function(){
                 CPager.moveBack();
             });
-        },
-        mainPage: function(object,value){
-            CPager.setMainPage(value);
         },
         sideMenu: function(object,value){
             CSwiper.initSideMenu(value.positions);

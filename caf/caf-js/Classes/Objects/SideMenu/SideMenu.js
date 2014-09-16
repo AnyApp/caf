@@ -28,7 +28,7 @@ var CSideMenu = Class(CContainer,{
         });
 
         // Set Children.
-        this.data.childs = ['side-menu-left','side-menu-right'];
+        this.data.childs = [this.leftMenu,this.rightMenu];
         var positions = [];
         if (this.leftContainer != null)
             positions.push('left');

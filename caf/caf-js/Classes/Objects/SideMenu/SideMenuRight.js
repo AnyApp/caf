@@ -18,7 +18,7 @@ var CSideMenuRight = Class(CContainer,{
         CObject.mergeWithDefaults(values,CSideMenuRight);
         // Invoke parent's constructor
         CSideMenuRight.$super.call(this, values);
-        this.uname = 'side-menu-right';
+        //this.uname = 'side-menu-right';
     }
 
 });

@@ -728,7 +728,15 @@ var CLogic = Class({
             });
         },
         text: function(object,value){
-            CUtils.element(object.uid()).innerHTML = value;
+            CUtils.element(object.uid()).innerHTML += value;
+        },
+        icon: function(object,value){
+            var size    = CUtils.isEmpty(value.size)?'': ' iconSize'+value.size;
+            var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
+            var iconElmText = '<i class="flaticon-'+value.name+size+align+'"></i>';
+
+            var elm = CUtils.element(object.uid());
+            elm.innerHTML = iconElmText+elm.innerHTML;
         },
         doStopPropagation: function(object,value){
             if (value==false)
