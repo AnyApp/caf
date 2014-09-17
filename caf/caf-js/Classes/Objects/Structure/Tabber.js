@@ -65,6 +65,7 @@ var CTabber = Class(CContainer,{
         // Get and set default data.
         this.data.childs                 = this.data.childs                  || [];
         this.data.tabs                   = this.data.tabs                    || [];
+        // Currently not used.
         this.data.animation              = this.data.animation               || '';
         this.data.loop                   = this.data.loop                    || false;
         this.data.onLoads                = this.data.onLoads                 || [];

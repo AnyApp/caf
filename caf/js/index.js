@@ -143,11 +143,12 @@ var app =
             .design(builder.getDesign('main-button'))
             .text('Category Dvir').icon('right43',40,'right').link('category/dvir');
         builder.create('Form','form')
-            .inputs(['form-input-name','form-input-phone'])
-            .onSubmit(function(values) { CLog.log(values); })
-            .formSaveToUrl('').formSaveToUrlCallback(function(responseData){})
+            .formInputs(['form-input-name','form-input-phone'])
+            .formOnSubmit(function(values) { CLog.log(values); })
+            .formSaveToUrl('')
+            .formSaveToUrlCallback(function(responseData){})
             .childs(['form-input-name','form-input-phone','form-submit-button',
-                'form-sent-to-url-button','form-save-to-local-storage-button','form-clear-button'])
+                'form-send-to-url-button','form-save-to-local-storage-button','form-clear-button'])
             .design({ widthSM: 5,widthXS: 10,padding: 5,round:3,marginTop:10 });
         //Add Design.
         builder.addDesign('text-input',{marginTop:4, margin:'centered',widthSM:7, widthXS:11});
@@ -157,7 +158,50 @@ var app =
         builder.create('Input','form-input-phone')
             .inputName('phone').inputRequired().formLoadInputFromStorage()
             .design(builder.getDesign('text-input'));
-        builder.create('Content','content').childs([]);
+        //Add Design.
+        builder.addDesign('form-button-base',{ height:40, marginTop:4,widthSM: 7,widthXS: 11,marginRight:1, marginLeft:1, marginTop:1});
+        builder.create('Button','form-submit-button')
+            .design(/*Strong*/{bgColor:{color:'Olive',level:3},
+                active: { bgColor:{color:'Olive',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .text('Submit Form').icon('right43',40,'right')
+            .formSubmitButton('form');
+        builder.create('Button','form-send-to-url-button')
+            .design(/*Strong*/{bgColor:{color:'Navy',level:3},
+                active: { bgColor:{color:'Navy',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .text('Send to URL').icon('right43',40,'right')
+            .formSendToUrlButton('form');
+        builder.create('Button','form-save-to-local-storage-button')
+            .design(/*Strong*/{bgColor:{color:'Purple',level:3},
+                active: { bgColor:{color:'Purple',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .text('Save to Local Storage').icon('right43',40,'right')
+            .formSaveToLocalStorageButton('form');
+        builder.create('Button','form-clear-button')
+            .design(/*Strong*/{bgColor:{color:'Red',level:3},
+                active: { bgColor:{color:'Red',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .text('Clear Form').icon('right43',40,'right')
+            .formClearButton('form');
+        builder.create('Gallery','main-gallery')
+            .sliderPagination()
+            .sliderSlidesPerView(1)// Example that can be more than 1 slide per view.
+            .galleryImages([
+                'http://ourevent.co.il/wp-content/uploads/2014/04/1-1.jpg',
+                'http://ourevent.co.il/wp-content/uploads/2014/04/2-1.jpg',
+                'http://ourevent.co.il/wp-content/uploads/2014/04/3-1.jpg',
+                'http://ourevent.co.il/wp-content/uploads/2014/04/4-1.jpg'
+            ]);
+        builder.create('Tabber','tabber').tabberTabs(['tab-aqua','tab-red','tab-green'])
+            .tabberButtonsPerView(2).tabberButtonsHeight(45)
+            .tabberButtonsTexts(['Aqua','Red','Green'])
+            .tabberButtonsDesign({bgColor: {color:'Maroon',level:3},
+                active: {bgColor: {color:'Maroon',level:4}},
+                hold: { bgColor: {color:'Maroon',level:6} } });
+        builder.create('Tab','tab-aqua').childs([])
+            .design({bgColor:{color:'Aqua',level:4}});
+        builder.create('Tab','tab-red').childs([])
+            .design({bgColor:{color:'Red',level:4}});
+        builder.create('Tab','tab-green').childs([])
+            .design({bgColor:{color:'Green',level:4}});
+
 
 /*
         var appContainer = {   uname:  'app-container', type:   'AppContainer',
@@ -468,7 +512,7 @@ var app =
         var form = { uname: 'form', type: 'Form',
             data: { inputs: ['form-input-name','form-input-phone'],
                     childs: ['form-input-name','form-input-phone',
-                            'form-submit-button','form-sent-to-url-button',
+                            'form-submit-button','form-send-to-url-button',
                             'form-save-to-local-storage-button','form-clear-button'],
                     onSubmit: function(values) { CLog.log(values); }
             },
@@ -489,7 +533,6 @@ var app =
             design:inputsDesign,
             logic: {loadInputFromStorage: true}
         }
-*/
         var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
             design: { height:40, bgColor:{color:'Olive',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Olive',level:5} }
@@ -498,7 +541,7 @@ var app =
                 formSubmitButton: 'form'
             }
         };
-        var formSendToURLButton = { uname: 'form-sent-to-url-button', type: 'Button',
+        var formSendToURLButton = { uname: 'form-send-to-url-button', type: 'Button',
             design: { height:40, bgColor:{color:'Navy',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Blue',level:5} }
             },
@@ -531,8 +574,6 @@ var app =
                 pagination: true
             }
         };
-
-
         var tabber = { uname: 'tabber', type: 'Tabber',
             data: {
                 tabs: ['tab-aqua','tab-red','tab-green'],
@@ -567,7 +608,6 @@ var app =
             }
         };
 
-/*
         var objects = [
             appContainer,
             sideMenu,

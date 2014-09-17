@@ -149,6 +149,68 @@ var CBuilderObject = Class({
         this.properties.data.images = images;
         return this;
     },
+    sliderPagination: function() {
+        this.properties.data.pagination = true;
+        return this;
+    },
+    sliderAutoPlay: function() {
+        this.properties.data.autoPlay = true;
+        return this;
+    },
+    sliderNotAutoPlay: function() {
+        this.properties.data.autoPlay = false;
+        return this;
+    },
+    sliderSlideTime: function(slideTime) {
+        this.properties.data.slideTime = slideTime || null;
+        return this;
+    },
+    sliderOnSlideLoad: function(onSlideLoad) {
+        this.properties.data.slideTime = onSlideLoad || function(slideIndex){};
+        return this;
+    },
+    sliderSlidesPerView: function(slidesPerView) {
+        this.properties.data.slidesPerView = slidesPerView || null;
+        return this;
+    },
+    tabberTabs: function(tabs) {
+        this.properties.data.tabs = tabs || null;
+        return this;
+    },
+    tabberLoop: function() {
+        this.properties.data.loop = true;
+        return this;
+    },
+    tabberOnLoads: function(onLoads) {
+        this.properties.data.onLoads = onLoads || null;
+        return this;
+    },
+    tabberButtonsTexts: function(texts) {
+        this.properties.data.buttons = this.properties.data.buttons || {};
+        this.properties.data.texts = texts || null;
+        return this;
+    },
+    tabberButtonsIcons: function(icons,align) {
+        this.properties.data.buttons    = this.properties.data.buttons || {};
+        this.properties.data.icons      = icons || null;
+        this.properties.data.iconsAlign = align || null;
+        return this;
+    },
+    tabberButtonsDesign: function(design) {
+        this.properties.data.buttons = this.properties.data.buttons || {};
+        this.properties.data.design = design || null;
+        return this;
+    },
+    tabberButtonsHeight: function(height) {
+        this.properties.data.buttons = this.properties.data.buttons || {};
+        this.properties.data.height = height || null;
+        return this;
+    },
+    tabberButtonsPerView: function(perView) {
+        this.properties.data.buttons = this.properties.data.buttons || {};
+        this.properties.data.perView = perView || null;
+        return this;
+    },
     onClick: function(onClickHandler) {
         this.properties.logic.onClick = onClickHandler;
         return this;
