@@ -9,12 +9,19 @@ var CBuilderObjects = Class({
     constructor: function() {
         this.objects = [];
         this.designs = {};
+        this.datas = {};
     },
     addDesign: function(name,design){
         this.designs[name] = design;
     },
     getDesign: function(name){
         return this.designs[name];
+    },
+    addData: function(name,data){
+        this.datas[name] = data;
+    },
+    getData: function(name){
+        return this.datas[name];
     },
     build: function(){
         var builtObjects = [];

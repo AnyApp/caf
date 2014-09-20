@@ -12,7 +12,7 @@ var CDesign = Class({
             }
             if (CUtils.isEmpty(level))  level = 0;
             level = Math.max(level,0);
-            level = Math.min(level,10);
+            level = Math.min(level,17);
 
             return color+level;
         }
@@ -97,7 +97,7 @@ var CDesign = Class({
             return "";
         },
         display: function(data){
-            var values = ['inlineBlock','block','hidden'];
+            var values = ['inlineBlock','block','inline','hidden'];
             if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
                 return data;
             }

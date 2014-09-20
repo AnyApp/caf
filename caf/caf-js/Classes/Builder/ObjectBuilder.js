@@ -18,6 +18,10 @@ var CBuilderObject = Class({
     build: function(){
         return this.properties;
     },
+    initTemplate: function(){
+        this.properties.data.template   = this.properties.data.template || {};
+        this.properties.logic.template  = true;
+    },
     childs: function(childs){
         this.properties.data.childs    = childs;
         return this;
@@ -26,10 +30,6 @@ var CBuilderObject = Class({
         this.properties.data.page =
                 { name: name || '', title: title || '', onLoad: onLoad || function() {} };
         this.properties.logic.page = true;
-        return this;
-    },
-    abstractObjects: function(abstractObjects) {
-        this.properties.data.abstractObjects = abstractObjects;
         return this;
     },
     sideMenuLeftContainer: function(leftContainer) {
@@ -52,12 +52,38 @@ var CBuilderObject = Class({
         this.properties.logic.text = text;
         return this;
     },
-    dynamic: function(url,autoLoad,queryData){
-        this.properties.logic.dynamic = {
+    template: function(url,autoLoad,queryData){
+        this.initTemplate();
+        this.properties.data.template = {
             url:        url         || null,
             autoLoad:   autoLoad    || null,
             queryData:  queryData   || null
-        }
+        };
+        return this;
+    },
+    templateObjects: function(objects) {
+        this.initTemplate();
+        this.properties.data.template.objects = objects;
+        return this;
+    },
+    templateObject: function(object) {
+        this.initTemplate();
+        this.properties.data.template.object = object;
+        return this;
+    },
+    templateData: function(data) {
+        this.initTemplate();
+        this.properties.data.template.data = data;
+        return this;
+    },
+    templateItemOnClick: function(onClick) {
+        this.initTemplate();
+        this.properties.data.template.callback = onClick;
+        return this;
+    },
+    templateItemOnClicks: function(onClicks) {
+        this.initTemplate();
+        this.properties.data.template.callbacks = onClicks;
         return this;
     },
     reloadDynamicButton: function(object,reset,queryData,onFinish){
@@ -187,28 +213,28 @@ var CBuilderObject = Class({
     },
     tabberButtonsTexts: function(texts) {
         this.properties.data.buttons = this.properties.data.buttons || {};
-        this.properties.data.texts = texts || null;
+        this.properties.data.buttons.texts = texts || null;
         return this;
     },
     tabberButtonsIcons: function(icons,align) {
         this.properties.data.buttons    = this.properties.data.buttons || {};
-        this.properties.data.icons      = icons || null;
-        this.properties.data.iconsAlign = align || null;
+        this.properties.data.buttons.icons      = icons || null;
+        this.properties.data.buttons.iconsAlign = align || null;
         return this;
     },
     tabberButtonsDesign: function(design) {
         this.properties.data.buttons = this.properties.data.buttons || {};
-        this.properties.data.design = design || null;
+        this.properties.data.buttons.design = design || null;
         return this;
     },
     tabberButtonsHeight: function(height) {
         this.properties.data.buttons = this.properties.data.buttons || {};
-        this.properties.data.height = height || null;
+        this.properties.data.buttons.height = height || null;
         return this;
     },
     tabberButtonsPerView: function(perView) {
         this.properties.data.buttons = this.properties.data.buttons || {};
-        this.properties.data.perView = perView || null;
+        this.properties.data.buttons.perView = perView || null;
         return this;
     },
     onClick: function(onClickHandler) {
@@ -222,25 +248,28 @@ var CBuilderObject = Class({
         };
         return this;
     },
-    icon: function(name,size,align) {
+    icon: function(name,size,align,color) {
         this.properties.logic.icon = {
             name:   name || null,
             size:   size || null,
-            align:  align || null
+            align:  align || null,
+            color: color || null
         };
         return this;
     },
-    iconLeft: function(name,size) {
+    iconLeft: function(name,size,color) {
         this.properties.logic.iconLeft = {
             name:   name || null,
-            size:   size || null
+            size:   size || null,
+            color: color || null
         };
         return this;
     },
-    iconRight: function(name,size) {
+    iconRight: function(name,size,color) {
         this.properties.logic.iconRight = {
             name:   name || null,
-            size:   size || null
+            size:   size || null,
+            color: color || null
         };
         return this;
     },
@@ -269,4 +298,10 @@ var CBuilderObject = Class({
 
 
 });
+
+
+window.co = function(type,uname){
+    var objectBuilder = new CBuilderObject(type || '',uname || '');
+    return objectBuilder;
+};
 

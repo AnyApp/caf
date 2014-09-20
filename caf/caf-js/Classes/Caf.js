@@ -11,7 +11,7 @@ var Caf = Class({
 
         var startBuildAll = (new  Date()).getTime();
 
-        CTemplator.buildAll();
+        CBuilder.buildAll();
         var endBuildAll = (new  Date()).getTime();
         CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
         CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');

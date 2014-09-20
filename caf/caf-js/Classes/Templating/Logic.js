@@ -7,6 +7,9 @@ var CLogic = Class({
         onClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
+        onTemplateElementClick: function(object,value){
+            CClicker.addOnClick(object,value);
+        },
         link: function(object,value){
             if (!object.isLinkLocal() && !CPlatforms.isWeb()){
                 CClicker.addOnClick(object,function(){
@@ -41,9 +44,12 @@ var CLogic = Class({
             CUtils.element(object.uid()).innerHTML += value;
         },
         icon: function(object,value){
-            var size    = CUtils.isEmpty(value.size)?'': ' iconSize'+value.size;
+            var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
             var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
-            var iconElmText = '<i class="flaticon-'+value.name+size+align+'"></i>';
+            var color   = CUtils.isEmpty(value.color)?'': ' '+CDesign.designs.color(value.color);
+//            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
+//            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
+            var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';
 
             var elm = CUtils.element(object.uid());
             elm.innerHTML = iconElmText+elm.innerHTML;
@@ -118,16 +124,17 @@ var CLogic = Class({
         init: function(object,value){
             value();
         },
-        dynamic: function(object,value){
-            CDynamics.applyDynamic(object,value);
+        template: function(object,value){
+            if (value ===true)
+                CTemplator.applyDynamic(object);
         },
         buttonReloadDynamic:  function(object,value){
             CClicker.addOnClick(object,function(){
-                CDynamics.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
+                CTemplator.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
             });
         },
         page: function(object,value){
-            //CDynamics.applyDynamic(object,value);
+            //CTemplator.applyDynamic(object,value);
             if (value===true)
                 CPager.addPage(object);
         }

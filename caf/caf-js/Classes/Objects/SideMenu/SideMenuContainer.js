@@ -1,29 +1,24 @@
 /**
  * Created by dvircn on 13/08/14.
  */
-var CButton = Class(CLabel,{
+var CSideMenuContainer = Class(CContainer,{
     $statics: {
         DEFAULT_DESIGN: {
-            cursor: 'pointer',
-            active:{
-                bgColor:{color:'Gray',level:10}
-            }
+            height:'100%'
         },
         DEFAULT_LOGIC: {
         }
-
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CButton);
-
+        CObject.mergeWithDefaults(values,CSideMenuContainer);
         // Invoke parent's constructor
-        CButton.$super.call(this, values);
-
+        CSideMenuContainer.$super.call(this, values);
+        //this.uname = 'side-menu-left';
     }
 
-
 });
+
 

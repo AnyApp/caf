@@ -7,22 +7,33 @@ var CColorsGenerator =
         return {name: name,value:value};
     },
     colors: [
-        ['Navy','001F3F'],
-        ['Blue','0074D9'],
-        ['Aqua','7FDBFF'],
-        ['Teal','39CCCC'],
-        ['Olive','3D9970'],
-        ['Green','2ECC40'],
-        ['Lime','01FF70'],
-        ['Yellow','FFDC00'],
-        ['Orange','FF851B'],
-        ['Red','FF4136'],
-        ['Maroon','85144B'],
-        ['Fuchsia','F012BE'],
-        ['Purple','B10DC9'],
-        ['Gray','AAAAAA']
+        ['LightRed','FF535D'],
+        ['Red','FF1E30'],
+        ['DarkRed','FF4136'],
+        ['LightPink','FF38AE'],
+        ['Pink','e91e63'],
+        ['DarkPink','f50057'],
+        ['Purple','9c27b0'],
+        ['DeepPurple','673ab7'],
+        ['Indigo','3949ab'],
+        ['Blue','2a36b1'],
+        ['LightBlue','03a9f4'],
+        ['Cyan','00bcd4'],
+        ['Teal','009688'],
+        ['DarkGreen','01FF70'],
+        ['Green','259b24'],
+        ['LightGreen','8bc34a'],
+        ['Lime','cddc39'],
+        ['Yellow','ffeb3b'],
+        ['Amber','ffc107'],
+        ['Orange','ff9800'],
+        ['DeepOrange','ff5722'],
+        ['Brown','795548'],
+        ['Gray','9e9e9e'],
+        ['BlueGray','607d8b']
+
     ],
-    levels:[100,90,80,70,60,50,40,30,20,15,10],
+    levels:[100,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15,10,5],
     generate:function(){
         var t = "";
         var html = ""
@@ -34,7 +45,7 @@ var CColorsGenerator =
                 t += ".bg"+name+level+"\t{ "+"background-color: "+res+"; \t}\n"
                 t += ".bc"+name+level+"\t{ "+"border-color: "+res+"; \t\t}\n"
                 t += ".c"+name+level+" \t{ "+"color: "+res+"; \t\t\t\t}\n"
-                html+='<div style="width:9%;height:100px;display:inline-block;background-color: '+res+'"><span style="direction:ltr;color: #000000;background-color: #cccccc">'+name+level+'</span></span></div>'
+                html+='<div style="width:5.5555555555555555555555555555556%;height:100px;display:inline-block;background-color: '+res+'"><span style="direction:ltr;color: #000000;background-color: #cccccc">'+name+level+'</span></span></div>'
             }
         }
         this.log(t);

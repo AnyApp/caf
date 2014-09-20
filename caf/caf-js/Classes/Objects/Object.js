@@ -44,11 +44,11 @@ var CObject = Class({
         // don't apply dynamic variables on dynamic data.
 
 /*
-        if (!CUtils.isEmpty(this.data.abstractObjects)) {
-            var dynamicData = this.data.abstractObjects;
-            this.data.abstractObjects = null;
+        if (!CUtils.isEmpty(this.data.templateObjects)) {
+            var dynamicData = this.data.templateObjects;
+            this.data.templateObjects = null;
             this.applyDynamicVariables(this.data);
-            this.data.abstractObjects = dynamicData;
+            this.data.templateObjects = dynamicData;
         }
         else{
             this.applyDynamicVariables(this.data);
@@ -276,10 +276,10 @@ var CObject = Class({
     },
     assignReferences: function(){
         // Leave out the dynamic data references as they need to evaluate only on object creation.
-        var abstractObjects         = this.data.abstractObjects     || null;
-        var abstractContainer       = this.data.abstractContainer   || null;
-        this.data.abstractObjects   = null;
-        this.data.abstractContainer = null;
+        var abstractObjects         = this.data.templateObjects     || null;
+        var abstractContainer       = this.data.templateContainer   || null;
+        this.data.templateObjects   = null;
+        this.data.templateContainer = null;
         // Retrieve relative and local references.
         this.parseReferences(this.data);
         this.parseReferences(this.logic);
@@ -294,8 +294,8 @@ var CObject = Class({
             parentObject.data.childs[thisIndex] = this.uid();
         }
         // Return the dynamic data.
-        this.data.abstractObjects   = abstractObjects;
-        this.data.abstractContainer = abstractContainer;
+        this.data.templateObjects   = abstractObjects;
+        this.data.templateContainer = abstractContainer;
     },
     isContainer: function(){
         return false;

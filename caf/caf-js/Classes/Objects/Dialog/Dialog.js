@@ -57,6 +57,8 @@ var CDialog = Class(CContainer,{
         this.data.list              = this.data.list                || [];
         this.data.iconsList         = this.data.iconsList           || [];
         this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
+        this.data.iconsSize         = this.data.iconsSize           || 30;
+        this.data.listDesign        = this.data.listDesign          || {};
         this.data.listCallbacks     = this.data.listCallbacks       || [];
         this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
         this.data.hideOnListChoose  = this.data.hideOnListChoose===false? false : true;
@@ -68,9 +70,9 @@ var CDialog = Class(CContainer,{
         this.data.extraText         = this.data.extraText           || '';
         this.data.extraCallback     = this.data.extraCallback       || function(){};
         // Design
-        this.data.dialogColor       = this.data.dialogColor         || {color:'Aqua',level:4};
+        this.data.dialogColor       = this.data.dialogColor         || {color:'Cyan',level:6};
         this.data.bgColor           = this.data.bgColor             || {color:'Gray',level:0};
-        this.data.contentColor      = this.data.contentColor        || {color:'Gray',level:10};
+        this.data.contentColor      = this.data.contentColor        || {color:'Gray',level:12};
         this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};
         this.data.titleColor        = this.data.titleColor          || this.data.dialogColor;
         this.data.titleAlign        = this.data.titleAlign          || 'center';
@@ -257,13 +259,11 @@ var CDialog = Class(CContainer,{
         var design = {
             color: this.data.contentColor,
             width:'100%',
-            height: 'auto',
+            height: '45',
             boxSizing: 'borderBox',
             fontSize:17,
             fontStyle: ['bold'],
             margin: 'centered',
-            paddingTop:9,
-            paddingBottom:9,
             paddingRight:7,
             paddingLeft:7,
             border: {top:1},
@@ -275,29 +275,34 @@ var CDialog = Class(CContainer,{
         if (index === 0)
             design.border = {};
 
+        var logic = {
+            text: text,
+                onClick: function(){
+                listCallback();
+                chosenCallback(index,text);
+                hideOnChoose();
+            }
+        };
+
         // Set icon design
         if (!CUtils.isEmpty(icon)) {
-            var iconDesign = 'iconOnly';
+            var iconAlign = '';
             if (!CUtils.isEmpty(text)){
                 if (this.data.iconsAlign=='left')
-                    iconDesign = 'iconLeft';
+                    iconAlign = 'left';
                 if (this.data.iconsAlign=='right')
-                    iconDesign = 'iconRight';
+                    iconAlign = 'right';
             }
-            design[iconDesign] = icon;
+            logic.icon = {
+                name:   icon,
+                size:   this.data.iconsSize,
+                align:  iconAlign || null
+            }
         }
-
 
         var contentId = CObjectsHandler.createObject('Button',{
                 design: design,
-                logic: {
-                    text: text,
-                    onClick: function(){
-                        listCallback();
-                        chosenCallback(index,text);
-                        hideOnChoose();
-                    }
-                }
+                logic: logic
             });
 
         this.appendContent(contentId);

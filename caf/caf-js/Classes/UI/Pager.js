@@ -166,20 +166,20 @@ var CPager = Class({
         return name+CPager.dataToPath(params);
     },
     showPage: function(name,params){
-        // Check if the page need to be reloaded with dynamic data
-        // or already loaded dynamic page.
+        // Check if the page need to be reloaded with template data
+        // or already loaded template page.
         var id                  = CPager.pages[name];
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
             if (CUtils.isEmpty(id)) {
                 id = CPager.pages[name];
-                // Check if dynamic.
-                if (CDynamics.objectHasDynamic(id)) {
+                // Check if template.
+                if (CTemplator.objectHasDynamic(id)) {
                     CPager.tempPageId     = id;
                     CPager.tempPagePath   = pagePath;
                     var onFinish = function(){
-                        var pageId = CDynamics.lastDuplicate(CPager.tempPageId);
+                        var pageId = CTemplator.lastDuplicate(CPager.tempPageId);
                         if (!CUtils.isEmpty(pageId)) {
                             CPager.pages[CPager.tempPagePath] = pageId;
                             CPager.showPage(name,params); // show page.
@@ -188,7 +188,7 @@ var CPager = Class({
                         CPager.tempPageId     = '';
                         CPager.tempPagePath   = '';
                     };
-                    CDynamics.loadObjectWithData(id,CPager.getParamsAsMap(params),onFinish);
+                    CTemplator.loadObjectWithData(id,CPager.getParamsAsMap(params),onFinish);
                     return; // Return and move when page created callback.
                 }
             }

@@ -86,6 +86,10 @@ var CContainer = Class(CObject,{
     appendChild: function(objectId){
         this.data.childs.push(objectId);
     },
+    appendChilds: function(objectsIds){
+        objectsIds = objectsIds || [];
+        this.data.childs.push.apply(this.data.childs,objectsIds);
+    },
     addChildInPosition: function(objectId,index){
         this.data.childs.push(objectId);
         this.moveChild(objectId,index);
@@ -124,7 +128,7 @@ var CContainer = Class(CObject,{
         this.moveChildFromIndex(this.data.childs.indexOf(objectId),toIndex);
     },
     rebuild: function(onFinish){
-        CTemplator.buildFromObject(this.uid(),onFinish);
+        CBuilder.buildFromObject(this.uid(),onFinish);
     },
     restructureChildren: function(){
         if (CUtils.equals(this.data.lastChilds,this.data.childs))

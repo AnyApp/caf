@@ -62,7 +62,7 @@ var CObjectsHandler = Class({
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromDynamicObject: function(abstractObject,data,logic,design){
+    createFromTemplateObject: function(abstractObject,data,logic,design){
         var duplicatedObjectBase        = {};
         for (var key in abstractObject){
             duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);

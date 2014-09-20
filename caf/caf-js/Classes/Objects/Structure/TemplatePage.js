@@ -1,13 +1,13 @@
 /**
  * Created by dvircn on 25/08/14.
  */
-var CDynamicPage = Class([CPage,CDynamicObject],{
+var CTemplatePage = Class([CPage,CTemplate],{
     $statics: {
         gifLoaders:{
             default: 'loaderDefault'
         },
         DEFAULT_DESIGN: {
-            classes: CDynamics.hiddenClass
+            classes: CTemplator.hiddenClass
         },
         DEFAULT_LOGIC: {
         }
@@ -17,15 +17,16 @@ var CDynamicPage = Class([CPage,CDynamicObject],{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CDynamicPage);
+        CObject.mergeWithDefaults(values,CTemplatePage);
 
         // Invoke parent's constructor
-        CDynamicPage.$super.call(this, values);
-        CDynamicObject.prototype.constructor.call(this, values);
+        CTemplatePage.$super.call(this, values);
+        CTemplate.prototype.constructor.call(this, values);
         // Set that there is a page container for the abstract objects.
-        this.data.abstractContainer.data.page   = this.data.abstractContainer.data.page || this.data.page || {};
+        this.data.template.container.data.page   = this.data.template.container.data.page || this.data.page || {};
         //this.data.page                  = null;
-        this.data.abstractContainer.type        = 'Page';
+        this.data.template.container.type        = 'Page';
+        this.data.template.autoLoad = false;
 
     }
 

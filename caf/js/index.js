@@ -6,14 +6,54 @@ var app =
         builder.create('AppContainer','app-container').childs(['side-menu','main-view','drop-down-menu']);
         builder.create('SideMenu','side-menu')
             .sideMenuLeftContainer('side-menu-left-container').sideMenuRightContainer('side-menu-right-container');
-        builder.create('Container','side-menu-left-container').childs([]);
-        builder.create('Container','side-menu-right-container').childs([]);
+        builder.addData('navigation',[
+            {data: {icon:'large16',        text: 'Buttons', link: 'buttons'} },
+            {data: {icon:'text78',         text: 'Forms'  , link: 'forms'  } },
+            {data: {icon:'image63',        text: 'Sliders', link: 'sliders'} },
+            {data: {icon:'two151',         text: 'Tabs'   , link: 'tabs'   } },
+            {data: {icon:'exclamation14',  text: 'Dialogs', link: 'dialogs'} },
+            {data: {icon:'smile5',         text: 'Icons'  , link: 'icons'  } },
+            {data: {icon:'table34',        text: 'Data'   , link: 'data'   } },
+            {data: {icon:'earth31',        text: 'Routing', link: 'routing'} }
+        ]);
+        builder.create('SideMenuContainer','side-menu-left-container').childs(['left-menu'])
+            .design({bgColor: CColor('Indigo',15)});
+        builder.addDesign('left-menu-button',{
+            paddingLeft:6,boxSizing:'borderBox',textAlign:'left',height:45, widthXS: 12,
+            fontSize:16,color: CColor('Gray',2), marginTop:1, round: 0,
+            active: { bgColor:CColor('Indigo',17),color: CColor('White') }
+        });
+        builder.create('Template','left-menu')
+            .templateObject(
+                co('Button')
+                    .iconRight('#this.data.icon',28).sideMenuSwitch('left')
+                    .design(builder.getDesign('left-menu-button'))
+                    .text('#this.data.text').link('#this.data.link').build()
+            )
+            .templateData(builder.getData('navigation'));
+        builder.create('SideMenuContainer','side-menu-right-container').childs(['right-menu'])
+            .design({bgColor: CColor('Purple',15)});;
+        builder.addDesign('right-menu-button',{
+            paddingRight:6,boxSizing:'borderBox',textAlign:'right',height:45, widthXS: 12,
+            fontSize:16,color: CColor('Gray',2), marginTop:1, round: 0,
+            active: { bgColor:CColor('Purple',17),color: CColor('White') }
+        });
+        builder.create('Template','right-menu')
+            .templateObject(
+                co('Button')
+                    .iconLeft('#this.data.icon',28).sideMenuSwitch('right')
+                    .design(builder.getDesign('right-menu-button'))
+                    .text('#this.data.text').link('#this.data.link').build()
+            )
+            .templateData(builder.getData('navigation'));
+
         builder.create('MainView','main-view').childs(['header','content','footer']);
         builder.create('Header','header')
             .headerLeft(['header-button-left-0','header-button-back'])
-            .headerRight(['header-button-right-0','header-button-right-1']);
+            .headerRight(['header-button-right-0','header-button-right-1'])
+            .design({bgColor:{color:'LightBlue',level:8}});
         //Add Design.
-        builder.addDesign('header-button',{active: { bgColor:{color:'Blue',level:6} } });
+        builder.addDesign('header-button',{active: { bgColor:{color:'LightBlue',level:10} } });
         builder.create('Button','header-button-right-0')
             .design(builder.getDesign('header-button'))
             .icon('ellipsis',38).dialogSwitch('drop-down-menu');
@@ -29,6 +69,7 @@ var app =
         builder.create('Dialog','drop-down-menu').data({
             topView: 'header-button-right-0',
             list: ['dvir','cohen','tal','levi','cohen','tal levi the very very very very very very very very man','levi','cohen'],
+            iconsList:['ellipsis'],
             chooseCallback: function(index,value){
                 CLog.dlog(index+") "+value);
             },
@@ -44,33 +85,29 @@ var app =
         builder.create('Footer','footer').childs([]);
         builder.create('Content','content').childs(['main-page','form-page','category-page','tabs-page']);
         builder.create('Page','main-page')
-            .childs(['main-to-buttons-button','main-to-forms-button','main-to-sliders-button',
-                'main-to-tabs-button','main-to-dialogs-button','main-to-icons-button',
-                'main-to-data-button','to-category-button','to-category-dvir-button',
-                'main-button','main-reload-dynamic','dynamic-buttons','main-gallery'])
+            .childs(['main-buttons-template','main-reload-dynamic','dynamic-buttons','main-gallery'])
             .page('','Main',function(){} /* Optional On Page Load */);
         builder.create('Page','form-page').childs(['form'])
             .page('form','Form');
         builder.create('Page','tabs-page').childs(['tabber'])
             .page('tabs','Tabs');
-        builder.create('DynamicPage','category-page').childs(['tabber'])
+        builder.create('TemplatePage','category-page').childs(['tabber'])
             .page('category','Category Page',function(params) {CLog.dlog(params);})
-            .dynamic()
-            .abstractObjects([
+            .templateObjects([
                 // Create object.
-                (new CBuilderObject('Label','#/label')).text('Title: #.data.category')
-                    .design({ height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0})
+                co('Label','#/label').text('Title: #.data.category')
+                    .design({ height:40, bgColor:{color:'Red',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0})
                     .build()
             ])
-        builder.create('DynamicObject','dynamic-buttons')
-            .dynamic('http://codletech.net/CAF/caf.php',true)
-            .abstractObjects([
-                (new CBuilderObject('Label')).text('Title: #this.data.name')
-                    .design({ height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0})
+        builder.create('Template','dynamic-buttons')
+            .template('http://codletech.net/CAF/caf.php',true)
+            .templateObjects([
+                co('Label').text('Title: #this.data.name')
+                    .design({ height:40, bgColor:{color:'Red',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0})
                     .build(),
-                (new CBuilderObject('Button')).text('Welcome #.data.name')
-                    .design({ height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0,
-                        active: { bgColor:{color:'Aqua',level:6} }})
+                co('Button').text('Welcome #.data.name')
+                    .design({ height:40, bgColor:{color:'Cyan',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0,
+                        active: { bgColor:{color:'Cyan',level:8} }})
                     .showDialog(/*Data*/{
                         title: 'Hello #.data.name !',
                         //topView: 'main-button',
@@ -81,67 +118,47 @@ var app =
                     .build()
             ])
         builder.create('Button','main-reload-dynamic')
-            .design({ height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Olive',level:6} }})
+            .design({ height:40, bgColor:{color:'LightGreen',level:6},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'LightGreen',level:8} }})
             .reloadDynamicButton('dynamic-buttons',true /*QueryData and callback here*/)
             .text('Reload');
         //Add Design.
         builder.addDesign('main-button',{
-            paddingLeft:8,boxSizing:'borderBox',textAlign:'left',height:40,widthSM: 5, widthXS: 10,
-            bgColor:{color:'Teal',level:4},marginRight:1,marginLeft:1, marginTop:1, round: 0,
-            active: { bgColor:{color:'Teal',level:6} }
+            paddingLeft:6,boxSizing:'borderBox',textAlign:'left',height:60,widthSM: 6, widthXS: 12,
+            fontSize:18,color: CColor('Cyan',8),bgColor:CColor('White',6), marginTop:1, round: 0,
+            active: { bgColor:CColor('Cyan',8),color: CColor('White') }
         });
-        builder.create('Button','main-to-buttons-button')
-            .design(builder.getDesign('main-button'))
-            .text('Buttons').icon('right43',40,'right').link('buttons');
-        builder.create('Button','main-to-forms-button')
-            .design(builder.getDesign('main-button'))
-            .text('Forms').icon('right43',40,'right').link('forms');
-        builder.create('Button','main-to-sliders-button')
-            .design(builder.getDesign('main-button'))
-            .text('Sliders').icon('right43',40,'right').link('sliders');
-        builder.create('Button','main-to-tabs-button')
-            .design(builder.getDesign('main-button'))
-            .text('Tabs').icon('right43',40,'right').link('tabs');
-        builder.create('Button','main-to-dialogs-button')
-            .design(builder.getDesign('main-button'))
-            .text('Dialogs').icon('right43',40,'right').link('dialogs');
-        builder.create('Button','main-to-icons-button')
-            .design(builder.getDesign('main-button'))
-            .text('Icons').icon('right43',40,'right').link('icons');
-        builder.create('Button','main-to-data-button')
-            .design(builder.getDesign('main-button'))
-            .text('Data').icon('right43',40,'right').link('data');
-        builder.create('Button','to-category-button')
-            .design(builder.getDesign('main-button'))
-            .text('Category').icon('right43',40,'right').link('category');
-        builder.create('Button','to-category-dvir-button')
-            .design(builder.getDesign('main-button'))
-            .text('Category Dvir').icon('right43',40,'right').link('category/dvir');
-        builder.create('Button','main-button')
-            .design(builder.getDesign('main-button'))
-            .text('Show Dialog').icon('right43',40,'right').link('category/dvir')
-            .showDialog(/*Data*/{
-                title: 'Confirmation',
-                //topView: 'main-button',
-                textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.',
-                list: ['dvir','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi'],
-                chooseCallback: function(index,value){
-                    CLog.dlog(index+") "+value);
-                },
-                listCallbacks:[function(){CLog.dlog('Dvir Clicked')},
-                    function(){CLog.dlog('Cohen Clicked')}],
-                hideOnListChoose: false,
-                cancelText: 'Cancel',
-                cancelCallback: function() { CLog.dlog('Cancel Callback')},
-                confirmText: 'Confirm',
-                confirmCallback: function() { CLog.dlog('Confirm Callback')},
-                extraText: 'Extra Button',
-                extraCallback: function() { CLog.dlog('Extra Callback')}
-            },/*Design*/{});
-        builder.create('Button','to-category-dvir-button')
-            .design(builder.getDesign('main-button'))
-            .text('Category Dvir').icon('right43',40,'right').link('category/dvir');
+        builder.create('Template','main-buttons-template')
+            .templateObject(
+                co('Button')
+                    .iconRight('right65',40).iconLeft('#this.data.icon',35)
+                    .design(builder.getDesign('main-button'))
+                    .text('#this.data.text').link('#this.data.link')
+                    .build()
+            )
+            .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
+            .templateData(builder.getData('navigation')
+                /*co().iconLeft('table34',35)    .text('Category')   .link('category').build(),
+                co().iconLeft('table34',35)    .text('Category Dvir').link('category/dvir').build(),
+                co().iconLeft('table34',35)    .text('Show Dialog').showDialog(*//*Data*//*{
+                    title: 'Confirmation',
+                    //topView: 'main-button',
+                    textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.',
+                    list: ['dvir','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi','cohen','tal','levi'],
+                    chooseCallback: function(index,value){
+                        CLog.dlog(index+") "+value);
+                    },
+                    listCallbacks:[function(){CLog.dlog('Dvir Clicked')},
+                        function(){CLog.dlog('Cohen Clicked')}],
+                    hideOnListChoose: false,
+                    cancelText: 'Cancel',
+                    cancelCallback: function() { CLog.dlog('Cancel Callback')},
+                    confirmText: 'Confirm',
+                    confirmCallback: function() { CLog.dlog('Confirm Callback')},
+                    extraText: 'Extra Button',
+                    extraCallback: function() { CLog.dlog('Extra Callback')}
+                }).build()*/
+            );
         builder.create('Form','form')
             .formInputs(['form-input-name','form-input-phone'])
             .formOnSubmit(function(values) { CLog.log(values); })
@@ -161,23 +178,23 @@ var app =
         //Add Design.
         builder.addDesign('form-button-base',{ height:40, marginTop:4,widthSM: 7,widthXS: 11,marginRight:1, marginLeft:1, marginTop:1});
         builder.create('Button','form-submit-button')
-            .design(/*Strong*/{bgColor:{color:'Olive',level:3},
-                active: { bgColor:{color:'Olive',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .design(/*Strong*/{bgColor:{color:'DarkGreen',level:7},
+                active: { bgColor:{color:'DarkGreen',level:9}}},/*Base*/builder.getDesign('form-button-base'))
             .text('Submit Form').icon('right43',40,'right')
             .formSubmitButton('form');
         builder.create('Button','form-send-to-url-button')
-            .design(/*Strong*/{bgColor:{color:'Navy',level:3},
-                active: { bgColor:{color:'Navy',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .design(/*Strong*/{bgColor:{color:'LightBlue',level:5},
+                active: { bgColor:{color:'LightBlue',level:7}}},/*Base*/builder.getDesign('form-button-base'))
             .text('Send to URL').icon('right43',40,'right')
             .formSendToUrlButton('form');
         builder.create('Button','form-save-to-local-storage-button')
-            .design(/*Strong*/{bgColor:{color:'Purple',level:3},
-                active: { bgColor:{color:'Purple',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .design(/*Strong*/{bgColor:{color:'Purple',level:5},
+                active: { bgColor:{color:'Purple',level:7}}},/*Base*/builder.getDesign('form-button-base'))
             .text('Save to Local Storage').icon('right43',40,'right')
             .formSaveToLocalStorageButton('form');
         builder.create('Button','form-clear-button')
-            .design(/*Strong*/{bgColor:{color:'Red',level:3},
-                active: { bgColor:{color:'Red',level:5}}},/*Base*/builder.getDesign('form-button-base'))
+            .design(/*Strong*/{bgColor:{color:'Red',level:5},
+                active: { bgColor:{color:'Red',level:7}}},/*Base*/builder.getDesign('form-button-base'))
             .text('Clear Form').icon('right43',40,'right')
             .formClearButton('form');
         builder.create('Gallery','main-gallery')
@@ -189,18 +206,18 @@ var app =
                 'http://ourevent.co.il/wp-content/uploads/2014/04/3-1.jpg',
                 'http://ourevent.co.il/wp-content/uploads/2014/04/4-1.jpg'
             ]);
-        builder.create('Tabber','tabber').tabberTabs(['tab-aqua','tab-red','tab-green'])
+        builder.create('Tabber','tabber').tabberTabs(['tab-Cyan','tab-red','tab-green'])
             .tabberButtonsPerView(2).tabberButtonsHeight(45)
-            .tabberButtonsTexts(['Aqua','Red','Green'])
-            .tabberButtonsDesign({bgColor: {color:'Maroon',level:3},
-                active: {bgColor: {color:'Maroon',level:4}},
-                hold: { bgColor: {color:'Maroon',level:6} } });
-        builder.create('Tab','tab-aqua').childs([])
-            .design({bgColor:{color:'Aqua',level:4}});
+            .tabberButtonsTexts(['Cyan','Red','Green'])
+            .tabberButtonsDesign({bgColor: CColor('Brown',5),
+                active: {bgColor: CColor('Brown',6)},
+                hold: { bgColor: CColor('Brown',8) } });
+        builder.create('Tab','tab-Cyan').childs([])
+            .design({bgColor:CColor('Cyan',6)});
         builder.create('Tab','tab-red').childs([])
-            .design({bgColor:{color:'Red',level:4}});
+            .design({bgColor:CColor('Red',6)});
         builder.create('Tab','tab-green').childs([])
-            .design({bgColor:{color:'Green',level:4}});
+            .design({bgColor:CColor('Green',6)});
 
 
 /*
@@ -231,7 +248,7 @@ var app =
             data: {  childs: ['main-page','form-page','category-page','tabs-page'] }
         };
         var mainPage = {   uname:  'main-page', type:   'Page',
-            data: {  childs: ['main-to-buttons-button','main-to-forms-button','main-to-sliders-button','main-to-tabs-button','main-to-dialogs-button','main-to-icons-button','main-to-data-button','to-category-button','to-category-dvir-button','main-button','main-reload-dynamic','dynamic-buttons','main-gallery'],
+            data: {  childs: ['main-to-buttons-button','main-to-forms-button','main-to-sliders-button','main-to-tabs-button','main-to-dialogs-button','main-to-icons-button','main-to-data-button','to-category-button','to-category-dvir-button','main-button','main-reload-template','template-buttons','main-gallery'],
                 page: {
                     name: '',
                     title: 'Main',
@@ -260,7 +277,7 @@ var app =
             },
             logic: { page: true }
         };
-        var categoryPage = {   uname:  'category-page',type:   'DynamicPage',
+        var categoryPage = {   uname:  'category-page',type:   'TemplatePage',
             data: {
                 childs: [],
                 page: {
@@ -268,39 +285,39 @@ var app =
                     title: 'Category Page',
                     onLoad: function(params) {CLog.dlog(params);}
                 },
-                abstractObjects:[
+                templateObjects:[
                     {
                         type:   'Label',
-                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                            active: { bgColor:{color:'Red',level:6} },
-                            activeRemove: {bgColor:{color:'Red',level:4}}
+                        design: { height:40, bgColor:{color:'Red',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Red',level:8} },
+                            activeRemove: {bgColor:{color:'Red',level:6}}
                         },
                         logic: { text: "Title: #.data.category" }
                     }
                 ]
             },
             logic: {
-                dynamic:{},
+                template:{},
                 page: true
             }
         };
-        var dynamicButtons = {   uname:  'dynamic-buttons',type:   'DynamicObject',
+        var dynamicButtons = {   uname:  'template-buttons',type:   'Template',
             data: {
-                abstractObjects:[
+                templateObjects:[
                     {
                         type:   'Label',
                         uname: '#/label',
-                        design: { height:40, bgColor:{color:'Red',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                            active: { bgColor:{color:'Red',level:6} },
-                            activeRemove: {bgColor:{color:'Red',level:4}}
+                        design: { height:40, bgColor:{color:'Red',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Red',level:8} },
+                            activeRemove: {bgColor:{color:'Red',level:6}}
                         },
                         logic: { text: "Title: #this.data.name" }
                     },
                     {
                         type:   'Button',
-                        design: { height:40, bgColor:{color:'Aqua',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                            active: { bgColor:{color:'Aqua',level:6} },
-                            activeRemove: {bgColor:{color:'Aqua',level:4}}
+                        design: { height:40, bgColor:{color:'Cyan',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                            active: { bgColor:{color:'Cyan',level:8} },
+                            activeRemove: {bgColor:{color:'Cyan',level:6}}
                         },
                         logic: { text: "Welcome #.data.name",
                             showDialog: {
@@ -317,25 +334,25 @@ var app =
                 ]
             },
             logic: {
-                dynamic:{
+                template:{
                     url: 'http://codletech.net/CAF/caf.php',
                     autoLoad: true
                 }
             }
         };
-        var mainViewReloadDynamic = {   uname:  'main-reload-dynamic', type:   'Button',
-            design: { height:40, bgColor:{color:'Olive',level:4},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Olive',level:6} }},
+        var mainViewReloadDynamic = {   uname:  'main-reload-template', type:   'Button',
+            design: { height:40, bgColor:{color:'DarkGreen',level:6},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'DarkGreen',level:8} }},
             logic: {
                 text: "Reload",
-                buttonReloadDynamic: {object: 'dynamic-buttons', reset: true, queryData: {} }
+                buttonReloadDynamic: {object: 'template-buttons', reset: true, queryData: {} }
             }
         };
         var mainButtonsDesign = {
             paddingLeft:8,boxSizing:'borderBox',textAlign:'left',height:40,
-                bgColor:{color:'Teal',level:4},widthSM: 5, widthXS: 10,marginRight:1,
+                bgColor:{color:'Teal',level:6},widthSM: 5, widthXS: 10,marginRight:1,
                 marginLeft:1, marginTop:1, round: 0,
-                active: { bgColor:{color:'Teal',level:6} }
+                active: { bgColor:{color:'Teal',level:8} }
         };
         var mainToButtonsButton = {   uname:  'main-to-buttons-button', type:   'Button',
             design: mainButtonsDesign,
@@ -394,8 +411,8 @@ var app =
             }
         }
         var toCategoryButton = {   uname:  'to-category-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Lime',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Lime',level:6} }
+            design: { height:40, bgColor:{color:'Lime',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Lime',level:8} }
             },
             logic: {
                 text:'Category',
@@ -406,8 +423,8 @@ var app =
             }
         }
         var toCategoryDvirButton = {   uname:  'to-category-dvir-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Lime',level:4},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Lime',level:6} }
+            design: { height:40, bgColor:{color:'Lime',level:6},widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Lime',level:8} }
             },
             logic: {
                 text:'Category Dvir',
@@ -418,8 +435,8 @@ var app =
             }
         }
         var mainViewButton = {   uname:  'main-button', type:   'Button',
-            design: { height:40, bgColor:{color:'Maroon',level:4},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Maroon',level:6} }
+            design: { height:40, bgColor:{color:'Maroon',level:6},widthSM: 5, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'Maroon',level:8} }
             },
             logic: { text: "Show Dialog",
                 onClick: function(){
@@ -445,8 +462,8 @@ var app =
             }
         };
         var headerButtonRight0 = {   uname:  'header-button-right-0', type:   'Button',
-            design: { //bgColor:{color:'Red',level:4},
-                active: { bgColor:{color:'Blue',level:6} }
+            design: { //bgColor:{color:'Red',level:6},
+                active: { bgColor:{color:'Blue',level:8} }
             },
             logic: { text: "dm",
                 onClick: function(){
@@ -460,7 +477,7 @@ var app =
             }
         };
         var headerButtonRight1 = {   uname:  'header-button-right-1', type:   'Button',
-            design: { active: { bgColor:{color:'Blue',level:6} } },
+            design: { active: { bgColor:{color:'Blue',level:8} } },
             logic: {
                 link: {
                     path: 'form',
@@ -473,7 +490,7 @@ var app =
             }
         };
         var headerButtonLeft0 = {   uname:  'header-button-left-0', type:   'Button',
-            design: { active: { bgColor:{color:'Blue',level:6} } },
+            design: { active: { bgColor:{color:'Blue',level:8} } },
             logic: {
                 sideMenuSwitch: 'left',
                 icon: {
@@ -483,7 +500,7 @@ var app =
             }
         };
         var headerBackButton = {   uname:  'header-button-back', type:   'Button',
-            design: { active: { bgColor:{color:'Blue',level:6} } },
+            design: { active: { bgColor:{color:'Blue',level:8} } },
             logic: {
                 backButton: true,
                 icon: {
@@ -534,15 +551,15 @@ var app =
             logic: {loadInputFromStorage: true}
         }
         var formSubmitButton = { uname: 'form-submit-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Olive',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'Olive',level:5} }
+            design: { height:40, bgColor:{color:'DarkGreen',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+                active: { bgColor:{color:'DarkGreen',level:5} }
             },
             logic: { text: "Submit Form",
                 formSubmitButton: 'form'
             }
         };
         var formSendToURLButton = { uname: 'form-send-to-url-button', type: 'Button',
-            design: { height:40, bgColor:{color:'Navy',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
+            design: { height:40, bgColor:{color:'LightBlue',level:3}, marginTop:4,widthSM: 7, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1, round: 2,
                 active: { bgColor:{color:'Blue',level:5} }
             },
             logic: { text: "Send to URL",
@@ -576,35 +593,35 @@ var app =
         };
         var tabber = { uname: 'tabber', type: 'Tabber',
             data: {
-                tabs: ['tab-aqua','tab-red','tab-green'],
+                tabs: ['tab-Cyan','tab-red','tab-green'],
                 buttons: {
                     perView: 2,
-                    texts:['Aqua','Red','Green'],
+                    texts:['Cyan','Red','Green'],
                     design:{
                         bgColor: {color:'Maroon',level:3},
                         active: {
-                            bgColor: {color:'Maroon',level:4}
+                            bgColor: {color:'Maroon',level:6}
                         },
                         hold: {
-                            bgColor: {color:'Maroon',level:6}
+                            bgColor: {color:'Maroon',level:8}
                         }
                     }
                 }
             }
         };
-        var tabAqua = { uname: 'tab-aqua', type: 'Tab',
+        var tabCyan = { uname: 'tab-Cyan', type: 'Tab',
             design:{
-                bgColor:{color:'Aqua',level:4}
+                bgColor:{color:'Cyan',level:6}
             }
         };
         var tabRed = { uname: 'tab-red', type: 'Tab',
             design: {
-                bgColor:{color:'Red',level:4}
+                bgColor:{color:'Red',level:6}
             }
         };
         var tabGreen = { uname: 'tab-green', type: 'Tab',
             design: {
-                bgColor:{color:'Green',level:4}
+                bgColor:{color:'Green',level:6}
             }
         };
 
@@ -640,7 +657,7 @@ var app =
             headerBackButton,
             tabsPage,
             tabber,
-            tabAqua,
+            tabCyan,
             tabRed,
             tabGreen,
             mainToButtonsButton,
