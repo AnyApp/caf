@@ -93,7 +93,7 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
-            if (object.onClicks.length>0)
+            if (object.onClicks.length>0 && !object.isLink())
                 e.preventDefault();
 
             var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);

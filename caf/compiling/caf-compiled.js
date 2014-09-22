@@ -1559,6 +1559,18 @@ var CUtils = Class({
         } catch (e) {
             return false;
         }
+    },
+    arrayFromObjectsKey: function(objects,key1,key2,key3){
+        var arr = [];
+        _.each(objects,function(element){
+            var value = element[key1];
+            if (key2)
+                value = value[key2];
+            if (key3)
+                value = value[key3];
+            arr.push(value || null);
+        },this);
+        return arr;
     }
 
 
@@ -1877,7 +1889,7 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
-            if (object.onClicks.length>0)
+            if (object.onClicks.length>0 && !object.isLink())
                 e.preventDefault();
 
             var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
@@ -2996,7 +3008,7 @@ var  CDialogContainer = Class(CContainer,{
             minHeight: 100,
             maxWidth: '90%',
             maxHeight: '80%',
-            round:2,
+            //round:2,
             bgColor:{color:'White'},
             //border: { all: 1},
             borderColor:{color:'Gray',level:2}
@@ -3078,7 +3090,10 @@ var CDialog = Class(CContainer,{
         this.data.iconsList         = this.data.iconsList           || [];
         this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
         this.data.iconsSize         = this.data.iconsSize           || 30;
+        this.data.listDesign        = this.data.listDesign          || {};
         this.data.listCallbacks     = this.data.listCallbacks       || [];
+        this.data.listItemsData     = this.data.listItemsData       || [];
+        this.data.listItemsLogic    = this.data.listItemsLogic      || [];
         this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
         this.data.hideOnListChoose  = this.data.hideOnListChoose===false? false : true;
         this.data.cancelCallOnHide  = this.data.cancelCallOnHide===false? false : true;
@@ -3243,6 +3258,8 @@ var CDialog = Class(CContainer,{
         var list            = this.data.list,
             iconsList       = this.data.iconsList,
             listCallbacks   = this.data.listCallbacks,
+            listItemsData   = this.data.listItemsData,
+            listItemsLogic  = this.data.listItemsLogic,
             chooseCallback  = this.data.chooseCallback,
             actualCallbacks = [],
             dialog          = this;
@@ -3257,6 +3274,8 @@ var CDialog = Class(CContainer,{
             var index = i;
             var text = list[index] || '';
             var icon = index < iconsList.length ? iconsList[index] : '';
+            var data = index < listItemsData.length ? listItemsData[index] : {};
+            var logic = index < listItemsLogic.length ? listItemsLogic[index] : {};
 
             var listCallback = index < listCallbacks.length ?
                 listCallbacks[index] : function(){};
@@ -3268,13 +3287,13 @@ var CDialog = Class(CContainer,{
                 dialog.hide();
             } : function(){};
 
-            this.createListElement(index,text,icon,listCallback,chosenCallback,hideOnChoose);
+            this.createListElement(index,text,data,logic,icon,listCallback,chosenCallback,hideOnChoose);
         }
 
 
 
     },
-    createListElement: function (index,text,icon,listCallback,chosenCallback,hideOnChoose) {
+    createListElement: function (index,text,data,customLogic,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {
             color: this.data.contentColor,
             width:'100%',
@@ -3282,7 +3301,7 @@ var CDialog = Class(CContainer,{
             boxSizing: 'borderBox',
             fontSize:17,
             fontStyle: ['bold'],
-            margin: 'centered',
+            //margin: 'centered',
             paddingRight:7,
             paddingLeft:7,
             border: {top:1},
@@ -3290,6 +3309,8 @@ var CDialog = Class(CContainer,{
             textAlign: this.data.contentAlign,
             active: { bgColor: this.data.dialogColor, color: {color:'White'}}
         };
+
+        design = CUtils.mergeJSONs(design,this.data.listDesign);
 
         if (index === 0)
             design.border = {};
@@ -3318,10 +3339,12 @@ var CDialog = Class(CContainer,{
                 align:  iconAlign || null
             }
         }
+        logic = CUtils.mergeJSONs(logic,customLogic);
 
         var contentId = CObjectsHandler.createObject('Button',{
                 design: design,
-                logic: logic
+                logic: logic,
+                data:data
             });
 
         this.appendContent(contentId);

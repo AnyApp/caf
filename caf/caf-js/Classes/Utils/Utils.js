@@ -191,6 +191,18 @@ var CUtils = Class({
         } catch (e) {
             return false;
         }
+    },
+    arrayFromObjectsKey: function(objects,key1,key2,key3){
+        var arr = [];
+        _.each(objects,function(element){
+            var value = element[key1];
+            if (key2)
+                value = value[key2];
+            if (key3)
+                value = value[key3];
+            arr.push(value || null);
+        },this);
+        return arr;
     }
 
 
