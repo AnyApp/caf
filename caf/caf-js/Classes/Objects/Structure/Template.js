@@ -26,6 +26,7 @@ var CTemplate = Class(CContainer,{
         this.design.classes             = this.design.classes           || '';
         //this.design.classes             += ' ' +CTemplate.gifLoaders.default+ ' ';
         this.logic.template             = true;
+        this.logic.pullToRefresh        = true;
         this.data.template              = this.data.template            || {};
         this.data.template.url          = this.data.template.url        || '';
         this.data.template.callback     = this.data.template.callback   || function(){};

@@ -393,7 +393,6 @@
         if (!which(e)) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey) return;
         if (e.defaultPrevented) return;
-
         // ensure link
         //var el = e.target;
         var el = e.target || e.srcElement;
@@ -424,6 +423,10 @@
 
         //e.preventDefault();
         e.preventDefault ? e.preventDefault() : e.returnValue = false;
+
+        // If in pull do not move page.
+        if (CPullToRefresh.inPullToRefresh()) return;
+
         page.show(orig);
     }
 

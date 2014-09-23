@@ -93,14 +93,14 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
-            if (object.onClicks.length>0 && !object.isLink())
-                e.preventDefault();
-
             var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
             var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
             var boxSize = 15;
-            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout')
+            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout'
+                && !CPullToRefresh.inPullToRefresh())
             {
+                if (object.onClicks.length>0 && !object.isLink())
+                    e.preventDefault();
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
                     onClick();

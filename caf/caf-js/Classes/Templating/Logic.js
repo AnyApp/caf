@@ -137,6 +137,10 @@ var CLogic = Class({
             //CTemplator.applyDynamic(object,value);
             if (value===true)
                 CPager.addPage(object);
+        },
+        pullToRefresh: function(object,value){
+            if (value === true)
+                CPullToRefresh.applyPullToRefresh(object);
         }
 
     },

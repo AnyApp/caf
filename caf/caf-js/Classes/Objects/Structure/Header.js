@@ -45,9 +45,9 @@ var CHeader = Class(CContainer,{
         CUI.setTitleObject(this.data.title);
 
         // Set up childs array.
-        this.data.childs = this.data.childs.concat(this.data.left);
-        this.data.childs = this.data.childs.concat([this.data.title]);
-        this.data.childs = this.data.childs.concat(this.data.right);
+        this.appendChilds(this.data.left);
+        this.appendChilds([this.data.title]);
+        this.appendChilds(this.data.right);
 
         // Set Force Design
         this.forceDesign = {

@@ -20,6 +20,7 @@ var CBuilderObject = Class({
     },
     initTemplate: function(){
         this.properties.data.template   = this.properties.data.template || {};
+        this.properties.data.template.container    = this.properties.data.template.container  || {type:'Container'};
         this.properties.logic.template  = true;
     },
     childs: function(childs){
@@ -74,6 +75,19 @@ var CBuilderObject = Class({
     templateData: function(data) {
         this.initTemplate();
         this.properties.data.template.data = data;
+        return this;
+    },
+    templateContainerDesign: function(design) {
+        this.initTemplate();
+        this.properties.data.template.container.design = design;
+        return this;
+    },
+    templateBorder: function(color,size) {
+        this.initTemplate();
+        this.properties.data.template.container.design
+            = this.properties.data.template.container.design || {};
+        this.properties.data.template.container.design.border = {top:size||1};
+        this.properties.data.template.container.design.borderColor = color || CColor('Gray',4);
         return this;
     },
     templateItemOnClick: function(onClick) {

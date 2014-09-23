@@ -20,6 +20,11 @@ var CContainer = Class(CObject,{
         this.data.childs        = this.data.childs || [];
         this.data.lastChilds    = this.data.lastChilds || [];
         this.data.toRemoveChilds= [];
+//        this.data.actualContainer = this;
+//        if (this.logic.scrollable===true){
+//            this.data.actualContainer = CObjectsHandler.createObject('Container')
+//        }
+
     },
     /**
      *  Build Object.
@@ -69,6 +74,9 @@ var CContainer = Class(CObject,{
 
         return content;
     },
+    getChilds: function(){
+        return this.data.childs;
+    },
     assignReferences: function(){
         _.each(this.data.childs,function(childID){
             var object = CObjectsHandler.object(childID);
@@ -82,6 +90,9 @@ var CContainer = Class(CObject,{
     applyForceDesign: function(object){
         if (!CUtils.isEmpty(this.forceDesign))
             object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));
+    },
+    setChildInPosition: function(childId,position){
+        this.data.childs[position] = childId;
     },
     appendChild: function(objectId){
         this.data.childs.push(objectId);

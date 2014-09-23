@@ -6,6 +6,7 @@ var CObjectsHandler = Class({
     objectsById: {},
     preparedObjects: Array(),
     appContainerId: "",
+    dialogsContainerId: "",
     mainViewId: "",
 
     addObject: function(object){

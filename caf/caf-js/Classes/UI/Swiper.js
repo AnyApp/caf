@@ -126,7 +126,8 @@ var CSwiper = Class({
         //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable
+            disable: disable,
+            minDragDistance: 30
         });
     },
     openOrCloseSideMenu: function(name) {

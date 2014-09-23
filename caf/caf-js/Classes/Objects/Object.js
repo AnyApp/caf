@@ -147,10 +147,14 @@ var CObject = Class({
         this.lastLogic = {};
     },
     parseReferences: function(obj) {
+        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true) // Circular
+            return;
+        obj.parseReferencesVisited = true;
         for (var property in obj) {
             if (obj.hasOwnProperty(property)) {
-                if (typeof obj[property] == "object")
+                if (typeof obj[property] == "object"){
                     this.parseReferences(obj[property]);
+                }
                 else if (typeof obj[property] == 'string' || obj[property] instanceof String){
                     // Evaluate dynamic data.
                     var evaluated   = this.replaceReferencesInString(obj[property]);
@@ -159,6 +163,7 @@ var CObject = Class({
 
             }
         }
+        delete obj.parseReferencesVisited;
     },
     parseLocalReference: function(str){
         return eval(str);
@@ -290,8 +295,8 @@ var CObject = Class({
         // Update reference in parent.
         if (!CUtils.isEmpty(this.getRelativeParent())){
             var parentObject = CObjectsHandler.object(this.getRelativeParent());
-            var thisIndex = parentObject.data.childs.indexOf(prevUID);
-            parentObject.data.childs[thisIndex] = this.uid();
+            var thisIndex = parentObject.getChilds().indexOf(prevUID);
+            parentObject.setChildInPosition(this.uid(),thisIndex);
         }
         // Return the dynamic data.
         this.data.templateObjects   = abstractObjects;

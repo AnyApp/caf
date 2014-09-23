@@ -23,7 +23,7 @@ var CGallery = Class(CSlider,{
             var imageId = CObjectsHandler.createObject('ZoomedImage',{
                 data: {  src: [imageSrc] }
             });
-            this.data.childs.push(imageId);
+            this.appendChild(imageId);
         },this);
 
         // Invoke parent's constructor

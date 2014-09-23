@@ -68,9 +68,23 @@ var app =
             .icon('left46',34).backButton();
         builder.create('Dialog','drop-down-menu').data({
             topView: 'header-button-right-0',
-            list: CUtils.arrayFromObjectsKey(builder.getData('navigation'),'data','text'),
+            //list: CUtils.arrayFromObjectsKey(builder.getData('navigation'),'data','text'),
             //iconsList:CUtils.arrayFromObjectsKey(builder.getData('navigation'),'data','icon'),
             //iconsAlign: 'left',
+            dialogWidth: '250',
+            list:co('Template')
+                .templateObject(
+                    co('Button')
+                        .iconRight('right65',28).iconLeft('#this.data.icon',28)
+                        .design({textAlign:'left'})
+                        .text('#this.data.text').link('#this.data.link')
+                        .build()
+                )
+                .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
+                .templateData(builder.getData('navigation'))
+                .templateBorder(CColor('Red',6),4)
+                .templateContainerDesign({})// can change/append item container design.
+                .build(),
             chooseCallback: function(index,value){
                 CLog.dlog(index+") "+value);
             },
@@ -83,7 +97,6 @@ var app =
             //listItemsData: builder.getData('navigation'),
             contentColor: {color: 'White'},
             bgColor: {color:'Teal', level: 13},
-            dialogWidth: 250,
             destroyOnHide: false
         });
         builder.create('Footer','footer').childs([]);
@@ -140,6 +153,7 @@ var app =
                     .text('#this.data.text').link('#this.data.link')
                     .build()
             )
+            .templateContainerDesign({display:'inline'})
             .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
             .templateData(builder.getData('navigation')
                 /*co().iconLeft('table34',35)    .text('Category')   .link('category').build(),

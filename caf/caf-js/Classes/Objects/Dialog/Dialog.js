@@ -25,9 +25,17 @@ var CDialog = Class(CContainer,{
             design              = CUtils.clone(design);
 
             var newDialog = CObjectsHandler.createObject('Dialog',{data: data,design: design });
-            CObjectsHandler.object(CObjectsHandler.appContainerId).appendChild(newDialog);
+            CObjectsHandler.object(CObjectsHandler.dialogsContainerId).appendChild(newDialog);
             var onBuildFinish = function() {CObjectsHandler.object(newDialog).show();};
-            CObjectsHandler.object(CObjectsHandler.appContainerId).rebuild(onBuildFinish);
+            CObjectsHandler.object(CObjectsHandler.dialogsContainerId).rebuild(onBuildFinish);
+        },
+        hideDialogContainer: function(){
+            CUtils.element(CObjectsHandler.dialogsContainerId).style.zIndex='';
+            CUtils.element(CObjectsHandler.dialogsContainerId).style.display='';
+        },
+        showDialogContainer: function(){
+            CUtils.element(CObjectsHandler.dialogsContainerId).style.zIndex='10000';
+            CUtils.element(CObjectsHandler.dialogsContainerId).style.display='inherit';
         }
     },
 
@@ -54,15 +62,15 @@ var CDialog = Class(CContainer,{
         this.data.title             = this.data.title               || '';
         this.data.textContent       = this.data.textContent         || '';
         this.data.objectContent     = this.data.objectContent       || '';
-        this.data.list              = this.data.list                || [];
-        this.data.iconsList         = this.data.iconsList           || [];
-        this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
-        this.data.iconsSize         = this.data.iconsSize           || 30;
-        this.data.listDesign        = this.data.listDesign          || {};
-        this.data.listCallbacks     = this.data.listCallbacks       || [];
-        this.data.listItemsData     = this.data.listItemsData       || [];
-        this.data.listItemsLogic    = this.data.listItemsLogic      || [];
-        this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
+        this.data.list              = this.data.list                || {};
+//        this.data.iconsList         = this.data.iconsList           || [];
+//        this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
+//        this.data.iconsSize         = this.data.iconsSize           || 30;
+//        this.data.listDesign        = this.data.listDesign          || {};
+//        this.data.listCallbacks     = this.data.listCallbacks       || [];
+//        this.data.listItemsData     = this.data.listItemsData       || [];
+//        this.data.listItemsLogic    = this.data.listItemsLogic      || [];
+//        this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
         this.data.hideOnListChoose  = this.data.hideOnListChoose===false? false : true;
         this.data.cancelCallOnHide  = this.data.cancelCallOnHide===false? false : true;
         this.data.cancelText        = this.data.cancelText          || '';
@@ -120,6 +128,7 @@ var CDialog = Class(CContainer,{
         CAnimations.hide(this.uid());
     },
     show: function(){
+        CDialog.showDialogContainer();
         CAnimations.show(this.uid());
         this.onResize();
     },
@@ -133,6 +142,14 @@ var CDialog = Class(CContainer,{
             this.data.onAnimHideComplete = function(){
                 object.removeSelf();
                 CUtils.unbindEvent(window,'resize',object.onResize);
+                // Hide dialogs container.
+                CDialog.hideDialogContainer();
+            };
+        }
+        else {
+            this.data.onAnimHideComplete = function(){
+                // Hide dialogs container.
+                CDialog.hideDialogContainer();
             };
         }
     },
@@ -177,7 +194,7 @@ var CDialog = Class(CContainer,{
             }
         });
 
-        CObjectsHandler.object(this.dialogContainer).data.childs.push(this.dialogTitle);
+        CObjectsHandler.object(this.dialogContainer).appendChild(this.dialogTitle);
     },
     createContainer: function(){
         // Create container.
@@ -190,11 +207,11 @@ var CDialog = Class(CContainer,{
             }
         });
 
-        CObjectsHandler.object(this.dialogContainer).data.childs.push(this.contentContainer);
+        CObjectsHandler.object(this.dialogContainer).appendChild(this.contentContainer);
 
     },
     appendContent: function(contentId) {
-        CObjectsHandler.object(this.contentContainer).data.childs.push(contentId);
+        CObjectsHandler.object(this.contentContainer).appendChild(contentId);
     },
     createContent: function () {
         var contentId = null;
@@ -223,8 +240,35 @@ var CDialog = Class(CContainer,{
             this.appendContent(contentId);
     },
     createList: function () {
-        var list            = this.data.list,
-            iconsList       = this.data.iconsList,
+        var list            = this.data.list;
+        if (CUtils.isEmpty(list) || CUtils.isEmpty(list.logic) ||
+            list.logic.template !== true || CUtils.isEmpty(list.data) || CUtils.isEmpty(list.data.template) )
+            return;
+
+        var design = {
+            color: this.data.contentColor, width:'100%', height: '45', boxSizing: 'borderBox',
+            fontSize:17, fontStyle: ['bold'], paddingRight:7, paddingLeft:7,
+            textAlign: this.data.contentAlign, display: 'block',
+            active: { bgColor: this.data.dialogColor, color: {color:'White'}}
+        };
+
+        if (!CUtils.isEmpty(list.data.template.object))
+            list.data.template.object.design =
+                CUtils.mergeJSONs(design,list.data.template.object.design||{});
+
+        // List template item container - Border
+        list.data.template.container    = list.data.template.container  || {type:'Container'};
+        var containerDesign = {borderColor: this.data.listBorderColor,border: {top:1},
+                            width:'100%',display:'inlineBlock'};
+        list.data.template.container.design =
+            CUtils.mergeJSONs(containerDesign,list.data.template.container.design);
+
+        list.data.template.callback =  this.createListCallback(this,list.data.template.callback);
+        var listId = CObjectsHandler.createObject('Template',list);
+        this.appendContent(listId);
+
+        return;
+        var    iconsList       = this.data.iconsList,
             listCallbacks   = this.data.listCallbacks,
             listItemsData   = this.data.listItemsData,
             listItemsLogic  = this.data.listItemsLogic,
@@ -260,6 +304,12 @@ var CDialog = Class(CContainer,{
 
 
 
+    },
+    createListCallback: function(dialog,callback){
+        return this.data.hideOnListChoose === true ? function(){
+            callback();
+            dialog.hide();
+        } : function(){};
     },
     createListElement: function (index,text,data,customLogic,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {
@@ -337,7 +387,7 @@ var CDialog = Class(CContainer,{
             }
         });
 
-        CObjectsHandler.object(this.dialogContainer).data.childs.push(this.buttonsContainer);
+        CObjectsHandler.object(this.dialogContainer).appendChild(this.buttonsContainer);
 
         // Create all buttons
         var currentButton = 0;
@@ -391,7 +441,7 @@ var CDialog = Class(CContainer,{
         });
 
         // Add to container.
-        CObjectsHandler.object(this.buttonsContainer).data.childs.push(contentId);
+        CObjectsHandler.object(this.buttonsContainer).appendChild(contentId);
 
     },
     setPositionHandler: function () {

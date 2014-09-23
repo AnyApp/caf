@@ -38,11 +38,15 @@ var CTemplator = Class({
             var templateData = object.data.template;
             var containerData   = CUtils.clone(templateData.container);
             containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
-            containerData.design.display = 'inline';
+
             // On item click listener.
             var position = templateData.duplicates.length;
             var onItemClick = CTemplator.createItemOnClick(position,
                 templateData.callback,templateData.callbacks[position] || function(){});
+            // Clear border from first item.
+            containerData.design = containerData.design || {};
+            containerData.design.border      = position!==0?containerData.design.border:null;
+            containerData.design.borderColor = position!==0?containerData.design.borderColor:null;
 
             var containerId = CObjectsHandler.createObject(containerData.type,containerData);
             templateData.duplicates.push(containerId);

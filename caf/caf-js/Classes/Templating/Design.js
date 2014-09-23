@@ -97,7 +97,7 @@ var CDesign = Class({
             return "";
         },
         display: function(data){
-            var values = ['inlineBlock','block','inline','hidden'];
+            var values = ['inlineBlock','block','inline','hidden','displayNone'];
             if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
                 return data;
             }

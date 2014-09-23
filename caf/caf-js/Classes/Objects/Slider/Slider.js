@@ -36,7 +36,7 @@ var CSlider = Class(CContainer,{
             var sliderId = CObjectsHandler.createObject('SliderSlide',{
                 data: {  childs: [child] }
             });
-            this.data.childs.push(sliderId);
+            this.appendChild(sliderId);
         },this);
 
         var wrapperChilds = this.data.childs;
