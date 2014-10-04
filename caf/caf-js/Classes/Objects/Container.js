@@ -101,6 +101,10 @@ var CContainer = Class(CObject,{
         objectsIds = objectsIds || [];
         this.data.childs.push.apply(this.data.childs,objectsIds);
     },
+    addChildToStart: function(objectId){
+        this.data.childs.push(objectId);
+        this.moveChild(objectId,0);
+    },
     addChildInPosition: function(objectId,index){
         this.data.childs.push(objectId);
         this.moveChild(objectId,index);

@@ -7,10 +7,11 @@ var CContent = Class(CContainer,{
             classes: 'content',
             bgColor:{
                 color: 'White'
-            },
-            overflow: 'scrollable'
+            }/*,
+            overflow: 'scrollable'*/
         },
         DEFAULT_LOGIC: {
+            scrollable: true
         }
 
     },

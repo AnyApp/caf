@@ -194,7 +194,6 @@
                     utils.events.removeEvent(settings.element, utils.transitionCallback(), action.translate.easeCallback);
                 },
                 easeTo: function(n) {
-
                     if( !utils.canTransform() ){
                         cache.translation = n;
                         action.translate.x(n);
@@ -258,6 +257,8 @@
                     utils.events.removeEvent(settings.element, utils.eventType('up'), action.drag.endDrag);
                 },
                 startDrag: function(e) {
+                    if (CPullToRefresh.inPull)
+                        return;
                     // No drag on ignored elements
                     var target = e.target ? e.target : e.srcElement,
                         ignoreParent = utils.parentUntil(target, 'data-snap-ignore');
@@ -308,6 +309,11 @@
                     };
                 },
                 dragging: function(e) {
+                    if (CPullToRefresh.inPull){
+                        action.drag.endDrag(e);
+                        return;
+                    }
+
                     if (cache.isDragging && settings.touchToDrag) {
 
                         var thePageX = utils.page('X', e),

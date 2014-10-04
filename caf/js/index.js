@@ -32,7 +32,7 @@ var app =
             )
             .templateData(builder.getData('navigation'));
         builder.create('SideMenuContainer','side-menu-right-container').childs(['right-menu'])
-            .design({bgColor: CColor('Purple',15)});;
+            .design({bgColor: CColor('Purple',15)});
         builder.addDesign('right-menu-button',{
             paddingRight:6,boxSizing:'borderBox',textAlign:'right',height:45, widthXS: 12,
             fontSize:16,color: CColor('Gray',2), marginTop:1, round: 0,
@@ -46,7 +46,6 @@ var app =
                     .text('#this.data.text').link('#this.data.link').build()
             )
             .templateData(builder.getData('navigation'));
-
         builder.create('MainView','main-view').childs(['header','content','footer']);
         builder.create('Header','header')
             .headerLeft(['header-button-left-0','header-button-back'])
@@ -102,7 +101,7 @@ var app =
         builder.create('Footer','footer').childs([]);
         builder.create('Content','content').childs(['main-page','form-page','category-page','tabs-page']);
         builder.create('Page','main-page')
-            .childs(['main-buttons-template','main-reload-dynamic','dynamic-buttons','main-gallery'])
+            .childs(['main-buttons-template','main-show-dialog','main-reload-dynamic','dynamic-buttons','main-gallery'])
             .page('','Main',function(){} /* Optional On Page Load */);
         builder.create('Page','form-page').childs(['form'])
             .page('form','Form');
@@ -120,11 +119,13 @@ var app =
             .template('http://codletech.net/CAF/caf.php',true)
             .templateObjects([
                 co('Label').text('Dynamic Load Title #this.data.name')
-                    .design({ height:40, color:CColor('Red',6),widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0})
+                    .design({ height:40, color:CColor('DeepOrange',8),widthSM: 8, widthXS: 8,marginRight:1, marginLeft:1, marginTop:1, round: 0
+                        ,border:{bottom:1},borderColor: CColor('DeepOrange',8)})
                     .build(),
                 co('Button').text('Dynamic Load Button #this.data.name')
-                    .design({ height:40, color:CColor('Cyan',6),widthSM: 10, widthXS: 10,marginRight:1, marginLeft:1, marginTop:1, round: 0,
-                        active: { color:CColor('Cyan',10) }})
+                    .design({ height:40 ,widthSM: 8, widthXS: 8, marginRight:1, marginLeft:1, marginTop:1,marginBottom:1,
+                        color: CColor('DeepOrange',8),border:{all:1},borderColor: CColor('DeepOrange',8),
+                        active: { bgColor:CColor('DeepOrange',12),color: CColor('White') } })
                     .showDialog(/*Data*/{
                         title: 'Hello #.data.name !',
                         //topView: 'main-button',
@@ -135,8 +136,9 @@ var app =
                     .build()
             ])
         builder.create('Button','main-reload-dynamic')
-            .design({ height:40, bgColor:{color:'LightGreen',level:6},widthSM: 5, widthXS: 10, marginRight:1, marginLeft:1, marginTop:1, round: 2,
-                active: { bgColor:{color:'LightGreen',level:8} }})
+            .design({ height:40 ,widthSM: 11, widthXS: 11, marginRight:1, marginLeft:1, marginTop:1,
+                color: CColor('Green',8),border:{all:1},borderColor: CColor('DarkGreen',8),
+                active: { bgColor:CColor('DarkGreen',8),color: CColor('White') } })
             .reloadDynamicButton('dynamic-buttons',true /*QueryData and callback here*/)
             .text('Reload');
         //Add Design.
@@ -153,6 +155,7 @@ var app =
                     .text('#this.data.text').link('#this.data.link')
                     .build()
             )
+            .templatPullToRefresh()
             .templateContainerDesign({display:'inline'})
             .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
             .templateData(builder.getData('navigation')
@@ -177,6 +180,40 @@ var app =
                     extraCallback: function() { CLog.dlog('Extra Callback')}
                 }).build()*/
             );
+        builder.create('Button','main-show-dialog')
+            .design({
+                paddingLeft:6,boxSizing:'borderBox',textAlign:'left',height:60, widthXS: 12,
+                fontSize:18,color: CColor('Cyan',8),bgColor:CColor('White',6), marginTop:1, round: 0,
+                active: { bgColor:CColor('Cyan',8),color: CColor('White') }
+            })
+            .iconRight('right65',40).iconLeft('question36',35)
+            .text('Show Dialog')
+            .showDialog({
+                title: 'Confirmation',
+                //topView: 'main-button',
+                textContent: 'Always do good things. Good things lead to better society, happiness, health and freedom.',
+                list:co('Template')
+                    .templateObject(
+                        co('Button')
+                            .iconRight('right65',28).iconLeft('#this.data.icon',28)
+                            .design({textAlign:'left',color:CColor('Cyan',9)})
+                            .text('#this.data.text').link('#this.data.link')
+                            .build()
+                    )
+                    .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
+                    .templateData(builder.getData('navigation'))
+                    .templateBorder(CColor('Red',6),4)
+                    .templateContainerDesign({})// can change/append item container design.
+                    .build(),
+                hideOnListChoose: true,
+                cancelText: 'Cancel',
+                cancelCallback: function() { CLog.dlog('Cancel Callback')},
+                confirmText: 'Confirm',
+                confirmCallback: function() { CLog.dlog('Confirm Callback')},
+                extraText: 'Extra Button',
+                extraCallback: function() { CLog.dlog('Extra Callback')}}
+        );
+
         builder.create('Form','form')
             .formInputs(['form-input-name','form-input-phone'])
             .formOnSubmit(function(values) { CLog.log(values); })

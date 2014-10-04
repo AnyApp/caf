@@ -136,6 +136,9 @@ var CObject = Class({
     getClasses: function(){
         return this.classes;
     },
+    setText: function(text){
+        CUtils.element(this.uid()).innerHTML = text||'';
+    },
     getLastLogic: function(){
         return this.lastLogic;
     },
@@ -147,7 +150,8 @@ var CObject = Class({
         this.lastLogic = {};
     },
     parseReferences: function(obj) {
-        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true) // Circular
+        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true // Circular
+            || obj.abstract===true)
             return;
         obj.parseReferencesVisited = true;
         for (var property in obj) {
@@ -309,6 +313,14 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
         parentContainer.rebuild();
+    },
+    getClosestScroller: function(){
+        if (!CUtils.isEmpty(this.scroller))
+            return this.scroller;
+        var parent = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parent))
+            return parent.getClosestScroller();
+        return null;
     }
 
 

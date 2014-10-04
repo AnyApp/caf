@@ -33,7 +33,7 @@ var CPage = Class(CContainer,{
         this.data.page.onLoad  = this.data.page.onLoad    || function(){};
         this.data.page.id      = this.uid();
         this.data.page.loaded  = false;
-        this.data.page.params  = [];
+        this.data.page.params  = {};
         this.data.page.paramsChanged  = false;
     },
     setParams: function(params){

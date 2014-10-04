@@ -82,13 +82,6 @@ var CTemplator = Class({
         if (rebuild === true)
             object.rebuild();
     },
-    // Currently Not Used
-    loadDataToObject: function (object, data) {
-        object.data     = CUtils.mergeJSONs(object.data,data.data);
-        object.logic    = CUtils.mergeJSONs(object.logic,data.logic);
-        object.design   = CUtils.mergeJSONs(object.design,data.design);
-        CBuilder.buildFromObject(object.uid());
-    },
     loadObjectWithData: function (objectId, data, onFinish, reset, preventRebuild) {
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object)) // Case that objectId is actually object.
@@ -118,12 +111,13 @@ var CTemplator = Class({
     },
     load: function(objectId, queryData, onFinish, reset) {
         var object = CObjectsHandler.object(objectId);
+        if (CUtils.isEmpty(object.data.template.url) ||
+            (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){
+            onFinish();
+            return;
+        }
 
         object.showLoading();
-
-        // Do not rebuild again.
-        if (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData))
-            return;
 
         object.data.template.queryData = queryData;
 

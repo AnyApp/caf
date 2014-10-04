@@ -17,6 +17,10 @@ var CSideMenuContainer = Class(CContainer,{
         // Invoke parent's constructor
         CSideMenuContainer.$super.call(this, values);
         //this.uname = 'side-menu-left';
+        this.logic              = this.logic || {};
+        this.logic.scrollable   = true;
+        this.design             = this.design || {};
+        this.design.height      = '100%';
     }
 
 });

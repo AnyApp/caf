@@ -203,6 +203,19 @@ var CUtils = Class({
             arr.push(value || null);
         },this);
         return arr;
+    },
+    doElementsCollide: function(el1, el2) {
+        if (CUtils.isEmpty(el1) || CUtils.isEmpty(el2))
+            return false;
+        el1.offsetBottom = el1.offsetTop + el1.offsetHeight;
+        el1.offsetRight = el1.offsetLeft + el1.offsetWidth;
+        el2.offsetBottom = el2.offsetTop + el2.offsetHeight;
+        el2.offsetRight = el2.offsetLeft + el2.offsetWidth;
+
+        return !((el1.offsetBottom < el2.offsetTop) ||
+            (el1.offsetTop > el2.offsetBottom) ||
+            (el1.offsetRight < el2.offsetLeft) ||
+            (el1.offsetLeft > el2.offsetRight))
     }
 
 

@@ -11,9 +11,10 @@ var CBuilderObject = Class({
         this.properties.type    = type   || 'Object';
         if (!CUtils.isEmpty(uname))
             this.properties.uname   = uname  || '';
-        this.properties.data    = {};
-        this.properties.design    = {};
-        this.properties.logic    = {};
+        this.properties.data        = {};
+        this.properties.design      = {};
+        this.properties.logic       = {};
+        this.properties.abstract    = true;
     },
     build: function(){
         return this.properties;
@@ -30,6 +31,12 @@ var CBuilderObject = Class({
     page: function(name,title,onLoad){
         this.properties.data.page =
                 { name: name || '', title: title || '', onLoad: onLoad || function() {} };
+        this.properties.logic.page = true;
+        return this;
+    },
+    pageOnLoad: function(onLoad){
+        this.properties.data.page = this.properties.data.page || {};
+        this.properties.data.page.onLoad = onLoad  || function() {};
         this.properties.logic.page = true;
         return this;
     },
@@ -53,6 +60,10 @@ var CBuilderObject = Class({
         this.properties.logic.text = text;
         return this;
     },
+    scrollable: function() {
+        this.properties.logic.scrollable = true;
+        return this;
+    },
     template: function(url,autoLoad,queryData){
         this.initTemplate();
         this.properties.data.template = {
@@ -72,6 +83,11 @@ var CBuilderObject = Class({
         this.properties.data.template.object = object;
         return this;
     },
+    templatPullToRefresh: function() {
+        this.initTemplate();
+        this.properties.data.template.pullToRefresh = true;
+        return this;
+    },
     templateData: function(data) {
         this.initTemplate();
         this.properties.data.template.data = data;
@@ -80,6 +96,11 @@ var CBuilderObject = Class({
     templateContainerDesign: function(design) {
         this.initTemplate();
         this.properties.data.template.container.design = design;
+        return this;
+    },
+    templateResetOnReload: function(resetOnReload) {
+        this.initTemplate();
+        this.properties.data.template.resetOnReload = resetOnReload;
         return this;
     },
     templateBorder: function(color,size) {
@@ -292,6 +313,10 @@ var CBuilderObject = Class({
             data: data || {},
             design: design || {}
         };
+        return this;
+    },
+    spinnerAutoStart: function() {
+        this.properties.data.spinnerAutoStart = true;
         return this;
     },
     data: function(data){

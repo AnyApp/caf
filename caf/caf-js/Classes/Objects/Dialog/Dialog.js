@@ -63,14 +63,6 @@ var CDialog = Class(CContainer,{
         this.data.textContent       = this.data.textContent         || '';
         this.data.objectContent     = this.data.objectContent       || '';
         this.data.list              = this.data.list                || {};
-//        this.data.iconsList         = this.data.iconsList           || [];
-//        this.data.iconsAlign        = this.data.iconsAlign          || CAppConfig.get('textAlign') || 'left';
-//        this.data.iconsSize         = this.data.iconsSize           || 30;
-//        this.data.listDesign        = this.data.listDesign          || {};
-//        this.data.listCallbacks     = this.data.listCallbacks       || [];
-//        this.data.listItemsData     = this.data.listItemsData       || [];
-//        this.data.listItemsLogic    = this.data.listItemsLogic      || [];
-//        this.data.chooseCallback    = this.data.chooseCallback      || function(index,value){};
         this.data.hideOnListChoose  = this.data.hideOnListChoose===false? false : true;
         this.data.cancelCallOnHide  = this.data.cancelCallOnHide===false? false : true;
         this.data.cancelText        = this.data.cancelText          || '';
@@ -202,8 +194,11 @@ var CDialog = Class(CContainer,{
             design: {
                 width:'100%',
                 height: 'auto',
-                overflow: 'scrollable',
+                //overflow: 'scrollable',
                 boxSizing: 'borderBox'
+            },
+            logic: {
+                scrollable: true
             }
         });
 
@@ -264,6 +259,7 @@ var CDialog = Class(CContainer,{
             CUtils.mergeJSONs(containerDesign,list.data.template.container.design);
 
         list.data.template.callback =  this.createListCallback(this,list.data.template.callback);
+
         var listId = CObjectsHandler.createObject('Template',list);
         this.appendContent(listId);
 
@@ -503,13 +499,12 @@ var CDialog = Class(CContainer,{
             var siblings = CUtils.element(dialog.contentContainer).parentNode.children;
 
             _.each(siblings,function(node){
-                if (node.id === dialog.contentContainer)
+                if (node.id === dialog.contentContainer || !CObjectsHandler.isCObject(node.id) )
                     return;
                 contentMaxHeight -= node.getBoundingClientRect().height;
             },this);
 
             contentContainer.style.maxHeight = (contentMaxHeight-5)+'px';
-
         };
         window.addEventListener('resize',this.onResize);
     }

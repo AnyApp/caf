@@ -29,6 +29,9 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    isCObject: function(id){
+        return !CUtils.isEmpty(this.object(id));
+    },
     updateUname: function(last,current){
         if (last === current)
             return;

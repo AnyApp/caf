@@ -4,139 +4,158 @@
 var CPullToRefresh = Class({
     $singleton: true,
     inPull: false,
-    injectedSize: 60,
-    applyPullToRefresh: function(container){
-        var element = CUtils.element(container.uid());
+    spinnerSize: 60,
+    minDistance: 70,
+    applyPullToRefresh: function(template){
+        var element = CUtils.element(template.uid());
         // Set element to be relative.
         element.style.display = 'relative';
 
-        container.events = container.events || {};
-        container.pullToRefreshData = {
+        template.events = template.events || {};
+        template.pullToRefreshData = {
             startX:-100000,
             startY:-100000,
             lastX:-200000,
             lastY:-200000,
+            lastDistance: 0,
             startTime: 0,
-            injectedId:''
+            spinnerId:''
         };
         //Unbind
-        CUtils.unbindEvent(element,'touchstart',container.events.onPullToRefreshListenerStart);
-        CUtils.unbindEvent(element,'mousedown',container.events.onPullToRefreshListenerStart);
-        CUtils.unbindEvent(element,'touchend',container.events.onPullToRefreshListenerEnd);
-        CUtils.unbindEvent(element,'mouseup',container.events.onPullToRefreshListenerEnd);
-        CUtils.unbindEvent(element,'mouseout',container.events.onPullToRefreshListenerEnd);
-        CUtils.unbindEvent(element,'touchcancel',container.events.onPullToRefreshListenerEnd);
-        CUtils.unbindEvent(element,'touchmove',container.events.onPullToRefreshListenerMove);
-        CUtils.unbindEvent(element,'mousemove',container.events.onPullToRefreshListenerMove);
+        CUtils.unbindEvent(element,'touchstart',template.events.onPullToRefreshListenerStart);
+        CUtils.unbindEvent(element,'mousedown',template.events.onPullToRefreshListenerStart);
+        CUtils.unbindEvent(element,'touchend',template.events.onPullToRefreshListenerEnd);
+        CUtils.unbindEvent(element,'mouseup',template.events.onPullToRefreshListenerEnd);
+        CUtils.unbindEvent(element,'mouseout',template.events.onPullToRefreshListenerEnd);
+        CUtils.unbindEvent(element,'touchcancel',template.events.onPullToRefreshListenerEnd);
+        CUtils.unbindEvent(element,'touchmove',template.events.onPullToRefreshListenerMove);
+        CUtils.unbindEvent(element,'mousemove',template.events.onPullToRefreshListenerMove);
 
-        container.events.onPullToRefreshListenerStart = function(e){
+        template.events.onPullToRefreshListenerStart = function(e){
+            // Check that the scroller is on top.
+            var closestScroller = template.getClosestScroller();
+            if (CUtils.isEmpty(closestScroller) || closestScroller.getScrollTop()>5){
+                CLog.dlog(closestScroller.getScrollTop());
+                return;
+            }
+
+
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
-            container.pullToRefreshData.startX     = pointer.pageX;
-            container.pullToRefreshData.startY     = pointer.pageY;
-            container.pullToRefreshData.lastX      = pointer.pageX;
-            container.pullToRefreshData.lastY      = pointer.pageY;
-            container.pullToRefreshData.startTime  = (new  Date()).getTime();
+            template.pullToRefreshData.startX     = pointer.pageX;
+            template.pullToRefreshData.startY     = pointer.pageY;
+            template.pullToRefreshData.lastX      = pointer.pageX;
+            template.pullToRefreshData.lastY      = pointer.pageY;
+            e.preventDefault();
         };
-        container.events.onPullToRefreshListenerMove = function(e){
-            if (container.pullToRefreshData.startY<0) // Not started.
+        template.events.onPullToRefreshListenerMove = function(e){
+            if (template.pullToRefreshData.startY<0) // Not started.
                 return;
-
             var pointer = CUtils.getPointerEvent(e);
+
             // caching the last x & y
-            container.pullToRefreshData.lastX = pointer.pageX;
-            container.pullToRefreshData.lastY = pointer.pageY;
-            var distance = container.pullToRefreshData.lastY-container.pullToRefreshData.startY;
-            distance = distance -25;
-            CLog.dlog('Y Distance: '+distance);
+            template.pullToRefreshData.lastX = pointer.pageX;
+            template.pullToRefreshData.lastY = pointer.pageY;
+            var distance = template.pullToRefreshData.lastY-template.pullToRefreshData.startY;
+            distance = distance -50;
+
             if (distance<=0)
                 return;
 
+            distance = distance - (Math.max(0,distance/1.5-30)); // Slower speed when distance is high.
+            distance = Math.min(110,distance); // Set max distance
+            template.pullToRefreshData.lastDistance = distance;
 
             // Append element.
-            CPullToRefresh.injectElement(container);
+            CPullToRefresh.injectSpinner(template);
             CPullToRefresh.inPull = true;
             e.stopPropagation();
             e.preventDefault();
-            CLog.dlog('Y Distance: '+distance);
-            var element = CUtils.element(container.uid());
+
+            var element = CUtils.element(template.uid());
             element.style.paddingTop = distance+'px';
-            CPullToRefresh.getInjectedElement(container).style.top = ((-1)*CPullToRefresh.injectedSize)+distance+'px';
-            return true;
+            CPullToRefresh.getInjectedSpinner(template).style.top = ((-1)*CPullToRefresh.spinnerSize)+distance+'px';
+            if (distance>CPullToRefresh.minDistance)
+                CObjectsHandler.object(template.pullToRefreshData.spinnerId).startSpin();
+
         };
-        container.events.onPullToRefreshListenerEnd = function(e){
-            if (e.srcElement && e.srcElement.id!==container.uid()){
-                //CLog.dlog('out: '+e.srcElement.id);
-                //CLog.dlog('cid: '+container.uid());
+        template.events.onPullToRefreshListenerEnd = function(e){
+            if (!CPullToRefresh.inPull) // Not started.
+                return;
 
-                //return;
+            var pointer = CUtils.getPointerEvent(e);
+
+            if (pointer && pointer.type && pointer.type ==='mouseout' &&
+                CPullToRefresh.isDeepChild(template.uid(),e.toElement)){
+                return;
             }
-//            if (container.onClicks.length>0 && !container.isLink())
-//                e.preventDefault();
-//
-//            var diffX = Math.abs(container.pullToRefreshData.lastX-container.pullToRefreshData.startX);
-//            var diffY = Math.abs(container.pullToRefreshData.lastY-container.pullToRefreshData.startY);
-//            var boxSize = 15;
-//            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout')
-//            {
-//                // Execute OnClicks.
-//                _.each(container.onClicks,function(onClick){
-//                    onClick();
-//                },this);
-//            }
 
-            // Reset
-            var element = CUtils.element(container.uid());
-            element.style.paddingTop = '0px';
-            container.pullToRefreshData.startX = -100000;
-            container.pullToRefreshData.startY = -100000;
-            container.pullToRefreshData.lastX = -200000;
-            container.pullToRefreshData.lastY = -200000;
+            e.stopPropagation();
+            // not need refresh.
 
-            container.removeChild(container.pullToRefreshData.injectedId||'');
-            container.pullToRefreshData.injectedId = '';
+            if (template.pullToRefreshData.lastDistance<=CPullToRefresh.minDistance){
+                CPullToRefresh.reset(template);}
 
-            CThreads.start(function(){CPullToRefresh.inPull = false},100);
+            // refresh.
+            template.reload(null,function(){
+                // Reset
+                CPullToRefresh.reset(template);
+            },null);
 
-            container.rebuild();
         };
 
 
 
         // Set Events Handlers.
-        element.addEventListener("touchstart",container.events.onPullToRefreshListenerStart);
-        element.addEventListener("mousedown",container.events.onPullToRefreshListenerStart);
-        element.addEventListener("touchend",container.events.onPullToRefreshListenerEnd);
-        element.addEventListener("mouseup",container.events.onPullToRefreshListenerEnd);
-        //element.addEventListener("mouseout",container.events.onPullToRefreshListenerEnd);
-        //element.addEventListener("touchcancel",container.events.onPullToRefreshListenerEnd);
-        element.addEventListener("touchmove",container.events.onPullToRefreshListenerMove);
-        element.addEventListener("mousemove",container.events.onPullToRefreshListenerMove);
-
+        element.addEventListener("touchstart",template.events.onPullToRefreshListenerStart);
+        element.addEventListener("mousedown",template.events.onPullToRefreshListenerStart);
+        element.addEventListener("touchend",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("mouseup",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("mouseout",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("touchcancel",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("touchmove",template.events.onPullToRefreshListenerMove);
+        element.addEventListener("mousemove",template.events.onPullToRefreshListenerMove);
     },
     inPullToRefresh: function(){
         return CPullToRefresh.inPull;
     },
-    injectElement: function (container) {
-        if (!CUtils.isEmpty(container.pullToRefreshData.injectedId))
+    injectSpinner: function (template) {
+        if (!CUtils.isEmpty(template.pullToRefreshData.spinnerId))
             return;
 
-        var injectedId = CObjectsHandler.createObject('Object',co('Object')
-            .design({width:'100%',position:'absolute',height:CPullToRefresh.injectedSize,
-                color:CColor('Cyan',10),fontStyle:['bold']})
-            .icon('rotating16',20)
-            .text('Pull To Refresh').build()
+        var spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
+            .design({position:'absolute',height:CPullToRefresh.spinnerSize}).build()
         );
-        container.pullToRefreshData.injectedId = injectedId;
-        container.appendChild(injectedId);
-        container.rebuild(function(){
-            var injected = CUtils.element(injectedId);
-            injected.style.top = '-'+CPullToRefresh.injectedSize+'px';
+        template.pullToRefreshData.spinnerId = spinnerId;
+        template.appendChild(spinnerId);
+        template.rebuild(function(){
+            var spinner = CUtils.element(spinnerId);
+            spinner.style.top = '-'+CPullToRefresh.spinnerSize+'px';
         });
-        CUtils.element(container.uid()).style.overflowY = 'hidden';
+        CUtils.element(template.uid()).style.overflowY = 'hidden';
     },
-    getInjectedElement: function(container){
-        return CUtils.element(container.pullToRefreshData.injectedId || '');
+    getInjectedSpinner: function(template){
+        return CUtils.element(template.pullToRefreshData.spinnerId || '');
+    },
+    reset: function(template){
+        var element = CUtils.element(template.uid());
+        element.style.paddingTop = '0px';
+        template.pullToRefreshData.startX = -100000;
+        template.pullToRefreshData.startY = -100000;
+        template.pullToRefreshData.lastX = -200000;
+        template.pullToRefreshData.lastY = -200000;
+
+        template.removeChild(template.pullToRefreshData.spinnerId||'');
+        template.pullToRefreshData.spinnerId = '';
+
+        CThreads.run(function(){CPullToRefresh.inPull = false;},100);
+
+        template.rebuild();
+    },
+    isDeepChild: function(parentId,element){
+        if (CUtils.isEmpty(element))
+            return false;
+        return parentId === element.id || CPullToRefresh.isDeepChild(parentId,element.parentElement);
     }
 
 

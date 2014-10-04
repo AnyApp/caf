@@ -26,7 +26,9 @@ var CTemplate = Class(CContainer,{
         this.design.classes             = this.design.classes           || '';
         //this.design.classes             += ' ' +CTemplate.gifLoaders.default+ ' ';
         this.logic.template             = true;
-        this.logic.pullToRefresh        = true;
+        this.data.template.pullToRefresh= this.data.template.pullToRefresh || false;
+        if (this.data.template.pullToRefresh === true)
+            this.logic.pullToRefresh    = true;
         this.data.template              = this.data.template            || {};
         this.data.template.url          = this.data.template.url        || '';
         this.data.template.callback     = this.data.template.callback   || function(){};
@@ -34,7 +36,9 @@ var CTemplate = Class(CContainer,{
         this.data.template.queryData    = this.data.template.queryData  || {};
         this.data.template.data         = this.data.template.data       || null;
         this.data.template.applied      = this.data.template.applied    || false;
+        this.data.template.showLoader   = this.data.template.showLoader === false ? false : true;
         this.data.template.autoLoad     = this.data.template.autoLoad   === false ? false : true;
+        this.data.template.resetOnReload= this.data.template.resetOnReload=== false ? false : true;
         this.data.template.loaded       = this.data.template.loaded     || false;
         this.data.template.duplicates   = this.data.template.duplicates || [];
         this.data.template.objects      = this.data.template.objects    || [];
@@ -76,10 +80,27 @@ var CTemplate = Class(CContainer,{
       this.filter();
     },
     showLoading: function(){
-        //CUtils.removeClass(CUtils.element(this.uid()),CTemplator.hiddenClass);
+        if (this.data.template.showLoader!==true || !CUtils.isEmpty(this.spinnerId))
+            return;
+        this.spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
+            .spinnerAutoStart().build());
+        this.addChildToStart(this.spinnerId);
+        this.rebuild();
     },
     stopLoading: function(){
-        //CUtils.addClass(CUtils.element(this.uid()),CTemplator.hiddenClass);
+        if (this.data.template.showLoader!==true)
+            return
+
+        var obj = this;
+        CThreads.run(function(){
+            obj.removeChild(obj.spinnerId);
+            obj.rebuild();
+            delete obj.spinnerId;
+        },1500);
+    },
+    reload: function(queryData,onFinish, reset){
+        CTemplator.load(this.uid(),queryData||this.data.template.queryData,
+            onFinish||function(){},reset||this.data.template.resetOnReload);
     }
 
 

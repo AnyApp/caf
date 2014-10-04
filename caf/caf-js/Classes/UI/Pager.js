@@ -14,7 +14,6 @@ var CPager = Class({
     initialize: function(){
         var base = CAppConfig.basePath();
         page.base(base);
-        //this.sammy = Sammy();
 
         // Add all pages names to the router.
         _.each(this.pages,function(pageId,name){
@@ -113,9 +112,8 @@ var CPager = Class({
             return;
         }
 
-        if (this.currentPage == toPageId) {
+        if (this.currentPage == toPageId)
             return;
-        }
 
         var lastPageId = this.currentPage;
 
@@ -155,12 +153,10 @@ var CPager = Class({
     checkAndChangeBackButtonState:function() {
         if (CUtils.isEmpty(this.backButtonId)) return;
 
-        if (this.currentPageNumber <= 1) {
+        if (this.currentPageNumber <= 1)
             CUtils.addClass(CUtils.element(this.backButtonId),'hidden');
-        }
-        else {
+        else
             CUtils.removeClass(CUtils.element(this.backButtonId),'hidden');
-        }
     },
     getPagePath: function(name,params){
         return name+CPager.dataToPath(params);
@@ -172,7 +168,7 @@ var CPager = Class({
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
-            if (CUtils.isEmpty(id)) {
+            if (CUtils.isEmpty(id)) { // Page not exist.
                 id = CPager.pages[name];
                 // Check if template.
                 if (CTemplator.objectHasDynamic(id)) {

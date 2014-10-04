@@ -141,6 +141,10 @@ var CLogic = Class({
         pullToRefresh: function(object,value){
             if (value === true)
                 CPullToRefresh.applyPullToRefresh(object);
+        },
+        scrollable: function(object,value){
+            if (value===true)
+                object.scroller = $("#"+object.uid()).niceScroll({});
         }
 
     },
