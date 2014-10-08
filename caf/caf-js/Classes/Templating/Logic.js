@@ -11,13 +11,16 @@ var CLogic = Class({
             CClicker.addOnClick(object,value);
         },
         link: function(object,value){
-            if (!object.isLinkLocal() && !CPlatforms.isWeb()){
+            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value);
                 });
             }
-            CClicker.addOnClick(object,null);
-
+            else {
+                CClicker.addOnClick(object,function(){
+                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
+                });
+            }
         },
         showDialog: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -143,8 +146,11 @@ var CLogic = Class({
                 CPullToRefresh.applyPullToRefresh(object);
         },
         scrollable: function(object,value){
-            if (value===true)
-                object.scroller = $("#"+object.uid()).niceScroll({});
+            if (value!==true)
+                return;
+            // Old android only
+            if (!CScrolling.isNativeScrolling())
+                object.scroller = $('#'+object.uid()).niceScroll({});
         }
 
     },

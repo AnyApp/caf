@@ -20,11 +20,6 @@ var CContainer = Class(CObject,{
         this.data.childs        = this.data.childs || [];
         this.data.lastChilds    = this.data.lastChilds || [];
         this.data.toRemoveChilds= [];
-//        this.data.actualContainer = this;
-//        if (this.logic.scrollable===true){
-//            this.data.actualContainer = CObjectsHandler.createObject('Container')
-//        }
-
     },
     /**
      *  Build Object.

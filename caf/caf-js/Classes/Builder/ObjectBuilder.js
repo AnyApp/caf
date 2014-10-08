@@ -61,7 +61,7 @@ var CBuilderObject = Class({
         return this;
     },
     scrollable: function() {
-        this.properties.logic.scrollable = true;
+        CScrolling.setScrollable(this.properties);
         return this;
     },
     template: function(url,autoLoad,queryData){

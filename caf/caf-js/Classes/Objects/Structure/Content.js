@@ -7,11 +7,9 @@ var CContent = Class(CContainer,{
             classes: 'content',
             bgColor:{
                 color: 'White'
-            }/*,
-            overflow: 'scrollable'*/
+            }
         },
         DEFAULT_LOGIC: {
-            scrollable: true
         }
 
     },
@@ -27,6 +25,7 @@ var CContent = Class(CContainer,{
         this.design.top     =   CAppConfig.get('headerSize');
         this.design.bottom  =   CAppConfig.get('footerSize');
 
+        CScrolling.setScrollable(this);
 
     }
 

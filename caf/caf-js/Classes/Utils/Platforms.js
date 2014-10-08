@@ -22,8 +22,8 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isAndroid: function() {
-        if (caf.utils.isEmpty(device))      return false;
-        return device.platform.toLowerCase() == 'android';
+        if (window.device===undefined || CUtils.isEmpty(window.device))      return false;
+        return window.device.platform.toLowerCase() == 'android';
     },
     /**
      * Return the android series.
@@ -31,7 +31,7 @@ var CPlatforms = Class({
      * @returns {number}
      */
     androidSeries: function() {
-        if (!this.isAndroid()) return 0;
+        if (!this.isAndroid()) return -1;
 
         var deviceOSVersion = device.version;  //fetch the device OS version
         return Number(deviceOSVersion.substring(0,deviceOSVersion.indexOf(".")));

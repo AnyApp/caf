@@ -1815,7 +1815,7 @@
           if (!self.hidden&&!self.visibility) self.showRail().showRailHr();
         }        
       }
-    
+
       var premaxh = self.page.maxh;
       var premaxw = self.page.maxw;
 

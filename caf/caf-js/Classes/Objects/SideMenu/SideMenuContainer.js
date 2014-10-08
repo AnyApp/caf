@@ -16,11 +16,10 @@ var CSideMenuContainer = Class(CContainer,{
         CObject.mergeWithDefaults(values,CSideMenuContainer);
         // Invoke parent's constructor
         CSideMenuContainer.$super.call(this, values);
-        //this.uname = 'side-menu-left';
-        this.logic              = this.logic || {};
-        this.logic.scrollable   = true;
         this.design             = this.design || {};
         this.design.height      = '100%';
+        CScrolling.setScrollable(this);
+
     }
 
 });

@@ -516,9 +516,16 @@ var CDesign = Class({
             return "";
         },
         overflow: function(data){
+            CLog.dlog(data);
             if (data==="hidden")        return "hidden";
-            if (data==="scrollable")    return "overthrow";
+            //if (data==="scrollable")    return "scrollable";
+            if (data==="scrollY")       return "yScrollable";
             return "";
+        },
+        scrollable: function(data){
+            if (data===true && CScrolling.isNativeScrolling())
+                return CScrolling.scrollableClass();
+            return '';
         },
         boxSizing: function(data){
             var values = ['borderBox'];
@@ -673,13 +680,16 @@ var CLogic = Class({
             CClicker.addOnClick(object,value);
         },
         link: function(object,value){
-            if (!object.isLinkLocal() && !CPlatforms.isWeb()){
+            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value);
                 });
             }
-            CClicker.addOnClick(object,null);
-
+            else {
+                CClicker.addOnClick(object,function(){
+                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
+                });
+            }
         },
         showDialog: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -805,8 +815,11 @@ var CLogic = Class({
                 CPullToRefresh.applyPullToRefresh(object);
         },
         scrollable: function(object,value){
-            if (value===true)
-                object.scroller = $("#"+object.uid()).niceScroll({});
+            if (value!==true)
+                return;
+            // Old android only
+            if (!CScrolling.isNativeScrolling())
+                object.scroller = $('#'+object.uid()).niceScroll({});
         }
 
     },
@@ -1301,8 +1314,8 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isAndroid: function() {
-        if (caf.utils.isEmpty(device))      return false;
-        return device.platform.toLowerCase() == 'android';
+        if (window.device===undefined || CUtils.isEmpty(window.device))      return false;
+        return window.device.platform.toLowerCase() == 'android';
     },
     /**
      * Return the android series.
@@ -1310,7 +1323,7 @@ var CPlatforms = Class({
      * @returns {number}
      */
     androidSeries: function() {
-        if (!this.isAndroid()) return 0;
+        if (!this.isAndroid()) return -1;
 
         var deviceOSVersion = device.version;  //fetch the device OS version
         return Number(deviceOSVersion.substring(0,deviceOSVersion.indexOf(".")));
@@ -1372,6 +1385,14 @@ var CThreads = Class({
     },
     run: function(task,time){
         window.setTimeout(task,time);
+    },
+    runTimes: function(task,start,interval,times){
+        for (var i=0;i<times;i++){
+            window.setTimeout(task,start+interval*i);
+        }
+    },
+    runIntervaly: function(task,interval){
+        window.setInterval(task,interval);
     }
 
 });
@@ -1468,23 +1489,26 @@ var CUtils = Class({
     getPointerEvent: function(event) {
         return event.targetTouches ? event.targetTouches[0] : event;
     },
-    openURL: function(url)
-    {
-        if (CPlatforms.isIOS())
-        {
+    openLocalURL: function(url){
+        window.location = '#'+url;
+    },
+    openURL: function(url) {
+        if (CPlatforms.isIOS()) {
             window.open(url,  '_system', 'location=yes');
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 navigator.app.loadUrl(url, {openExternal:true});
             }
-            catch (e)
-            {
+            catch (e) {
                 window.open(url,  '_system', 'location=yes');
             }
         }
+    },
+    isURLLocal: function(url){
+        if (CUtils.isEmpty(url))
+            return true;
+        return url.indexOf('www.')<0;
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};
@@ -1594,6 +1618,36 @@ var CUtils = Class({
             (el1.offsetTop > el2.offsetBottom) ||
             (el1.offsetRight < el2.offsetLeft) ||
             (el1.offsetLeft > el2.offsetRight))
+    },
+    /**
+     * Check that the object is really showing:
+     * 1. not hidden under any element.
+     * 2. on screen.
+     * 3. area > 0 (visibility + display:none).
+     * @param element
+     * @returns {boolean}
+     */
+    isRealVisible: function(element) {
+        if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
+        var height = document.documentElement.clientHeight,
+            rects = element.getClientRects(),
+            on_top = function(r) {
+                var x = (r.left + r.right)/2, y = (r.top + r.bottom)/2;
+                var showingElement = document.elementFromPoint(x, y);
+                return showingElement.id === element.id ||
+                    CUtils.isDeepChild(element.id,showingElement);
+            };
+        for (var i = 0, l = rects.length; i < l; i++) {
+            var r = rects[i],
+                in_viewport = r.top > 0 ? r.top <= height : (r.bottom > 0 && r.bottom <= height);
+            if (in_viewport && on_top(r)) return true;
+        }
+        return false;
+    },
+    isDeepChild: function(parentId,element){
+        if (CUtils.isEmpty(element))
+            return false;
+        return parentId === element.id || CUtils.isDeepChild(parentId,element.parentElement);
     }
 
 
@@ -1918,7 +1972,7 @@ var CClicker = Class({
             if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
             {
-                if (object.onClicks.length>0 && !object.isLink())
+                if (object.onClicks.length>0)
                     e.preventDefault();
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
@@ -1980,47 +2034,41 @@ var CPager = Class({
     $singleton: true,
     firstLoad: true,
     historyStack: new Array(),
-    currentPageNumber: 0,
-    maxPageNumber: 0,
     mainPage: '',
     backButtonId: '',
     pages: {},
+    router: null,
+    currentPageNumber: 0,
 
     initialize: function(){
-        var base = CAppConfig.basePath();
-        page.base(base);
-
+        this.resetPages();
+        this.setBackForwardDetection();
         // Add all pages names to the router.
         _.each(this.pages,function(pageId,name){
             var currentPage = CObjectsHandler.object(pageId);
-            var load = function(context){
-                if (CUtils.isEmpty(context.state.pageNumber)) {
-                    CPager.maxPageNumber += 1;
-                    context.state.pageNumber = CPager.maxPageNumber;
-                }
-                CPager.currentPageNumber = context.state.pageNumber;
-                var params = CPager.fetchParams(context);
+            var load = function(){
+                var params = CPager.fetchParams(window.location.hash);
                 CPager.showPage(name,params);
             }
             if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
-                page('/'+currentPage.getPageName()+'',load);
-                page('/'+currentPage.getPageName()+'/*',load);
+                routie(currentPage.getPageName()+'',load);
+                routie(currentPage.getPageName()+'/*',load);
             }
-            else {
-                // Main Page.
-                page('',load);
-            }
-        },this);
-        page('*', function() { CLog.dlog('page not found')});
-        this.resetPages();
-        page.start();
-    },
-    fetchParams: function(context) {
-        if (CUtils.isEmpty(context.path))
-            return [];
+            else // Main Page.
+                routie('',load);
 
-        var params = context.path.split('/');
+        },this);
+        routie('*', function() { CLog.dlog('page not found')});
+
+        this.checkAndChangeBackButtonState();
+    },
+    fetchParams: function(path) {
+        if (CUtils.isEmpty(path))
+            return [];
+        path = path.substr(path.indexOf('#')+1);
+
+        var params = path.split('/');
         if (params.length>0 && params[0]=='')
             params.shift();
         if (params.length>0 && params[params.length-1]=='')
@@ -2038,34 +2086,6 @@ var CPager = Class({
         this.backButtonId = backButtonId;
         this.checkAndChangeBackButtonState();
     },
-    moveToTab: function(tabButtonId,toSlide,swiperId) {
-        // Get Tabs.
-        var tabs = CSwiper.getSwiperButtons(swiperId);
-        _.each(tabs,function(buttonId){
-            // Remove hold mark.
-            this.removeHoldClass(buttonId);
-        },this);
-
-        this.addHoldClass(tabButtonId);
-
-        if (!CUtils.isEmpty(toSlide))
-            CSwiper.moveSwiperToSlide(swiperId,toSlide);
-
-    },
-    addHoldClass: function(tabButtonId) {
-        if (CUtils.isEmpty(tabButtonId))    return;
-
-        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
-        if (!CUtils.isEmpty(holdClass))
-            CUtils.addClass(CUtils.element(tabButtonId),holdClass);
-    },
-    removeHoldClass: function(tabButtonId) {
-        if (CUtils.isEmpty(tabButtonId))    return;
-
-        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
-        if (!CUtils.isEmpty(holdClass))
-            CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
-    },
     dataToPath: function (data) {
         data = data || [];
         var path = '';
@@ -2074,50 +2094,45 @@ var CPager = Class({
         },CPager);
         return path;
     },
-    /**
-     * move to page.
-     */
-    moveToPage: function(path/*toPageId,isRealPage,inAnim,outAnim*/) {
-        // convert data to path. Example: {area:'north',side:'r'}=>/area/north/side/r
-
-
-        // Check if need to move back.
-        if (toPageId == 'move-back') {
-            this.moveBack();
-            return;
-        }
-
-        if (this.currentPage == toPageId) {
-            return;
-        }
-
-        var lastPageId = this.currentPage;
-
-        //Replace current page.
-        this.currentPage = toPageId;
-        this.insertPageToStack(toPageId);
-        this.restructure();
-        var toPageDiv = document.getElementById(toPageId);
-
-        if (CUtils.isEmpty(lastPageId)) {
-            // on load page.
-            CPager.onLoadPage(toPageDiv);
-            // Hide back button if needed.
-            this.checkAndChangeBackButtonState();
-            return;
-        }
-
-        CAnimations.fadeIn(toPageDiv,300);
-
-        // on load page.
-        CPager.onLoadPage(toPageDiv);
-        // Hide back button if needed.
-        this.checkAndChangeBackButtonState();
-
-
-    },
     moveBack: function() {
         history.back();
+    },
+    setBackForwardDetection: function () {
+        var detectBackOrForward = function() {
+            CPager.hashHistory   = [window.location.hash];
+            CPager.historyLength = window.history.length;
+            CPager.historyStart  = CPager.hashHistory.length;
+            CPager.currentPageNumber = 0;
+
+            return function() {
+                var hash = window.location.hash, length = window.history.length;
+                if (CPager.hashHistory.length && CPager.historyLength == length) {
+                    if (CPager.hashHistory[CPager.hashHistory.length - 2] == hash) {
+                        CPager.hashHistory.pop();
+                        CPager.currentPageNumber = CPager.currentPageNumber -1;
+                    } else {
+                        CPager.hashHistory.push(hash);
+                        CPager.currentPageNumber = CPager.currentPageNumber +1;
+                    }
+                } else {
+                    CPager.hashHistory.push(hash);
+                    CPager.currentPageNumber = CPager.currentPageNumber +1;
+                    CPager.historyLength = length;
+                }
+
+                CPager.checkAndChangeBackButtonState();
+
+            }
+        };
+
+        window.addEventListener("hashchange", detectBackOrForward());
+    },
+    checkAndChangeBackButtonState:function() {
+        if (CUtils.isEmpty(CPager.backButtonId) || !CPager.hashHistory ) return;
+        if (CPager.currentPageNumber===0)
+            CUtils.addClass(CUtils.element(CPager.backButtonId),'hidden');
+        else
+            CUtils.removeClass(CUtils.element(CPager.backButtonId),'hidden');
     },
     onLoadPage: function(pageId) {
         var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
@@ -2125,16 +2140,6 @@ var CPager = Class({
             return;
         // Execute onPageLoad.
         onPageLoad();
-    },
-    checkAndChangeBackButtonState:function() {
-        if (CUtils.isEmpty(this.backButtonId)) return;
-
-        if (this.currentPageNumber <= 1) {
-            CUtils.addClass(CUtils.element(this.backButtonId),'hidden');
-        }
-        else {
-            CUtils.removeClass(CUtils.element(this.backButtonId),'hidden');
-        }
     },
     getPagePath: function(name,params){
         return name+CPager.dataToPath(params);
@@ -2195,7 +2200,7 @@ var CPager = Class({
         else
             CAnimations.show(CPager.currentPage,animationOptions);
 
-        this.checkAndChangeBackButtonState();
+        //this.checkAndChangeBackButtonState();
 
     },
     // Immediate hide to all pages on first load.
@@ -2238,6 +2243,7 @@ var CPullToRefresh = Class({
 
         template.events = template.events || {};
         template.pullToRefreshData = {
+            started: false,
             startX:-100000,
             startY:-100000,
             lastX:-200000,
@@ -2258,20 +2264,24 @@ var CPullToRefresh = Class({
 
         template.events.onPullToRefreshListenerStart = function(e){
             // Check that the scroller is on top.
-            var closestScroller = template.getClosestScroller();
-            if (CUtils.isEmpty(closestScroller) || closestScroller.getScrollTop()>5){
-                CLog.dlog(closestScroller.getScrollTop());
+            var closestScroller = CScrolling.getClosestScrollableObject(template);
+            if (CUtils.isEmpty(closestScroller.uid()) ||
+                    CScrolling.getScrollerTop(closestScroller.uid())>5){
                 return;
             }
 
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
+            template.pullToRefreshData.started    = true;
             template.pullToRefreshData.startX     = pointer.pageX;
             template.pullToRefreshData.startY     = pointer.pageY;
             template.pullToRefreshData.lastX      = pointer.pageX;
             template.pullToRefreshData.lastY      = pointer.pageY;
-            e.preventDefault();
+            //e.preventDefault();
+
+            // Check if template is not showing anymore.
+            CPullToRefresh.runNotVisibleCheck(template);
         };
         template.events.onPullToRefreshListenerMove = function(e){
             if (template.pullToRefreshData.startY<0) // Not started.
@@ -2282,7 +2292,7 @@ var CPullToRefresh = Class({
             template.pullToRefreshData.lastX = pointer.pageX;
             template.pullToRefreshData.lastY = pointer.pageY;
             var distance = template.pullToRefreshData.lastY-template.pullToRefreshData.startY;
-            distance = distance -50;
+            distance = distance -30;
 
             if (distance<=0)
                 return;
@@ -2311,7 +2321,7 @@ var CPullToRefresh = Class({
             var pointer = CUtils.getPointerEvent(e);
 
             if (pointer && pointer.type && pointer.type ==='mouseout' &&
-                CPullToRefresh.isDeepChild(template.uid(),e.toElement)){
+                CUtils.isDeepChild(template.uid(),e.toElement)){
                 return;
             }
 
@@ -2319,7 +2329,9 @@ var CPullToRefresh = Class({
             // not need refresh.
 
             if (template.pullToRefreshData.lastDistance<=CPullToRefresh.minDistance){
-                CPullToRefresh.reset(template);}
+                CPullToRefresh.reset(template);
+                return;
+            }
 
             // refresh.
             template.reload(null,function(){
@@ -2340,6 +2352,15 @@ var CPullToRefresh = Class({
         element.addEventListener("touchcancel",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("touchmove",template.events.onPullToRefreshListenerMove);
         element.addEventListener("mousemove",template.events.onPullToRefreshListenerMove);
+    },
+    runNotVisibleCheck: function (template) {
+        CThreads.runTimes(function(){
+            if (!template.pullToRefreshData.started)
+                return;
+            var elm = CUtils.element(template.uid());
+            if (elm.clientHeight === 0 && elm.clientWidth === 0)
+                CPullToRefresh.reset(template);
+        },200,200,20);
     },
     inPullToRefresh: function(){
         return CPullToRefresh.inPull;
@@ -2365,6 +2386,7 @@ var CPullToRefresh = Class({
     reset: function(template){
         var element = CUtils.element(template.uid());
         element.style.paddingTop = '0px';
+        template.pullToRefreshData.started = false;
         template.pullToRefreshData.startX = -100000;
         template.pullToRefreshData.startY = -100000;
         template.pullToRefreshData.lastX = -200000;
@@ -2376,14 +2398,62 @@ var CPullToRefresh = Class({
         CThreads.run(function(){CPullToRefresh.inPull = false;},100);
 
         template.rebuild();
-    },
-    isDeepChild: function(parentId,element){
-        if (CUtils.isEmpty(element))
-            return false;
-        return parentId === element.id || CPullToRefresh.isDeepChild(parentId,element.parentElement);
     }
 
 
+});
+
+
+/**
+ * Created by dvircn on 12/08/14.
+ */
+var CScrolling = Class({
+    $singleton: true,
+    scrollers: {},
+    isNative: null,
+    setScrollable: function(object){
+        object.logic              = object.logic || {};
+        object.design             = object.design ||{};
+        object.logic.scrollable   = true;
+        object.design.scrollable  = true;
+    },
+    scrollableClass: function(){
+        return 'yScrollable';
+    },
+    isScroller: function(object){
+        if (CScrolling.isNativeScrolling())
+            return object.getClasses().indexOf(CScrolling.scrollableClass()) > 0;
+        else
+            return !CUtils.isEmpty(object.scroller);
+    },
+    isNativeScrolling: function(){
+        if (this.isNative===null){
+            this.isNative = ! (CPlatforms.isAndroid() && CPlatforms.androidSeries()>0 &&
+                                CPlatforms.androidSeries()<4);
+        }
+        return this.isNative;
+    },
+    getScrollerTop: function(scrollerId){
+        if (CScrolling.isNativeScrolling()) {
+            var element = CUtils.element(scrollerId);
+            if (!CUtils.isEmpty(element))
+                return element.scrollTop;
+        }
+        else {
+            var scroller = CObjectsHandler.object(scrollerId).scroller;
+            if (!CUtils.isEmpty(scroller))
+                return scroller.getScrollTop();
+        }
+        return 10000000;
+    },
+    getClosestScrollableObject: function(object){
+        if (CScrolling.isScroller(object))
+            return object;
+        var parent = CObjectsHandler.object(object.parent);
+        if (!CUtils.isEmpty(parent))
+            return CScrolling.getClosestScrollableObject(parent);
+        return null;
+    }
 });
 
 
@@ -2597,22 +2667,6 @@ var CObject = Class({
         this.relative       = values.relative || false; // Is this object relative.
         this.logic.doStopPropagation = values.logic.doStopPropagation || false;
 
-        // Replace all references.
-        //this.applyDynamicVariables(this.logic);
-        // don't apply dynamic variables on dynamic data.
-
-/*
-        if (!CUtils.isEmpty(this.data.templateObjects)) {
-            var dynamicData = this.data.templateObjects;
-            this.data.templateObjects = null;
-            this.applyDynamicVariables(this.data);
-            this.data.templateObjects = dynamicData;
-        }
-        else{
-            this.applyDynamicVariables(this.data);
-        }
-*/
-
     },
     /**
      * Return Unique identifier.
@@ -2663,15 +2717,6 @@ var CObject = Class({
     },
     getLink: function() {
         return this.data.link || '';
-    },
-    hasLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLinkLocal: function(){
-        return this.data.link.indexOf(CAppConfig.baseUrl())>=0;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -2811,13 +2856,6 @@ var CObject = Class({
         attributes.push('class="'+this.classes+'"');
 
         // Custom tag - can be used to insert a,input..
-        if (this.hasLink()){
-            this.setLink(this.logic.link.path+ CPager.dataToPath(this.logic.link.data));
-            tag = 'a';
-            // Allow outer links only in browser. Avoid links opening inside app.
-            if (this.isLinkLocal() || CPlatforms.isWeb())
-                attributes.push('href="'+this.data.link+'"');
-        }
         tag         = CUtils.isEmpty(tag)? 'div' : tag;
         var tagOpen = '<'+tag;
 
@@ -2871,14 +2909,6 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
         parentContainer.rebuild();
-    },
-    getClosestScroller: function(){
-        if (!CUtils.isEmpty(this.scroller))
-            return this.scroller;
-        var parent = CObjectsHandler.object(this.parent);
-        if (!CUtils.isEmpty(parent))
-            return parent.getClosestScroller();
-        return null;
     }
 
 
@@ -2971,11 +3001,6 @@ var CContainer = Class(CObject,{
         this.data.childs        = this.data.childs || [];
         this.data.lastChilds    = this.data.lastChilds || [];
         this.data.toRemoveChilds= [];
-//        this.data.actualContainer = this;
-//        if (this.logic.scrollable===true){
-//            this.data.actualContainer = CObjectsHandler.createObject('Container')
-//        }
-
     },
     /**
      *  Build Object.
@@ -3470,10 +3495,10 @@ var CDialog = Class(CContainer,{
                 //overflow: 'scrollable',
                 boxSizing: 'borderBox'
             },
-            logic: {
-                scrollable: true
-            }
+            logic: {}
         });
+        // Set scrollable.
+        CScrolling.setScrollable(CObjectsHandler.object(this.contentContainer));
 
         CObjectsHandler.object(this.dialogContainer).appendChild(this.contentContainer);
 
@@ -3830,12 +3855,10 @@ var CMainView = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-content',
             bgColor:{color:'White'},
-            textAlign: 'center'/*,
-            overflow: 'scrollable'*/
+            textAlign: 'center'
 
         },
         DEFAULT_LOGIC: {
-            scrollable: true
         }
     },
 
@@ -3845,6 +3868,7 @@ var CMainView = Class(CContainer,{
         CObject.mergeWithDefaults(values,CMainView);
         // Invoke parent's constructor
         CMainView.$super.call(this, values);
+
     }
 
 });
@@ -3914,11 +3938,10 @@ var CSideMenuContainer = Class(CContainer,{
         CObject.mergeWithDefaults(values,CSideMenuContainer);
         // Invoke parent's constructor
         CSideMenuContainer.$super.call(this, values);
-        //this.uname = 'side-menu-left';
-        this.logic              = this.logic || {};
-        this.logic.scrollable   = true;
         this.design             = this.design || {};
         this.design.height      = '100%';
+        CScrolling.setScrollable(this);
+
     }
 
 });
@@ -4236,11 +4259,9 @@ var CContent = Class(CContainer,{
             classes: 'content',
             bgColor:{
                 color: 'White'
-            }/*,
-            overflow: 'scrollable'*/
+            }
         },
         DEFAULT_LOGIC: {
-            scrollable: true
         }
 
     },
@@ -4256,6 +4277,7 @@ var CContent = Class(CContainer,{
         this.design.top     =   CAppConfig.get('headerSize');
         this.design.bottom  =   CAppConfig.get('footerSize');
 
+        CScrolling.setScrollable(this);
 
     }
 
@@ -4303,6 +4325,7 @@ var CPage = Class(CContainer,{
     setParams: function(params){
         if ( !CUtils.equals(this.data.page.params,params)){
             this.data.page.params = params;
+            CLog.dlog(params);
             this.data.page.paramsChanged = true;
         }
     },
@@ -5195,7 +5218,7 @@ var CBuilderObject = Class({
         return this;
     },
     scrollable: function() {
-        this.properties.logic.scrollable = true;
+        CScrolling.setScrollable(this.properties);
         return this;
     },
     template: function(url,autoLoad,queryData){
@@ -7339,7 +7362,7 @@ a){var b=F.exec(a);b&&(b[1]=(b[1]||"").toLowerCase(),b[3]=b[3]&&new RegExp("(?:^
           if (!self.hidden&&!self.visibility) self.showRail().showRailHr();
         }        
       }
-    
+
       var premaxh = self.page.maxh;
       var premaxw = self.page.maxw;
 
@@ -9281,492 +9304,214 @@ a){var b=F.exec(a);b&&(b[1]=(b[1]||"").toLowerCase(),b[3]=b[3]&&new RegExp("(?:^
         });
     }
 }).call(this, window, document);
+/*!
+ * routie - a tiny hash router
+ * v0.3.2
+ * http://projects.jga.me/routie
+ * copyright Greg Allen 2013
+ * MIT License
+*/
+(function(w) {
 
-;(function(){
+  var routes = [];
+  var map = {};
+  var reference = "routie";
+  var oldReference = w[reference];
 
-    /**
-     * Perform initial dispatch.
-     */
+  var Route = function(path, name) {
+    this.name = name;
+    this.path = path;
+    this.keys = [];
+    this.fns = [];
+    this.params = {};
+    this.regex = pathToRegexp(this.path, this.keys, false, false);
 
-    var dispatch = true;
+  };
 
-    /**
-     * Base path.
-     */
+  Route.prototype.addHandler = function(fn) {
+    this.fns.push(fn);
+  };
 
-    var base = '';
+  Route.prototype.removeHandler = function(fn) {
+    for (var i = 0, c = this.fns.length; i < c; i++) {
+      var f = this.fns[i];
+      if (fn == f) {
+        this.fns.splice(i, 1);
+        return;
+      }
+    }
+  };
 
-    var location = history.location || window.location;
+  Route.prototype.run = function(params) {
+    for (var i = 0, c = this.fns.length; i < c; i++) {
+      this.fns[i].apply(this, params);
+    }
+  };
 
-    /**
-     * Running flag.
-     */
+  Route.prototype.match = function(path, params){
+    var m = this.regex.exec(path);
 
-    var running;
+    if (!m) return false;
 
-    /**
-     * Register `path` with callback `fn()`,
-     * or route `path`, or `page.start()`.
-     *
-     *   page(fn);
-     *   page('*', fn);
-     *   page('/user/:id', load, user);
-     *   page('/user/' + user.id, { some: 'thing' });
-     *   page('/user/' + user.id);
-     *   page();
-     *
-     * @param {String|Function} path
-     * @param {Function} fn...
-     * @api public
-     */
 
-    function page(path, fn) {
-        // <callback>
-        if ('function' == typeof path) {
-            return page('*', path);
-        }
+    for (var i = 1, len = m.length; i < len; ++i) {
+      var key = this.keys[i - 1];
 
-        // route <path> to <callback ...>
-        if ('function' == typeof fn) {
-            var route = new Route(path);
-            for (var i = 1; i < arguments.length; ++i) {
-                page.callbacks.push(route.middleware(arguments[i]));
-            }
-            // show <path> with [state]
-        } else if ('string' == typeof path) {
-            page.show(path, fn);
-            // start [options]
-        } else {
-            page.start(path);
-        }
+      var val = ('string' == typeof m[i]) ? decodeURIComponent(m[i]) : m[i];
+
+      if (key) {
+        this.params[key.name] = val;
+      }
+      params.push(val);
     }
 
-    /**
-     * Callback functions.
-     */
+    return true;
+  };
 
-    page.callbacks = [];
-
-    /**
-     * Get or set basepath to `path`.
-     *
-     * @param {String} path
-     * @api public
-     */
-
-    page.base = function(path){
-        if (0 == arguments.length) return base;
-        base = path;
-    };
-
-    /**
-     * Bind with the given `options`.
-     *
-     * Options:
-     *
-     *    - `click` bind to click events [true]
-     *    - `popstate` bind to popstate [true]
-     *    - `dispatch` perform initial dispatch [true]
-     *
-     * @param {Object} options
-     * @api public
-     */
-
-    page.start = function(options){
-        options = options || {};
-        if (running) return;
-        running = true;
-        if (false === options.dispatch) dispatch = false;
-//        if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-//        if (false !== options.click) window.addEventListener('click', onclick, false);
-        if (false !== options.popstate) addEvent(window, 'popstate', onpopstate);
-        if (false !== options.click) addEvent(document, 'click', onclick);
-        if (!dispatch) return;
-        var url = location.pathname + location.search + location.hash;
-        page.replace(url, null, true, dispatch);
-    };
-
-    /**
-     * Unbind click and popstate event handlers.
-     *
-     * @api public
-     */
-
-    page.stop = function(){
-        running = false;
-//        removeEventListener('click', onclick, false);
-//        removeEventListener('popstate', onpopstate, false);
-        removeEvent(document, 'click', onclick);
-        removeEvent(window, 'popstate', onpopstate);
-    };
-
-    /**
-     * Show `path` with optional `state` object.
-     *
-     * @param {String} path
-     * @param {Object} state
-     * @param {Boolean} dispatch
-     * @return {Context}
-     * @api public
-     */
-
-    page.show = function(path, state, dispatch){
-        var ctx = new Context(path, state);
-        if (false !== dispatch) page.dispatch(ctx);
-        if (!ctx.unhandled) ctx.pushState();
-        return ctx;
-    };
-
-    /**
-     * Replace `path` with optional `state` object.
-     *
-     * @param {String} path
-     * @param {Object} state
-     * @return {Context}
-     * @api public
-     */
-
-    page.replace = function(path, state, init, dispatch){
-        var ctx = new Context(path, state);
-        ctx.init = init;
-        if (null == dispatch) dispatch = true;
-        if (dispatch) page.dispatch(ctx);
-        ctx.save();
-        return ctx;
-    };
-
-    /**
-     * Dispatch the given `ctx`.
-     *
-     * @param {Object} ctx
-     * @api private
-     */
-
-    page.dispatch = function(ctx){
-        var i = 0;
-
-        function next() {
-            var fn = page.callbacks[i++];
-            if (!fn) return unhandled(ctx);
-            fn(ctx, next);
-        }
-
-        next();
-    };
-
-    /**
-     * Unhandled `ctx`. When it's not the initial
-     * popstate then redirect. If you wish to handle
-     * 404s on your own use `page('*', callback)`.
-     *
-     * @param {Context} ctx
-     * @api private
-     */
-
-    function unhandled(ctx) {
-//        var current = window.location.pathname + window.location.search;
-//        if (current == ctx.canonicalPath) return;
-        if (location.pathname + location.search == ctx.canonicalPath) return;
-        page.stop();
-        ctx.unhandled = true;
-        window.location = ctx.canonicalPath;
+  Route.prototype.toURL = function(params) {
+    var path = this.path;
+    for (var param in params) {
+      path = path.replace('/:'+param, '/'+params[param]);
     }
-
-    /**
-     * Initialize a new "request" `Context`
-     * with the given `path` and optional initial `state`.
-     *
-     * @param {String} path
-     * @param {Object} state
-     * @api public
-     */
-
-    function Context(path, state) {
-        if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
-        var i = path.indexOf('?');
-
-        this.canonicalPath = path;
-        this.path = path.replace(base, '') || '/';
-
-        this.title = document.title;
-        this.state = state || {};
-        this.state.path = path;
-        this.querystring = ~i ? path.slice(i + 1) : '';
-        this.pathname = ~i ? path.slice(0, i) : path;
-        this.params = [];
-
-        // fragment
-        this.hash = '';
-        if (!~this.path.indexOf('#')) return;
-        var parts = this.path.split('#');
-        this.path = parts[0];
-        this.hash = parts[1] || '';
-        this.querystring = this.querystring.split('#')[0];
+    path = path.replace(/\/:.*\?/g, '/').replace(/\?/g, '');
+    if (path.indexOf(':') != -1) {
+      throw new Error('missing parameters for url: '+path);
     }
+    return path;
+  };
 
-    /**
-     * Expose `Context`.
-     */
+  var pathToRegexp = function(path, keys, sensitive, strict) {
+    if (path instanceof RegExp) return path;
+    if (path instanceof Array) path = '(' + path.join('|') + ')';
+    path = path
+      .concat(strict ? '' : '/?')
+      .replace(/\/\(/g, '(?:/')
+      .replace(/\+/g, '__plus__')
+      .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional){
+        keys.push({ name: key, optional: !! optional });
+        slash = slash || '';
+        return '' + (optional ? '' : slash) + '(?:' + (optional ? slash : '') + (format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')' + (optional || '');
+      })
+      .replace(/([\/.])/g, '\\$1')
+      .replace(/__plus__/g, '(.+)')
+      .replace(/\*/g, '(.*)');
+    return new RegExp('^' + path + '$', sensitive ? '' : 'i');
+  };
 
-    page.Context = Context;
+  var addHandler = function(path, fn) {
+    var s = path.split(' ');
+    var name = (s.length == 2) ? s[0] : null;
+    path = (s.length == 2) ? s[1] : s[0];
 
-    /**
-     * Push state.
-     *
-     * @api private
-     */
-
-    Context.prototype.pushState = function(){
-        history.pushState(this.state, this.title, this.canonicalPath);
-    };
-
-    /**
-     * Save the context state.
-     *
-     * @api public
-     */
-
-    Context.prototype.save = function(){
-        history.replaceState(this.state, this.title, this.canonicalPath);
-    };
-
-    /**
-     * Initialize `Route` with the given HTTP `path`,
-     * and an array of `callbacks` and `options`.
-     *
-     * Options:
-     *
-     *   - `sensitive`    enable case-sensitive routes
-     *   - `strict`       enable strict matching for trailing slashes
-     *
-     * @param {String} path
-     * @param {Object} options.
-     * @api private
-     */
-
-    function Route(path, options) {
-        options = options || {};
-        this.path = path;
-        this.method = 'GET';
-        this.regexp = pathtoRegexp(path
-            , this.keys = []
-            , options.sensitive
-            , options.strict);
+    if (!map[path]) {
+      map[path] = new Route(path, name);
+      routes.push(map[path]);
     }
+    map[path].addHandler(fn);
+  };
 
-    /**
-     * Expose `Route`.
-     */
-
-    page.Route = Route;
-
-    /**
-     * Return route middleware with
-     * the given callback `fn()`.
-     *
-     * @param {Function} fn
-     * @return {Function}
-     * @api public
-     */
-
-    Route.prototype.middleware = function(fn){
-        var self = this;
-        return function(ctx, next){
-            if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
-            next();
-        };
-    };
-
-    /**
-     * Check if this route matches `path`, if so
-     * populate `params`.
-     *
-     * @param {String} path
-     * @param {Array} params
-     * @return {Boolean}
-     * @api private
-     */
-
-    Route.prototype.match = function(path, params){
-        var keys = this.keys
-            , qsIndex = path.indexOf('?')
-            , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
-            , m = this.regexp.exec(pathname);
-
-        if (!m) return false;
-
-        for (var i = 1, len = m.length; i < len; ++i) {
-            var key = keys[i - 1];
-
-            var val = 'string' == typeof m[i]
-                ? decodeURIComponent(m[i])
-                : m[i];
-
-            if (key) {
-                params[key.name] = undefined !== params[key.name]
-                    ? params[key.name]
-                    : val;
-            }
-            else if (val.indexOf('/')>=0){
-                params.push.apply(params,val.split('/'));
-            }
-            else {
-                params.push(val);
-            }
-        }
-
-        return true;
-    };
-
-    /**
-     * Normalize the given path string,
-     * returning a regular expression.
-     *
-     * An empty array should be passed,
-     * which will contain the placeholder
-     * key names. For example "/user/:id" will
-     * then contain ["id"].
-     *
-     * @param  {String|RegExp|Array} path
-     * @param  {Array} keys
-     * @param  {Boolean} sensitive
-     * @param  {Boolean} strict
-     * @return {RegExp}
-     * @api private
-     */
-
-    function pathtoRegexp(path, keys, sensitive, strict) {
-        if (path instanceof RegExp) return path;
-        if (path instanceof Array) path = '(' + path.join('|') + ')';
-        path = path
-            .concat(strict ? '' : '/?')
-            .replace(/\/\(/g, '(?:/')
-            .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional){
-                keys.push({ name: key, optional: !! optional });
-                slash = slash || '';
-                return ''
-                    + (optional ? '' : slash)
-                    + '(?:'
-                    + (optional ? slash : '')
-                    + (format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')'
-                    + (optional || '');
-            })
-            .replace(/([\/.])/g, '\\$1')
-            .replace(/\*/g, '(.*)');
-        return new RegExp('^' + path + '$', sensitive ? '' : 'i');
+  var routie = function(path, fn) {
+    if (typeof fn == 'function') {
+      addHandler(path, fn);
+      routie.reload();
+    } else if (typeof path == 'object') {
+      for (var p in path) {
+        addHandler(p, path[p]);
+      }
+      routie.reload();
+    } else if (typeof fn === 'undefined') {
+      routie.navigate(path);
     }
+  };
 
-    /**
-     * Handle "populate" events.
-     */
-
-    function onpopstate(e) {
-        if (e.state) {
-            var path = e.state.path;
-            page.replace(path, e.state);
-        }
+  routie.lookup = function(name, obj) {
+    for (var i = 0, c = routes.length; i < c; i++) {
+      var route = routes[i];
+      if (route.name == name) {
+        return route.toURL(obj);
+      }
     }
+  };
 
-    /**
-     * Handle "click" events.
-     */
+  routie.remove = function(path, fn) {
+    var route = map[path];
+    if (!route)
+      return;
+    route.removeHandler(fn);
+  };
 
-    function onclick(e) {
-        //if (1 != which(e)) return;
-        if (!which(e)) return;
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-        if (e.defaultPrevented) return;
-        // ensure link
-        //var el = e.target;
-        var el = e.target || e.srcElement;
-        while (el && 'A' != el.nodeName) el = el.parentNode;
-        if (!el || 'A' != el.nodeName) return;
+  routie.removeAll = function() {
+    map = {};
+    routes = [];
+  };
 
-        // ensure non-hash for the same path
-        var link = el.getAttribute('href');
-        if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
+  routie.navigate = function(path, options) {
+    options = options || {};
+    var silent = options.silent || false;
 
-        // check target
-        if (el.target) return;
-
-        // x-origin
-        if (!sameOrigin(el.href)) return;
-
-        // rebuild path
-        var path = el.pathname + el.search + (el.hash || '');
-
-        // on non-html5 browsers (IE9-), `el.pathname` doesn't include leading '/'
-        if (path[0] !== '/') path = '/' + path;
-
-        // same page
-        var orig = path + el.hash;
-
-        path = path.replace(base, '');
-        if (base && orig == path) return;
-
-        //e.preventDefault();
-        e.preventDefault ? e.preventDefault() : e.returnValue = false;
-
-        // If in pull do not move page.
-        if (CPullToRefresh.inPullToRefresh()) return;
-
-        page.show(orig);
+    if (silent) {
+      removeListener();
     }
+    setTimeout(function() {
+      window.location.hash = path;
 
-    /**
-     * Event button.
-     */
+      if (silent) {
+        setTimeout(function() { 
+          addListener();
+        }, 1);
+      }
 
-    function which(e) {
-        e = e || window.event;
-        return null == e.which
-            //? e.button
-            //: e.which;
-            ? e.button == 0
-            : e.which == 1;
+    }, 1);
+  };
+
+  routie.noConflict = function() {
+    w[reference] = oldReference;
+    return routie;
+  };
+
+  var getHash = function() {
+    return window.location.hash.substring(1);
+  };
+
+  var checkRoute = function(hash, route) {
+    var params = [];
+    if (route.match(hash, params)) {
+      route.run(params);
+      return true;
     }
+    return false;
+  };
 
-    /**
-     * Check if `href` is the same origin.
-     */
-
-    function sameOrigin(href) {
-        var origin = location.protocol + '//' + location.hostname;
-        if (location.port) origin += ':' + location.port;
-        return 0 == href.indexOf(origin);
+  var hashChanged = routie.reload = function() {
+    var hash = getHash();
+    for (var i = 0, c = routes.length; i < c; i++) {
+      var route = routes[i];
+      if (checkRoute(hash, route)) {
+        return;
+      }
     }
+  };
 
-    /**
-     * Basic cross browser event code
-     */
-
-    function addEvent(obj, type, fn) {
-        if (obj.addEventListener) {
-            obj.addEventListener(type, fn, false);
-        } else {
-            obj.attachEvent('on' + type, fn);
-        }
-    }
-
-    function removeEvent(obj, type, fn) {
-        if (obj.removeEventListener) {
-            obj.removeEventListener(type, fn, false);
-        } else {
-            obj.detachEvent('on' + type, fn);
-        }
-    }
-
-    /**
-     * Expose `page`.
-     */
-
-    if ('undefined' == typeof module) {
-        window.page = page;
+  var addListener = function() {
+    if (w.addEventListener) {
+      w.addEventListener('hashchange', hashChanged, false);
     } else {
-        module.exports = page;
+      w.attachEvent('onhashchange', hashChanged);
     }
+  };
 
-})();
+  var removeListener = function() {
+    if (w.removeEventListener) {
+      w.removeEventListener('hashchange', hashChanged);
+    } else {
+      w.detachEvent('onhashchange', hashChanged);
+    }
+  };
+  addListener();
+
+  w[reference] = routie;
+   
+})(window);
 var Swiper = function (selector, params) {
     'use strict';
 

@@ -90,23 +90,26 @@ var CUtils = Class({
     getPointerEvent: function(event) {
         return event.targetTouches ? event.targetTouches[0] : event;
     },
-    openURL: function(url)
-    {
-        if (CPlatforms.isIOS())
-        {
+    openLocalURL: function(url){
+        window.location = '#'+url;
+    },
+    openURL: function(url) {
+        if (CPlatforms.isIOS()) {
             window.open(url,  '_system', 'location=yes');
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 navigator.app.loadUrl(url, {openExternal:true});
             }
-            catch (e)
-            {
+            catch (e) {
                 window.open(url,  '_system', 'location=yes');
             }
         }
+    },
+    isURLLocal: function(url){
+        if (CUtils.isEmpty(url))
+            return true;
+        return url.indexOf('www.')<0;
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};
@@ -216,6 +219,36 @@ var CUtils = Class({
             (el1.offsetTop > el2.offsetBottom) ||
             (el1.offsetRight < el2.offsetLeft) ||
             (el1.offsetLeft > el2.offsetRight))
+    },
+    /**
+     * Check that the object is really showing:
+     * 1. not hidden under any element.
+     * 2. on screen.
+     * 3. area > 0 (visibility + display:none).
+     * @param element
+     * @returns {boolean}
+     */
+    isRealVisible: function(element) {
+        if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
+        var height = document.documentElement.clientHeight,
+            rects = element.getClientRects(),
+            on_top = function(r) {
+                var x = (r.left + r.right)/2, y = (r.top + r.bottom)/2;
+                var showingElement = document.elementFromPoint(x, y);
+                return showingElement.id === element.id ||
+                    CUtils.isDeepChild(element.id,showingElement);
+            };
+        for (var i = 0, l = rects.length; i < l; i++) {
+            var r = rects[i],
+                in_viewport = r.top > 0 ? r.top <= height : (r.bottom > 0 && r.bottom <= height);
+            if (in_viewport && on_top(r)) return true;
+        }
+        return false;
+    },
+    isDeepChild: function(parentId,element){
+        if (CUtils.isEmpty(element))
+            return false;
+        return parentId === element.id || CUtils.isDeepChild(parentId,element.parentElement);
     }
 
 

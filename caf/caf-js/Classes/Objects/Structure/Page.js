@@ -39,6 +39,7 @@ var CPage = Class(CContainer,{
     setParams: function(params){
         if ( !CUtils.equals(this.data.page.params,params)){
             this.data.page.params = params;
+            CLog.dlog(params);
             this.data.page.paramsChanged = true;
         }
     },

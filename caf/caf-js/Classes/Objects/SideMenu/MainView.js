@@ -6,12 +6,10 @@ var CMainView = Class(CContainer,{
         DEFAULT_DESIGN: {
             classes:'snap-content',
             bgColor:{color:'White'},
-            textAlign: 'center'/*,
-            overflow: 'scrollable'*/
+            textAlign: 'center'
 
         },
         DEFAULT_LOGIC: {
-            scrollable: true
         }
     },
 
@@ -21,6 +19,7 @@ var CMainView = Class(CContainer,{
         CObject.mergeWithDefaults(values,CMainView);
         // Invoke parent's constructor
         CMainView.$super.call(this, values);
+
     }
 
 });

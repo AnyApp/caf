@@ -99,7 +99,7 @@ var CClicker = Class({
             if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
             {
-                if (object.onClicks.length>0 && !object.isLink())
+                if (object.onClicks.length>0)
                     e.preventDefault();
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){

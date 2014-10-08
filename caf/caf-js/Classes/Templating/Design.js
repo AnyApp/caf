@@ -104,9 +104,16 @@ var CDesign = Class({
             return "";
         },
         overflow: function(data){
+            CLog.dlog(data);
             if (data==="hidden")        return "hidden";
-            if (data==="scrollable")    return "overthrow";
+            //if (data==="scrollable")    return "scrollable";
+            if (data==="scrollY")       return "yScrollable";
             return "";
+        },
+        scrollable: function(data){
+            if (data===true && CScrolling.isNativeScrolling())
+                return CScrolling.scrollableClass();
+            return '';
         },
         boxSizing: function(data){
             var values = ['borderBox'];

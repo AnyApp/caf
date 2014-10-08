@@ -197,10 +197,10 @@ var CDialog = Class(CContainer,{
                 //overflow: 'scrollable',
                 boxSizing: 'borderBox'
             },
-            logic: {
-                scrollable: true
-            }
+            logic: {}
         });
+        // Set scrollable.
+        CScrolling.setScrollable(CObjectsHandler.object(this.contentContainer));
 
         CObjectsHandler.object(this.dialogContainer).appendChild(this.contentContainer);
 

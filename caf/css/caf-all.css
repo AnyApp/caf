@@ -17652,7 +17652,12 @@ li{
     right: 0;
 }
 .yScrollable{
-    overflow-y: scroll;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translatez(0)
+}
+.xScrollable{
+    overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
 }
 .cDialog {

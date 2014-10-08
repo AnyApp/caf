@@ -13,6 +13,7 @@ var CPullToRefresh = Class({
 
         template.events = template.events || {};
         template.pullToRefreshData = {
+            started: false,
             startX:-100000,
             startY:-100000,
             lastX:-200000,
@@ -33,20 +34,24 @@ var CPullToRefresh = Class({
 
         template.events.onPullToRefreshListenerStart = function(e){
             // Check that the scroller is on top.
-            var closestScroller = template.getClosestScroller();
-            if (CUtils.isEmpty(closestScroller) || closestScroller.getScrollTop()>5){
-                CLog.dlog(closestScroller.getScrollTop());
+            var closestScroller = CScrolling.getClosestScrollableObject(template);
+            if (CUtils.isEmpty(closestScroller.uid()) ||
+                    CScrolling.getScrollerTop(closestScroller.uid())>5){
                 return;
             }
 
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
+            template.pullToRefreshData.started    = true;
             template.pullToRefreshData.startX     = pointer.pageX;
             template.pullToRefreshData.startY     = pointer.pageY;
             template.pullToRefreshData.lastX      = pointer.pageX;
             template.pullToRefreshData.lastY      = pointer.pageY;
-            e.preventDefault();
+            //e.preventDefault();
+
+            // Check if template is not showing anymore.
+            CPullToRefresh.runNotVisibleCheck(template);
         };
         template.events.onPullToRefreshListenerMove = function(e){
             if (template.pullToRefreshData.startY<0) // Not started.
@@ -57,7 +62,7 @@ var CPullToRefresh = Class({
             template.pullToRefreshData.lastX = pointer.pageX;
             template.pullToRefreshData.lastY = pointer.pageY;
             var distance = template.pullToRefreshData.lastY-template.pullToRefreshData.startY;
-            distance = distance -50;
+            distance = distance -30;
 
             if (distance<=0)
                 return;
@@ -86,7 +91,7 @@ var CPullToRefresh = Class({
             var pointer = CUtils.getPointerEvent(e);
 
             if (pointer && pointer.type && pointer.type ==='mouseout' &&
-                CPullToRefresh.isDeepChild(template.uid(),e.toElement)){
+                CUtils.isDeepChild(template.uid(),e.toElement)){
                 return;
             }
 
@@ -94,7 +99,9 @@ var CPullToRefresh = Class({
             // not need refresh.
 
             if (template.pullToRefreshData.lastDistance<=CPullToRefresh.minDistance){
-                CPullToRefresh.reset(template);}
+                CPullToRefresh.reset(template);
+                return;
+            }
 
             // refresh.
             template.reload(null,function(){
@@ -115,6 +122,15 @@ var CPullToRefresh = Class({
         element.addEventListener("touchcancel",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("touchmove",template.events.onPullToRefreshListenerMove);
         element.addEventListener("mousemove",template.events.onPullToRefreshListenerMove);
+    },
+    runNotVisibleCheck: function (template) {
+        CThreads.runTimes(function(){
+            if (!template.pullToRefreshData.started)
+                return;
+            var elm = CUtils.element(template.uid());
+            if (elm.clientHeight === 0 && elm.clientWidth === 0)
+                CPullToRefresh.reset(template);
+        },200,200,20);
     },
     inPullToRefresh: function(){
         return CPullToRefresh.inPull;
@@ -140,6 +156,7 @@ var CPullToRefresh = Class({
     reset: function(template){
         var element = CUtils.element(template.uid());
         element.style.paddingTop = '0px';
+        template.pullToRefreshData.started = false;
         template.pullToRefreshData.startX = -100000;
         template.pullToRefreshData.startY = -100000;
         template.pullToRefreshData.lastX = -200000;
@@ -151,11 +168,6 @@ var CPullToRefresh = Class({
         CThreads.run(function(){CPullToRefresh.inPull = false;},100);
 
         template.rebuild();
-    },
-    isDeepChild: function(parentId,element){
-        if (CUtils.isEmpty(element))
-            return false;
-        return parentId === element.id || CPullToRefresh.isDeepChild(parentId,element.parentElement);
     }
 
 

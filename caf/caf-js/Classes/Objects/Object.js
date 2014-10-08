@@ -39,22 +39,6 @@ var CObject = Class({
         this.relative       = values.relative || false; // Is this object relative.
         this.logic.doStopPropagation = values.logic.doStopPropagation || false;
 
-        // Replace all references.
-        //this.applyDynamicVariables(this.logic);
-        // don't apply dynamic variables on dynamic data.
-
-/*
-        if (!CUtils.isEmpty(this.data.templateObjects)) {
-            var dynamicData = this.data.templateObjects;
-            this.data.templateObjects = null;
-            this.applyDynamicVariables(this.data);
-            this.data.templateObjects = dynamicData;
-        }
-        else{
-            this.applyDynamicVariables(this.data);
-        }
-*/
-
     },
     /**
      * Return Unique identifier.
@@ -105,15 +89,6 @@ var CObject = Class({
     },
     getLink: function() {
         return this.data.link || '';
-    },
-    hasLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLinkLocal: function(){
-        return this.data.link.indexOf(CAppConfig.baseUrl())>=0;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -253,13 +228,6 @@ var CObject = Class({
         attributes.push('class="'+this.classes+'"');
 
         // Custom tag - can be used to insert a,input..
-        if (this.hasLink()){
-            this.setLink(this.logic.link.path+ CPager.dataToPath(this.logic.link.data));
-            tag = 'a';
-            // Allow outer links only in browser. Avoid links opening inside app.
-            if (this.isLinkLocal() || CPlatforms.isWeb())
-                attributes.push('href="'+this.data.link+'"');
-        }
         tag         = CUtils.isEmpty(tag)? 'div' : tag;
         var tagOpen = '<'+tag;
 
@@ -313,14 +281,6 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
         parentContainer.rebuild();
-    },
-    getClosestScroller: function(){
-        if (!CUtils.isEmpty(this.scroller))
-            return this.scroller;
-        var parent = CObjectsHandler.object(this.parent);
-        if (!CUtils.isEmpty(parent))
-            return parent.getClosestScroller();
-        return null;
     }
 
 

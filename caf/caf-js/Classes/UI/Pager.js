@@ -5,47 +5,41 @@ var CPager = Class({
     $singleton: true,
     firstLoad: true,
     historyStack: new Array(),
-    currentPageNumber: 0,
-    maxPageNumber: 0,
     mainPage: '',
     backButtonId: '',
     pages: {},
+    router: null,
+    currentPageNumber: 0,
 
     initialize: function(){
-        var base = CAppConfig.basePath();
-        page.base(base);
-
+        this.resetPages();
+        this.setBackForwardDetection();
         // Add all pages names to the router.
         _.each(this.pages,function(pageId,name){
             var currentPage = CObjectsHandler.object(pageId);
-            var load = function(context){
-                if (CUtils.isEmpty(context.state.pageNumber)) {
-                    CPager.maxPageNumber += 1;
-                    context.state.pageNumber = CPager.maxPageNumber;
-                }
-                CPager.currentPageNumber = context.state.pageNumber;
-                var params = CPager.fetchParams(context);
+            var load = function(){
+                var params = CPager.fetchParams(window.location.hash);
                 CPager.showPage(name,params);
             }
             if (!CUtils.isEmpty(currentPage.getPageName())){
                 // Custom page.
-                page('/'+currentPage.getPageName()+'',load);
-                page('/'+currentPage.getPageName()+'/*',load);
+                routie(currentPage.getPageName()+'',load);
+                routie(currentPage.getPageName()+'/*',load);
             }
-            else {
-                // Main Page.
-                page('',load);
-            }
-        },this);
-        page('*', function() { CLog.dlog('page not found')});
-        this.resetPages();
-        page.start();
-    },
-    fetchParams: function(context) {
-        if (CUtils.isEmpty(context.path))
-            return [];
+            else // Main Page.
+                routie('',load);
 
-        var params = context.path.split('/');
+        },this);
+        routie('*', function() { CLog.dlog('page not found')});
+
+        this.checkAndChangeBackButtonState();
+    },
+    fetchParams: function(path) {
+        if (CUtils.isEmpty(path))
+            return [];
+        path = path.substr(path.indexOf('#')+1);
+
+        var params = path.split('/');
         if (params.length>0 && params[0]=='')
             params.shift();
         if (params.length>0 && params[params.length-1]=='')
@@ -63,34 +57,6 @@ var CPager = Class({
         this.backButtonId = backButtonId;
         this.checkAndChangeBackButtonState();
     },
-    moveToTab: function(tabButtonId,toSlide,swiperId) {
-        // Get Tabs.
-        var tabs = CSwiper.getSwiperButtons(swiperId);
-        _.each(tabs,function(buttonId){
-            // Remove hold mark.
-            this.removeHoldClass(buttonId);
-        },this);
-
-        this.addHoldClass(tabButtonId);
-
-        if (!CUtils.isEmpty(toSlide))
-            CSwiper.moveSwiperToSlide(swiperId,toSlide);
-
-    },
-    addHoldClass: function(tabButtonId) {
-        if (CUtils.isEmpty(tabButtonId))    return;
-
-        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
-        if (!CUtils.isEmpty(holdClass))
-            CUtils.addClass(CUtils.element(tabButtonId),holdClass);
-    },
-    removeHoldClass: function(tabButtonId) {
-        if (CUtils.isEmpty(tabButtonId))    return;
-
-        var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
-        if (!CUtils.isEmpty(holdClass))
-            CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
-    },
     dataToPath: function (data) {
         data = data || [];
         var path = '';
@@ -99,49 +65,45 @@ var CPager = Class({
         },CPager);
         return path;
     },
-    /**
-     * move to page.
-     */
-    moveToPage: function(path/*toPageId,isRealPage,inAnim,outAnim*/) {
-        // convert data to path. Example: {area:'north',side:'r'}=>/area/north/side/r
-
-
-        // Check if need to move back.
-        if (toPageId == 'move-back') {
-            this.moveBack();
-            return;
-        }
-
-        if (this.currentPage == toPageId)
-            return;
-
-        var lastPageId = this.currentPage;
-
-        //Replace current page.
-        this.currentPage = toPageId;
-        this.insertPageToStack(toPageId);
-        this.restructure();
-        var toPageDiv = document.getElementById(toPageId);
-
-        if (CUtils.isEmpty(lastPageId)) {
-            // on load page.
-            CPager.onLoadPage(toPageDiv);
-            // Hide back button if needed.
-            this.checkAndChangeBackButtonState();
-            return;
-        }
-
-        CAnimations.fadeIn(toPageDiv,300);
-
-        // on load page.
-        CPager.onLoadPage(toPageDiv);
-        // Hide back button if needed.
-        this.checkAndChangeBackButtonState();
-
-
-    },
     moveBack: function() {
         history.back();
+    },
+    setBackForwardDetection: function () {
+        var detectBackOrForward = function() {
+            CPager.hashHistory   = [window.location.hash];
+            CPager.historyLength = window.history.length;
+            CPager.historyStart  = CPager.hashHistory.length;
+            CPager.currentPageNumber = 0;
+
+            return function() {
+                var hash = window.location.hash, length = window.history.length;
+                if (CPager.hashHistory.length && CPager.historyLength == length) {
+                    if (CPager.hashHistory[CPager.hashHistory.length - 2] == hash) {
+                        CPager.hashHistory.pop();
+                        CPager.currentPageNumber = CPager.currentPageNumber -1;
+                    } else {
+                        CPager.hashHistory.push(hash);
+                        CPager.currentPageNumber = CPager.currentPageNumber +1;
+                    }
+                } else {
+                    CPager.hashHistory.push(hash);
+                    CPager.currentPageNumber = CPager.currentPageNumber +1;
+                    CPager.historyLength = length;
+                }
+
+                CPager.checkAndChangeBackButtonState();
+
+            }
+        };
+
+        window.addEventListener("hashchange", detectBackOrForward());
+    },
+    checkAndChangeBackButtonState:function() {
+        if (CUtils.isEmpty(CPager.backButtonId) || !CPager.hashHistory ) return;
+        if (CPager.currentPageNumber===0)
+            CUtils.addClass(CUtils.element(CPager.backButtonId),'hidden');
+        else
+            CUtils.removeClass(CUtils.element(CPager.backButtonId),'hidden');
     },
     onLoadPage: function(pageId) {
         var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
@@ -149,14 +111,6 @@ var CPager = Class({
             return;
         // Execute onPageLoad.
         onPageLoad();
-    },
-    checkAndChangeBackButtonState:function() {
-        if (CUtils.isEmpty(this.backButtonId)) return;
-
-        if (this.currentPageNumber <= 1)
-            CUtils.addClass(CUtils.element(this.backButtonId),'hidden');
-        else
-            CUtils.removeClass(CUtils.element(this.backButtonId),'hidden');
     },
     getPagePath: function(name,params){
         return name+CPager.dataToPath(params);
@@ -217,7 +171,7 @@ var CPager = Class({
         else
             CAnimations.show(CPager.currentPage,animationOptions);
 
-        this.checkAndChangeBackButtonState();
+        //this.checkAndChangeBackButtonState();
 
     },
     // Immediate hide to all pages on first load.
