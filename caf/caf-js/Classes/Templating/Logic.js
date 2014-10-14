@@ -27,6 +27,11 @@ var CLogic = Class({
                 CDialog.showDialog(value.data || {},value.design || {});
             });
         },
+        request: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CNetwork.request(value.url || '',value.data || {},value.callback || function(){});
+            });
+        },
         sideMenuSwitch: function(object,value){
             object.logic.doStopPropagation = true;
             CClicker.addOnClick(object,function(){
@@ -49,7 +54,7 @@ var CLogic = Class({
         icon: function(object,value){
             var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
             var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
-            var color   = CUtils.isEmpty(value.color)?'': ' '+CDesign.designs.color(value.color);
+            var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
 //            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
 //            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
             var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';

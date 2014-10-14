@@ -144,6 +144,9 @@ var CPager = Class({
             }
         }
 
+        // Cancel Pull to refresh.
+        CPullToRefresh.interrupt();
+
         var lastPage            = CPager.currentPage || '';
         CPager.currentPage      = id;
 
@@ -183,6 +186,8 @@ var CPager = Class({
     },
     getParamsAsMap: function(params){
         var map = {};
+        if (CUtils.isEmpty(params))
+            return map;
         var cParams = CUtils.clone(params);
         // If there is no argument for the page name -
         if (cParams.length%2 ==1) {

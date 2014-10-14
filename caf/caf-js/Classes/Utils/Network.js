@@ -16,7 +16,7 @@ var CNetwork = Class({
                 var data = null;
                 // If the response in JSON, Parse it.
                 try {
-                    data = JSON.parse(origData);
+                    data = JSONfn.parse(origData);
                 } catch (e) {
                     data = origData;
                 }

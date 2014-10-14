@@ -8,6 +8,7 @@ var CObjectsHandler = Class({
     appContainerId: "",
     dialogsContainerId: "",
     mainViewId: "",
+    contentId: "",
 
     addObject: function(object){
         this.objectsById[object.uid()] = object;
@@ -64,6 +65,7 @@ var CObjectsHandler = Class({
         CObjectsHandler.addObject(cObject);
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
+        if (type=="Content") CObjectsHandler.contentId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
     createFromTemplateObject: function(abstractObject,data,logic,design){

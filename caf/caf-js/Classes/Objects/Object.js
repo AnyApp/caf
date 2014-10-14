@@ -13,8 +13,13 @@ var CObject = Class({
             return "c_"+Math.random().toString(36).substring(2);
         },
         mergeWithDefaults: function(values,useClass){
-            values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
+            if (!CUtils.isString(values.design))
+                values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
             values.logic = CUtils.mergeJSONs(useClass.DEFAULT_LOGIC,values.logic);
+        },
+        mergeDesignWithDefaults: function(design,useClass){
+            if (!CUtils.isString(design))
+                return CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,design);
         }
     },
 
@@ -125,8 +130,7 @@ var CObject = Class({
         this.lastLogic = {};
     },
     parseReferences: function(obj) {
-        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true // Circular
-            || obj.abstract===true)
+        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true /* Circular*/)
             return;
         obj.parseReferencesVisited = true;
         for (var property in obj) {
@@ -147,6 +151,12 @@ var CObject = Class({
     parseLocalReference: function(str){
         return eval(str);
     },
+    parseGlobalReference: function(str){
+        return CGlobals.get(str);
+    },
+    parseDesignReference: function(str){
+        return CDesignHandler.get(str);
+    },
     parseRelativeReference: function(str){
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
@@ -163,7 +173,7 @@ var CObject = Class({
     },
     replaceReferencesInString: function(str) {
         if (CUtils.isEmpty(str))
-            return '';
+            return str;
         if (str.indexOf('#') < 0)
             return str;
         // Multiple reference.
@@ -179,6 +189,10 @@ var CObject = Class({
                 parts[i] = this.parseRelativeReference(part.substr(1))    || null;
             else if (part.length>2 && part.substr(0,2) == '#/')
                 parts[i] = this.parseRelativeObjectId(part.substr(1))     || null;
+            else if (part.length>9 && part.substr(0,9) == '#globals.')
+                parts[i] = this.parseGlobalReference(part.substr(9))     || null;
+            else if (part.length>9 && part.substr(0,9) == '#designs.')
+                parts[i] = this.parseDesignReference(part.substr(9))     || null;
         }
         // Filter out empty elements.
         parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });
@@ -210,7 +224,7 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
-        CDesign.prepareDesign(this);
+        CDesigner.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
@@ -260,6 +274,10 @@ var CObject = Class({
         // Retrieve relative and local references.
         this.parseReferences(this.data);
         this.parseReferences(this.logic);
+        if (CUtils.isString(this.design)){
+            this.design = this.replaceReferencesInString(this.design);
+            this.design = CObject.mergeDesignWithDefaults(this.design,this);
+        }
         // Parse relative uname.
         var prevUID = this.uid();
         this.uname = this.replaceReferencesInString(this.uname);

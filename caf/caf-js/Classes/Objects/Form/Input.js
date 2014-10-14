@@ -8,13 +8,9 @@ var CInput = Class(CObject,{
     $statics: {
         DEFAULT_DESIGN: {
             height:35,
-            marginRight:1,
-            marginLeft:1,
-            marginTop:1,
             padding: 2,
             fontSize:16,
-            fontStyle:['bold'],
-            round: 2
+            fontStyle:['bold']
         },
         DEFAULT_LOGIC: {
         }
@@ -31,6 +27,7 @@ var CInput = Class(CObject,{
         this.data.required           = values.data.required      || false;
         this.data.validators         = values.data.validators    || [];
         this.data.prepares           = values.data.prepares      || [];
+        this.data.placeholder        = values.data.placeholder   || '';
 
         if (this.data.required)
             this.data.validators.unshift('notEmpty');
@@ -42,7 +39,8 @@ var CInput = Class(CObject,{
         // Prepare this element - wrap it's children.
         return CInput.$superp.prepareBuild.call(this,{
             tag: 'input',
-            tagHasInner: false
+            tagHasInner: false,
+            attributes: ['placeholder="'+this.data.placeholder+'"']
         });
     },
     value: function() {

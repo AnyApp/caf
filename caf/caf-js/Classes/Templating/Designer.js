@@ -1,13 +1,13 @@
 /**
  * Created by dvircn on 06/08/14.
  */
-var CDesign = Class({
+var CDesigner = Class({
     $singleton: true,
     colors: {
         notLeveled: ['Black', 'White'],
         getColor: function(color,level){
             // Not Leveled Color.
-            if (CDesign.colors.notLeveled.indexOf(color)>=0){
+            if (CDesigner.colors.notLeveled.indexOf(color)>=0){
                 return color;
             }
             if (CUtils.isEmpty(level))  level = 0;
@@ -40,13 +40,13 @@ var CDesign = Class({
             return 'IconLeft borderBox '+CIconsManager.getIcon(data);
         },
         bgColor: function(data){
-            return "bg"+CDesign.colors.getColor(data.color,data.level || null);
+            return "bg"+CDesigner.colors.getColor(data.color,data.level || null);
         },
         color: function(data){
-            return "c"+CDesign.colors.getColor(data.color,data.level || null);
+            return "c"+CDesigner.colors.getColor(data.color,data.level || null);
         },
         borderColor: function(data){
-            return "bc"+CDesign.colors.getColor(data.color,data.level || null);
+            return "bc"+CDesigner.colors.getColor(data.color,data.level || null);
         },
         border: function(data){
             var classes = "";
@@ -104,7 +104,6 @@ var CDesign = Class({
             return "";
         },
         overflow: function(data){
-            CLog.dlog(data);
             if (data==="hidden")        return "hidden";
             //if (data==="scrollable")    return "scrollable";
             if (data==="scrollY")       return "yScrollable";
@@ -229,22 +228,42 @@ var CDesign = Class({
     prepareDesign: function(object){
         var design = object.design;
         // Save the classes in the object.
-        object.setClasses(CDesign.designToClasses(design));
+        object.setClasses(CDesigner.designToClasses(design));
+    },
+    mergeParents: function(design){
+        var parents = design.parents || [];
+        _.each(parents,function(parent){
+            var parentDesign = {};
+            // Design is reference to named design.
+            if (CUtils.isString(parent))
+                parentDesign = CDesignHandler.get(parent) || {};
+            else
+                parentDesign = parent;
+            // In case it wasn't merged yet, Merge parents of parent.
+            CDesigner.mergeParents(parentDesign);
+            // Merge parent design into current design - current design is stronger.
+            design = CUtils.mergeJSONs(parentDesign,design);
+        },this);
+        // Remove after merge.
+        delete design.parents;
+
+        return design;
     },
     designToClasses: function(design){
         if (CUtils.isEmpty(design))
             return "";
 
+        design = CDesigner.mergeParents(design);
 
         var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.
         _.each(design,function(value,attribute){
             if (CUtils.isEmpty(value))  return;
-            if (CUtils.isEmpty(CDesign.designs[attribute])){
+            if (CUtils.isEmpty(CDesigner.designs[attribute])){
                 CLog.error("Design: "+attribute+" doesn't exist.")
                 return "";
             }
-            classesBuilder.append( CDesign.designs[attribute](value) );
+            classesBuilder.append( CDesigner.designs[attribute](value) );
         },this);
         return classesBuilder.build(' ');
     },

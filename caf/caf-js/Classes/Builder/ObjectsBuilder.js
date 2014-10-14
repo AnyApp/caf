@@ -9,7 +9,7 @@ var CBuilderObjects = Class({
     constructor: function() {
         this.objects = [];
         this.designs = {};
-        this.datas = {};
+        this.data = {};
     },
     addDesign: function(name,design){
         this.designs[name] = design;
@@ -18,17 +18,24 @@ var CBuilderObjects = Class({
         return this.designs[name];
     },
     addData: function(name,data){
-        this.datas[name] = data;
+        this.data[name] = data;
     },
     getData: function(name){
-        return this.datas[name];
+        return this.data[name];
     },
     build: function(){
+        // Create Objects.
         var builtObjects = [];
         _.each(this.objects,function(objectBuilder){
             builtObjects.push(objectBuilder.build());
         });
-        return builtObjects;
+
+        var appData = {
+            objects:    builtObjects,
+            designs:    this.designs,
+            data:       this.data
+        };
+        return appData;
     },
     create: function(type,uname){
         var objectBuilder = new CBuilderObject(type || '',uname || '');

@@ -61,7 +61,7 @@ var CBuilder = Class({
         _.each(CObjectsHandler.getPreparedObjects(),function(object){
             // Apply Logic and Design on the Object.
             CLogic.applyLogic(object);
-            CDesign.applyDesign(object);
+            CDesigner.applyDesign(object);
         },CBuilder);
 
         // Clear Whitespaces.

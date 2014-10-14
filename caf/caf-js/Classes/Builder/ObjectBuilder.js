@@ -14,7 +14,6 @@ var CBuilderObject = Class({
         this.properties.data        = {};
         this.properties.design      = {};
         this.properties.logic       = {};
-        this.properties.abstract    = true;
     },
     build: function(){
         return this.properties;
@@ -26,6 +25,11 @@ var CBuilderObject = Class({
     },
     childs: function(childs){
         this.properties.data.childs    = childs;
+        return this;
+    },
+    child: function(child){
+        this.properties.data.childs    = this.properties.data.childs || [];
+        this.properties.data.childs.push(child);
         return this;
     },
     page: function(name,title,onLoad){
@@ -83,7 +87,7 @@ var CBuilderObject = Class({
         this.properties.data.template.object = object;
         return this;
     },
-    templatPullToRefresh: function() {
+    templatePullToRefresh: function() {
         this.initTemplate();
         this.properties.data.template.pullToRefresh = true;
         return this;
@@ -119,6 +123,14 @@ var CBuilderObject = Class({
     templateItemOnClicks: function(onClicks) {
         this.initTemplate();
         this.properties.data.template.callbacks = onClicks;
+        return this;
+    },
+    request: function(url,data,callback){
+        this.properties.logic.request = {
+            url:        url             || null,
+            data:       data            || null,
+            callback:   callback        || null
+        }
         return this;
     },
     reloadDynamicButton: function(object,reset,queryData,onFinish){
@@ -160,6 +172,28 @@ var CBuilderObject = Class({
     },
     inputNotRequired: function() {
         this.properties.data.required = false;
+        return this;
+    },
+    inputPlaceholder: function(placeholder) {
+        this.properties.data.placeholder = placeholder;
+        return this;
+    },
+    inputValidators: function(validators) {
+        this.properties.data.validators = validators;
+        return this;
+    },
+    inputValidator: function(validator) {
+        this.properties.data.validators = this.properties.data.validators || [];
+        this.properties.data.validators.push(validator);
+        return this;
+    },
+    inputPrepares: function(prepares) {
+        this.properties.data.prepares = prepares;
+        return this;
+    },
+    inputPrepare: function(prepare) {
+        this.properties.data.prepares = this.properties.data.prepares || [];
+        this.properties.data.prepares.push(prepare);
         return this;
     },
     formLoadInputFromStorage: function() {
@@ -204,6 +238,14 @@ var CBuilderObject = Class({
     },
     backButton: function() {
         this.properties.logic.backButton = true;
+        return this;
+    },
+    imageSource: function(src) {
+        this.properties.data.src = src;
+        return this;
+    },
+    videoSource: function(src) {
+        this.properties.data.src = src;
         return this;
     },
     galleryImages: function(images) {

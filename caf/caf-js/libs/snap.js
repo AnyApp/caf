@@ -185,9 +185,15 @@
                     cache.easing = false;
                     clearInterval(cache.animatingInterval);
 
+                    var content = CUtils.element(CObjectsHandler.contentId);
                     if(cache.easingTo===0){
                         utils.klass.remove(doc.body, 'snapjs-right');
                         utils.klass.remove(doc.body, 'snapjs-left');
+                        CUtils.removeClass(content,'unreachable');
+                        CPullToRefresh.enable();
+                    }
+                    else{
+                        CUtils.addClass(content,'unreachable');
                     }
 
                     utils.dispatchEvent('animated');
@@ -212,7 +218,7 @@
                     }
                     if(n===0){
                            settings.element.style[cache.vendor+'Transform'] = '';
-                       }
+                    }
                 },
                 x: function(n) {
                     if( (settings.disable==='left' && n>0) ||
@@ -241,6 +247,9 @@
                         settings.element.style.left = n+'px';
                         settings.element.style.right = '';
                     }
+                    // Disable pulling.
+                    CPullToRefresh.disable();
+
                 }
             },
             drag: {
@@ -529,7 +538,6 @@
                 eventList[evt] = false;
             }
         };
-
         this.enable = function() {
             utils.dispatchEvent('enable');
             action.drag.listen();

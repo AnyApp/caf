@@ -48,8 +48,7 @@ var CUtils = Class({
     },
     isString: function(variable)
     {
-        return (typeof variable == 'string' || variable instanceof String)
-            && variable.trim().indexOf("function")!=0;
+        return (typeof variable == 'string' || variable instanceof String);
     },
     isArray: function(variable){
         return Object.prototype.toString.call( variable ) === '[object Array]';
@@ -64,15 +63,17 @@ var CUtils = Class({
     },
     hasClass: function(el, name)
     {
+        if (!el)
+            return false;
         return new RegExp('(\\s|^)'+name+'(\\s|$)').test(el.className);
     },
     addClass: function(el, name)
     {
-        if (!CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
+        if (el && !CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
     },
     removeClass: function(el, name)
     {
-        if (CUtils.hasClass(el, name)) {
+        if (el && CUtils.hasClass(el, name)) {
             el.className=el.className.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
         }
     },

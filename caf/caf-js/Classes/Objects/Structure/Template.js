@@ -4,7 +4,7 @@
 var CTemplate = Class(CContainer,{
     $statics: {
         gifLoaders:{
-            default: 'loaderDefault'
+            'default': 'loaderDefault'
         },
         DEFAULT_DESIGN: {
             //classes: CTemplator.hiddenClass,
@@ -67,13 +67,10 @@ var CTemplate = Class(CContainer,{
         filterFunction = filterFunction || function(data) { return true; };
         _.each(this.data.template.containerToData,function(data,id){
             data = data || {};
-            CLog.dlog(data);
-            if (filterFunction(data)===true){
+            if (filterFunction(data)===true)
                 CUtils.element(id).style.display = '';
-            }
-            else{
+            else
                 CUtils.element(id).style.display = 'none';
-            }
         },this);
     },
     clearFilter: function(){
@@ -90,13 +87,9 @@ var CTemplate = Class(CContainer,{
     stopLoading: function(){
         if (this.data.template.showLoader!==true)
             return
-
-        var obj = this;
-        CThreads.run(function(){
-            obj.removeChild(obj.spinnerId);
-            obj.rebuild();
-            delete obj.spinnerId;
-        },1500);
+        this.removeChild(this.spinnerId);
+        this.rebuild();
+        delete this.spinnerId;
     },
     reload: function(queryData,onFinish, reset){
         CTemplator.load(this.uid(),queryData||this.data.template.queryData,

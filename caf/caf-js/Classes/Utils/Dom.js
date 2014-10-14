@@ -48,7 +48,6 @@ var CDom = Class({
         var node = CUtils.element(nodeId);
         if (!CUtils.isEmpty(node) && !CUtils.isEmpty(node.parentElement))
             node.parentElement.removeChild(node);
-        //CLog.dlog('Removing: '+nodeId);
     },
     /**
      * Move node to index and push all other nodes forward.

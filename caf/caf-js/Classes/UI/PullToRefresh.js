@@ -4,8 +4,10 @@
 var CPullToRefresh = Class({
     $singleton: true,
     inPull: false,
+    inPullTemplate: null,
     spinnerSize: 60,
     minDistance: 70,
+    enabled: true,
     applyPullToRefresh: function(template){
         var element = CUtils.element(template.uid());
         // Set element to be relative.
@@ -33,6 +35,10 @@ var CPullToRefresh = Class({
         CUtils.unbindEvent(element,'mousemove',template.events.onPullToRefreshListenerMove);
 
         template.events.onPullToRefreshListenerStart = function(e){
+            // Disabled.
+            if (!CPullToRefresh.enabled)
+                return;
+
             // Check that the scroller is on top.
             var closestScroller = CScrolling.getClosestScrollableObject(template);
             if (CUtils.isEmpty(closestScroller.uid()) ||
@@ -54,6 +60,11 @@ var CPullToRefresh = Class({
             CPullToRefresh.runNotVisibleCheck(template);
         };
         template.events.onPullToRefreshListenerMove = function(e){
+            // Disabled.
+            if (!CPullToRefresh.enabled) {
+                CPullToRefresh.interrupt();
+                return;
+            }
             if (template.pullToRefreshData.startY<0) // Not started.
                 return;
             var pointer = CUtils.getPointerEvent(e);
@@ -74,6 +85,7 @@ var CPullToRefresh = Class({
             // Append element.
             CPullToRefresh.injectSpinner(template);
             CPullToRefresh.inPull = true;
+            CPullToRefresh.inPullTemplate = template;
             e.stopPropagation();
             e.preventDefault();
 
@@ -153,6 +165,16 @@ var CPullToRefresh = Class({
     getInjectedSpinner: function(template){
         return CUtils.element(template.pullToRefreshData.spinnerId || '');
     },
+    interrupt: function(){
+        if (!CUtils.isEmpty(CPullToRefresh.inPullTemplate))
+            CPullToRefresh.reset(CPullToRefresh.inPullTemplate);
+    },
+    disable: function(){
+        CPullToRefresh.enabled = false;
+    },
+    enable: function(){
+        CPullToRefresh.enabled = true;
+    },
     reset: function(template){
         var element = CUtils.element(template.uid());
         element.style.paddingTop = '0px';
@@ -165,7 +187,10 @@ var CPullToRefresh = Class({
         template.removeChild(template.pullToRefreshData.spinnerId||'');
         template.pullToRefreshData.spinnerId = '';
 
-        CThreads.run(function(){CPullToRefresh.inPull = false;},100);
+        CThreads.run(function(){
+            CPullToRefresh.inPull = false;
+            CPullToRefresh.inPullTemplate = null;
+        },100);
 
         template.rebuild();
     }

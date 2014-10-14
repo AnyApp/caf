@@ -30,8 +30,8 @@ var CClicker = Class({
         var design = object.getDesign();
         // Check
         object.clicker = {};
-        object.clicker.activeClasses       = CDesign.designToClasses(object.getDesign().active);
-        object.clicker.activeRemoveClasses = CDesign.designToClasses(object.getDesign().activeRemove);
+        object.clicker.activeClasses       = CDesigner.designToClasses(object.getDesign().active);
+        object.clicker.activeRemoveClasses = CDesigner.designToClasses(object.getDesign().activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,

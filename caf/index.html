@@ -8,17 +8,18 @@
     <!-- CSS Includes -->
     <!--<link rel="stylesheet" type="text/css" href="fonts/stylesheet.css"  charset="utf-8" />-->
     <link rel="stylesheet" type="text/css" href="css/caf-all.css" />
-    <link rel="stylesheet" type="text/css" href="css/flaticons/flaticon.css">
+    <link rel="stylesheet" type="text/css" href="css/flaticons/flaticon.css"/>
     <title>Codletech Application Framework</title>
 </head>
 <body id="body" ontouchstart="" class="">
 </body>
 <!-- JS Includes -->
 <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-<script type="text/javascript" src="compiling/caf-compiled.js"></script>
+<script type="text/javascript" src="/caf/core/Initiator.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
+<!--<script type="text/javascript" src="compiling/caf-compiled.js"></script>-->
 <script type="text/javascript">
-    app.initialize();
+    window.setTimeout(app.initialize,400);
 </script>
 
 

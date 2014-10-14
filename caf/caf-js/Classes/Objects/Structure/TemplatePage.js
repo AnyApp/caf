@@ -4,7 +4,7 @@
 var CTemplatePage = Class([CPage,CTemplate],{
     $statics: {
         gifLoaders:{
-            default: 'loaderDefault'
+            'default': 'loaderDefault'
         },
         DEFAULT_DESIGN: {
             classes: CTemplator.hiddenClass

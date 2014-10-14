@@ -40,14 +40,14 @@ var CTabber = Class(CContainer,{
         addHoldClass: function(tabButtonId) {
             if (CUtils.isEmpty(tabButtonId))    return;
 
-            var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
+            var holdClass = CDesigner.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
             if (!CUtils.isEmpty(holdClass))
                 CUtils.addClass(CUtils.element(tabButtonId),holdClass);
         },
         removeHoldClass: function(tabButtonId) {
             if (CUtils.isEmpty(tabButtonId))    return;
 
-            var holdClass = CDesign.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
+            var holdClass = CDesigner.designToClasses(CObjectsHandler.object(tabButtonId).getDesign().hold);
             if (!CUtils.isEmpty(holdClass))
                 CUtils.removeClass(CUtils.element(tabButtonId),holdClass);
         }
