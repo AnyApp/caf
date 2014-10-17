@@ -17805,8 +17805,14 @@ li{
 .bold{
     font-weight: bold;
 }
+.fontWeightNormal{
+    font-weight: normal;
+}
 .italic{
     font-style: italic;
+}
+.fontStyleNormal{
+    font-style: normal;
 }
 .white{
     color: #ffffff;

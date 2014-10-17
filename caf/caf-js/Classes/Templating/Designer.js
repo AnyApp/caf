@@ -64,8 +64,14 @@ var CDesigner = Class({
         },
         fontStyle: function(data){
             var classes = "";
-            if (data.indexOf('bold')>=0)       classes+="bold ";
-            if (data.indexOf('italic')>=0)     classes+="italic ";
+            if (data=='normal')     classes+="fontStyleNormal ";
+            if (data=='italic')     classes+="italic ";
+            return classes;
+        },
+        fontWeight: function(data){
+            var classes = "";
+            if (data=='bold')       classes+="bold ";
+            if (data=='normal')     classes+="fontWeightNormal ";
             return classes;
         },
         cursor: function(data){

@@ -106,6 +106,8 @@ var CDialog = Class(CContainer,{
 
     },
     hide: function(callback){
+        if (CAnimations.objectInAnim(this))
+            return;
         // Check if need to set cancel callback\use the given callback
         // or do not call callback - empty function;
         if (CUtils.isEmpty(callback) && !CUtils.isEmpty(this.data.cancelCallback)
@@ -249,7 +251,7 @@ var CDialog = Class(CContainer,{
 
         if (!CUtils.isEmpty(list.data.template.object))
             list.data.template.object.design =
-                CUtils.mergeJSONs(design,list.data.template.object.design||{});
+                CUtils.mergeJSONs(design,list.data.template.object.design || {});
 
         // List template item container - Border
         list.data.template.container    = list.data.template.container  || {type:'Container'};
@@ -264,7 +266,7 @@ var CDialog = Class(CContainer,{
         this.appendContent(listId);
 
         return;
-        var    iconsList       = this.data.iconsList,
+        /*var    iconsList       = this.data.iconsList,
             listCallbacks   = this.data.listCallbacks,
             listItemsData   = this.data.listItemsData,
             listItemsLogic  = this.data.listItemsLogic,
@@ -296,9 +298,7 @@ var CDialog = Class(CContainer,{
             } : function(){};
 
             this.createListElement(index,text,data,logic,icon,listCallback,chosenCallback,hideOnChoose);
-        }
-
-
+        }*/
 
     },
     createListCallback: function(dialog,callback){

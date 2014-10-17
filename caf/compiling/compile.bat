@@ -3,9 +3,12 @@ copy /b libs\jsface.js+Classes\FormUtils\*+Classes\Templating\*+Classes\Interfac
 cd ..\compiling
 java -jar yuicompressor-2.4.8.jar -o caf.min.js caf-compiled.js
 copy /b caf.min.js ..\js\caf.min.js
-copy /b caf-compiled.js ..\core\caf.min.js
+copy /b caf.min.js ..\core\caf.min.js
 
 cd ..\caf-css
 del ..\css\caf-all.css
 copy /b idangerous.swiper.css+snap.css+utils\elementTransitions.css+dialogs.css+utils\animations.css+utils\responsive.css+utils\heights.css+utils\min-heights.css+utils\heights.css+utils\max-heights.css+utils\font-sizes.css+utils\widths.css+utils\paddings.css+utils\absolutes.css+utils\margins.css+caf.css ..\css\caf-all.css
-copy /b ..\css\caf-all.css ..\core\caf-all.css
+copy /b ..\css\caf-all.css ..\compiling\caf-all.css
+cd ..\compiling
+java -jar yuicompressor-2.4.8.jar -o caf.min.css caf-all.css
+copy /b caf.min.css ..\core\caf.min.css

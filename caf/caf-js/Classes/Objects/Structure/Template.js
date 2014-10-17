@@ -61,6 +61,8 @@ var CTemplate = Class(CContainer,{
 
     },
     setTemplateData: function(data){
+        this.data.template.data = data;
+        this.parseReferences(this.data.template.data);
         CTemplator.loadObjectWithData(this,data,null,true);
     },
     filter: function(filterFunction){

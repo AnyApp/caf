@@ -42,7 +42,7 @@ var CHeader = Class(CContainer,{
         this.data.title = CObjectsHandler.createObject('Label',{
             design: this.data.titleDesign
         });
-        CUI.setTitleObject(this.data.title);
+        CTitleHandler.setTitleObject(this.data.title);
 
         // Set up childs array.
         this.appendChilds(this.data.left);

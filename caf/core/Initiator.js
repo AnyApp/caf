@@ -5,8 +5,8 @@ var CInitiator = {
     cafFilePrefix:          'caf-file-',
     coreCSSName:            'core-css',
     coreJSName:             'core-js',
-    localCoreCSSPath:       '/caf/core/caf-all.css',
-    localCoreJSPath:        '/caf/core/caf.min.js',
+    localCoreCSSPath:       'core/caf.min.css',
+    localCoreJSPath:        'core/caf.min.js',
     script:                 null,
     doneLoadScript:         false,
     initiate: function(){

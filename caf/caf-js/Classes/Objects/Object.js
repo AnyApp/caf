@@ -134,7 +134,7 @@ var CObject = Class({
             return;
         obj.parseReferencesVisited = true;
         for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
+            if (obj.hasOwnProperty(property) && property!='template') {
                 if (typeof obj[property] == "object"){
                     this.parseReferences(obj[property]);
                 }
@@ -266,11 +266,6 @@ var CObject = Class({
 
     },
     assignReferences: function(){
-        // Leave out the dynamic data references as they need to evaluate only on object creation.
-        var abstractObjects         = this.data.templateObjects     || null;
-        var abstractContainer       = this.data.templateContainer   || null;
-        this.data.templateObjects   = null;
-        this.data.templateContainer = null;
         // Retrieve relative and local references.
         this.parseReferences(this.data);
         this.parseReferences(this.logic);
@@ -288,9 +283,6 @@ var CObject = Class({
             var thisIndex = parentObject.getChilds().indexOf(prevUID);
             parentObject.setChildInPosition(this.uid(),thisIndex);
         }
-        // Return the dynamic data.
-        this.data.templateObjects   = abstractObjects;
-        this.data.templateContainer = abstractContainer;
     },
     isContainer: function(){
         return false;

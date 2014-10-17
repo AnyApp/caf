@@ -107,10 +107,13 @@ var CAnimations = Class({
             CAnimations.show(nextObjectId);
         };
     },
+    objectInAnim: function(object){
+        return object.data.inAnim===true;
+    },
     prepareObjectAnimation: function(caller,objectId,options){
         var object = CObjectsHandler.object(objectId);
         // Wait until current animation is finished.
-        if (object.data.inAnim===true){
+        if (CAnimations.objectInAnim(object)){
             CThreads.run(function(){caller(objectId,options);},100);
             return null;
         }

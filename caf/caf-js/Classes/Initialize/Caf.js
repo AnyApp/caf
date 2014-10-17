@@ -8,7 +8,7 @@ var Caf = Class({
     appUpdateChecked: false,
     updateAsked: false,
     start: function(){
-        CAppHandler.initialize(Caf.startUpdate);
+        CAppHandler.start(Caf.startUpdate);
     },
     startUpdate: function(){
         // Run parallel.

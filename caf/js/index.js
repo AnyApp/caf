@@ -30,7 +30,7 @@ var app =
                     .design('#designs.left-menu-button')
                     .text('#this.data.text').link('#this.data.link').build()
             )
-            .templateData(builder.getData('navigation'));
+            .templateData('#globals.navigation');
         builder.create('SideMenuContainer','side-menu-right-container').childs(['right-menu'])
             .design({bgColor: CColor('Purple',15)});
         builder.addDesign('right-menu-button',{
@@ -45,7 +45,7 @@ var app =
                     .design('#designs.right-menu-button')
                     .text('#this.data.text').link('#this.data.link').build()
             )
-            .templateData(builder.getData('navigation'));
+            .templateData('#globals.navigation');
         builder.create('MainView','main-view').childs(['header','content','footer']);
         builder.create('Header','header')
             .headerLeft(['header-button-left-0','header-button-back'])
@@ -67,8 +67,8 @@ var app =
             .icon('left46',34,'',CColor('White')).backButton();
         builder.create('Dialog','drop-down-menu').data({
             topView: 'header-button-right-0',
-            //list: CUtils.arrayFromObjectsKey(builder.getData('navigation'),'data','text'),
-            //iconsList:CUtils.arrayFromObjectsKey(builder.getData('navigation'),'data','icon'),
+            //list: CUtils.arrayFromObjectsKey('#globals.navigation','data','text'),
+            //iconsList:CUtils.arrayFromObjectsKey('#globals.navigation','data','icon'),
             //iconsAlign: 'left',
             dialogWidth: '250',
             list:co('Template')
@@ -80,7 +80,7 @@ var app =
                         .build()
                 )
                 .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
-                .templateData(builder.getData('navigation'))
+                .templateData('#globals.navigation')
                 .templateBorder(CColor('Red',6),4)
                 .templateContainerDesign({})// can change/append item container design.
                 .build(),
@@ -93,12 +93,15 @@ var app =
             listBorderColor: {color: 'Teal', level: 14},
             listDesign: {textAlign:'left',color:CColor('White')},
             //listItemsLogic: {},
-            //listItemsData: builder.getData('navigation'),
+            //listItemsData: '#globals.navigation',
             contentColor: {color: 'White'},
             bgColor: {color:'Teal', level: 13},
             destroyOnHide: false
         });
-        builder.create('Footer','footer').childs([]);
+        builder.create('Footer','footer').child('footer-message')
+            .design({bgColor:{color:'LightBlue',level:8}});
+        builder.create('Label','footer-message').text('By Codletech')
+            .design({color:CColor('White'),textAlign:'center',fontWeight:'normal'});
         builder.create('Content','content')
             .child('main-page').child('category-page').child('form-page')
             .child('category-page').child('tabs-page').child('sliders-page')
@@ -178,7 +181,7 @@ var app =
             .templatePullToRefresh()
             .templateContainerDesign({display:'inline'})
             .templateItemOnClick(function(index){CLog.dlog('onClick item: '+index)})
-            .templateData(builder.getData('navigation')
+            .templateData('#globals.navigation'
                 /*co().iconLeft('table34',35)    .text('Category')   .link('category').build(),
                 co().iconLeft('table34',35)    .text('Category Dvir').link('category/dvir').build(),
                 co().iconLeft('table34',35)    .text('Show Dialog').showDialog(*//*Data*/
@@ -322,13 +325,13 @@ var app =
                 active: {bgColor: CColor('Red',6)},
                 hold: { bgColor: CColor('Red',8) } });
         builder.create('Tab','tab-1').childs([])
-            .design({bgColor:CColor('White',6),color:CColor('Cyan',8),fontStyle:['bold'],paddingTop:30})
+            .design({bgColor:CColor('White',6),color:CColor('Cyan',8),fontWeight:'bold',paddingTop:30})
             .text('Tab 1 Content');
         builder.create('Tab','tab-2').childs([])
-            .design({bgColor:CColor('White',6),color:CColor('Green',8),fontStyle:['bold'],paddingTop:30})
+            .design({bgColor:CColor('White',6),color:CColor('Green',8),fontWeight:'bold',paddingTop:30})
             .text('Tab 2 Content');
         builder.create('Tab','tab-3').childs([])
-            .design({bgColor:CColor('White',6),color:CColor('Brown',8),fontStyle:['bold'],paddingTop:30})
+            .design({bgColor:CColor('White',6),color:CColor('Brown',8),fontWeight:'bold',paddingTop:30})
             .text('Tab 3 Content');
         builder.create('Video','sample-youtube')
             .videoSource('http://www.youtube.com/watch?v=I9ix0ECNuyE')

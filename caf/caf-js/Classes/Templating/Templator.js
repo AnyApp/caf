@@ -32,10 +32,12 @@ var CTemplator = Class({
             CTemplator.removeDuplicates(object.uid(),false);
             object.data.template.containerToData = {};
         }
+
         // For each row in data.
         _.each(data,function(currentData){
             // Create container.
             var templateData = object.data.template;
+
             var containerData   = CUtils.clone(templateData.container);
             containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
 
@@ -86,6 +88,18 @@ var CTemplator = Class({
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object)) // Case that objectId is actually object.
             object = objectId;
+
+        object.data.template.data = data;
+        // Parse References
+        if (typeof object.data.template.data == "object")
+            object.parseReferences(object.data.template.data);
+        else{
+            object.data.template.data = [object.data.template.data]
+            object.parseReferences(object.data.template.data);
+            object.data.template.data = object.data.template.data[0];
+        }
+        data = object.data.template.data;
+
         this.duplicateWithData(object,data, onFinish, reset, preventRebuild);
     },
     loadObjectWithDataNoRebuild: function (objectId, data, reset) {

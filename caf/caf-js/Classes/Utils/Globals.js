@@ -5,15 +5,15 @@ var CGlobals = Class({
     $singleton: true,
     globals: {},
 
-    get: function(name,value){
+    get: function(name){
         return CGlobals.globals[name] || null;
     },
     setGlobal: function(key,value){
-        CDesignHandler.designs[key] = value;
+        CGlobals.globals[key] = value;
     },
     setGlobals: function(globals){
         _.each(globals,function(value,key){
-            CDesignHandler.designs[key] = value;
+            CGlobals.globals[key] = value;
         },this);
     }
 

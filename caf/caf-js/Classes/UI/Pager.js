@@ -165,7 +165,7 @@ var CPager = Class({
             page.reload();
         };
         var page = CObjectsHandler.object(CPager.currentPage);
-        CUI.setTitle(page.getPageTitle());
+        CTitleHandler.setTitle(page.getPageTitle());
         page.setParams(this.getParamsAsMap(params));
 
         // Showing current page.
