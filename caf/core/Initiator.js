@@ -3,39 +3,49 @@
  */
 var CInitiator = {
     cafFilePrefix:          'caf-file-',
-    coreCSSName:            'core-css',
-    coreJSName:             'core-js',
+    coreCSSName:            'caf.min.css',
+    coreJSName:             'caf.min.js',
     localCoreCSSPath:       'core/caf.min.css',
     localCoreJSPath:        'core/caf.min.js',
+    localStorageCSSID:      'caf-ls-stylesheet',
     script:                 null,
     doneLoadScript:         false,
     initiate: function(){
         var cssData = CInitiator.getFromLocalStorage(CInitiator.coreCSSName);
         var jsData  = CInitiator.getFromLocalStorage(CInitiator.coreJSName);
 
-        if (cssData == null || jsData == null)
+        if (CInitiator.isEmpty(cssData)  || CInitiator.isEmpty(jsData))
             CInitiator.loadFromLocal();
         else
-            CInitiator.loadFromStorage(cssData,jsData)
+            CInitiator.loadFromStorage(cssData,jsData);
     },
     startCAF: function(){
         Caf.start();
     },
     loadFromStorage: function(cssData,jsData){
-        // Prepare JS Load
-        CInitiator.script           = document.createElement('script');
-        CInitiator.script.type      = "text/javascript";
-        CInitiator.script.innerHTML = jsData;
-        CInitiator.setScriptLoadCallback();
         // Prepare CSS Load
         var style                   = document.createElement('style');
+        style.id                    = CInitiator.localStorageCSSID;
         style.type                  = "text/css";
         style.innerHTML             = cssData;
 
-        // Load both
+        // Load css
         var head         = document.head || document.getElementsByTagName("head")[0];
-        head.appendChild(CInitiator.script);
         head.appendChild(style);
+
+        // Try load script.
+        try {
+            eval.call(window,jsData);
+            CInitiator.handleLoad();
+        }
+        catch (e){
+            // revert and load local.
+            var stylesheet = document.getElementById(CInitiator.localStorageCSSID);
+            stylesheet.innerHTML = '';
+            CInitiator.doneLoadScript = false;
+            CInitiator.loadFromLocal();
+        }
+
     },
     loadFromLocal: function(){
         // Prepare JS Load
@@ -62,6 +72,7 @@ var CInitiator = {
         if (!CInitiator.doneLoadScript) {
             CInitiator.doneLoadScript = true;
             CInitiator.startCAF();
+
         }
     },
     handleReadyStateChange: function () {
@@ -110,6 +121,9 @@ var CInitiator = {
 
             return value;
         });
+    },
+    isEmpty: function(obj) {
+        return obj === undefined || obj === null || obj === '' || obj.toString()==='';
     }
 
 }

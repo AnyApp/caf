@@ -14,10 +14,14 @@ JSONfn.stringify = function (obj) {
 };
 
 JSONfn.parse = function (str, date2obj) {
+    if (str === 'undefined')
+        str = 'null';
 
     var iso8061 = date2obj ? /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/ : false;
 
     return JSON.parse(str, function (key, value) {
+        if (value === undefined)
+            value = null;
         var prefix;
 
         if (typeof value != 'string') {

@@ -8,6 +8,7 @@ var CAppHandler = Class({
     appData:            {},
     localDataPath:      'core/data.dcaf',
     start: function(callback){
+        callback = callback || function(){};
         CAppHandler.loadAppObjects(function(){
             CAppHandler.initialize(callback);
         });
@@ -18,9 +19,11 @@ var CAppHandler = Class({
         var appData = CAppHandler.appData;
         CAppHandler.appData = null; // Remove reference.
 
-        // After finished getting the data, we can run the callback.
-        CThreads.start(callback);
+        appData.data = appData.data || {};
 
+        // Load Theme if chosen.
+        if (appData.data['app-main-theme'] && !CUtils.isEmpty(appData.data['app-main-theme']))
+            CThemes.loadTheme(appData.data['app-main-theme']);
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});
@@ -38,6 +41,9 @@ var CAppHandler = Class({
         CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
         CPager.initialize();
+
+        // After finished, we can run the callback.
+        CThreads.start(callback);
     },
     resetApp: function() {
         window.location.hash = '';
@@ -51,13 +57,14 @@ var CAppHandler = Class({
         }
         else {
             // Load the local file.
-            CNetwork.request(CAppHandler.localDataPath,function(content){
+            CNetwork.request(CAppHandler.localDataPath,{},function(content){
                 if (!CUtils.isEmpty(content)){
                     CLocalStorage.save(CAppHandler.appDataKey,content);
-                    CAppHandler.appData = JSONfn.parse(content);
+                    // Re-Parse the data. In case that the data hasn't parsed functions.
+                    CAppHandler.appData = JSONfn.parse(JSONfn.stringify(content));
                 }
                 callback();
-            });
+            },callback);
         }
     }
 

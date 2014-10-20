@@ -240,6 +240,11 @@ var CObject = Class({
         // Add class attribute.
         attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
+        var inlineDesign = CDesigner.getFinalInlineStyle(this.design);
+        if (!CUtils.isEmpty(inlineDesign)) {
+            CLog.dlog(inlineDesign);
+            attributes.push('style="'+inlineDesign+'"');
+        }
 
         // Custom tag - can be used to insert a,input..
         tag         = CUtils.isEmpty(tag)? 'div' : tag;

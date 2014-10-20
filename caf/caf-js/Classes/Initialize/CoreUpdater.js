@@ -3,44 +3,70 @@
  */
 var CCoreUpdater = Class({
     $singleton:             true,
+    upToDateSign:           'File up to date',
     cafFilePrefix:          'caf-file-',
-    coreCSSName:            'core-css',
-    coreJSName:             'core-js',
-    coreCSSPath:            'http://',
-    coreJSPath:             'http://',
+    coreCSSName:            'caf.min.css',
+    coreJSName:             'caf.min.js',
+    coreCSSPath:            'https://codletech-builder.herokuapp.com/getGlobalFile',
+    coreJSPath:             'https://codletech-builder.herokuapp.com/getGlobalFile',
 
 
     update: function(){
-        CCoreUpdater.updateJS();
+        CThreads.start(CCoreUpdater.updateJS);
+        CThreads.start(CCoreUpdater.updateCSS);
     },
     updateJS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreJSPath,CCoreUpdater.coreJSName,
-            function() {CCoreUpdater.updateCSS();});
+            function() {
+                // Marked as checked.
+                Caf.coreJSUpdateChecked = true;
+            });
     },
     updateCSS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreCSSPath,CCoreUpdater.coreCSSName,
             function(){
                 // Marked as checked.
-                Caf.coreUpdateChecked = true;
+                Caf.coreCSSUpdateChecked = true;
             });
     },
     updateFile: function(path,name,callback){
         callback            = callback || function(){};
         var currentFileData = CLocalStorage.get(CCoreUpdater.cafFilePrefix+name);
-        var hashObj         = new jsSHA(currentFileData, "TEXT");
-        var hash            = hashObj.getHash("SHA-512", "HEX");
-        CCoreUpdater.requestUpdateFile(path,name,hash,callback);
+        if (currentFileData == null || currentFileData == undefined)
+            currentFileData = '';
+        var shaObj         = new jsSHA(currentFileData, "TEXT");
+        var sha            = shaObj.getHash("SHA-512", "HEX");
+        CCoreUpdater.requestUpdateFile(path,name,sha,callback);
 
     },
-    requestUpdateFile: function(path,name,hash,callback) {
-        CNetwork.request(path,{name:name,hash:hash},function(content){
+    requestUpdateFile: function(path,name,sha,callback) {
+        CNetwork.request(path,{fileName:name,fileSha:sha},function(content){
+            if (CUtils.isEmpty(content)){
+                callback();
+                return;
+            }
+            var dontNeedUpdate = content.status === 1 || content.status === -1;
             // Updated (data===true means the versions matched and no update needed).
-            if (!CUtils.isEmpty(content) && content !== true){
-                CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
-                Caf.updated = true;
+            if (!dontNeedUpdate){
+                try {
+                    CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
+                    Caf.updated = true;
+                }
+                catch (e) {
+                    CLog.error('Error at:'+name);
+                    CLog.error(e);
+                }
+                CLog.dlog('Update Needed:\t\t'+name);
+            }
+            else{
+                CLog.dlog('Don\'t Need Update:\t'+name);
             }
             callback();
-        });
+        },callback);
+    },
+    clearAll: function(){
+        CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreCSSName,'');
+        CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreJSName,'');
     }
 
 

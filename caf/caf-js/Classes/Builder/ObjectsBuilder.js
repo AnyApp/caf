@@ -41,6 +41,9 @@ var CBuilderObjects = Class({
         var objectBuilder = new CBuilderObject(type || '',uname || '');
         this.objects.push(objectBuilder);
         return objectBuilder;
+    },
+    saveAppDataToFile: function(path){
+
     }
 
 

@@ -341,7 +341,7 @@ var app =
             .design({widthXS:10, height:250});
 
 
-        CAppUpdater.saveApp(builder.build());
+        //CAppUpdater.saveApp(builder.build());
         //CAppHandler.resetApp();
         //Caf.start();
 

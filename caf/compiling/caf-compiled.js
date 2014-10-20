@@ -308,899 +308,6 @@ var CValidators = Class({
 
 
 /**
- * Created by dvircn on 09/08/14.
- */
-var CBuilder = Class({
-    $singleton: true,
-    inBuilding: false,
-    waitingCount: 0,
-    current: '',
-    /**
-     * Build all objects.
-     */
-    buildAll: function(onFinish){
-        CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
-        this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
-    },
-    /**
-     * Build from object.
-     * @param id : Object ID.
-     */
-    buildFromObject: function(id,onFinish){
-        if (CBuilder.inBuilding===true && CBuilder.waitingCount<100){
-            CBuilder.waitingCount++;
-            CThreads.run(function(){CBuilder.buildFromObject(id,onFinish);},50);
-            return;
-        }
-
-        onFinish = onFinish || function(){};
-
-        CBuilder.waitingCount = 0;
-        CBuilder.inBuilding = true;
-        CBuilder.current = id;
-
-        // Get root object.
-        var currentObject   = CObjectsHandler.object(id);
-
-        // Assign References.
-        currentObject.assignReferences();
-
-        // Clear prepared objects.
-        CObjectsHandler.clearPreparedObjects();
-
-        // Prepare for build and get the view (If the objects aren't in the DOM).
-        var view            = new CStringBuilder();
-
-        var viewBuilder     = currentObject.prepareBuild({view:view});
-
-        // Append the view to the parent in the DOM.
-        // Note: If the objects are already in the DOM, viewStr will be empty
-        //       and the DOM won't change.
-        var viewStr = viewBuilder.build(' ');
-        CDom.addChild(currentObject.getParent(),viewStr);
-
-        // Restructure before logic is applied.
-        _.each(CObjectsHandler.getPreparedObjects(),function(object){
-            //Restructure containers children.
-            if (object.isContainer())
-                object.restructureChildren();
-        },CBuilder);
-
-        // Build relevant Objects by the order of their build (Parent->Child).
-        _.each(CObjectsHandler.getPreparedObjects(),function(object){
-            // Apply Logic and Design on the Object.
-            CLogic.applyLogic(object);
-            CDesigner.applyDesign(object);
-        },CBuilder);
-
-        // Clear Whitespaces.
-        CUtils.cleanWhitespace();
-
-
-        CBuilder.inBuilding = false;
-
-        if (!CUtils.isEmpty(onFinish))
-            onFinish();
-
-    },
-    objectJSON: function(type,uname,design,logic,data){
-        var object = {};
-        object.type     = type;
-        object.uname    = uname;
-        object.design   = design;
-        object.logic    = logic;
-        object.data     = data;
-    },
-    forceRedraw: function(element){
-        //CUtils.element(id).style.display = 'none';
-        //CUtils.element(id).style.display = '';
-        if (!element) { return; }
-
-        var n = document.createTextNode(' ');
-        var disp = element.style.display;  // don't worry about previous display style
-
-        element.appendChild(n);
-        element.style.display = 'none';
-
-        setTimeout(function(){
-            element.style.display = disp;
-            n.parentNode.removeChild(n);
-        },0); // you can play with this timeout to make it as short as possible
-    }
-
-
-});
-/**
- * Created by dvircn on 06/08/14.
- */
-var CDesigner = Class({
-    $singleton: true,
-    colors: {
-        notLeveled: ['Black', 'White'],
-        getColor: function(color,level){
-            // Not Leveled Color.
-            if (CDesigner.colors.notLeveled.indexOf(color)>=0){
-                return color;
-            }
-            if (CUtils.isEmpty(level))  level = 0;
-            level = Math.max(level,0);
-            level = Math.min(level,17);
-
-            return color+level;
-        }
-    },
-    designs: {
-        classes: function(data){
-            return data;
-        },
-        active: function(data){
-            // Do Nothing. Just to mention the active class attribute.
-        },
-        hold: function(data){
-            // Do Nothing. Just to mention the hold class attribute.
-        },
-        activeRemove: function(data){
-            // Do Nothing. Just to mention the activeRemove class attribute.
-        },
-        iconOnly: function(data){
-            return 'iconOnly '+CIconsManager.getIcon(data);
-        },
-        iconRight: function(data){
-            return 'IconRight borderBox '+CIconsManager.getIcon(data);
-        },
-        iconLeft: function(data){
-            return 'IconLeft borderBox '+CIconsManager.getIcon(data);
-        },
-        bgColor: function(data){
-            return "bg"+CDesigner.colors.getColor(data.color,data.level || null);
-        },
-        color: function(data){
-            return "c"+CDesigner.colors.getColor(data.color,data.level || null);
-        },
-        borderColor: function(data){
-            return "bc"+CDesigner.colors.getColor(data.color,data.level || null);
-        },
-        border: function(data){
-            var classes = "";
-            if (!CUtils.isEmpty(data['all']))       classes+="border"+data['all']+"p ";
-            if (!CUtils.isEmpty(data['bottom']))    classes+="borderBottom"+data['bottom']+"p ";
-            if (!CUtils.isEmpty(data['right']))     classes+="borderRight"+data['right']+"p ";
-            if (!CUtils.isEmpty(data['left']))      classes+="borderLeft"+data['left']+"p ";
-            if (!CUtils.isEmpty(data['top']))       classes+="borderTop"+data['top']+"p ";
-
-            return classes;
-        },
-        fontSize: function(data){
-            // Font Size
-            return 'fsz'+data;
-        },
-        fontStyle: function(data){
-            var classes = "";
-            if (data=='normal')     classes+="fontStyleNormal ";
-            if (data=='italic')     classes+="italic ";
-            return classes;
-        },
-        fontWeight: function(data){
-            var classes = "";
-            if (data=='bold')       classes+="bold ";
-            if (data=='normal')     classes+="fontWeightNormal ";
-            return classes;
-        },
-        cursor: function(data){
-            var values = ['pointer'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return data;
-            }
-            return "";
-        },
-        direction: function(data){
-            var values = ['rtl','ltr'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return data;
-            }
-            return "";
-        },
-        textAlign: function(data){
-            var values = ['center','right','left'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return "text"+CUtils.capitaliseFirstLetter(data);
-            }
-            return "";
-        },
-        position: function(data){
-            var values = ['absolute','relative'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return data;
-            }
-            return "";
-        },
-        display: function(data){
-            var values = ['inlineBlock','block','inline','hidden','displayNone'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return data;
-            }
-            return "";
-        },
-        overflow: function(data){
-            if (data==="hidden")        return "hidden";
-            //if (data==="scrollable")    return "scrollable";
-            if (data==="scrollY")       return "yScrollable";
-            return "";
-        },
-        scrollable: function(data){
-            if (data===true && CScrolling.isNativeScrolling())
-                return CScrolling.scrollableClass();
-            return '';
-        },
-        boxSizing: function(data){
-            var values = ['borderBox'];
-            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
-                return data;
-            }
-            return "";
-        },
-        round: function(data){
-            if (data==="circle")    return "circle";
-
-            return "Rounded"+data;
-        },
-        width: function(data){
-            data = ""+data;
-            if (data.indexOf('%')>=0)   return "w"+data.substring(0,data.length-1);
-            return "wp"+data;
-        },
-        widthXS: function(data){
-            return "col-xs-"+data;
-        },
-        widthSM: function(data){
-            return "col-sm-"+data;
-        },
-        widthMD: function(data){
-            return "col-md-"+data;
-        },
-        widthLG: function(data){
-            return "col-lg-"+data;
-        },
-        height: function(data){
-            data = ""+data;
-            if (data==='auto') return 'heightAuto';
-            if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
-            return "hp"+data;
-        },
-        minHeight: function(data){
-            return "mhp"+data;
-        },
-        maxHeight: function(data){
-            data = ""+data;
-            if (data.indexOf('%')>=0)   return "maxh"+data.substring(0,data.length-1);
-
-            return "maxhp"+data;
-        },
-        maxWidth: function(data){
-            data = ""+data;
-            if (data.indexOf('%')>=0)   return "maxw"+data.substring(0,data.length-1);
-
-            return "maxwp"+data;
-        },
-        margin: function(data){
-            if (data==="none")
-                return "noMargin";
-            if (data==="auto")
-                return "autoMargin";
-            if (data==="centered")
-                return "marginCentered";
-            if (data==="to-right")
-                return "marginRighted";
-            if (data==="to-left")
-                return "marginLefted";
-            return "mt"+data+" mb"+data+" mr"+data+" ml"+data;
-        },
-        marginTop: function(data){
-            return "mt"+data;
-        },
-        marginBottom: function(data){
-            return "mb"+data;
-        },
-        marginLeft: function(data){
-            return "ml"+data;
-        },
-        marginRight: function(data){
-            return "mr"+data;
-        },
-        paddingTop: function(data){
-            return "pt"+data;
-        },
-        paddingBottom: function(data){
-            return "pb"+data;
-        },
-        paddingLeft: function(data){
-            return "pl"+data;
-        },
-        paddingRight: function(data){
-            return "pr"+data;
-        },
-        padding: function(data){
-            if (data==="none")
-                return "noPadding";
-            return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
-        },
-        top: function(data){
-            return "top"+data;
-        },
-        bottom: function(data){
-            return "bottom"+data;
-        },
-        left: function(data){
-            return "left"+data;
-        },
-        right: function(data){
-            return "right"+data;
-        },
-        gpuAccelerated: function(data){
-            if (data===true){
-                return "gpuAccelerated";
-            }
-        }
-
-    },
-    prepareDesign: function(object){
-        var design = object.design;
-        // Save the classes in the object.
-        object.setClasses(CDesigner.designToClasses(design));
-    },
-    mergeParents: function(design){
-        var parents = design.parents || [];
-        _.each(parents,function(parent){
-            var parentDesign = {};
-            // Design is reference to named design.
-            if (CUtils.isString(parent))
-                parentDesign = CDesignHandler.get(parent) || {};
-            else
-                parentDesign = parent;
-            // In case it wasn't merged yet, Merge parents of parent.
-            CDesigner.mergeParents(parentDesign);
-            // Merge parent design into current design - current design is stronger.
-            design = CUtils.mergeJSONs(parentDesign,design);
-        },this);
-        // Remove after merge.
-        delete design.parents;
-
-        return design;
-    },
-    designToClasses: function(design){
-        if (CUtils.isEmpty(design))
-            return "";
-
-        design = CDesigner.mergeParents(design);
-
-        var classesBuilder = new CStringBuilder();
-        // Scan the designs and generate classes.
-        _.each(design,function(value,attribute){
-            if (CUtils.isEmpty(value))  return;
-            if (CUtils.isEmpty(CDesigner.designs[attribute])){
-                CLog.error("Design: "+attribute+" doesn't exist.")
-                return "";
-            }
-            classesBuilder.append( CDesigner.designs[attribute](value) );
-        },this);
-        return classesBuilder.build(' ');
-    },
-    applyDesign: function(object){
-        if (object.lastClasses !== object.classes)
-            CUtils.element(object.uid()).className = object.classes;
-    }
-
-});
-
-/**
- * Created by dvircn on 06/08/14.
- */
-var CLogic = Class({
-    $singleton: true,
-    logics: {
-        onClick: function(object,value){
-            CClicker.addOnClick(object,value);
-        },
-        onTemplateElementClick: function(object,value){
-            CClicker.addOnClick(object,value);
-        },
-        link: function(object,value){
-            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
-                CClicker.addOnClick(object,function(){
-                    CUtils.openURL(value);
-                });
-            }
-            else {
-                CClicker.addOnClick(object,function(){
-                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
-                });
-            }
-        },
-        showDialog: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CDialog.showDialog(value.data || {},value.design || {});
-            });
-        },
-        request: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CNetwork.request(value.url || '',value.data || {},value.callback || function(){});
-            });
-        },
-        sideMenuSwitch: function(object,value){
-            object.logic.doStopPropagation = true;
-            CClicker.addOnClick(object,function(){
-                CSwiper.openOrCloseSideMenu(value);
-            });
-        },
-        swipePrev: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CSwiper.previous(value);
-            });
-        },
-        swipeNext: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CSwiper.next(value);
-            });
-        },
-        text: function(object,value){
-            CUtils.element(object.uid()).innerHTML += value;
-        },
-        icon: function(object,value){
-            var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
-            var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
-            var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
-//            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
-//            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
-            var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';
-
-            var elm = CUtils.element(object.uid());
-            elm.innerHTML = iconElmText+elm.innerHTML;
-        },
-        iconLeft: function(object,value){
-            value.align = 'left';
-            CLogic.logics.icon(object,value);
-        },
-        iconRight: function(object,value){
-            value.align = 'right';
-            CLogic.logics.icon(object,value);
-        },
-        doStopPropagation: function(object,value){
-            if (value==false)
-                return;
-            object.logic.doStopPropagation = true;
-        },
-        backButton: function(object,value){
-            if (value !== true)
-                return;
-            CPager.setBackButton(object.uid());
-            CClicker.addOnClick(object,function(){
-                CPager.moveBack();
-            });
-        },
-        sideMenu: function(object,value){
-            CSwiper.initSideMenu(value.positions);
-        },
-        swipeView: function(object,value){
-            //CThreads.start(function(){
-                CSwiper.initSwiper(value);
-            //});
-        },
-        dialogSwitch: function(object,value){
-            CClicker.addOnClick(object,function(){
-                CObjectsHandler.object(value).switchDialog();
-            });
-        },
-        formSubmitButton: function(object,value){
-            CClicker.addOnClick(object,function(){
-                var form = CObjectsHandler.object(value);
-                form.submitForm();
-            });
-        },
-        formSendToUrlButton: function(object,value){
-            CClicker.addOnClick(object,function(){
-                var form = CObjectsHandler.object(value);
-                form.sendFormToUrl();
-            });
-        },
-        formSaveToLocalStorageButton: function(object,value){
-            CClicker.addOnClick(object,function(){
-                var form = CObjectsHandler.object(value);
-                form.saveFormToLocalStorage();
-            });
-        },
-        formClearButton: function(object,value){
-            CClicker.addOnClick(object,function(){
-                var form = CObjectsHandler.object(value);
-                form.clearForm();
-            });
-        },
-        loadInputFromStorage: function(object,value){
-            if (value===true){
-                CThreads.start(function() {
-                    var inputStoredValue = CLocalStorage.get(object.getName());
-                    if (!CUtils.isEmpty(inputStoredValue))
-                        object.setValue(inputStoredValue);
-                });
-            }
-        },
-        init: function(object,value){
-            value();
-        },
-        template: function(object,value){
-            if (value ===true)
-                CTemplator.applyDynamic(object);
-        },
-        buttonReloadDynamic:  function(object,value){
-            CClicker.addOnClick(object,function(){
-                CTemplator.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
-            });
-        },
-        page: function(object,value){
-            //CTemplator.applyDynamic(object,value);
-            if (value===true)
-                CPager.addPage(object);
-        },
-        pullToRefresh: function(object,value){
-            if (value === true)
-                CPullToRefresh.applyPullToRefresh(object);
-        },
-        scrollable: function(object,value){
-            if (value!==true)
-                return;
-            // Old android only
-            if (!CScrolling.isNativeScrolling())
-                object.scroller = $('#'+object.uid()).niceScroll({});
-        }
-
-    },
-    applyLogic: function(object){
-        var logic = object.getLogic();
-        var lastLogic = object.getLastLogic();
-        // Check if need to apply logic.
-        if (CUtils.equals(logic,lastLogic))
-            return; // Logic hasn't changed from the last build.
-
-        // Run each function.
-        _.each(logic,function(value,attribute){
-            // Apply only if the logic have changed / never applied before.
-            if (CUtils.equals(logic[attribute],lastLogic[attribute]))
-                return;
-            if (CUtils.isEmpty(this.logics[attribute])){
-                CLog.error('Logic does not exist: "'+attribute+'".');
-                return;
-            }
-            // Apply Logic.
-            this.logics[attribute](object,value);
-        },this);
-        // Save last logic build.
-        object.saveLastLogic();
-    }
-
-
-});
-
-
-/**
- * Created by dvircn on 07/08/14.
- */
-var CObjectsHandler = Class({
-    $singleton: true,
-    objectsById: {},
-    preparedObjects: Array(),
-    appContainerId: "",
-    dialogsContainerId: "",
-    mainViewId: "",
-    contentId: "",
-
-    addObject: function(object){
-        this.objectsById[object.uid()] = object;
-    },
-    /**
-     * Remove object from the DOM and the ObjectsHandler.
-     * @param objectId
-     */
-    removeObject: function(objectId){
-        //Remove from the DOM.
-        var element = CUtils.element(this.object(objectId).uid());
-        element.parentNode.removeChild(element);
-        // Remove from ObjectsHandler.
-        delete this.objectsById[objectId];
-    },
-    addPreparedObject: function(object){
-        this.preparedObjects.push(object);
-    },
-    object: function(id){
-        return this.objectsById[id];
-    },
-    isCObject: function(id){
-        return !CUtils.isEmpty(this.object(id));
-    },
-    updateUname: function(last,current){
-        if (last === current)
-            return;
-        var object = this.object(last);
-        //delete this.objectsById[last];
-        this.objectsById[current] = object;
-    },
-    getPreparedObjects: function(){
-        return this.preparedObjects;
-    },
-    clearPreparedObjects: function(){
-        this.preparedObjects = Array();
-    },
-    loadObjects: function(objects){
-        _.each(objects,function(object){
-            var type = object.type; // Get the Object type.
-            if (CUtils.isEmpty(type)) return;
-            // Try to create object.
-            //try {
-                this.createObject(type,object);
-            //}
-            //catch (e){
-            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            //}
-
-        },this);
-    },
-    createObject: function(type,data){
-        var cObject = eval("new C"+type+"(data)"); // Create the object.
-        CObjectsHandler.addObject(cObject);
-        if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
-        if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
-        if (type=="Content") CObjectsHandler.contentId = cObject.uid(); // Identify Main Object.
-        return cObject.uid();
-    },
-    createFromTemplateObject: function(abstractObject,data,logic,design){
-        var duplicatedObjectBase        = {};
-        for (var key in abstractObject){
-            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
-        }
-
-        duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
-        duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
-        duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
-
-        var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
-
-        return duplicateId;
-    }
-
-
-});
-
-
-/**
- * Created by dvircn on 22/08/14.
- */
-var CTemplator = Class({
-    $singleton: true,
-    parseReferences: function(object,json) {
-        if (CUtils.isEmpty(json) || json.parseReferencesVisited === true /* Circular*/)
-            return;
-        json.parseReferencesVisited = true;
-        for (var property in json) {
-            if (json.hasOwnProperty(property) && property!='template') {
-                if (typeof json[property] == "object"){
-                    this.parseReferences(json[property]);
-                }
-                else if (typeof json[property] == 'string' || json[property] instanceof String){
-                    // Evaluate dynamic data.
-                    var evaluated   = this.replaceReferencesInString(json[property]);
-                    json[property] = evaluated;
-                }
-
-            }
-        }
-        delete json.parseReferencesVisited;
-    },
-    parseLocalReference: function(str){
-        return eval(str);
-    },
-    parseGlobalReference: function(str){
-        return CGlobals.get(str);
-    },
-    parseDesignReference: function(str){
-        return CDesignHandler.get(str);
-    },
-    parseRelativeReference: function(str){
-        var relativeParentId = this.getRelativeParent();
-        if (!CUtils.isEmpty(relativeParentId)){
-            var relativeParent = CObjectsHandler.object(relativeParentId);
-            return eval('relativeParent'+str);
-        }
-        return null;
-    },
-    parseRelativeObjectId: function(str){
-        var relativeParentId = this.getRelativeParent();
-        if (!CUtils.isEmpty(relativeParentId))
-            return relativeParentId+str;
-        return str.substr(1);
-    },
-    replaceReferencesInString: function(str) {
-        if (CUtils.isEmpty(str))
-            return str;
-        if (str.indexOf('#') < 0)
-            return str;
-        // Multiple reference.
-        var parts = str.split(' ');
-        for (var i=0; i<parts.length; i++){
-            var part = parts[i];
-            // not a reference.
-            if (part.length<=0 || part[0]!='#')
-                continue;
-            if (part.length>6 && part.substr(0,6) == '#this.')
-                parts[i] = this.parseLocalReference(part.substr(1))       || null;
-            else if (part.length>2 && part.substr(0,2) == '#.')
-                parts[i] = this.parseRelativeReference(part.substr(1))    || null;
-            else if (part.length>2 && part.substr(0,2) == '#/')
-                parts[i] = this.parseRelativeObjectId(part.substr(1))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#globals.')
-                parts[i] = this.parseGlobalReference(part.substr(9))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#designs.')
-                parts[i] = this.parseDesignReference(part.substr(9))     || null;
-        }
-        // Filter out empty elements.
-        parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });
-        // Case of single variable - could be an object reference. Otherwise, String.
-        if (parts.length==1)
-            return parts[0];
-
-        return parts.join(' ');
-    }
-    
-});
-
-
-/**
- * Created by dvircn on 22/08/14.
- */
-var CTemplator = Class({
-    $singleton: true,
-    hiddenClass: 'displayNone',
-    applyDynamic: function(object) {
-        // Do not re-initiate
-        if (this.dynamicApplied(object.uid()))
-            return;
-
-        object.data.template = object.data.template || {};
-
-        if (object.data.template.autoLoad === true)
-            this.load(object.uid());
-
-        object.data.template.applied = true;
-    },
-    dynamicApplied: function(objectId){
-        return CObjectsHandler.object(objectId).data.template.applied===true;
-    },
-    objectHasDynamic: function(objectId) {
-        var object = CObjectsHandler.object(objectId);
-        return !CUtils.isEmpty(object.logic.template) && object.logic.template===true;
-    },
-    duplicateWithData: function (object, data, onFinish, reset, preventRebuild) {
-        if (!CUtils.isArray(data)) // Convert to Array
-            data = [data];
-
-        // Remove All Previous duplicates.
-        if (reset===true){
-            CTemplator.removeDuplicates(object.uid(),false);
-            object.data.template.containerToData = {};
-        }
-
-        // For each row in data.
-        _.each(data,function(currentData){
-            // Create container.
-            var templateData = object.data.template;
-
-            var containerData   = CUtils.clone(templateData.container);
-            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
-
-            // On item click listener.
-            var position = templateData.duplicates.length;
-            var onItemClick = CTemplator.createItemOnClick(position,
-                templateData.callback,templateData.callbacks[position] || function(){});
-            // Clear border from first item.
-            containerData.design = containerData.design || {};
-            containerData.design.border      = position!==0?containerData.design.border:null;
-            containerData.design.borderColor = position!==0?containerData.design.borderColor:null;
-
-            var containerId = CObjectsHandler.createObject(containerData.type,containerData);
-            templateData.duplicates.push(containerId);
-            var container   = CObjectsHandler.object(containerId);
-            // For each abstract object in the template object.
-            _.each(templateData.objects,function(abstractObject){
-                var logic = currentData.logic||{};
-                logic.onTemplateElementClick = onItemClick;
-                var duplicateId = CObjectsHandler.createFromTemplateObject(abstractObject,
-                    currentData.data||{},logic,currentData.design||{});
-                container.appendChild(duplicateId);
-            },this);
-
-            // Map container to data.
-            object.data.template.containerToData[containerId] = currentData;
-        },this);
-        object.appendChilds(object.data.template.duplicates);
-
-        if (preventRebuild !== true)
-            object.rebuild(onFinish);
-    },
-    createItemOnClick: function(index,callback,callbacksCallback){
-        return function() {
-            callbacksCallback();
-            callback(index);
-        };
-    },
-    removeDuplicates: function(objectId,rebuild){
-        var object          = CObjectsHandler.object(objectId);
-        // Remove All Previous duplicates.
-        object.removeChilds(object.data.template.duplicates);
-        object.data.template.duplicates = [];
-        if (rebuild === true)
-            object.rebuild();
-    },
-    loadObjectWithData: function (objectId, data, onFinish, reset, preventRebuild) {
-        var object = CObjectsHandler.object(objectId);
-        if (CUtils.isEmpty(object)) // Case that objectId is actually object.
-            object = objectId;
-
-        object.data.template.data = data;
-        // Parse References
-        if (typeof object.data.template.data == "object")
-            object.parseReferences(object.data.template.data);
-        else{
-            object.data.template.data = [object.data.template.data]
-            object.parseReferences(object.data.template.data);
-            object.data.template.data = object.data.template.data[0];
-        }
-        data = object.data.template.data;
-
-        this.duplicateWithData(object,data, onFinish, reset, preventRebuild);
-    },
-    loadObjectWithDataNoRebuild: function (objectId, data, reset) {
-        this.loadObjectWithData(objectId,data, null, reset, true);
-    },
-    getDuplicates: function (objectId) {
-        if (CTemplator.dynamicApplied(objectId))
-            return CObjectsHandler.object(objectId).template.duplicates||[];
-    },
-    lastDuplicate: function (objectId) {
-        if (!CTemplator.dynamicApplied(objectId))
-            return null;
-        var duplicates = CTemplator.getDuplicates(objectId);
-        return duplicates[duplicates.length-1];
-
-    },
-    duplicateAtPosition: function (objectId,position) {
-        if (!CTemplator.dynamicApplied(objectId))
-            return null;
-        var duplicates = CTemplator.getDuplicates(objectId);
-        return duplicates[position];
-
-    },
-    load: function(objectId, queryData, onFinish, reset) {
-        var object = CObjectsHandler.object(objectId);
-        if (CUtils.isEmpty(object.data.template.url) ||
-            (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){
-            onFinish();
-            return;
-        }
-
-        object.showLoading();
-
-        object.data.template.queryData = queryData;
-
-        // Request.
-        CNetwork.request(object.data.template.url,object.data.template.queryData,
-            function(retrievedData){
-                CTemplator.loadObjectWithData(objectId, retrievedData, onFinish, reset);
-                object.stopLoading();
-        });
-
-    }
-
-});
-
-
-/**
  * Created by dvircn on 06/08/14.
  */
 /**
@@ -1374,50 +481,34 @@ var CLog = Class({
  */
 var CNetwork = Class({
     $singleton: true,
-    requestsStates: {},
-    initializeRequest: function(requestId,xmlhttp,url,data,callback,errorHandler){
-        CNetwork.requestsStates[requestId] = false;
-        xmlhttp.onreadystatechange = function(){
-            if (xmlhttp.readyState == 4){
-                if (xmlhttp.status == 200) {
-                    var origData = xmlhttp.responseText;
-                    if (CNetwork.requestsStates[requestId]===true || CUtils.isEmpty(origData))
-                        return;
-                    CNetwork.requestsStates[requestId] = true;
-
-                    var data = null;
-                    // If the response in JSON, Parse it.
-                    try {
-                        data = JSONfn.parse(origData);
-                    } catch (e) {
-                        data = origData;
-                    }
-                    if (!CUtils.isEmpty(callback)){
-                        callback(data); // callback
-                    }
-                }
-                else {
-                    CLog.error('request error: ' + xmlhttp.responseText);
-                    if (!CUtils.isEmpty(errorHandler)){
-                        errorHandler(); // callback
-                    }
-                }
-            }
-
-        };
-        xmlhttp.open("POST", url);
-        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    },
     send: function(url,data,callback,errorHandler){
-        var xmlhttp = new XMLHttpRequest();
-        CNetwork.initializeRequest(CNetwork.generateID(),xmlhttp,url,data,callback,errorHandler);
-        xmlhttp.send(JSONfn.stringify(data));
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: url,
+            data: JSONfn.stringify(data), //Data sent to server
+            contentType: 'application/json', // content type sent to server
+            dataType: 'json', //Expected data format from server
+            processdata: true, //True or False
+            crossDomain: true,
+            success: function (data, textStatus, xmlHttp) {
+                if (callback) callback(data); // callback
+            },
+            error: function(e) {
+                CLog.error('Request Error at: '+url);
+                CLog.error(e.statusText);
+                if (errorHandler) errorHandler();
+            }  // When Service call fails
+        });
     },
     request: function(url,data,callback,errorHandler){
         this.send(url,data,callback,errorHandler);
     },
-    generateID: function() {
-        return Math.random().toString(36).substring(2);
+    downloadText: function(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+        pom.click();
     }
 
 });/**
@@ -2800,6 +1891,885 @@ var CTitleHandler = Class({
 
 
 /**
+ * Created by dvircn on 19/10/14.
+ */
+var CThemeFlatBlue = Class({
+    $singleton: true,
+    designs: {
+        'left-menu-button': {
+            paddingLeft:6,boxSizing:'borderBox',textAlign:'left',height:45, widthXS: 12,
+            fontSize:16,color: CColor('Gray',2), marginTop:1, round: 0,
+            active: { bgColor:CColor('Indigo',17),color: CColor('White') }
+        }
+    }
+});
+
+/**
+ * Created by dvircn on 09/08/14.
+ */
+var CBuilder = Class({
+    $singleton: true,
+    inBuilding: false,
+    waitingCount: 0,
+    current: '',
+    /**
+     * Build all objects.
+     */
+    buildAll: function(onFinish){
+        CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
+        this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
+    },
+    /**
+     * Build from object.
+     * @param id : Object ID.
+     */
+    buildFromObject: function(id,onFinish){
+        if (CBuilder.inBuilding===true && CBuilder.waitingCount<100){
+            CBuilder.waitingCount++;
+            CThreads.run(function(){CBuilder.buildFromObject(id,onFinish);},50);
+            return;
+        }
+
+        onFinish = onFinish || function(){};
+
+        CBuilder.waitingCount = 0;
+        CBuilder.inBuilding = true;
+        CBuilder.current = id;
+
+        // Get root object.
+        var currentObject   = CObjectsHandler.object(id);
+
+        // Assign References.
+        currentObject.assignReferences();
+
+        // Clear prepared objects.
+        CObjectsHandler.clearPreparedObjects();
+
+        // Prepare for build and get the view (If the objects aren't in the DOM).
+        var view            = new CStringBuilder();
+
+        var viewBuilder     = currentObject.prepareBuild({view:view});
+
+        // Append the view to the parent in the DOM.
+        // Note: If the objects are already in the DOM, viewStr will be empty
+        //       and the DOM won't change.
+        var viewStr = viewBuilder.build(' ');
+        CDom.addChild(currentObject.getParent(),viewStr);
+
+        // Restructure before logic is applied.
+        _.each(CObjectsHandler.getPreparedObjects(),function(object){
+            //Restructure containers children.
+            if (object.isContainer())
+                object.restructureChildren();
+        },CBuilder);
+
+        // Build relevant Objects by the order of their build (Parent->Child).
+        _.each(CObjectsHandler.getPreparedObjects(),function(object){
+            // Apply Logic and Design on the Object.
+            CLogic.applyLogic(object);
+            CDesigner.applyDesign(object);
+        },CBuilder);
+
+        // Clear Whitespaces.
+        CUtils.cleanWhitespace();
+
+
+        CBuilder.inBuilding = false;
+
+        if (!CUtils.isEmpty(onFinish))
+            onFinish();
+
+    },
+    objectJSON: function(type,uname,design,logic,data){
+        var object = {};
+        object.type     = type;
+        object.uname    = uname;
+        object.design   = design;
+        object.logic    = logic;
+        object.data     = data;
+    },
+    forceRedraw: function(element){
+        //CUtils.element(id).style.display = 'none';
+        //CUtils.element(id).style.display = '';
+        if (!element) { return; }
+
+        var n = document.createTextNode(' ');
+        var disp = element.style.display;  // don't worry about previous display style
+
+        element.appendChild(n);
+        element.style.display = 'none';
+
+        setTimeout(function(){
+            element.style.display = disp;
+            n.parentNode.removeChild(n);
+        },0); // you can play with this timeout to make it as short as possible
+    }
+
+
+});
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CDesigner = Class({
+    $singleton: true,
+    colors: {
+        notLeveled: ['Black', 'White'],
+        getColor: function(color,level){
+            // Not Leveled Color.
+            if (CDesigner.colors.notLeveled.indexOf(color)>=0){
+                return color;
+            }
+            if (CUtils.isEmpty(level))  level = 0;
+            level = Math.max(level,0);
+            level = Math.min(level,17);
+
+            return color+level;
+        }
+    },
+    designs: {
+        classes: function(data){
+            return data;
+        },
+        active: function(data){
+            // Do Nothing. Just to mention the active class attribute.
+        },
+        hold: function(data){
+            // Do Nothing. Just to mention the hold class attribute.
+        },
+        activeRemove: function(data){
+            // Do Nothing. Just to mention the activeRemove class attribute.
+        },
+        iconOnly: function(data){
+            return 'iconOnly '+CIconsManager.getIcon(data);
+        },
+        iconRight: function(data){
+            return 'IconRight borderBox '+CIconsManager.getIcon(data);
+        },
+        iconLeft: function(data){
+            return 'IconLeft borderBox '+CIconsManager.getIcon(data);
+        },
+        bgColor: function(data){
+            return "bg"+CDesigner.colors.getColor(data.color,data.level || null);
+        },
+        color: function(data){
+            return "c"+CDesigner.colors.getColor(data.color,data.level || null);
+        },
+        borderColor: function(data){
+            return "bc"+CDesigner.colors.getColor(data.color,data.level || null);
+        },
+        border: function(data){
+            var classes = "";
+            if (!CUtils.isEmpty(data['all']))       classes+="border"+data['all']+"p ";
+            if (!CUtils.isEmpty(data['bottom']))    classes+="borderBottom"+data['bottom']+"p ";
+            if (!CUtils.isEmpty(data['right']))     classes+="borderRight"+data['right']+"p ";
+            if (!CUtils.isEmpty(data['left']))      classes+="borderLeft"+data['left']+"p ";
+            if (!CUtils.isEmpty(data['top']))       classes+="borderTop"+data['top']+"p ";
+
+            return classes;
+        },
+        fontSize: function(data){
+            // Font Size
+            return 'fsz'+data;
+        },
+        fontStyle: function(data){
+            var classes = "";
+            if (data=='normal')     classes+="fontStyleNormal ";
+            if (data=='italic')     classes+="italic ";
+            return classes;
+        },
+        fontWeight: function(data){
+            var classes = "";
+            if (data=='bold')       classes+="bold ";
+            if (data=='normal')     classes+="fontWeightNormal ";
+            return classes;
+        },
+        cursor: function(data){
+            var values = ['pointer'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        direction: function(data){
+            var values = ['rtl','ltr'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        textAlign: function(data){
+            var values = ['center','right','left'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return "text"+CUtils.capitaliseFirstLetter(data);
+            }
+            return "";
+        },
+        position: function(data){
+            var values = ['absolute','relative'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        display: function(data){
+            var values = ['inlineBlock','block','inline','hidden','displayNone'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        overflow: function(data){
+            if (data==="hidden")        return "hidden";
+            //if (data==="scrollable")    return "scrollable";
+            if (data==="scrollY")       return "yScrollable";
+            return "";
+        },
+        scrollable: function(data){
+            if (data===true && CScrolling.isNativeScrolling())
+                return CScrolling.scrollableClass();
+            return '';
+        },
+        boxSizing: function(data){
+            var values = ['borderBox'];
+            if (!CUtils.isEmpty(data) && (values.indexOf(data)>=0) ) {
+                return data;
+            }
+            return "";
+        },
+        round: function(data){
+            if (data==="circle")    return "circle";
+
+            return "Rounded"+data;
+        },
+        width: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "w"+data.substring(0,data.length-1);
+            return "wp"+data;
+        },
+        widthXS: function(data){
+            return "col-xs-"+data;
+        },
+        widthSM: function(data){
+            return "col-sm-"+data;
+        },
+        widthMD: function(data){
+            return "col-md-"+data;
+        },
+        widthLG: function(data){
+            return "col-lg-"+data;
+        },
+        height: function(data){
+            data = ""+data;
+            if (data==='auto') return 'heightAuto';
+            if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
+            return "hp"+data;
+        },
+        minHeight: function(data){
+            return "mhp"+data;
+        },
+        maxHeight: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "maxh"+data.substring(0,data.length-1);
+
+            return "maxhp"+data;
+        },
+        maxWidth: function(data){
+            data = ""+data;
+            if (data.indexOf('%')>=0)   return "maxw"+data.substring(0,data.length-1);
+
+            return "maxwp"+data;
+        },
+        margin: function(data){
+            if (data==="none")
+                return "noMargin";
+            if (data==="auto")
+                return "autoMargin";
+            if (data==="centered")
+                return "marginCentered";
+            if (data==="to-right")
+                return "marginRighted";
+            if (data==="to-left")
+                return "marginLefted";
+            return "mt"+data+" mb"+data+" mr"+data+" ml"+data;
+        },
+        marginTop: function(data){
+            return "mt"+data;
+        },
+        marginBottom: function(data){
+            return "mb"+data;
+        },
+        marginLeft: function(data){
+            return "ml"+data;
+        },
+        marginRight: function(data){
+            return "mr"+data;
+        },
+        paddingTop: function(data){
+            return "pt"+data;
+        },
+        paddingBottom: function(data){
+            return "pb"+data;
+        },
+        paddingLeft: function(data){
+            return "pl"+data;
+        },
+        paddingRight: function(data){
+            return "pr"+data;
+        },
+        padding: function(data){
+            if (data==="none")
+                return "noPadding";
+            return "pt"+data+" pb"+data+" pr"+data+" pl"+data;
+        },
+        top: function(data){
+            return "top"+data;
+        },
+        bottom: function(data){
+            return "bottom"+data;
+        },
+        left: function(data){
+            return "left"+data;
+        },
+        right: function(data){
+            return "right"+data;
+        },
+        gpuAccelerated: function(data){
+            if (data===true){
+                return "gpuAccelerated";
+            }
+        },
+        inline: function(data){
+            return '';
+        },
+        parents: function(data){
+            return '';
+        }
+
+    },
+    prepareDesign: function(object){
+        var design = object.design;
+        // Save the classes in the object.
+        object.setClasses(CDesigner.designToClasses(design));
+    },
+    mergeParents: function(design){
+        var parents = design.parents || [];
+        _.each(parents,function(parent){
+            var parentDesign = {};
+            // Design is reference to named design.
+            if (CUtils.isString(parent))
+                parentDesign = CDesignHandler.get(parent) || {};
+            else
+                parentDesign = parent;
+            // In case it wasn't merged yet, Merge parents of parent.
+            CDesigner.mergeParents(parentDesign);
+            // Merge parent design into current design - current design is stronger.
+            design = CUtils.mergeJSONs(parentDesign,design);
+        },this);
+
+        return design;
+    },
+    getFinalInlineStyle: function(design){
+        if (CUtils.isEmpty(design))
+            return '';
+        if (!CUtils.isEmpty(design.inline))
+            return design.inline;
+        var inline = '';
+        var parents = design.parents || [];
+        _.each(parents,function(parent){
+            var parentDesign = {};
+            // Design is reference to named design.
+            if (CUtils.isString(parent))
+                parentDesign = CDesignHandler.get(parent) || {};
+            else
+                parentDesign = parent;
+            // Return first arent design with inline,
+            // By Saving only the first inline design we catch.
+            if (!CUtils.isEmpty(parentDesign.inline) && CUtils.isEmpty(inline))
+                inline = parentDesign.inline;
+        },this);
+        return inline;
+    },
+    designToClasses: function(design){
+        if (CUtils.isEmpty(design))
+            return "";
+
+        design = CDesigner.mergeParents(design);
+
+        var classesBuilder = new CStringBuilder();
+        // Scan the designs and generate classes.
+        _.each(design,function(value,attribute){
+            if (CUtils.isEmpty(value))  return;
+            if (CUtils.isEmpty(CDesigner.designs[attribute])){
+                CLog.error("Design: "+attribute+" doesn't exist.")
+                return "";
+            }
+            classesBuilder.append( CDesigner.designs[attribute](value) );
+        },this);
+        return classesBuilder.build(' ');
+    },
+    applyDesign: function(object){
+        if (object.lastClasses !== object.classes)
+            CUtils.element(object.uid()).className = object.classes;
+    }
+
+});
+
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CLogic = Class({
+    $singleton: true,
+    logics: {
+        onClick: function(object,value){
+            CClicker.addOnClick(object,value);
+        },
+        onTemplateElementClick: function(object,value){
+            CClicker.addOnClick(object,value);
+        },
+        link: function(object,value){
+            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
+                CClicker.addOnClick(object,function(){
+                    CUtils.openURL(value);
+                });
+            }
+            else {
+                CClicker.addOnClick(object,function(){
+                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
+                });
+            }
+        },
+        showDialog: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CDialog.showDialog(value.data || {},value.design || {});
+            });
+        },
+        request: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CNetwork.request(value.url || '',value.data || {},value.callback || function(){});
+            });
+        },
+        sideMenuSwitch: function(object,value){
+            object.logic.doStopPropagation = true;
+            CClicker.addOnClick(object,function(){
+                CSwiper.openOrCloseSideMenu(value);
+            });
+        },
+        swipePrev: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CSwiper.previous(value);
+            });
+        },
+        swipeNext: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CSwiper.next(value);
+            });
+        },
+        text: function(object,value){
+            CUtils.element(object.uid()).innerHTML += value;
+        },
+        icon: function(object,value){
+            var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
+            var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
+            var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
+//            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
+//            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
+            var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';
+
+            var elm = CUtils.element(object.uid());
+            elm.innerHTML = iconElmText+elm.innerHTML;
+        },
+        iconLeft: function(object,value){
+            value.align = 'left';
+            CLogic.logics.icon(object,value);
+        },
+        iconRight: function(object,value){
+            value.align = 'right';
+            CLogic.logics.icon(object,value);
+        },
+        doStopPropagation: function(object,value){
+            if (value==false)
+                return;
+            object.logic.doStopPropagation = true;
+        },
+        backButton: function(object,value){
+            if (value !== true)
+                return;
+            CPager.setBackButton(object.uid());
+            CClicker.addOnClick(object,function(){
+                CPager.moveBack();
+            });
+        },
+        sideMenu: function(object,value){
+            CSwiper.initSideMenu(value.positions);
+        },
+        swipeView: function(object,value){
+            //CThreads.start(function(){
+                CSwiper.initSwiper(value);
+            //});
+        },
+        dialogSwitch: function(object,value){
+            CClicker.addOnClick(object,function(){
+                CObjectsHandler.object(value).switchDialog();
+            });
+        },
+        formSubmitButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.submitForm();
+            });
+        },
+        formSendToUrlButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.sendFormToUrl();
+            });
+        },
+        formSaveToLocalStorageButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.saveFormToLocalStorage();
+            });
+        },
+        formClearButton: function(object,value){
+            CClicker.addOnClick(object,function(){
+                var form = CObjectsHandler.object(value);
+                form.clearForm();
+            });
+        },
+        loadInputFromStorage: function(object,value){
+            if (value===true){
+                CThreads.start(function() {
+                    var inputStoredValue = CLocalStorage.get(object.getName());
+                    if (!CUtils.isEmpty(inputStoredValue))
+                        object.setValue(inputStoredValue);
+                });
+            }
+        },
+        init: function(object,value){
+            value();
+        },
+        template: function(object,value){
+            if (value ===true)
+                CTemplator.applyDynamic(object);
+        },
+        buttonReloadDynamic:  function(object,value){
+            CClicker.addOnClick(object,function(){
+                CTemplator.load(value.object,value.queryData || {},value.onFinish || function(){},value.reset || false);
+            });
+        },
+        page: function(object,value){
+            //CTemplator.applyDynamic(object,value);
+            if (value===true)
+                CPager.addPage(object);
+        },
+        pullToRefresh: function(object,value){
+            if (value === true)
+                CPullToRefresh.applyPullToRefresh(object);
+        },
+        scrollable: function(object,value){
+            if (value!==true)
+                return;
+            // Old android only
+            if (!CScrolling.isNativeScrolling())
+                object.scroller = $('#'+object.uid()).niceScroll({});
+        }
+
+    },
+    applyLogic: function(object){
+        var logic = object.getLogic();
+        var lastLogic = object.getLastLogic();
+        // Check if need to apply logic.
+        if (CUtils.equals(logic,lastLogic))
+            return; // Logic hasn't changed from the last build.
+
+        // Run each function.
+        _.each(logic,function(value,attribute){
+            // Apply only if the logic have changed / never applied before.
+            if (CUtils.equals(logic[attribute],lastLogic[attribute]))
+                return;
+            if (CUtils.isEmpty(this.logics[attribute])){
+                CLog.error('Logic does not exist: "'+attribute+'".');
+                return;
+            }
+            // Apply Logic.
+            this.logics[attribute](object,value);
+        },this);
+        // Save last logic build.
+        object.saveLastLogic();
+    }
+
+
+});
+
+
+/**
+ * Created by dvircn on 07/08/14.
+ */
+var CObjectsHandler = Class({
+    $singleton: true,
+    objectsById: {},
+    preparedObjects: Array(),
+    appContainerId: "",
+    dialogsContainerId: "",
+    mainViewId: "",
+    contentId: "",
+
+    addObject: function(object){
+        this.objectsById[object.uid()] = object;
+    },
+    /**
+     * Remove object from the DOM and the ObjectsHandler.
+     * @param objectId
+     */
+    removeObject: function(objectId){
+        //Remove from the DOM.
+        var element = CUtils.element(this.object(objectId).uid());
+        element.parentNode.removeChild(element);
+        // Remove from ObjectsHandler.
+        delete this.objectsById[objectId];
+    },
+    addPreparedObject: function(object){
+        this.preparedObjects.push(object);
+    },
+    object: function(id){
+        return this.objectsById[id];
+    },
+    isCObject: function(id){
+        return !CUtils.isEmpty(this.object(id));
+    },
+    updateUname: function(last,current){
+        if (last === current)
+            return;
+        var object = this.object(last);
+        //delete this.objectsById[last];
+        this.objectsById[current] = object;
+    },
+    getPreparedObjects: function(){
+        return this.preparedObjects;
+    },
+    clearPreparedObjects: function(){
+        this.preparedObjects = Array();
+    },
+    loadObjects: function(objects){
+        _.each(objects,function(object){
+            var type = object.type; // Get the Object type.
+            if (CUtils.isEmpty(type)) return;
+            // Try to create object.
+            //try {
+                this.createObject(type,object);
+            //}
+            //catch (e){
+            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
+
+        },this);
+    },
+    createObject: function(type,data){
+        var cObject = eval("new C"+type+"(data)"); // Create the object.
+        CObjectsHandler.addObject(cObject);
+        if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
+        if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
+        if (type=="Content") CObjectsHandler.contentId = cObject.uid(); // Identify Main Object.
+        return cObject.uid();
+    },
+    createFromTemplateObject: function(abstractObject,data,logic,design){
+        var duplicatedObjectBase        = {};
+        for (var key in abstractObject){
+            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
+        }
+
+        duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);
+        duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic);
+        duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design);
+
+        var duplicateId = this.createObject(duplicatedObjectBase.type,duplicatedObjectBase);
+
+        return duplicateId;
+    }
+
+
+});
+
+
+/**
+ * Created by dvircn on 22/08/14.
+ */
+var CTemplator = Class({
+    $singleton: true,
+    hiddenClass: 'displayNone',
+    applyDynamic: function(object) {
+        // Do not re-initiate
+        if (this.dynamicApplied(object.uid()))
+            return;
+
+        object.data.template = object.data.template || {};
+
+        if (object.data.template.autoLoad === true)
+            this.load(object.uid());
+
+        object.data.template.applied = true;
+    },
+    dynamicApplied: function(objectId){
+        return CObjectsHandler.object(objectId).data.template.applied===true;
+    },
+    objectHasDynamic: function(objectId) {
+        var object = CObjectsHandler.object(objectId);
+        return !CUtils.isEmpty(object.logic.template) && object.logic.template===true;
+    },
+    duplicateWithData: function (object, data, onFinish, reset, preventRebuild) {
+        if (!CUtils.isArray(data)) // Convert to Array
+            data = [data];
+
+        // Remove All Previous duplicates.
+        if (reset===true){
+            CTemplator.removeDuplicates(object.uid(),false);
+            object.data.template.containerToData = {};
+        }
+
+        // For each row in data.
+        _.each(data,function(currentData){
+            // Create container.
+            var templateData = object.data.template;
+
+            var containerData   = CUtils.clone(templateData.container);
+            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
+
+            // On item click listener.
+            var position = templateData.duplicates.length;
+            var onItemClick = CTemplator.createItemOnClick(position,
+                templateData.callback,templateData.callbacks[position] || function(){});
+            // Clear border from first item.
+            containerData.design = containerData.design || {};
+            containerData.design.border      = position!==0?containerData.design.border:null;
+            containerData.design.borderColor = position!==0?containerData.design.borderColor:null;
+
+            var containerId = CObjectsHandler.createObject(containerData.type,containerData);
+            templateData.duplicates.push(containerId);
+            var container   = CObjectsHandler.object(containerId);
+            // For each abstract object in the template object.
+            _.each(templateData.objects,function(abstractObject){
+                var logic = currentData.logic||{};
+                logic.onTemplateElementClick = onItemClick;
+                var duplicateId = CObjectsHandler.createFromTemplateObject(abstractObject,
+                    currentData.data||{},logic,currentData.design||{});
+                container.appendChild(duplicateId);
+            },this);
+
+            // Map container to data.
+            object.data.template.containerToData[containerId] = currentData;
+        },this);
+        object.appendChilds(object.data.template.duplicates);
+
+        if (preventRebuild !== true)
+            object.rebuild(onFinish);
+    },
+    createItemOnClick: function(index,callback,callbacksCallback){
+        return function() {
+            callbacksCallback();
+            callback(index);
+        };
+    },
+    removeDuplicates: function(objectId,rebuild){
+        var object          = CObjectsHandler.object(objectId);
+        // Remove All Previous duplicates.
+        object.removeChilds(object.data.template.duplicates);
+        object.data.template.duplicates = [];
+        if (rebuild === true)
+            object.rebuild();
+    },
+    loadObjectWithData: function (objectId, data, onFinish, reset, preventRebuild) {
+        var object = CObjectsHandler.object(objectId);
+        if (CUtils.isEmpty(object)) // Case that objectId is actually object.
+            object = objectId;
+
+        object.data.template.data = data;
+        // Parse References
+        if (typeof object.data.template.data == "object")
+            object.parseReferences(object.data.template.data);
+        else{
+            object.data.template.data = [object.data.template.data]
+            object.parseReferences(object.data.template.data);
+            object.data.template.data = object.data.template.data[0];
+        }
+        data = object.data.template.data;
+
+        this.duplicateWithData(object,data, onFinish, reset, preventRebuild);
+    },
+    loadObjectWithDataNoRebuild: function (objectId, data, reset) {
+        this.loadObjectWithData(objectId,data, null, reset, true);
+    },
+    getDuplicates: function (objectId) {
+        if (CTemplator.dynamicApplied(objectId))
+            return CObjectsHandler.object(objectId).template.duplicates||[];
+    },
+    lastDuplicate: function (objectId) {
+        if (!CTemplator.dynamicApplied(objectId))
+            return null;
+        var duplicates = CTemplator.getDuplicates(objectId);
+        return duplicates[duplicates.length-1];
+
+    },
+    duplicateAtPosition: function (objectId,position) {
+        if (!CTemplator.dynamicApplied(objectId))
+            return null;
+        var duplicates = CTemplator.getDuplicates(objectId);
+        return duplicates[position];
+
+    },
+    load: function(objectId, queryData, onFinish, reset) {
+        var object = CObjectsHandler.object(objectId);
+        if (CUtils.isEmpty(object.data.template.url) ||
+            (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){
+            onFinish();
+            return;
+        }
+
+        object.showLoading();
+
+        object.data.template.queryData = queryData;
+
+        // Request.
+        CNetwork.request(object.data.template.url,object.data.template.queryData,
+            function(retrievedData){
+                CTemplator.loadObjectWithData(objectId, retrievedData, onFinish, reset);
+                object.stopLoading();
+        });
+
+    }
+
+});
+
+
+/**
+ * Created by dvircn on 19/10/14.
+ */
+/**
+ * Created by dvircn on 06/08/14.
+ */
+var CThemes = Class({
+    $singleton: true,
+    mainTheme: '',
+    themes: {
+        'flat-blue': CThemeFlatBlue
+    },
+    get: function(name){
+        return CThemes[name];
+    },
+    setMainTheme: function(name) {
+        CThemes.mainTheme = name;
+    },
+    loadTheme: function(name){
+        var theme = CThemes.themes[name];
+        if (CUtils.isEmpty(theme))
+            return;
+
+        _.each(theme.designs, function(design,name){
+            CDesignHandler.addDesign(name,design);
+        });
+    }
+});
+
+/**
  * Created by dvircn on 06/08/14.
  */
 var CObject = Class({
@@ -3041,6 +3011,11 @@ var CObject = Class({
         // Add class attribute.
         attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
+        var inlineDesign = CDesigner.getFinalInlineStyle(this.design);
+        if (!CUtils.isEmpty(inlineDesign)) {
+            CLog.dlog(inlineDesign);
+            attributes.push('style="'+inlineDesign+'"');
+        }
 
         // Custom tag - can be used to insert a,input..
         tag         = CUtils.isEmpty(tag)? 'div' : tag;
@@ -3443,6 +3418,7 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(CObjectsHandler.dialogsContainerId).appendChild(newDialog);
             var onBuildFinish = function() {CObjectsHandler.object(newDialog).show();};
             CObjectsHandler.object(CObjectsHandler.dialogsContainerId).rebuild(onBuildFinish);
+            return newDialog;
         },
         hideDialogContainer: function(){
             CUtils.element(CObjectsHandler.dialogsContainerId).style.zIndex='';
@@ -3501,9 +3477,12 @@ var CDialog = Class(CContainer,{
 
         // Init function.
         var dialog = this;
-
+        dialog.isHidden = true;
         // Adnimation handling.
-        this.data.onAnimShowComplete = function(){dialog.onResize();};
+        this.data.onAnimShowComplete = function(){
+            dialog.isHidden = false;
+            dialog.onResize();
+        };
 
         this.logic.init = function(){ dialog.onResize(); }
         // Set destroy on hide handler.
@@ -3521,7 +3500,7 @@ var CDialog = Class(CContainer,{
 
     },
     hide: function(callback){
-        if (CAnimations.objectInAnim(this))
+        if (CAnimations.objectInAnim(this) && this.isHidden === false)
             return;
         // Check if need to set cancel callback\use the given callback
         // or do not call callback - empty function;
@@ -3536,10 +3515,23 @@ var CDialog = Class(CContainer,{
         callback();
         CAnimations.hide(this.uid());
     },
+    postponeHide: function(dialog,callback){
+        CThreads.run(function(){
+            dialog.hide(callback);
+        },100);
+    },
     show: function(){
+        if (CAnimations.objectInAnim(this) && this.isHidden === true)
+            return;
+
         CDialog.showDialogContainer();
         CAnimations.show(this.uid());
         this.onResize();
+    },
+    postponeShow: function(dialog){
+        CThreads.run(function(){
+            dialog.show();
+        },100);
     },
     switchDialog: function(){
         CAnimations.hideOrShow(this.uid());
@@ -3549,6 +3541,7 @@ var CDialog = Class(CContainer,{
         var object = this;
         if (this.data.destroyOnHide){
             this.data.onAnimHideComplete = function(){
+                this.isHidden = true;
                 object.removeSelf();
                 CUtils.unbindEvent(window,'resize',object.onResize);
                 // Hide dialogs container.
@@ -3557,6 +3550,7 @@ var CDialog = Class(CContainer,{
         }
         else {
             this.data.onAnimHideComplete = function(){
+                this.isHidden = true;
                 // Hide dialogs container.
                 CDialog.hideDialogContainer();
             };
@@ -4559,12 +4553,6 @@ var CGallery = Class(CSlider,{
 /**
  * Created by dvircn on 06/08/14.
  */
-/**
- * Created by dvircn on 06/08/14.
- */
-/**
- * Created by dvircn on 06/08/14.
- */
 
 var CLabel = Class(CObject,{
     $statics: {
@@ -4661,6 +4649,12 @@ var CImage = Class(CObject,{
 
 });
 
+/**
+ * Created by dvircn on 06/08/14.
+ */
+/**
+ * Created by dvircn on 06/08/14.
+ */
 /**
  * Created by dvircn on 06/08/14.
  */
@@ -5272,6 +5266,7 @@ var CAppHandler = Class({
     appData:            {},
     localDataPath:      'core/data.dcaf',
     start: function(callback){
+        callback = callback || function(){};
         CAppHandler.loadAppObjects(function(){
             CAppHandler.initialize(callback);
         });
@@ -5282,9 +5277,11 @@ var CAppHandler = Class({
         var appData = CAppHandler.appData;
         CAppHandler.appData = null; // Remove reference.
 
-        // After finished getting the data, we can run the callback.
-        CThreads.start(callback);
+        appData.data = appData.data || {};
 
+        // Load Theme if chosen.
+        if (appData.data['app-main-theme'] && !CUtils.isEmpty(appData.data['app-main-theme']))
+            CThemes.loadTheme(appData.data['app-main-theme']);
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});
@@ -5302,6 +5299,9 @@ var CAppHandler = Class({
         CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
         CPager.initialize();
+
+        // After finished, we can run the callback.
+        CThreads.start(callback);
     },
     resetApp: function() {
         window.location.hash = '';
@@ -5315,13 +5315,14 @@ var CAppHandler = Class({
         }
         else {
             // Load the local file.
-            CNetwork.request(CAppHandler.localDataPath,function(content){
+            CNetwork.request(CAppHandler.localDataPath,{},function(content){
                 if (!CUtils.isEmpty(content)){
                     CLocalStorage.save(CAppHandler.appDataKey,content);
-                    CAppHandler.appData = JSONfn.parse(content);
+                    // Re-Parse the data. In case that the data hasn't parsed functions.
+                    CAppHandler.appData = JSONfn.parse(JSONfn.stringify(content));
                 }
                 callback();
-            });
+            },callback);
         }
     }
 
@@ -5332,18 +5333,25 @@ var CAppHandler = Class({
  */
 var CAppUpdater = Class({
     $singleton: true,
-    appUpdateURL: 'http://',
+    appUpdateURL: 'http://codletech-builder.herokuapp.com/getAppData',
     update: function(onFinish){
         var currentVersion = CLocalStorage.get(CAppHandler.appVersionKey) || -1;
         // Request Update.
-        CNetwork.request(CAppUpdater.appUpdateURL,{appID: CSettings.get('appID'),version: currentVersion},
+        CNetwork.request(CAppUpdater.appUpdateURL,
+            {appID: CSettings.get('appID'),version: currentVersion},
             function(data){
                 // Updated (data===true means the versions matched and no update needed).
-                if (!CUtils.isEmpty(data) && data !== true){
+                var dontNeedUpdate = !CUtils.isEmpty(data) && !CUtils.isEmpty(data.status);
+                if (!CUtils.isEmpty(data) && !dontNeedUpdate ){
+                    CLog.dlog('App Updated');
                     CAppUpdater.saveApp(data);
                     CLocalStorage.save(CAppHandler.appVersionKey,data.version);
                     Caf.updated = true;
                 }
+                // Mark as checked.
+                Caf.appUpdateChecked = true;
+            },
+            function(e){ // Failed
                 // Mark as checked.
                 Caf.appUpdateChecked = true;
             }
@@ -5367,12 +5375,27 @@ var CAppUpdater = Class({
  */
 var Caf = Class({
     $singleton: true,
-    updated: false,
-    coreUpdateChecked: false,
+    coreJSUpdateChecked: false,
+    coreCSSUpdateChecked: false,
     appUpdateChecked: false,
-    updateAsked: false,
+    updateCheckFinished: false,
+    waitToLoadDialog: null,
+    firstLoadKey: 'caf-first-load',
+    firstLoad: false,
     start: function(){
-        CAppHandler.start(Caf.startUpdate);
+        Caf.firstLoad = CLocalStorage.get(Caf.firstLoadKey);
+        if (CUtils.isEmpty(Caf.firstLoad))
+            Caf.firstLoad = true;
+
+        CAppHandler.start(function(){
+            if (Caf.firstLoad) {
+                Caf.showWaitToLoad();
+                Caf.startUpdate();
+            }
+            else
+                Caf.startUpdate();
+        });
+
     },
     startUpdate: function(){
         // Run parallel.
@@ -5381,25 +5404,29 @@ var Caf = Class({
         CThreads.run(Caf.updatedCheck,300);
     },
     updatedCheck: function(){
-        if (Caf.coreUpdateChecked && Caf.appUpdateChecked && Caf.updated && !Caf.updateAsked)
-            Caf.askToUpdate();
+        if (Caf.coreCSSUpdateChecked && Caf.coreJSUpdateChecked
+            && Caf.appUpdateChecked && !Caf.updateCheckFinished)
+            Caf.hideWaitToLoad();
         else
             CThreads.run(Caf.updatedCheck,100);
     },
-    askToUpdate: function(){
-        Caf.updateAsked = true;
-
-        CDialog.showDialog({
-            hideOnOutClick: false,
-            title: 'Update Ready',
-            textContent: 'In order to apply the update, please reset the application.',
-            dialogColor: CColor('Brown',5),
-            confirmText: 'Update',
-            cancelText: 'Later',
-            confirmCallback: function(){
+    hideWaitToLoad: function(){
+        Caf.updateCheckFinished = true;
+        if (Caf.firstLoad) {
+            CLocalStorage.save(Caf.firstLoadKey,false);
+            if (Caf.updated)
                 CAppHandler.resetApp();
-            }
-        });
+            else
+                CObjectsHandler.object(Caf.waitToLoadDialog).hide();
+        }
+
+    },
+    showWaitToLoad: function(){
+        Caf.waitToLoadDialog = CDialog.showDialog({
+            hideOnOutClick: false,
+            title: 'Setting Up Some Things..',
+            dialogColor: CColor('Blue',9)
+        }, { minHeight: 'auto'});
     }
 
 });
@@ -5409,44 +5436,70 @@ var Caf = Class({
  */
 var CCoreUpdater = Class({
     $singleton:             true,
+    upToDateSign:           'File up to date',
     cafFilePrefix:          'caf-file-',
-    coreCSSName:            'core-css',
-    coreJSName:             'core-js',
-    coreCSSPath:            'http://',
-    coreJSPath:             'http://',
+    coreCSSName:            'caf.min.css',
+    coreJSName:             'caf.min.js',
+    coreCSSPath:            'https://codletech-builder.herokuapp.com/getGlobalFile',
+    coreJSPath:             'https://codletech-builder.herokuapp.com/getGlobalFile',
 
 
     update: function(){
-        CCoreUpdater.updateJS();
+        CThreads.start(CCoreUpdater.updateJS);
+        CThreads.start(CCoreUpdater.updateCSS);
     },
     updateJS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreJSPath,CCoreUpdater.coreJSName,
-            function() {CCoreUpdater.updateCSS();});
+            function() {
+                // Marked as checked.
+                Caf.coreJSUpdateChecked = true;
+            });
     },
     updateCSS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreCSSPath,CCoreUpdater.coreCSSName,
             function(){
                 // Marked as checked.
-                Caf.coreUpdateChecked = true;
+                Caf.coreCSSUpdateChecked = true;
             });
     },
     updateFile: function(path,name,callback){
         callback            = callback || function(){};
         var currentFileData = CLocalStorage.get(CCoreUpdater.cafFilePrefix+name);
-        var hashObj         = new jsSHA(currentFileData, "TEXT");
-        var hash            = hashObj.getHash("SHA-512", "HEX");
-        CCoreUpdater.requestUpdateFile(path,name,hash,callback);
+        if (currentFileData == null || currentFileData == undefined)
+            currentFileData = '';
+        var shaObj         = new jsSHA(currentFileData, "TEXT");
+        var sha            = shaObj.getHash("SHA-512", "HEX");
+        CCoreUpdater.requestUpdateFile(path,name,sha,callback);
 
     },
-    requestUpdateFile: function(path,name,hash,callback) {
-        CNetwork.request(path,{name:name,hash:hash},function(content){
+    requestUpdateFile: function(path,name,sha,callback) {
+        CNetwork.request(path,{fileName:name,fileSha:sha},function(content){
+            if (CUtils.isEmpty(content)){
+                callback();
+                return;
+            }
+            var dontNeedUpdate = content.status === 1 || content.status === -1;
             // Updated (data===true means the versions matched and no update needed).
-            if (!CUtils.isEmpty(content) && content !== true){
-                CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
-                Caf.updated = true;
+            if (!dontNeedUpdate){
+                try {
+                    CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
+                    Caf.updated = true;
+                }
+                catch (e) {
+                    CLog.error('Error at:'+name);
+                    CLog.error(e);
+                }
+                CLog.dlog('Update Needed:\t\t'+name);
+            }
+            else{
+                CLog.dlog('Don\'t Need Update:\t'+name);
             }
             callback();
-        });
+        },callback);
+    },
+    clearAll: function(){
+        CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreCSSName,'');
+        CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreJSName,'');
     }
 
 
@@ -5883,6 +5936,9 @@ var CBuilderObjects = Class({
         var objectBuilder = new CBuilderObject(type || '',uname || '');
         this.objects.push(objectBuilder);
         return objectBuilder;
+    },
+    saveAppDataToFile: function(path){
+
     }
 
 
@@ -14238,10 +14294,14 @@ JSONfn.stringify = function (obj) {
 };
 
 JSONfn.parse = function (str, date2obj) {
+    if (str === 'undefined')
+        str = 'null';
 
     var iso8061 = date2obj ? /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/ : false;
 
     return JSON.parse(str, function (key, value) {
+        if (value === undefined)
+            value = null;
         var prefix;
 
         if (typeof value != 'string') {

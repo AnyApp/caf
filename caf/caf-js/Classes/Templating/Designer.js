@@ -228,6 +228,12 @@ var CDesigner = Class({
             if (data===true){
                 return "gpuAccelerated";
             }
+        },
+        inline: function(data){
+            return '';
+        },
+        parents: function(data){
+            return '';
         }
 
     },
@@ -250,10 +256,29 @@ var CDesigner = Class({
             // Merge parent design into current design - current design is stronger.
             design = CUtils.mergeJSONs(parentDesign,design);
         },this);
-        // Remove after merge.
-        delete design.parents;
 
         return design;
+    },
+    getFinalInlineStyle: function(design){
+        if (CUtils.isEmpty(design))
+            return '';
+        if (!CUtils.isEmpty(design.inline))
+            return design.inline;
+        var inline = '';
+        var parents = design.parents || [];
+        _.each(parents,function(parent){
+            var parentDesign = {};
+            // Design is reference to named design.
+            if (CUtils.isString(parent))
+                parentDesign = CDesignHandler.get(parent) || {};
+            else
+                parentDesign = parent;
+            // Return first arent design with inline,
+            // By Saving only the first inline design we catch.
+            if (!CUtils.isEmpty(parentDesign.inline) && CUtils.isEmpty(inline))
+                inline = parentDesign.inline;
+        },this);
+        return inline;
     },
     designToClasses: function(design){
         if (CUtils.isEmpty(design))

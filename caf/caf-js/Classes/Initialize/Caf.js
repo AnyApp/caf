@@ -3,12 +3,27 @@
  */
 var Caf = Class({
     $singleton: true,
-    updated: false,
-    coreUpdateChecked: false,
+    coreJSUpdateChecked: false,
+    coreCSSUpdateChecked: false,
     appUpdateChecked: false,
-    updateAsked: false,
+    updateCheckFinished: false,
+    waitToLoadDialog: null,
+    firstLoadKey: 'caf-first-load',
+    firstLoad: false,
     start: function(){
-        CAppHandler.start(Caf.startUpdate);
+        Caf.firstLoad = CLocalStorage.get(Caf.firstLoadKey);
+        if (CUtils.isEmpty(Caf.firstLoad))
+            Caf.firstLoad = true;
+
+        CAppHandler.start(function(){
+            if (Caf.firstLoad) {
+                Caf.showWaitToLoad();
+                Caf.startUpdate();
+            }
+            else
+                Caf.startUpdate();
+        });
+
     },
     startUpdate: function(){
         // Run parallel.
@@ -17,25 +32,29 @@ var Caf = Class({
         CThreads.run(Caf.updatedCheck,300);
     },
     updatedCheck: function(){
-        if (Caf.coreUpdateChecked && Caf.appUpdateChecked && Caf.updated && !Caf.updateAsked)
-            Caf.askToUpdate();
+        if (Caf.coreCSSUpdateChecked && Caf.coreJSUpdateChecked
+            && Caf.appUpdateChecked && !Caf.updateCheckFinished)
+            Caf.hideWaitToLoad();
         else
             CThreads.run(Caf.updatedCheck,100);
     },
-    askToUpdate: function(){
-        Caf.updateAsked = true;
-
-        CDialog.showDialog({
-            hideOnOutClick: false,
-            title: 'Update Ready',
-            textContent: 'In order to apply the update, please reset the application.',
-            dialogColor: CColor('Brown',5),
-            confirmText: 'Update',
-            cancelText: 'Later',
-            confirmCallback: function(){
+    hideWaitToLoad: function(){
+        Caf.updateCheckFinished = true;
+        if (Caf.firstLoad) {
+            CLocalStorage.save(Caf.firstLoadKey,false);
+            if (Caf.updated)
                 CAppHandler.resetApp();
-            }
-        });
+            else
+                CObjectsHandler.object(Caf.waitToLoadDialog).hide();
+        }
+
+    },
+    showWaitToLoad: function(){
+        Caf.waitToLoadDialog = CDialog.showDialog({
+            hideOnOutClick: false,
+            title: 'Setting Up Some Things..',
+            dialogColor: CColor('Blue',9)
+        }, { minHeight: 'auto'});
     }
 
 });
