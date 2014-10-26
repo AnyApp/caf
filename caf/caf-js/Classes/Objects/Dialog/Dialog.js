@@ -51,7 +51,7 @@ var CDialog = Class(CContainer,{
         var containerDesign = CUtils.clone(values.design);
         values.design = {};
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CDialog);
+        CObject.setObjectDefaults(values,CDialog);
         // Invoke parent's constructor
         CDialog.$super.call(this, values);
 
@@ -91,7 +91,7 @@ var CDialog = Class(CContainer,{
         // Adnimation handling.
         this.data.onAnimShowComplete = function(){
             dialog.isHidden = false;
-            dialog.onResize();
+            CThreads.runTimes(dialog.onResize,0,100,15);
         };
 
         this.logic.init = function(){ dialog.onResize(); }
@@ -321,10 +321,12 @@ var CDialog = Class(CContainer,{
 
     },
     createListCallback: function(dialog,callback){
-        return this.data.hideOnListChoose === true ? function(){
-            callback();
+        return this.data.hideOnListChoose === true ? function(index,data){
+            callback(index,data);
             dialog.hide();
-        } : function(){};
+        } : function(index,data){
+            callback(index,data);
+        };
     },
     createListElement: function (index,text,data,customLogic,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {

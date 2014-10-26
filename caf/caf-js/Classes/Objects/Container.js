@@ -13,7 +13,7 @@ var CContainer = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CContainer);
+        CObject.setObjectDefaults(values,CContainer);
 
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
@@ -72,16 +72,15 @@ var CContainer = Class(CObject,{
     getChilds: function(){
         return this.data.childs;
     },
-    assignReferences: function(){
-        _.each(this.data.childs,function(childID){
-            var object = CObjectsHandler.object(childID);
-            //Set parent to this Object.
-            object.setParent(this.uid());
-            object.assignReferences();
-        },this);
-
-        CContainer.$superp.assignReferences.call(this);
-    },
+//    assignReferences: function(){
+//        _.each(this.data.childs,function(childID){
+//            var object = CObjectsHandler.object(childID);
+//            //Set parent to this Object.
+//            object.setParent(this.uid());
+//            object.assignReferences();
+//        },this);
+//        CContainer.$superp.assignReferences.call(this);
+//    },
     applyForceDesign: function(object){
         if (!CUtils.isEmpty(this.forceDesign))
             object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));

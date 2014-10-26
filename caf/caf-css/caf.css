@@ -172,6 +172,10 @@ li{
     box-sizing: border-box;
 }
 
+.selectable {
+    -webkit-user-select: initial;
+    -webkit-touch-callout: initial;
+}
 .overflowHidden{
     overflow: hidden;
 }

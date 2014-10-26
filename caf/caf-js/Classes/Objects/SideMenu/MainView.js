@@ -16,7 +16,7 @@ var CMainView = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CMainView);
+        CObject.setObjectDefaults(values,CMainView);
         // Invoke parent's constructor
         CMainView.$super.call(this, values);
 

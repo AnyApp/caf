@@ -13,7 +13,7 @@ var CSideMenuContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenuContainer);
+        CObject.setObjectDefaults(values,CSideMenuContainer);
         // Invoke parent's constructor
         CSideMenuContainer.$super.call(this, values);
         this.design             = this.design || {};

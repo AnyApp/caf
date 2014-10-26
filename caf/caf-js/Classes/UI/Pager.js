@@ -65,8 +65,16 @@ var CPager = Class({
         },CPager);
         return path;
     },
+    mapDataToPath: function (data) {
+        data = data || {};
+        var path = '';
+        _.each(data,function(value,key){
+            path += '/'+key+'/'+value;
+        });
+        return path;
+    },
     moveBack: function() {
-        history.back();
+        window.history.back();
     },
     setBackForwardDetection: function () {
         var detectBackOrForward = function() {
@@ -119,6 +127,7 @@ var CPager = Class({
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
+        var dynamicPageId       = '';
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
@@ -155,7 +164,7 @@ var CPager = Class({
             return;
 
         // Normal page hide.
-        if (!CUtils.isEmpty(lastPage))
+        if (!CUtils.isEmpty(lastPage) && !CTemplator.objectHasDynamic(lastPage))
             CAnimations.hide(lastPage,{});
 
         var animationOptions    = {};
@@ -181,7 +190,13 @@ var CPager = Class({
     resetPages: function() {
         // Hide All Pages except current.
         _.each(CPager.pages,function(pageId){
+            if (!CTemplator.objectHasDynamic(pageId))
                 CAnimations.quickHide(pageId);
+            else { //Parent dynamic page.
+                var pageElement = CUtils.element(pageId);
+                if (!CUtils.isEmpty(pageElement))
+                    pageElement.style.zIndex = '-1';
+            }
         },CPager);
     },
     getParamsAsMap: function(params){

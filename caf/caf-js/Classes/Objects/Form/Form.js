@@ -17,7 +17,7 @@ var CForm = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CForm);
+        CObject.setObjectDefaults(values,CForm);
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);

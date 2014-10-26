@@ -14,7 +14,7 @@ var CImage = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CImage);
+        CObject.setObjectDefaults(values,CImage);
 
         // Invoke parent's constructor
         CImage.$super.call(this, values);

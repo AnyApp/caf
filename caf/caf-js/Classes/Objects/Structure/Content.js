@@ -17,7 +17,7 @@ var CContent = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CContent);
+        CObject.setObjectDefaults(values,CContent);
 
         // Invoke parent's constructor
         CContent.$super.call(this, values);

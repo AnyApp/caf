@@ -18,7 +18,14 @@ var CLogic = Class({
             }
             else {
                 CClicker.addOnClick(object,function(){
-                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
+                    value.data = value.data || {};
+                    value.globalData = value.globalData || {};
+                    var finalData = CUtils.clone(value.data);
+                    // Evaluate dynamic global data.
+                    _.each(value.globalData,function(globalName,key){
+                        finalData[key] = CGlobals.get(globalName) || '';
+                    });
+                    CUtils.openLocalURL(value.path+CPager.mapDataToPath(finalData));
                 });
             }
         },

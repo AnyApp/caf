@@ -229,10 +229,18 @@ var CDesigner = Class({
                 return "gpuAccelerated";
             }
         },
+        selectable: function(data){
+            if (data===true){
+                return "selectable";
+            }
+        },
         inline: function(data){
             return '';
         },
         parents: function(data){
+            return '';
+        },
+        defaults: function(data){
             return '';
         }
 
@@ -280,11 +288,17 @@ var CDesigner = Class({
         },this);
         return inline;
     },
+    mergeDefaults: function(design){
+        var defaults = design.defaults;
+        //delete design.defaults;
+        return CUtils.mergeJSONs(defaults,design);
+    },
     designToClasses: function(design){
         if (CUtils.isEmpty(design))
             return "";
 
         design = CDesigner.mergeParents(design);
+        design = CDesigner.mergeDefaults(design);
 
         var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.

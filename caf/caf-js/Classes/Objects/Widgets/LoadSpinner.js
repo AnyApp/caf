@@ -20,7 +20,7 @@ var CLoadSpinner = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLoadSpinner);
+        CObject.setObjectDefaults(values,CLoadSpinner);
 
         // Invoke parent's constructor
         CLoadSpinner.$super.call(this, values);

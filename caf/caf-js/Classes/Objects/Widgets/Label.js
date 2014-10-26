@@ -11,6 +11,11 @@ var CLabel = Class(CObject,{
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
+        },
+        setLabelText: function(uid,text){
+            var label = CObjectsHandler.object(uid);
+            label.setText(text);
+            label.rebuild();
         }
 
     },
@@ -18,7 +23,7 @@ var CLabel = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLabel);
+        CObject.setObjectDefaults(values,CLabel);
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);

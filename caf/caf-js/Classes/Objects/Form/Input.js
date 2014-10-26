@@ -19,7 +19,7 @@ var CInput = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CInput);
+        CObject.setObjectDefaults(values,CInput);
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);

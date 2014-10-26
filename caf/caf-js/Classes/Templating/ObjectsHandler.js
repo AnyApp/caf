@@ -30,6 +30,24 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    // Extend CObject method: parseRelativeObjectId
+    relativeObject: function(baseObjectId,relativeId){
+        var baseObject = CObjectsHandler.object(baseObjectId);
+        if (CUtils.isEmpty(baseObject)) {
+            baseObject = baseObjectId; // Case CObject sent and not id.
+            baseObjectId = baseObject.uid();
+        }
+        if (CUtils.isEmpty(baseObject))
+            return null;
+        var relativeParentId = '';
+        if (baseObject.isRelative())
+            relativeParentId = baseObjectId;
+        else
+            relativeParentId = baseObject.getRelativeParent();
+        if (!CUtils.isEmpty(relativeParentId))
+            return relativeParentId+'/'+relativeId;
+
+    },
     isCObject: function(id){
         return !CUtils.isEmpty(this.object(id));
     },

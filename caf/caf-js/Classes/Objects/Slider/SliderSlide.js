@@ -14,7 +14,7 @@ var CSliderSlide = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSliderSlide);
+        CObject.setObjectDefaults(values,CSliderSlide);
 
         // Invoke parent's constructor
         CSliderSlide.$super.call(this, values);

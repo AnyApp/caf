@@ -15,7 +15,7 @@ var CVideo = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CVideo);
+        CObject.setObjectDefaults(values,CVideo);
 
         // Invoke parent's constructor
         CVideo.$super.call(this, values);

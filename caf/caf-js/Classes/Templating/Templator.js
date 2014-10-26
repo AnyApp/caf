@@ -12,7 +12,7 @@ var CTemplator = Class({
         object.data.template = object.data.template || {};
 
         if (object.data.template.autoLoad === true)
-            this.load(object.uid());
+            this.load(object.uid(), object.data.template.queryData || {});
 
         object.data.template.applied = true;
     },
@@ -39,11 +39,11 @@ var CTemplator = Class({
             var templateData = object.data.template;
 
             var containerData   = CUtils.clone(templateData.container);
-            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
+            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data||currentData);
 
             // On item click listener.
             var position = templateData.duplicates.length;
-            var onItemClick = CTemplator.createItemOnClick(position,
+            var onItemClick = CTemplator.createItemOnClick(position,currentData,
                 templateData.callback,templateData.callbacks[position] || function(){});
             // Clear border from first item.
             containerData.design = containerData.design || {};
@@ -53,14 +53,23 @@ var CTemplator = Class({
             var containerId = CObjectsHandler.createObject(containerData.type,containerData);
             templateData.duplicates.push(containerId);
             var container   = CObjectsHandler.object(containerId);
+
+            var rootObjects = templateData.rootObjects;
             // For each abstract object in the template object.
+            var appended = false;
             _.each(templateData.objects,function(abstractObject){
                 var logic = currentData.logic||{};
                 logic.onTemplateElementClick = onItemClick;
                 var duplicateId = CObjectsHandler.createFromTemplateObject(abstractObject,
                     currentData.data||{},logic,currentData.design||{});
-                container.appendChild(duplicateId);
+                // Set relative parent.
+                var duplicatedObject   = CObjectsHandler.object(duplicateId);
+                duplicatedObject.relativeParent = containerId;
+                // If root object or there is only one object, add to the top container.
+                if ( rootObjects.indexOf(abstractObject.uname || '') >=0 || templateData.objects.length === 1)
+                    container.appendChild(duplicateId);
             },this);
+
 
             // Map container to data.
             object.data.template.containerToData[containerId] = currentData;
@@ -70,10 +79,10 @@ var CTemplator = Class({
         if (preventRebuild !== true)
             object.rebuild(onFinish);
     },
-    createItemOnClick: function(index,callback,callbacksCallback){
+    createItemOnClick: function(index,data,callback,callbacksCallback){
         return function() {
-            callbacksCallback();
-            callback(index);
+            callbacksCallback(data);
+            callback(index,data);
         };
     },
     removeDuplicates: function(objectId,rebuild){
@@ -107,7 +116,7 @@ var CTemplator = Class({
     },
     getDuplicates: function (objectId) {
         if (CTemplator.dynamicApplied(objectId))
-            return CObjectsHandler.object(objectId).template.duplicates||[];
+            return CObjectsHandler.object(objectId).data.template.duplicates||[];
     },
     lastDuplicate: function (objectId) {
         if (!CTemplator.dynamicApplied(objectId))

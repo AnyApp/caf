@@ -18,7 +18,7 @@ var CHeader = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CHeader);
+        CObject.setObjectDefaults(values,CHeader);
 
         // Invoke parent's constructor
         CHeader.$super.call(this, values);

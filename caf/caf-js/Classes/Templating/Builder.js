@@ -33,8 +33,11 @@ var CBuilder = Class({
         // Get root object.
         var currentObject   = CObjectsHandler.object(id);
 
-        // Assign References.
+        // Assign References to all objects to avoid any conflicts.
         currentObject.assignReferences();
+        _.each(CObjectsHandler.objectsById,function(object){
+            object.assignReferences();
+        },CBuilder);
 
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();

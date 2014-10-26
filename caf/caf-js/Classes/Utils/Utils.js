@@ -250,6 +250,12 @@ var CUtils = Class({
         if (CUtils.isEmpty(element))
             return false;
         return parentId === element.id || CUtils.isDeepChild(parentId,element.parentElement);
+    },
+    replaceAll: function(string, find, replace) {
+        return string.replace(new RegExp(CUtils.escapeRegExp(find), 'g'), replace);
+    },
+    escapeRegExp: function(string) {
+        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
 

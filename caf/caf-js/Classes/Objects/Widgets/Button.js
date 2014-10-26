@@ -4,10 +4,7 @@
 var CButton = Class(CLabel,{
     $statics: {
         DEFAULT_DESIGN: {
-            cursor: 'pointer',
-            active:{
-                bgColor:{color:'Gray',level:10}
-            }
+            cursor: 'pointer'
         },
         DEFAULT_LOGIC: {
         }
@@ -17,7 +14,7 @@ var CButton = Class(CLabel,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CButton);
+        CObject.setObjectDefaults(values,CButton);
 
         // Invoke parent's constructor
         CButton.$super.call(this, values);

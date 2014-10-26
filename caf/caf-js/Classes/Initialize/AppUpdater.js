@@ -6,13 +6,19 @@ var CAppUpdater = Class({
     appUpdateURL: 'http://codletech-builder.herokuapp.com/getAppData',
     update: function(onFinish){
         var currentVersion = CLocalStorage.get(CAppHandler.appVersionKey) || -1;
+        var appID = CSettings.get('appID') || '';
+        if (CUtils.isEmpty(appID)) { // Mark as checked.
+            Caf.appUpdateChecked = true;
+            if (onFinish) onFinish();
+            return;
+        }
         // Request Update.
         CNetwork.request(CAppUpdater.appUpdateURL,
-            {appID: CSettings.get('appID'),version: currentVersion},
+            {appID: appID,version: currentVersion},
             function(data){
                 // Updated (data===true means the versions matched and no update needed).
                 var dontNeedUpdate = !CUtils.isEmpty(data) && !CUtils.isEmpty(data.status);
-                if (!CUtils.isEmpty(data) && !dontNeedUpdate ){
+                if (!CUtils.isEmpty(data) && !CUtils.isEmpty(data.objects) && !dontNeedUpdate ){
                     CLog.dlog('App Updated');
                     CAppUpdater.saveApp(data);
                     CLocalStorage.save(CAppHandler.appVersionKey,data.version);
@@ -34,8 +40,12 @@ var CAppUpdater = Class({
         data.data    =  data.data       || {};
 
         // Save to local storage.
-        CLocalStorage.save(CAppHandler.appDataKey,data);
+        if (!CUtils.isEmpty(data.objects))
+            CLocalStorage.save(CAppHandler.appDataKey,data);
 
+    },
+    clearAppData: function(data){
+        CLocalStorage.save(CAppHandler.appDataKey,'');
     }
 
 });

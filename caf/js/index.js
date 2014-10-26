@@ -27,7 +27,7 @@ var app =
             .templateObject(
                 co('Button')
                     .iconRight('#this.data.icon',28).sideMenuSwitch('left')
-                    .design('#designs.left-menu-button')
+                    .design({parents:'left-menu-button'})
                     .text('#this.data.text').link('#this.data.link').build()
             )
             .templateData('#globals.navigation');
@@ -42,7 +42,7 @@ var app =
             .templateObject(
                 co('Button')
                     .iconLeft('#this.data.icon',28).sideMenuSwitch('right')
-                    .design('#designs.right-menu-button')
+                    .design({parents:'right-menu-button'})
                     .text('#this.data.text').link('#this.data.link').build()
             )
             .templateData('#globals.navigation');
@@ -54,16 +54,16 @@ var app =
         //Add Design.
         builder.addDesign('header-button',{active: { bgColor:{color:'LightBlue',level:10} } });
         builder.create('Button','header-button-right-0')
-            .design('#designs.header-button')
+            .design({parents:'header-button'})
             .icon('ellipsis',38,'',CColor('White')).dialogSwitch('drop-down-menu');
         builder.create('Button','header-button-right-1')
-            .design('#designs.header-button')
+            .design({parents:'header-button'})
             .icon('pencil52',38,'',CColor('White')).link('form');
         builder.create('Button','header-button-left-0')
-            .design('#designs.header-button')
+            .design({parents:'header-button'})
             .icon('menu24',38,'',CColor('White')).sideMenuSwitch('left');
         builder.create('Button','header-button-back')
-            .design('#designs.header-button')
+            .design({parents:'header-button'})
             .icon('left46',34,'',CColor('White')).backButton();
         builder.create('Dialog','drop-down-menu').data({
             topView: 'header-button-right-0',
@@ -174,7 +174,7 @@ var app =
             .templateObject(
                 co('Button')
                     .iconRight('right65',40).iconLeft('#this.data.icon',35)
-                    .design('#designs.main-button')
+                    .design({parents:'main-button'})
                     .text('#this.data.text').link('#this.data.link')
                     .build()
             )
@@ -210,7 +210,7 @@ var app =
             active: { bgColor:CColor('Cyan',8),color: CColor('White') }
         });
         builder.create('Button','dialogs-show-error')
-            .design('#designs.dialogs-button')
+            .design({parents:'dialogs-button'})
             .iconRight('right65',40).iconLeft('cross55',35)
             .text('Show Error')
             .showDialog({
@@ -220,7 +220,7 @@ var app =
                 dialogColor: CColor('Red',7)
             });
         builder.create('Button','dialogs-show-success')
-            .design('#designs.dialogs-button')
+            .design({parents:'dialogs-button'})
             .iconRight('right65',40).iconLeft('check38',35)
             .text('Show Success')
             .showDialog({
@@ -230,7 +230,7 @@ var app =
                 dialogColor: CColor('DarkGreen',8)
             });
         builder.create('Button','dialogs-show-warning')
-            .design('#designs.dialogs-button')
+            .design({parents:'dialogs-button')
             .iconRight('right65',40).iconLeft('warning25',35)
             .text('Show Warning')
             .showDialog({
@@ -240,7 +240,7 @@ var app =
                 dialogColor: CColor('DeepOrange',7)
             });
         builder.create('Button','dialogs-show-dialog')
-            .design('#designs.dialogs-button')
+            .design({parents:'dialogs-button')
             .iconRight('right65',40).iconLeft('building26',35)
             .text('Show Complex Dialog')
             .showDialog({
@@ -282,11 +282,11 @@ var app =
         builder.create('Input','form-input-name')
             .inputName('name').inputRequired().formLoadInputFromStorage()
             .inputPlaceholder('Enter Your Name')
-            .design('#designs.text-input');
+            .design({parents:'text-input');
         builder.create('Input','form-input-phone')
             .inputName('phone').inputRequired().formLoadInputFromStorage()
             .inputPlaceholder('Enter Your Phone Number')
-            .design('#designs.text-input');
+            .design({parents:'text-input');
         //Add Design.
         builder.addDesign('form-button-base',{ height:40, marginTop:4,widthSM: 7,widthXS: 11,marginRight:1, marginLeft:1, marginTop:1});
         builder.create('Button','form-submit-button')

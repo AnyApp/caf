@@ -442,16 +442,23 @@ var CGlobals = Class({
  */
 var CLocalStorage = Class({
     $singleton: true,
+    base: '',
+    initBase: function(){
+        CLocalStorage.base = CSettings.get('appID') || '';
+    },
     save: function(key,value){
-        window.localStorage.setItem(key,JSONfn.stringify(value));
+        CLocalStorage.initBase();
+        window.localStorage.setItem(CLocalStorage.base+key,JSONfn.stringify(value));
     },
     get: function(key){
-        var value = window.localStorage.getItem(key);
+        CLocalStorage.initBase();
+        var value = window.localStorage.getItem(CLocalStorage.base+key);
         if (CUtils.isEmpty(value)) return null;
         return JSONfn.parse(value);
     },
     empty: function(key){
-        return CUtils.isEmpty(window.localStorage.getItem(key));
+        CLocalStorage.initBase();
+        return CUtils.isEmpty(window.localStorage.getItem(CLocalStorage.base+key));
     }
 
 });
@@ -870,6 +877,12 @@ var CUtils = Class({
         if (CUtils.isEmpty(element))
             return false;
         return parentId === element.id || CUtils.isDeepChild(parentId,element.parentElement);
+    },
+    replaceAll: function(string, find, replace) {
+        return string.replace(new RegExp(CUtils.escapeRegExp(find), 'g'), replace);
+    },
+    escapeRegExp: function(string) {
+        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
 
@@ -1129,8 +1142,8 @@ var CClicker = Class({
         var design = object.getDesign();
         // Check
         object.clicker = {};
-        object.clicker.activeClasses       = CDesigner.designToClasses(object.getDesign().active);
-        object.clicker.activeRemoveClasses = CDesigner.designToClasses(object.getDesign().activeRemove);
+        object.clicker.activeClasses       = CDesigner.designToClasses(CDesigner.mergeParents(object.getDesign()||{}).active);
+        object.clicker.activeRemoveClasses = CDesigner.designToClasses(CDesigner.mergeParents(object.getDesign()||{}).activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,
@@ -1324,8 +1337,16 @@ var CPager = Class({
         },CPager);
         return path;
     },
+    mapDataToPath: function (data) {
+        data = data || {};
+        var path = '';
+        _.each(data,function(value,key){
+            path += '/'+key+'/'+value;
+        });
+        return path;
+    },
     moveBack: function() {
-        history.back();
+        window.history.back();
     },
     setBackForwardDetection: function () {
         var detectBackOrForward = function() {
@@ -1378,6 +1399,7 @@ var CPager = Class({
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
+        var dynamicPageId       = '';
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
@@ -1414,7 +1436,7 @@ var CPager = Class({
             return;
 
         // Normal page hide.
-        if (!CUtils.isEmpty(lastPage))
+        if (!CUtils.isEmpty(lastPage) && !CTemplator.objectHasDynamic(lastPage))
             CAnimations.hide(lastPage,{});
 
         var animationOptions    = {};
@@ -1440,7 +1462,13 @@ var CPager = Class({
     resetPages: function() {
         // Hide All Pages except current.
         _.each(CPager.pages,function(pageId){
+            if (!CTemplator.objectHasDynamic(pageId))
                 CAnimations.quickHide(pageId);
+            else { //Parent dynamic page.
+                var pageElement = CUtils.element(pageId);
+                if (!CUtils.isEmpty(pageElement))
+                    pageElement.style.zIndex = '-1';
+            }
         },CPager);
     },
     getParamsAsMap: function(params){
@@ -1939,8 +1967,11 @@ var CBuilder = Class({
         // Get root object.
         var currentObject   = CObjectsHandler.object(id);
 
-        // Assign References.
+        // Assign References to all objects to avoid any conflicts.
         currentObject.assignReferences();
+        _.each(CObjectsHandler.objectsById,function(object){
+            object.assignReferences();
+        },CBuilder);
 
         // Clear prepared objects.
         CObjectsHandler.clearPreparedObjects();
@@ -2238,10 +2269,18 @@ var CDesigner = Class({
                 return "gpuAccelerated";
             }
         },
+        selectable: function(data){
+            if (data===true){
+                return "selectable";
+            }
+        },
         inline: function(data){
             return '';
         },
         parents: function(data){
+            return '';
+        },
+        defaults: function(data){
             return '';
         }
 
@@ -2289,11 +2328,17 @@ var CDesigner = Class({
         },this);
         return inline;
     },
+    mergeDefaults: function(design){
+        var defaults = design.defaults;
+        //delete design.defaults;
+        return CUtils.mergeJSONs(defaults,design);
+    },
     designToClasses: function(design){
         if (CUtils.isEmpty(design))
             return "";
 
         design = CDesigner.mergeParents(design);
+        design = CDesigner.mergeDefaults(design);
 
         var classesBuilder = new CStringBuilder();
         // Scan the designs and generate classes.
@@ -2334,7 +2379,14 @@ var CLogic = Class({
             }
             else {
                 CClicker.addOnClick(object,function(){
-                    CUtils.openLocalURL(value.path+CPager.dataToPath(value.data));
+                    value.data = value.data || {};
+                    value.globalData = value.globalData || {};
+                    var finalData = CUtils.clone(value.data);
+                    // Evaluate dynamic global data.
+                    _.each(value.globalData,function(globalName,key){
+                        finalData[key] = CGlobals.get(globalName) || '';
+                    });
+                    CUtils.openLocalURL(value.path+CPager.mapDataToPath(finalData));
                 });
             }
         },
@@ -2534,6 +2586,24 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    // Extend CObject method: parseRelativeObjectId
+    relativeObject: function(baseObjectId,relativeId){
+        var baseObject = CObjectsHandler.object(baseObjectId);
+        if (CUtils.isEmpty(baseObject)) {
+            baseObject = baseObjectId; // Case CObject sent and not id.
+            baseObjectId = baseObject.uid();
+        }
+        if (CUtils.isEmpty(baseObject))
+            return null;
+        var relativeParentId = '';
+        if (baseObject.isRelative())
+            relativeParentId = baseObjectId;
+        else
+            relativeParentId = baseObject.getRelativeParent();
+        if (!CUtils.isEmpty(relativeParentId))
+            return relativeParentId+'/'+relativeId;
+
+    },
     isCObject: function(id){
         return !CUtils.isEmpty(this.object(id));
     },
@@ -2605,7 +2675,7 @@ var CTemplator = Class({
         object.data.template = object.data.template || {};
 
         if (object.data.template.autoLoad === true)
-            this.load(object.uid());
+            this.load(object.uid(), object.data.template.queryData || {});
 
         object.data.template.applied = true;
     },
@@ -2632,11 +2702,11 @@ var CTemplator = Class({
             var templateData = object.data.template;
 
             var containerData   = CUtils.clone(templateData.container);
-            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data     ||currentData);
+            containerData.data  = CUtils.mergeJSONs(containerData.data,currentData.data||currentData);
 
             // On item click listener.
             var position = templateData.duplicates.length;
-            var onItemClick = CTemplator.createItemOnClick(position,
+            var onItemClick = CTemplator.createItemOnClick(position,currentData,
                 templateData.callback,templateData.callbacks[position] || function(){});
             // Clear border from first item.
             containerData.design = containerData.design || {};
@@ -2646,14 +2716,23 @@ var CTemplator = Class({
             var containerId = CObjectsHandler.createObject(containerData.type,containerData);
             templateData.duplicates.push(containerId);
             var container   = CObjectsHandler.object(containerId);
+
+            var rootObjects = templateData.rootObjects;
             // For each abstract object in the template object.
+            var appended = false;
             _.each(templateData.objects,function(abstractObject){
                 var logic = currentData.logic||{};
                 logic.onTemplateElementClick = onItemClick;
                 var duplicateId = CObjectsHandler.createFromTemplateObject(abstractObject,
                     currentData.data||{},logic,currentData.design||{});
-                container.appendChild(duplicateId);
+                // Set relative parent.
+                var duplicatedObject   = CObjectsHandler.object(duplicateId);
+                duplicatedObject.relativeParent = containerId;
+                // If root object or there is only one object, add to the top container.
+                if ( rootObjects.indexOf(abstractObject.uname || '') >=0 || templateData.objects.length === 1)
+                    container.appendChild(duplicateId);
             },this);
+
 
             // Map container to data.
             object.data.template.containerToData[containerId] = currentData;
@@ -2663,10 +2742,10 @@ var CTemplator = Class({
         if (preventRebuild !== true)
             object.rebuild(onFinish);
     },
-    createItemOnClick: function(index,callback,callbacksCallback){
+    createItemOnClick: function(index,data,callback,callbacksCallback){
         return function() {
-            callbacksCallback();
-            callback(index);
+            callbacksCallback(data);
+            callback(index,data);
         };
     },
     removeDuplicates: function(objectId,rebuild){
@@ -2700,7 +2779,7 @@ var CTemplator = Class({
     },
     getDuplicates: function (objectId) {
         if (CTemplator.dynamicApplied(objectId))
-            return CObjectsHandler.object(objectId).template.duplicates||[];
+            return CObjectsHandler.object(objectId).data.template.duplicates||[];
     },
     lastDuplicate: function (objectId) {
         if (!CTemplator.dynamicApplied(objectId))
@@ -2783,21 +2862,24 @@ var CObject = Class({
         generateID: function() {
             return "c_"+Math.random().toString(36).substring(2);
         },
-        mergeWithDefaults: function(values,useClass){
+        setObjectDefaults: function(values,useClass){
+            values.design = values.design || {};
             if (!CUtils.isString(values.design))
-                values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
             values.logic = CUtils.mergeJSONs(useClass.DEFAULT_LOGIC,values.logic);
         },
-        mergeDesignWithDefaults: function(design,useClass){
-            if (!CUtils.isString(design))
-                return CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,design);
+        setObjectDesignDefaults: function(values,useClass){
+            values.design = values.design || {};
+            if (!CUtils.isString(values.design))
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
         }
+
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CObject);
+        CObject.setObjectDefaults(values,CObject);
 
         this.id             = values.id         || CObject.generateID();
         this.appId          = values.appId;
@@ -2914,6 +2996,11 @@ var CObject = Class({
                     var evaluated   = this.replaceReferencesInString(obj[property]);
                     obj[property] = evaluated;
                 }
+                else if (typeof obj[property] == 'function' || obj[property] instanceof Function){
+                    // Evaluate references inside functions.
+                    var evaluated   = this.replaceReferencesInFunction(obj[property]);
+                    obj[property] = evaluated;
+                }
 
             }
         }
@@ -2936,11 +3023,26 @@ var CObject = Class({
         }
         return null;
     },
+    // Extension of this method in: CObjectHandler.relativeObject
     parseRelativeObjectId: function(str){
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;
         return str.substr(1);
+    },
+    replaceReferencesInFunction: function(func) {
+        if (CUtils.isEmpty(func))
+            return func;
+        var thisObjectStr = 'thisObject';
+        var funcAsString = JSONfn.stringify(func);
+        if (funcAsString.indexOf(thisObjectStr) < 0)
+            return func;
+
+        var thisObjectReference = 'CObjectsHandler.object(\''+this.uid()+'\')';
+        // Replace all 'thisObject' to reference to this object.
+        var replacedReferencesFunc = CUtils.replaceAll(funcAsString,'thisObject',
+            thisObjectReference);
+        return JSONfn.parse(replacedReferencesFunc);
     },
     replaceReferencesInString: function(str) {
         if (CUtils.isEmpty(str))
@@ -3013,7 +3115,6 @@ var CObject = Class({
         attributes.push('class="'+this.classes+'"');
         var inlineDesign = CDesigner.getFinalInlineStyle(this.design);
         if (!CUtils.isEmpty(inlineDesign)) {
-            CLog.dlog(inlineDesign);
             attributes.push('style="'+inlineDesign+'"');
         }
 
@@ -3042,13 +3143,6 @@ var CObject = Class({
 
     },
     assignReferences: function(){
-        // Retrieve relative and local references.
-        this.parseReferences(this.data);
-        this.parseReferences(this.logic);
-        if (CUtils.isString(this.design)){
-            this.design = this.replaceReferencesInString(this.design);
-            this.design = CObject.mergeDesignWithDefaults(this.design,this);
-        }
         // Parse relative uname.
         var prevUID = this.uid();
         this.uname = this.replaceReferencesInString(this.uname);
@@ -3059,6 +3153,13 @@ var CObject = Class({
             var thisIndex = parentObject.getChilds().indexOf(prevUID);
             parentObject.setChildInPosition(this.uid(),thisIndex);
         }
+        // Retrieve relative and local references.
+        this.parseReferences(this.data);
+        this.parseReferences(this.logic);
+        if (CUtils.isString(this.design)){
+            this.design = this.replaceReferencesInString(this.design);
+            this.design = CObject.setObjectDesignDefaults(this.design,this);
+        }
     },
     isContainer: function(){
         return false;
@@ -3067,6 +3168,11 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
         parentContainer.rebuild();
+    },
+    rebuild: function() {
+        var parentContainer = CObjectsHandler.object(this.parent);
+        parentContainer.rebuild();
+
     }
 
 
@@ -3091,7 +3197,7 @@ var CContainer = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CContainer);
+        CObject.setObjectDefaults(values,CContainer);
 
         // Invoke parent's constructor
         CContainer.$super.call(this, values);
@@ -3150,16 +3256,15 @@ var CContainer = Class(CObject,{
     getChilds: function(){
         return this.data.childs;
     },
-    assignReferences: function(){
-        _.each(this.data.childs,function(childID){
-            var object = CObjectsHandler.object(childID);
-            //Set parent to this Object.
-            object.setParent(this.uid());
-            object.assignReferences();
-        },this);
-
-        CContainer.$superp.assignReferences.call(this);
-    },
+//    assignReferences: function(){
+//        _.each(this.data.childs,function(childID){
+//            var object = CObjectsHandler.object(childID);
+//            //Set parent to this Object.
+//            object.setParent(this.uid());
+//            object.assignReferences();
+//        },this);
+//        CContainer.$superp.assignReferences.call(this);
+//    },
     applyForceDesign: function(object){
         if (!CUtils.isEmpty(this.forceDesign))
             object.setDesign(CUtils.mergeJSONs(this.forceDesign,object.getDesign()));
@@ -3273,7 +3378,7 @@ var CTemplate = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CTemplate);
+        CObject.setObjectDefaults(values,CTemplate);
 
         // Invoke parent's constructor
         CTemplate.$super.call(this, values);
@@ -3296,6 +3401,7 @@ var CTemplate = Class(CContainer,{
         this.data.template.resetOnReload= this.data.template.resetOnReload=== false ? false : true;
         this.data.template.loaded       = this.data.template.loaded     || false;
         this.data.template.duplicates   = this.data.template.duplicates || [];
+        this.data.template.rootObjects  = this.data.template.rootObjects|| [];
         this.data.template.objects      = this.data.template.objects    || [];
         this.data.template.object       = this.data.template.object     || null;
         if (this.data.template.object !== null) // Allow syntactic sugar.
@@ -3378,7 +3484,7 @@ var  CDialogContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CDialogContainer);
+        CObject.setObjectDefaults(values,CDialogContainer);
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
@@ -3441,7 +3547,7 @@ var CDialog = Class(CContainer,{
         var containerDesign = CUtils.clone(values.design);
         values.design = {};
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CDialog);
+        CObject.setObjectDefaults(values,CDialog);
         // Invoke parent's constructor
         CDialog.$super.call(this, values);
 
@@ -3481,7 +3587,7 @@ var CDialog = Class(CContainer,{
         // Adnimation handling.
         this.data.onAnimShowComplete = function(){
             dialog.isHidden = false;
-            dialog.onResize();
+            CThreads.runTimes(dialog.onResize,0,100,15);
         };
 
         this.logic.init = function(){ dialog.onResize(); }
@@ -3711,10 +3817,12 @@ var CDialog = Class(CContainer,{
 
     },
     createListCallback: function(dialog,callback){
-        return this.data.hideOnListChoose === true ? function(){
-            callback();
+        return this.data.hideOnListChoose === true ? function(index,data){
+            callback(index,data);
             dialog.hide();
-        } : function(){};
+        } : function(index,data){
+            callback(index,data);
+        };
     },
     createListElement: function (index,text,data,customLogic,icon,listCallback,chosenCallback,hideOnChoose) {
         var design = {
@@ -3938,7 +4046,7 @@ var CAppContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CAppContainer);
+        CObject.setObjectDefaults(values,CAppContainer);
 
         // Invoke parent's constructor
         CAppContainer.$super.call(this, values);
@@ -3976,7 +4084,7 @@ var CMainView = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CMainView);
+        CObject.setObjectDefaults(values,CMainView);
         // Invoke parent's constructor
         CMainView.$super.call(this, values);
 
@@ -4000,7 +4108,7 @@ var CSideMenu = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenu);
+        CObject.setObjectDefaults(values,CSideMenu);
         // Invoke parent's constructor
         CSideMenu.$super.call(this, values);
         this.leftContainer  = values.data.leftContainer  || null;
@@ -4046,7 +4154,7 @@ var CSideMenuContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenuContainer);
+        CObject.setObjectDefaults(values,CSideMenuContainer);
         // Invoke parent's constructor
         CSideMenuContainer.$super.call(this, values);
         this.design             = this.design || {};
@@ -4075,7 +4183,7 @@ var CSideMenuLeft = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenuLeft);
+        CObject.setObjectDefaults(values,CSideMenuLeft);
         // Invoke parent's constructor
         CSideMenuLeft.$super.call(this, values);
         //this.uname = 'side-menu-left';
@@ -4101,7 +4209,7 @@ var CSideMenuRight = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenuRight);
+        CObject.setObjectDefaults(values,CSideMenuRight);
         // Invoke parent's constructor
         CSideMenuRight.$super.call(this, values);
         //this.uname = 'side-menu-right';
@@ -4131,7 +4239,7 @@ var CFooter = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CFooter);
+        CObject.setObjectDefaults(values,CFooter);
 
         // Invoke parent's constructor
         CFooter.$super.call(this, values);
@@ -4163,7 +4271,7 @@ var CHeader = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CHeader);
+        CObject.setObjectDefaults(values,CHeader);
 
         // Invoke parent's constructor
         CHeader.$super.call(this, values);
@@ -4242,7 +4350,7 @@ var CContent = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CContent);
+        CObject.setObjectDefaults(values,CContent);
 
         // Invoke parent's constructor
         CContent.$super.call(this, values);
@@ -4280,7 +4388,7 @@ var CPage = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CPage);
+        CObject.setObjectDefaults(values,CPage);
 
         // Invoke parent's constructor
         CPage.$super.call(this, values);
@@ -4340,13 +4448,16 @@ var CTemplatePage = Class([CPage,CTemplate],{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CTemplatePage);
+        CObject.setObjectDefaults(values,CTemplatePage);
 
         // Invoke parent's constructor
         CTemplatePage.$super.call(this, values);
         CTemplate.prototype.constructor.call(this, values);
         // Set that there is a page container for the abstract objects.
-        this.data.template.container.data.page   = this.data.template.container.data.page || this.data.page || {};
+        this.data.template.container.data.page   = this.data.template.container.data.page || {};
+        if (this.data.page)
+            this.data.template.container.data.page = CUtils.clone(this.data.page);
+
         //this.data.page                  = null;
         this.data.template.container.type        = 'Page';
         this.data.template.autoLoad = false;
@@ -4375,7 +4486,7 @@ var CPagination = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CPagination);
+        CObject.setObjectDefaults(values,CPagination);
 
         // Invoke parent's constructor
         CPagination.$super.call(this, values);
@@ -4401,7 +4512,7 @@ var CSliderWrapper = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSliderWrapper);
+        CObject.setObjectDefaults(values,CSliderWrapper);
 
         // Invoke parent's constructor
         CSliderWrapper.$super.call(this, values);
@@ -4428,7 +4539,7 @@ var CSliderSlide = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSliderSlide);
+        CObject.setObjectDefaults(values,CSliderSlide);
 
         // Invoke parent's constructor
         CSliderSlide.$super.call(this, values);
@@ -4457,7 +4568,7 @@ var CSlider = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSlider);
+        CObject.setObjectDefaults(values,CSlider);
 
         // Invoke parent's constructor
         CSlider.$super.call(this, values);
@@ -4529,7 +4640,7 @@ var CGallery = Class(CSlider,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CGallery);
+        CObject.setObjectDefaults(values,CGallery);
 
         this.data = values.data || {};
         this.data.childs = values.data.childs || [];
@@ -4563,6 +4674,11 @@ var CLabel = Class(CObject,{
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
+        },
+        setLabelText: function(uid,text){
+            var label = CObjectsHandler.object(uid);
+            label.setText(text);
+            label.rebuild();
         }
 
     },
@@ -4570,7 +4686,7 @@ var CLabel = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLabel);
+        CObject.setObjectDefaults(values,CLabel);
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
@@ -4588,10 +4704,7 @@ var CLabel = Class(CObject,{
 var CButton = Class(CLabel,{
     $statics: {
         DEFAULT_DESIGN: {
-            cursor: 'pointer',
-            active:{
-                bgColor:{color:'Gray',level:10}
-            }
+            cursor: 'pointer'
         },
         DEFAULT_LOGIC: {
         }
@@ -4601,11 +4714,50 @@ var CButton = Class(CLabel,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CButton);
+        CObject.setObjectDefaults(values,CButton);
 
         // Invoke parent's constructor
         CButton.$super.call(this, values);
 
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
+var CIFrame = Class(CObject,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: "",
+            border: {all:0}
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.setObjectDefaults(values,CIFrame);
+
+        // Invoke parent's constructor
+        CVideo.$super.call(this, values);
+
+        this.data.src = values.data.src || '';
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element.
+        return CIFrame.$superp.prepareBuild.call(this,{
+            tag: 'iframe',
+            attributes: ['src="'+this.data.src+'"','frameborder="0"','webkitallowfullscreen',
+                'mozallowfullscreen','allowfullscreen']
+        });
     }
 
 
@@ -4627,7 +4779,7 @@ var CImage = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CImage);
+        CObject.setObjectDefaults(values,CImage);
 
         // Invoke parent's constructor
         CImage.$super.call(this, values);
@@ -4668,6 +4820,11 @@ var CLabel = Class(CObject,{
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
+        },
+        setLabelText: function(uid,text){
+            var label = CObjectsHandler.object(uid);
+            label.setText(text);
+            label.rebuild();
         }
 
     },
@@ -4675,7 +4832,7 @@ var CLabel = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLabel);
+        CObject.setObjectDefaults(values,CLabel);
 
         // Invoke parent's constructor
         CLabel.$super.call(this, values);
@@ -4709,7 +4866,7 @@ var CLoadSpinner = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CLoadSpinner);
+        CObject.setObjectDefaults(values,CLoadSpinner);
 
         // Invoke parent's constructor
         CLoadSpinner.$super.call(this, values);
@@ -4749,7 +4906,7 @@ var CVideo = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CVideo);
+        CObject.setObjectDefaults(values,CVideo);
 
         // Invoke parent's constructor
         CVideo.$super.call(this, values);
@@ -4815,7 +4972,7 @@ var CZoomedImage = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CZoomedImage);
+        CObject.setObjectDefaults(values,CZoomedImage);
 
         // Invoke parent's constructor
         CZoomedImage.$super.call(this, values);
@@ -4855,7 +5012,7 @@ var CTab = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CTab);
+        CObject.setObjectDefaults(values,CTab);
 
         // Invoke parent's constructor
         CTab.$super.call(this, values);
@@ -4926,7 +5083,7 @@ var CTabber = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CTabber);
+        CObject.setObjectDefaults(values,CTabber);
 
         // Invoke parent's constructor
         CTabber.$super.call(this, values);
@@ -5080,7 +5237,7 @@ var CForm = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CForm);
+        CObject.setObjectDefaults(values,CForm);
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
@@ -5179,7 +5336,7 @@ var CInput = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CInput);
+        CObject.setObjectDefaults(values,CInput);
 
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
@@ -5245,7 +5402,7 @@ var CInputEmail = Class(CInput,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CForm);
+        CObject.setObjectDefaults(values,CForm);
 
         values.prepares = values.prepares || [];
         values.prepares.push('email');
@@ -5336,13 +5493,19 @@ var CAppUpdater = Class({
     appUpdateURL: 'http://codletech-builder.herokuapp.com/getAppData',
     update: function(onFinish){
         var currentVersion = CLocalStorage.get(CAppHandler.appVersionKey) || -1;
+        var appID = CSettings.get('appID') || '';
+        if (CUtils.isEmpty(appID)) { // Mark as checked.
+            Caf.appUpdateChecked = true;
+            if (onFinish) onFinish();
+            return;
+        }
         // Request Update.
         CNetwork.request(CAppUpdater.appUpdateURL,
-            {appID: CSettings.get('appID'),version: currentVersion},
+            {appID: appID,version: currentVersion},
             function(data){
                 // Updated (data===true means the versions matched and no update needed).
                 var dontNeedUpdate = !CUtils.isEmpty(data) && !CUtils.isEmpty(data.status);
-                if (!CUtils.isEmpty(data) && !dontNeedUpdate ){
+                if (!CUtils.isEmpty(data) && !CUtils.isEmpty(data.objects) && !dontNeedUpdate ){
                     CLog.dlog('App Updated');
                     CAppUpdater.saveApp(data);
                     CLocalStorage.save(CAppHandler.appVersionKey,data.version);
@@ -5364,8 +5527,12 @@ var CAppUpdater = Class({
         data.data    =  data.data       || {};
 
         // Save to local storage.
-        CLocalStorage.save(CAppHandler.appDataKey,data);
+        if (!CUtils.isEmpty(data.objects))
+            CLocalStorage.save(CAppHandler.appDataKey,data);
 
+    },
+    clearAppData: function(data){
+        CLocalStorage.save(CAppHandler.appDataKey,'');
     }
 
 });
@@ -5584,6 +5751,11 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    templateRootObjects: function(rootObjects) {
+        this.initTemplate();
+        this.properties.data.template.rootObjects = rootObjects;
+        return this;
+    },
     templateObjects: function(objects) {
         this.initTemplate();
         this.properties.data.template.objects = objects;
@@ -5755,6 +5927,10 @@ var CBuilderObject = Class({
         this.properties.data.src = src;
         return this;
     },
+    iframeSource: function(src) {
+        this.properties.data.src = src;
+        return this;
+    },
     galleryImages: function(images) {
         this.properties.data.images = images;
         return this;
@@ -5825,10 +6001,11 @@ var CBuilderObject = Class({
         this.properties.logic.onClick = onClickHandler;
         return this;
     },
-    link: function(path,data) {
+    link: function(path,data,globalData) {
         this.properties.logic.link = {
-            path:   path || null,
-            data:  data || null
+            path:           path || null,
+            data:           data || null,
+            globalData:     globalData || null
         };
         return this;
     },

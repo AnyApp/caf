@@ -11,6 +11,7 @@ var CInitiator = {
     script:                 null,
     doneLoadScript:         false,
     initiate: function(){
+
         var cssData = CInitiator.getFromLocalStorage(CInitiator.coreCSSName);
         var jsData  = CInitiator.getFromLocalStorage(CInitiator.coreJSName);
 

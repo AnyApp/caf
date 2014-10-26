@@ -18,7 +18,7 @@ var CTemplate = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CTemplate);
+        CObject.setObjectDefaults(values,CTemplate);
 
         // Invoke parent's constructor
         CTemplate.$super.call(this, values);
@@ -41,6 +41,7 @@ var CTemplate = Class(CContainer,{
         this.data.template.resetOnReload= this.data.template.resetOnReload=== false ? false : true;
         this.data.template.loaded       = this.data.template.loaded     || false;
         this.data.template.duplicates   = this.data.template.duplicates || [];
+        this.data.template.rootObjects  = this.data.template.rootObjects|| [];
         this.data.template.objects      = this.data.template.objects    || [];
         this.data.template.object       = this.data.template.object     || null;
         if (this.data.template.object !== null) // Allow syntactic sugar.

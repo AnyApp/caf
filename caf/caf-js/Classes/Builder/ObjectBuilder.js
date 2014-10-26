@@ -77,6 +77,11 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    templateRootObjects: function(rootObjects) {
+        this.initTemplate();
+        this.properties.data.template.rootObjects = rootObjects;
+        return this;
+    },
     templateObjects: function(objects) {
         this.initTemplate();
         this.properties.data.template.objects = objects;
@@ -248,6 +253,10 @@ var CBuilderObject = Class({
         this.properties.data.src = src;
         return this;
     },
+    iframeSource: function(src) {
+        this.properties.data.src = src;
+        return this;
+    },
     galleryImages: function(images) {
         this.properties.data.images = images;
         return this;
@@ -318,10 +327,11 @@ var CBuilderObject = Class({
         this.properties.logic.onClick = onClickHandler;
         return this;
     },
-    link: function(path,data) {
+    link: function(path,data,globalData) {
         this.properties.logic.link = {
-            path:   path || null,
-            data:  data || null
+            path:           path || null,
+            data:           data || null,
+            globalData:     globalData || null
         };
         return this;
     },

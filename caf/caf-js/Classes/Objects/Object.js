@@ -12,21 +12,24 @@ var CObject = Class({
         generateID: function() {
             return "c_"+Math.random().toString(36).substring(2);
         },
-        mergeWithDefaults: function(values,useClass){
+        setObjectDefaults: function(values,useClass){
+            values.design = values.design || {};
             if (!CUtils.isString(values.design))
-                values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
             values.logic = CUtils.mergeJSONs(useClass.DEFAULT_LOGIC,values.logic);
         },
-        mergeDesignWithDefaults: function(design,useClass){
-            if (!CUtils.isString(design))
-                return CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,design);
+        setObjectDesignDefaults: function(values,useClass){
+            values.design = values.design || {};
+            if (!CUtils.isString(values.design))
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
         }
+
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CObject);
+        CObject.setObjectDefaults(values,CObject);
 
         this.id             = values.id         || CObject.generateID();
         this.appId          = values.appId;
@@ -143,6 +146,11 @@ var CObject = Class({
                     var evaluated   = this.replaceReferencesInString(obj[property]);
                     obj[property] = evaluated;
                 }
+                else if (typeof obj[property] == 'function' || obj[property] instanceof Function){
+                    // Evaluate references inside functions.
+                    var evaluated   = this.replaceReferencesInFunction(obj[property]);
+                    obj[property] = evaluated;
+                }
 
             }
         }
@@ -165,11 +173,26 @@ var CObject = Class({
         }
         return null;
     },
+    // Extension of this method in: CObjectHandler.relativeObject
     parseRelativeObjectId: function(str){
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;
         return str.substr(1);
+    },
+    replaceReferencesInFunction: function(func) {
+        if (CUtils.isEmpty(func))
+            return func;
+        var thisObjectStr = 'thisObject';
+        var funcAsString = JSONfn.stringify(func);
+        if (funcAsString.indexOf(thisObjectStr) < 0)
+            return func;
+
+        var thisObjectReference = 'CObjectsHandler.object(\''+this.uid()+'\')';
+        // Replace all 'thisObject' to reference to this object.
+        var replacedReferencesFunc = CUtils.replaceAll(funcAsString,'thisObject',
+            thisObjectReference);
+        return JSONfn.parse(replacedReferencesFunc);
     },
     replaceReferencesInString: function(str) {
         if (CUtils.isEmpty(str))
@@ -242,7 +265,6 @@ var CObject = Class({
         attributes.push('class="'+this.classes+'"');
         var inlineDesign = CDesigner.getFinalInlineStyle(this.design);
         if (!CUtils.isEmpty(inlineDesign)) {
-            CLog.dlog(inlineDesign);
             attributes.push('style="'+inlineDesign+'"');
         }
 
@@ -271,13 +293,6 @@ var CObject = Class({
 
     },
     assignReferences: function(){
-        // Retrieve relative and local references.
-        this.parseReferences(this.data);
-        this.parseReferences(this.logic);
-        if (CUtils.isString(this.design)){
-            this.design = this.replaceReferencesInString(this.design);
-            this.design = CObject.mergeDesignWithDefaults(this.design,this);
-        }
         // Parse relative uname.
         var prevUID = this.uid();
         this.uname = this.replaceReferencesInString(this.uname);
@@ -288,6 +303,13 @@ var CObject = Class({
             var thisIndex = parentObject.getChilds().indexOf(prevUID);
             parentObject.setChildInPosition(this.uid(),thisIndex);
         }
+        // Retrieve relative and local references.
+        this.parseReferences(this.data);
+        this.parseReferences(this.logic);
+        if (CUtils.isString(this.design)){
+            this.design = this.replaceReferencesInString(this.design);
+            this.design = CObject.setObjectDesignDefaults(this.design,this);
+        }
     },
     isContainer: function(){
         return false;
@@ -296,6 +318,11 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
         parentContainer.rebuild();
+    },
+    rebuild: function() {
+        var parentContainer = CObjectsHandler.object(this.parent);
+        parentContainer.rebuild();
+
     }
 
 
