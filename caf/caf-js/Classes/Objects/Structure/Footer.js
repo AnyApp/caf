@@ -24,7 +24,7 @@ var CFooter = Class(CContainer,{
         // Invoke parent's constructor
         CFooter.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('footerSize');
+        this.design.height = CGlobals.get('footerSize');
 
     }
 

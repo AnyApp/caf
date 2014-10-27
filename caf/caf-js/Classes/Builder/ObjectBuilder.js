@@ -171,8 +171,24 @@ var CBuilderObject = Class({
         this.properties.data.name = name || null;
         return this;
     },
+    inputType: function(type) {
+        this.properties.data.type = type || null;
+        return this;
+    },
+    inputValue: function(value) {
+        this.properties.data.value = value || null;
+        return this;
+    },
     inputRequired: function() {
         this.properties.data.required = true;
+        return this;
+    },
+    inputDisabled: function() {
+        this.properties.data.disabled = true;
+        return this;
+    },
+    inputEnabled: function() {
+        this.properties.data.disabled = false;
         return this;
     },
     inputNotRequired: function() {
@@ -181,6 +197,10 @@ var CBuilderObject = Class({
     },
     inputPlaceholder: function(placeholder) {
         this.properties.data.placeholder = placeholder;
+        return this;
+    },
+    inputOnFileSelect: function(inputOnFileSelect) {
+        this.properties.logic.inputOnFileSelect = inputOnFileSelect;
         return this;
     },
     inputValidators: function(validators) {
@@ -199,6 +219,10 @@ var CBuilderObject = Class({
     inputPrepare: function(prepare) {
         this.properties.data.prepares = this.properties.data.prepares || [];
         this.properties.data.prepares.push(prepare);
+        return this;
+    },
+    formPrepareValues: function(prepareValuesFunction) {
+        this.properties.data.prepareValues = prepareValuesFunction;
         return this;
     },
     formLoadInputFromStorage: function() {
@@ -325,6 +349,14 @@ var CBuilderObject = Class({
     },
     onClick: function(onClickHandler) {
         this.properties.logic.onClick = onClickHandler;
+        return this;
+    },
+    onCreate: function(onCreateHandler) {
+        this.properties.logic.onCreate = onCreateHandler;
+        return this;
+    },
+    onCreateAsync: function(onCreateAsyncHandler) {
+        this.properties.logic.onCreateAsync = onCreateAsyncHandler;
         return this;
     },
     link: function(path,data,globalData) {

@@ -24,6 +24,10 @@ var CInput = Class(CObject,{
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
         this.data.name               = values.data.name          || '';
+        this.data.type               = values.data.type          || 'text';
+        this.data.value              = values.data.value         || '';
+        this.data.disabled           = values.data.disabled      || false;
+        this.data.disabledAttribute  = values.data.disabled===true? 'disabled' : '';
         this.data.required           = values.data.required      || false;
         this.data.validators         = values.data.validators    || [];
         this.data.prepares           = values.data.prepares      || [];
@@ -40,7 +44,13 @@ var CInput = Class(CObject,{
         return CInput.$superp.prepareBuild.call(this,{
             tag: 'input',
             tagHasInner: false,
-            attributes: ['placeholder="'+this.data.placeholder+'"']
+            attributes: [
+                'placeholder="' +this.data.placeholder+'"',
+                'value="'       +this.data.value+'"',
+                'type="'        +this.data.type+'"',
+                this.data.disabledAttribute
+
+            ]
         });
     },
     value: function() {
@@ -63,6 +73,12 @@ var CInput = Class(CObject,{
     },
     getValidators: function(){
         return this.data.validators;
+    },
+    disable: function(){
+        CUtils.element(this.uid()).setAttribute('disabled','');
+    },
+    enable: function(){
+        CUtils.element(this.uid()).removeAttribute('disabled');
     }
 
 });

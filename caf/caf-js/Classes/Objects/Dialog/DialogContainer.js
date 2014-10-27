@@ -24,7 +24,7 @@ var  CDialogContainer = Class(CContainer,{
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
-        this.design.top = CAppConfig.get('headerSize')+20;
+        this.design.top = CGlobals.get('headerSize')+20;
     }
 
 });

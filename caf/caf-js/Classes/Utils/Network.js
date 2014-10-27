@@ -3,14 +3,14 @@
  */
 var CNetwork = Class({
     $singleton: true,
-    send: function(url,data,callback,errorHandler){
+    send: function(url,data,callback,errorHandler,type){
         $.ajax({
             type: 'POST',
             async: true,
             url: url,
             data: JSONfn.stringify(data), //Data sent to server
-            contentType: 'application/json', // content type sent to server
-            dataType: 'json', //Expected data format from server
+            contentType: type, // content type sent to server
+//            dataType: 'json', //Expected data format from server
             processdata: true, //True or False
             crossDomain: true,
             success: function (data, textStatus, xmlHttp) {
@@ -18,13 +18,14 @@ var CNetwork = Class({
             },
             error: function(e) {
                 CLog.error('Request Error at: '+url);
-                CLog.error(e.statusText);
+                CLog.log(e);
                 if (errorHandler) errorHandler();
             }  // When Service call fails
         });
     },
-    request: function(url,data,callback,errorHandler){
-        this.send(url,data,callback,errorHandler);
+    request: function(url,data,callback,errorHandler,type){
+        type = type || 'application/json';
+        this.send(url,data,callback,errorHandler,type);
     },
     downloadText: function(filename, text) {
         var pom = document.createElement('a');

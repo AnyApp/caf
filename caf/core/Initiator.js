@@ -87,11 +87,13 @@ var CInitiator = {
         }
     },
     getFromLocalStorage: function(key){
-        var value = window.localStorage.getItem(CInitiator.cafFilePrefix+key);
+        key = CSettings.get('appID')+'/'+CInitiator.cafFilePrefix+key;
+        var value = window.localStorage.getItem(key);
         if (value == null) return null;
         return CInitiator.JSONfnParse(value);
     },
     isStorageValueEmpty: function(key){
+        key = CSettings.get('appID')+key;
         return window.localStorage.getItem(key) == null;
     },
     JSONfnParse: function (str, date2obj) {

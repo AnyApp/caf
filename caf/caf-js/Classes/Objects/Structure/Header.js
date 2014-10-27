@@ -23,7 +23,7 @@ var CHeader = Class(CContainer,{
         // Invoke parent's constructor
         CHeader.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('headerSize');
+        this.design.height = CGlobals.get('headerSize');
 
         this.data.itemSize = this.design.height;
 

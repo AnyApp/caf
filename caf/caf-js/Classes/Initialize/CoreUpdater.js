@@ -50,7 +50,7 @@ var CCoreUpdater = Class({
             if (!dontNeedUpdate){
                 try {
                     CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
-                    Caf.updated = true;
+                    Caf.coreUpdated = true;
                 }
                 catch (e) {
                     CLog.error('Error at:'+name);

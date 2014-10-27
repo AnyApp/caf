@@ -22,7 +22,7 @@ var CAppUpdater = Class({
                     CLog.dlog('App Updated');
                     CAppUpdater.saveApp(data);
                     CLocalStorage.save(CAppHandler.appVersionKey,data.version);
-                    Caf.updated = true;
+                    Caf.appUpdated = true;
                 }
                 // Mark as checked.
                 Caf.appUpdateChecked = true;

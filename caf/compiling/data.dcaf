@@ -2,6 +2,7 @@
     "_id": {
         "$oid": "54454949ff3211020039f812"
     },
+    "appName": "CAF Showcase",
     "__v": 0,
     "app_features": [],
     "app_preferences": [],
@@ -264,7 +265,11 @@
                     },
                     "object": {
                         "type": "Button",
-                        "design": { "parents":["left-menu-button"]},
+                        "design": {
+                            "parents": [
+                                "left-menu-button"
+                            ]
+                        },
                         "logic": {
                             "iconRight": {
                                 "name": "#this.data.icon",
@@ -323,7 +328,11 @@
                     },
                     "object": {
                         "type": "Button",
-                        "design": {"parents":["right-menu-button"]},
+                        "design": {
+                            "parents": [
+                                "right-menu-button"
+                            ]
+                        },
                         "logic": {
                             "iconLeft": {
                                 "name": "#this.data.icon",
@@ -406,7 +415,11 @@
                 },
                 "dialogSwitch": "drop-down-menu"
             },
-            "design": {"parents":["header-button"]},
+            "design": {
+                "parents": [
+                    "header-button"
+                ]
+            },
             "uname": "header-button-right-0",
             "type": "Button",
             "_id": {
@@ -432,7 +445,11 @@
                     "data": null
                 }
             },
-            "design": {"parents":["header-button"]},
+            "design": {
+                "parents": [
+                    "header-button"
+                ]
+            },
             "uname": "header-button-right-1",
             "type": "Button",
             "_id": {
@@ -455,7 +472,11 @@
                 },
                 "sideMenuSwitch": "left"
             },
-            "design": {"parents":["header-button"]},
+            "design": {
+                "parents": [
+                    "header-button"
+                ]
+            },
             "uname": "header-button-left-0",
             "type": "Button",
             "_id": {
@@ -478,7 +499,11 @@
                 },
                 "backButton": true
             },
-            "design": {"parents":["header-button"]},
+            "design": {
+                "parents": [
+                    "header-button"
+                ]
+            },
             "uname": "header-button-back",
             "type": "Button",
             "_id": {
@@ -1007,7 +1032,11 @@
                     },
                     "object": {
                         "type": "Button",
-                        "design": {"parents":["main-button"]},
+                        "design": {
+                            "parents": [
+                                "main-button"
+                            ]
+                        },
                         "logic": {
                             "iconRight": {
                                 "name": "right65",
@@ -1065,7 +1094,11 @@
                     }
                 }
             },
-            "design": {"parents":["dialogs-button"]},
+            "design": {
+                "parents": [
+                    "dialogs-button"
+                ]
+            },
             "uname": "dialogs-show-error",
             "type": "Button",
             "_id": {
@@ -1100,7 +1133,11 @@
                     }
                 }
             },
-            "design": {"parents":["dialogs-button"]},
+            "design": {
+                "parents": [
+                    "dialogs-button"
+                ]
+            },
             "uname": "dialogs-show-success",
             "type": "Button",
             "_id": {
@@ -1135,7 +1172,11 @@
                     }
                 }
             },
-            "design": {"parents":["dialogs-button"]},
+            "design": {
+                "parents": [
+                    "dialogs-button"
+                ]
+            },
             "uname": "dialogs-show-warning",
             "type": "Button",
             "_id": {
@@ -1271,7 +1312,11 @@
                     }
                 }
             },
-            "design": {"parents":["dialogs-button"]},
+            "design": {
+                "parents": [
+                    "dialogs-button"
+                ]
+            },
             "uname": "dialogs-show-dialog",
             "type": "Button",
             "_id": {
@@ -1319,7 +1364,11 @@
             "logic": {
                 "loadInputFromStorage": true
             },
-            "design": {"parents":["text-input"]},
+            "design": {
+                "parents": [
+                    "text-input"
+                ]
+            },
             "data": {
                 "name": "name",
                 "required": true,
@@ -1338,7 +1387,11 @@
             "logic": {
                 "loadInputFromStorage": true
             },
-            "design": {"parents":["text-input"]},
+            "design": {
+                "parents": [
+                    "text-input"
+                ]
+            },
             "data": {
                 "name": "phone",
                 "required": true,
@@ -1687,5 +1740,5 @@
         }
     ],
     "plugins": [],
-    "version": 7
+    "version": 9
 }

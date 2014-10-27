@@ -86,15 +86,6 @@ var CObject = Class({
     setRelative: function(relative) {
         this.relative = relative;
     },
-    setLink: function(link) {
-        if (CUtils.isUrlRelative(link)) {
-            this.data.link = CAppConfig.baseUrl()+'/'+link;
-        }
-        else {
-            this.data.link = link;
-        }
-
-    },
     getLink: function() {
         return this.data.link || '';
     },
@@ -166,6 +157,8 @@ var CObject = Class({
         return CDesignHandler.get(str);
     },
     parseRelativeReference: function(str){
+        if (this.isRelative())
+            return eval('this'+str);
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
             var relativeParent = CObjectsHandler.object(relativeParentId);
@@ -175,6 +168,8 @@ var CObject = Class({
     },
     // Extension of this method in: CObjectHandler.relativeObject
     parseRelativeObjectId: function(str){
+        if (this.isRelative())
+            return eval(this.uid()+str);
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;

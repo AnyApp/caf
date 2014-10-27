@@ -59,9 +59,9 @@ var CAppHandler = Class({
             // Load the local file.
             CNetwork.request(CAppHandler.localDataPath,{},function(content){
                 if (!CUtils.isEmpty(content)){
-                    CLocalStorage.save(CAppHandler.appDataKey,content);
+                    CLocalStorage.save(CAppHandler.appDataKey,JSONfn.parse(content));
                     // Re-Parse the data. In case that the data hasn't parsed functions.
-                    CAppHandler.appData = JSONfn.parse(JSONfn.stringify(content));
+                    CAppHandler.appData = JSONfn.parse(content);
                 }
                 callback();
             },callback);

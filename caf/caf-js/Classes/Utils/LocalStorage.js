@@ -6,6 +6,7 @@ var CLocalStorage = Class({
     base: '',
     initBase: function(){
         CLocalStorage.base = CSettings.get('appID') || '';
+        CLocalStorage.base += '/';
     },
     save: function(key,value){
         CLocalStorage.initBase();

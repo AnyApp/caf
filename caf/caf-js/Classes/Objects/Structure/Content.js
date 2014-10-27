@@ -22,8 +22,8 @@ var CContent = Class(CContainer,{
         // Invoke parent's constructor
         CContent.$super.call(this, values);
 
-        this.design.top     =   CAppConfig.get('headerSize');
-        this.design.bottom  =   CAppConfig.get('footerSize');
+        this.design.top     =   CGlobals.get('headerSize');
+        this.design.bottom  =   CGlobals.get('footerSize');
 
         CScrolling.setScrollable(this);
 

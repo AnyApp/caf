@@ -308,47 +308,6 @@ var CValidators = Class({
 
 
 /**
- * Created by dvircn on 06/08/14.
- */
-/**
- * Created by dvircn on 06/08/14.
- */
-/**
- * Created by dvircn on 16/08/14.
- */
-var CAppConfig = Class({
-    $singleton: true,
-    loaded: false,
-    data: {
-        headerSize: 45,
-        footerSize: 35
-    },
-
-    load: function(){
-        var savedData = JSON.parse(CLocalStorage.get('app-config'));
-        this.data = CUtils.mergeJSONs(savedData,this.data);
-    },
-    get: function(key){
-        if (!this.loaded)
-            this.load();
-        return this.data[key];
-    },
-    saveConfig: function(data){
-        if (!this.loaded)
-            this.load();
-        this.data = CUtils.mergeJSONs(data,this.data);
-        CLocalStorage.save('app-config',JSON.stringify(this.data));
-    },
-    baseUrl: function(){
-        return window.location.toString().substring(0,window.location.toString().length-1); //TEMP ..'http://localhost:63342/CAF';//this.get('baseUrl');
-    },
-    basePath: function(){
-        return CUtils.getUrlParts(this.baseUrl()).pathname;//this.get('baseUrl');
-    }
-
-});
-
-/**
  * Created by dvircn on 17/08/14.
  */
 var CDom = Class({
@@ -422,11 +381,21 @@ var CDom = Class({
 var CGlobals = Class({
     $singleton: true,
     globals: {},
-
-    get: function(name){
-        return CGlobals.globals[name] || null;
+    initialized: false,
+    defaults: {
+        headerSize: 55,
+        footerSize: 35
     },
-    setGlobal: function(key,value){
+    get: function(name){
+        var value = CGlobals.globals[name];
+        if (CUtils.isEmpty(value) && !CUtils.isEmpty(CGlobals.defaults[name]))
+            value = CGlobals.defaults[name];
+        return value || null;
+    },
+    exist: function(name){
+        return !CUtils.isEmpty(CGlobals.get(name));
+    },
+    set: function(key,value){
         CGlobals.globals[key] = value;
     },
     setGlobals: function(globals){
@@ -434,7 +403,6 @@ var CGlobals = Class({
             CGlobals.globals[key] = value;
         },this);
     }
-
 
 });
 /**
@@ -445,6 +413,7 @@ var CLocalStorage = Class({
     base: '',
     initBase: function(){
         CLocalStorage.base = CSettings.get('appID') || '';
+        CLocalStorage.base += '/';
     },
     save: function(key,value){
         CLocalStorage.initBase();
@@ -488,14 +457,14 @@ var CLog = Class({
  */
 var CNetwork = Class({
     $singleton: true,
-    send: function(url,data,callback,errorHandler){
+    send: function(url,data,callback,errorHandler,type){
         $.ajax({
             type: 'POST',
             async: true,
             url: url,
             data: JSONfn.stringify(data), //Data sent to server
-            contentType: 'application/json', // content type sent to server
-            dataType: 'json', //Expected data format from server
+            contentType: type, // content type sent to server
+//            dataType: 'json', //Expected data format from server
             processdata: true, //True or False
             crossDomain: true,
             success: function (data, textStatus, xmlHttp) {
@@ -503,13 +472,14 @@ var CNetwork = Class({
             },
             error: function(e) {
                 CLog.error('Request Error at: '+url);
-                CLog.error(e.statusText);
+                CLog.log(e);
                 if (errorHandler) errorHandler();
             }  // When Service call fails
         });
     },
-    request: function(url,data,callback,errorHandler){
-        this.send(url,data,callback,errorHandler);
+    request: function(url,data,callback,errorHandler,type){
+        type = type || 'application/json';
+        this.send(url,data,callback,errorHandler,type);
     },
     downloadText: function(filename, text) {
         var pom = document.createElement('a');
@@ -2488,6 +2458,10 @@ var CLogic = Class({
                 form.clearForm();
             });
         },
+        inputOnFileSelect: function(object,value){
+            var element = CUtils.element(object.uid());
+            element.addEventListener('change', value, false);
+        },
         loadInputFromStorage: function(object,value){
             if (value===true){
                 CThreads.start(function() {
@@ -2936,15 +2910,6 @@ var CObject = Class({
     setRelative: function(relative) {
         this.relative = relative;
     },
-    setLink: function(link) {
-        if (CUtils.isUrlRelative(link)) {
-            this.data.link = CAppConfig.baseUrl()+'/'+link;
-        }
-        else {
-            this.data.link = link;
-        }
-
-    },
     getLink: function() {
         return this.data.link || '';
     },
@@ -3016,6 +2981,8 @@ var CObject = Class({
         return CDesignHandler.get(str);
     },
     parseRelativeReference: function(str){
+        if (this.isRelative())
+            return eval('this'+str);
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
             var relativeParent = CObjectsHandler.object(relativeParentId);
@@ -3025,6 +2992,8 @@ var CObject = Class({
     },
     // Extension of this method in: CObjectHandler.relativeObject
     parseRelativeObjectId: function(str){
+        if (this.isRelative())
+            return eval(this.uid()+str);
         var relativeParentId = this.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;
@@ -3488,7 +3457,7 @@ var  CDialogContainer = Class(CContainer,{
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
-        this.design.top = CAppConfig.get('headerSize')+20;
+        this.design.top = CGlobals.get('headerSize')+20;
     }
 
 });
@@ -3575,7 +3544,7 @@ var CDialog = Class(CContainer,{
         this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};
         this.data.titleColor        = this.data.titleColor          || this.data.dialogColor;
         this.data.titleAlign        = this.data.titleAlign          || 'center';
-        this.data.contentAlign      = this.data.contentAlign        || CAppConfig.get('textAlign') || 'center';
+        this.data.contentAlign      = this.data.contentAlign        || CGlobals.get('appGeneralAlign') || 'center';
         this.data.dialogWidth       = this.data.dialogWidth         || 400;
         containerDesign.width       = this.data.dialogWidth;
         containerDesign.bgColor     = this.data.bgColor;
@@ -3976,7 +3945,7 @@ var CDialog = Class(CContainer,{
             var containerMaxHeight = windowSize.height;
             if (dialog.data.topView===CObjectsHandler.appContainerId){
                 var top = ((windowSize.height*0.7-containerRect.height)/2);
-                if (top<0)  top = CAppConfig.get('headerSize') || 40;
+                if (top<0)  top = CGlobals.get('headerSize') || 40;
                 container.style.top = top+'px';
                 containerMaxHeight = (windowSize.height-70);
             }
@@ -4244,7 +4213,7 @@ var CFooter = Class(CContainer,{
         // Invoke parent's constructor
         CFooter.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('footerSize');
+        this.design.height = CGlobals.get('footerSize');
 
     }
 
@@ -4276,7 +4245,7 @@ var CHeader = Class(CContainer,{
         // Invoke parent's constructor
         CHeader.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('headerSize');
+        this.design.height = CGlobals.get('headerSize');
 
         this.data.itemSize = this.design.height;
 
@@ -4355,8 +4324,8 @@ var CContent = Class(CContainer,{
         // Invoke parent's constructor
         CContent.$super.call(this, values);
 
-        this.design.top     =   CAppConfig.get('headerSize');
-        this.design.bottom  =   CAppConfig.get('footerSize');
+        this.design.top     =   CGlobals.get('headerSize');
+        this.design.bottom  =   CGlobals.get('footerSize');
 
         CScrolling.setScrollable(this);
 
@@ -5245,6 +5214,7 @@ var CForm = Class(CContainer,{
         this.data.saveToUrl         = values.data.saveToUrl || '';
         this.data.saveToUrlCallback = values.data.saveToUrlCallback || function(){};
         this.data.onSubmit          = values.data.onSubmit ||  function(){};
+        this.data.prepareValues     = values.data.prepareValues ||  function(values) {return values;};
     },
     formValues: function() {
         var values = {};
@@ -5274,6 +5244,7 @@ var CForm = Class(CContainer,{
         } catch (e){
             return null;
         }
+        values = this.data.prepareValues(values);
         return values;
     },
     clearForm: function() {
@@ -5341,6 +5312,10 @@ var CInput = Class(CObject,{
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
         this.data.name               = values.data.name          || '';
+        this.data.type               = values.data.type          || 'text';
+        this.data.value              = values.data.value         || '';
+        this.data.disabled           = values.data.disabled      || false;
+        this.data.disabledAttribute  = values.data.disabled===true? 'disabled' : '';
         this.data.required           = values.data.required      || false;
         this.data.validators         = values.data.validators    || [];
         this.data.prepares           = values.data.prepares      || [];
@@ -5357,7 +5332,13 @@ var CInput = Class(CObject,{
         return CInput.$superp.prepareBuild.call(this,{
             tag: 'input',
             tagHasInner: false,
-            attributes: ['placeholder="'+this.data.placeholder+'"']
+            attributes: [
+                'placeholder="' +this.data.placeholder+'"',
+                'value="'       +this.data.value+'"',
+                'type="'        +this.data.type+'"',
+                this.data.disabledAttribute
+
+            ]
         });
     },
     value: function() {
@@ -5380,6 +5361,12 @@ var CInput = Class(CObject,{
     },
     getValidators: function(){
         return this.data.validators;
+    },
+    disable: function(){
+        CUtils.element(this.uid()).setAttribute('disabled','');
+    },
+    enable: function(){
+        CUtils.element(this.uid()).removeAttribute('disabled');
     }
 
 });
@@ -5474,9 +5461,9 @@ var CAppHandler = Class({
             // Load the local file.
             CNetwork.request(CAppHandler.localDataPath,{},function(content){
                 if (!CUtils.isEmpty(content)){
-                    CLocalStorage.save(CAppHandler.appDataKey,content);
+                    CLocalStorage.save(CAppHandler.appDataKey,JSONfn.parse(content));
                     // Re-Parse the data. In case that the data hasn't parsed functions.
-                    CAppHandler.appData = JSONfn.parse(JSONfn.stringify(content));
+                    CAppHandler.appData = JSONfn.parse(content);
                 }
                 callback();
             },callback);
@@ -5509,7 +5496,7 @@ var CAppUpdater = Class({
                     CLog.dlog('App Updated');
                     CAppUpdater.saveApp(data);
                     CLocalStorage.save(CAppHandler.appVersionKey,data.version);
-                    Caf.updated = true;
+                    Caf.appUpdated = true;
                 }
                 // Mark as checked.
                 Caf.appUpdateChecked = true;
@@ -5545,6 +5532,8 @@ var Caf = Class({
     coreJSUpdateChecked: false,
     coreCSSUpdateChecked: false,
     appUpdateChecked: false,
+    appUpdated: false,
+    coreUpdated: false,
     updateCheckFinished: false,
     waitToLoadDialog: null,
     firstLoadKey: 'caf-first-load',
@@ -5581,10 +5570,25 @@ var Caf = Class({
         Caf.updateCheckFinished = true;
         if (Caf.firstLoad) {
             CLocalStorage.save(Caf.firstLoadKey,false);
-            if (Caf.updated)
+            if (Caf.appUpdated || Caf.coreUpdated)
                 CAppHandler.resetApp();
             else
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
+        }
+        else {
+            if (Caf.appUpdated) {
+                CDialog.showDialog({
+                    hideOnOutClick: false,
+                    title: 'Update Ready',
+                    textContent: 'In order to apply the changes, you need to restart the application.',
+                    dialogColor: CColor('Blue',9),
+                    cancelText: 'Later',
+                    confirmText: 'Restart',
+                    confirmCallback: function() { CAppHandler.resetApp(); },
+
+                });
+            }
+
         }
 
     },
@@ -5650,7 +5654,7 @@ var CCoreUpdater = Class({
             if (!dontNeedUpdate){
                 try {
                     CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
-                    Caf.updated = true;
+                    Caf.coreUpdated = true;
                 }
                 catch (e) {
                     CLog.error('Error at:'+name);
@@ -5845,8 +5849,24 @@ var CBuilderObject = Class({
         this.properties.data.name = name || null;
         return this;
     },
+    inputType: function(type) {
+        this.properties.data.type = type || null;
+        return this;
+    },
+    inputValue: function(value) {
+        this.properties.data.value = value || null;
+        return this;
+    },
     inputRequired: function() {
         this.properties.data.required = true;
+        return this;
+    },
+    inputDisabled: function() {
+        this.properties.data.disabled = true;
+        return this;
+    },
+    inputEnabled: function() {
+        this.properties.data.disabled = false;
         return this;
     },
     inputNotRequired: function() {
@@ -5855,6 +5875,10 @@ var CBuilderObject = Class({
     },
     inputPlaceholder: function(placeholder) {
         this.properties.data.placeholder = placeholder;
+        return this;
+    },
+    inputOnFileSelect: function(inputOnFileSelect) {
+        this.properties.logic.inputOnFileSelect = inputOnFileSelect;
         return this;
     },
     inputValidators: function(validators) {
@@ -5873,6 +5897,10 @@ var CBuilderObject = Class({
     inputPrepare: function(prepare) {
         this.properties.data.prepares = this.properties.data.prepares || [];
         this.properties.data.prepares.push(prepare);
+        return this;
+    },
+    formPrepareValues: function(prepareValuesFunction) {
+        this.properties.data.prepareValues = prepareValuesFunction;
         return this;
     },
     formLoadInputFromStorage: function() {

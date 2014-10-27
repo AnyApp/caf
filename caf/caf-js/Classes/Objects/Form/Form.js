@@ -25,6 +25,7 @@ var CForm = Class(CContainer,{
         this.data.saveToUrl         = values.data.saveToUrl || '';
         this.data.saveToUrlCallback = values.data.saveToUrlCallback || function(){};
         this.data.onSubmit          = values.data.onSubmit ||  function(){};
+        this.data.prepareValues     = values.data.prepareValues ||  function(values) {return values;};
     },
     formValues: function() {
         var values = {};
@@ -54,6 +55,7 @@ var CForm = Class(CContainer,{
         } catch (e){
             return null;
         }
+        values = this.data.prepareValues(values);
         return values;
     },
     clearForm: function() {

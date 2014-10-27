@@ -6,6 +6,8 @@ var Caf = Class({
     coreJSUpdateChecked: false,
     coreCSSUpdateChecked: false,
     appUpdateChecked: false,
+    appUpdated: false,
+    coreUpdated: false,
     updateCheckFinished: false,
     waitToLoadDialog: null,
     firstLoadKey: 'caf-first-load',
@@ -42,10 +44,25 @@ var Caf = Class({
         Caf.updateCheckFinished = true;
         if (Caf.firstLoad) {
             CLocalStorage.save(Caf.firstLoadKey,false);
-            if (Caf.updated)
+            if (Caf.appUpdated || Caf.coreUpdated)
                 CAppHandler.resetApp();
             else
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
+        }
+        else {
+            if (Caf.appUpdated) {
+                CDialog.showDialog({
+                    hideOnOutClick: false,
+                    title: 'Update Ready',
+                    textContent: 'In order to apply the changes, you need to restart the application.',
+                    dialogColor: CColor('Blue',9),
+                    cancelText: 'Later',
+                    confirmText: 'Restart',
+                    confirmCallback: function() { CAppHandler.resetApp(); },
+
+                });
+            }
+
         }
 
     },

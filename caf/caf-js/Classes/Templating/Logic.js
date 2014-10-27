@@ -4,6 +4,14 @@
 var CLogic = Class({
     $singleton: true,
     logics: {
+        onCreate: function(object,value){
+            if (!CUtils.isEmpty(value))
+                value();
+        },
+        onCreateAsync: function(object,value){
+            if (!CUtils.isEmpty(value))
+                CThreads.start(value);
+        },
         onClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
@@ -126,6 +134,10 @@ var CLogic = Class({
                 var form = CObjectsHandler.object(value);
                 form.clearForm();
             });
+        },
+        inputOnFileSelect: function(object,value){
+            var element = CUtils.element(object.uid());
+            element.addEventListener('change', value, false);
         },
         loadInputFromStorage: function(object,value){
             if (value===true){

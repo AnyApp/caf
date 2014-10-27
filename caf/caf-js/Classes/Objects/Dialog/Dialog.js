@@ -79,7 +79,7 @@ var CDialog = Class(CContainer,{
         this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};
         this.data.titleColor        = this.data.titleColor          || this.data.dialogColor;
         this.data.titleAlign        = this.data.titleAlign          || 'center';
-        this.data.contentAlign      = this.data.contentAlign        || CAppConfig.get('textAlign') || 'center';
+        this.data.contentAlign      = this.data.contentAlign        || CGlobals.get('appGeneralAlign') || 'center';
         this.data.dialogWidth       = this.data.dialogWidth         || 400;
         containerDesign.width       = this.data.dialogWidth;
         containerDesign.bgColor     = this.data.bgColor;
@@ -480,7 +480,7 @@ var CDialog = Class(CContainer,{
             var containerMaxHeight = windowSize.height;
             if (dialog.data.topView===CObjectsHandler.appContainerId){
                 var top = ((windowSize.height*0.7-containerRect.height)/2);
-                if (top<0)  top = CAppConfig.get('headerSize') || 40;
+                if (top<0)  top = CGlobals.get('headerSize') || 40;
                 container.style.top = top+'px';
                 containerMaxHeight = (windowSize.height-70);
             }
