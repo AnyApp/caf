@@ -13,7 +13,7 @@ var CGlobals = Class({
         var value = CGlobals.globals[name];
         if (CUtils.isEmpty(value) && !CUtils.isEmpty(CGlobals.defaults[name]))
             value = CGlobals.defaults[name];
-        return value || null;
+        return value;
     },
     exist: function(name){
         return !CUtils.isEmpty(CGlobals.get(name));

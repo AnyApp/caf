@@ -58,16 +58,13 @@ var CClicker = Class({
         // Create events.
         object.events.onTouchStartEvent = function(e)
         {
-            //return;
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
             //e.preventDefault();
 
             if (object.logic.doStopPropagation===true)
-            {
                 e.stopPropagation();
-            }
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y

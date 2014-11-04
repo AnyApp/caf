@@ -15,14 +15,21 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isIOS: function() {
-        return navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+        try {
+            var result = navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+            return result;
+        }
+        catch (e){
+            return false;
+        }
+
     },
     /**
      * Return whether or not the device platform is android.
      * @returns {boolean}
      */
     isAndroid: function() {
-        if (window.device===undefined || CUtils.isEmpty(window.device))      return false;
+        if (window.device===undefined || CUtils.isEmpty(window.device || null) || CUtils.isEmpty(window.device.platform || null))      return false;
         return window.device.platform.toLowerCase() == 'android';
     },
     /**

@@ -18,8 +18,8 @@ var CIFrame = Class(CObject,{
         CObject.setObjectDefaults(values,CIFrame);
 
         // Invoke parent's constructor
-        CVideo.$super.call(this, values);
-
+        CIFrame.$super.call(this, values);
+        values.data = values.data || {};
         this.data.src = values.data.src || '';
     },
     /**

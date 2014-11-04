@@ -110,7 +110,7 @@ var CUtils = Class({
     isURLLocal: function(url){
         if (CUtils.isEmpty(url))
             return true;
-        return url.indexOf('www.')<0;
+        return ( (url.indexOf('www.')<0) && (url.indexOf('http://')<0) );
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};
@@ -256,7 +256,11 @@ var CUtils = Class({
     },
     escapeRegExp: function(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    },
+    stringEndsWith: function(str,suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
+
 
 
 

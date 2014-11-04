@@ -18,13 +18,18 @@ var CSideMenu = Class(CContainer,{
         CSideMenu.$super.call(this, values);
         this.leftContainer  = values.data.leftContainer  || null;
         this.rightContainer = values.data.rightContainer || null;
-
+        var leftMenuChilds = [];
+        if (!CUtils.isEmpty(this.leftContainer))
+            leftMenuChilds.push(this.leftContainer);
+        var rightMenuChilds = [];
+        if (!CUtils.isEmpty(this.rightContainer))
+            rightMenuChilds.push(this.rightContainer);
         // Create left and right menus.
         this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
-            data: {  childs: [this.leftContainer] }
+            data: {  childs: leftMenuChilds }
         });
         this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
-            data: {  childs: [this.rightContainer] }
+            data: {  childs: rightMenuChilds }
         });
 
         // Set Children.

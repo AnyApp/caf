@@ -7,6 +7,9 @@ body{
 div,ul,a,body,li,h1,h2,h3,h4,h5,h6,input,textarea,iframe{
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+div,input,textarea,iframe,ul,a {
+    vertical-align: middle;
+}
 a{
     text-decoration: none;
 }

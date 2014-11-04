@@ -18,10 +18,26 @@ var CLogic = Class({
         onTemplateElementClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
+        phoneCall: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                window.location = 'tel:'+value;
+            });
+        },
+        openNavigationApp: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+            });
+        },
         link: function(object,value){
-            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
+            if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
+                return;
+            if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
-                    CUtils.openURL(value);
+                    CUtils.openURL(value.path);
                 });
             }
             else {

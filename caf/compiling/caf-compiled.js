@@ -390,7 +390,7 @@ var CGlobals = Class({
         var value = CGlobals.globals[name];
         if (CUtils.isEmpty(value) && !CUtils.isEmpty(CGlobals.defaults[name]))
             value = CGlobals.defaults[name];
-        return value || null;
+        return value;
     },
     exist: function(name){
         return !CUtils.isEmpty(CGlobals.get(name));
@@ -458,6 +458,7 @@ var CLog = Class({
 var CNetwork = Class({
     $singleton: true,
     send: function(url,data,callback,errorHandler,type){
+        type = type || 'application/json';
         $.ajax({
             type: 'POST',
             async: true,
@@ -489,6 +490,31 @@ var CNetwork = Class({
     }
 
 });/**
+ * Created by dvircn on 17/08/14.
+ */
+var CPageData = Class({
+    $singleton: true,
+    pagesData: {},
+    get: function(name){
+        var pagesData = CPageData.pagesData[CPager.currentPage];
+        if (!CUtils.isEmpty(pagesData))
+            return pagesData[name];
+        return null;
+    },
+    exist: function(name){
+        return !CUtils.isEmpty(CPageData.get(name));
+    },
+    set: function(key,value){
+        // Init if needed.
+        if (CUtils.isEmpty(CPageData.pagesData[CPager.currentPage])){
+            CPageData.pagesData[CPager.currentPage] = {};
+        }
+        // Set
+        CPageData.pagesData[CPager.currentPage][key] = value;
+    }
+
+});
+/**
  * Created by dvircn on 12/08/14.
  */
 var CPlatforms = Class({
@@ -505,14 +531,21 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isIOS: function() {
-        return navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+        try {
+            var result = navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+            return result;
+        }
+        catch (e){
+            return false;
+        }
+
     },
     /**
      * Return whether or not the device platform is android.
      * @returns {boolean}
      */
     isAndroid: function() {
-        if (window.device===undefined || CUtils.isEmpty(window.device))      return false;
+        if (window.device===undefined || CUtils.isEmpty(window.device || null) || CUtils.isEmpty(window.device.platform || null))      return false;
         return window.device.platform.toLowerCase() == 'android';
     },
     /**
@@ -707,7 +740,7 @@ var CUtils = Class({
     isURLLocal: function(url){
         if (CUtils.isEmpty(url))
             return true;
-        return url.indexOf('www.')<0;
+        return ( (url.indexOf('www.')<0) && (url.indexOf('http://')<0) );
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};
@@ -853,7 +886,11 @@ var CUtils = Class({
     },
     escapeRegExp: function(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    },
+    stringEndsWith: function(str,suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
+
 
 
 
@@ -1140,16 +1177,13 @@ var CClicker = Class({
         // Create events.
         object.events.onTouchStartEvent = function(e)
         {
-            //return;
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
             //e.preventDefault();
 
             if (object.logic.doStopPropagation===true)
-            {
                 e.stopPropagation();
-            }
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
@@ -1218,7 +1252,9 @@ var CClicker = Class({
  * Created by dvircn on 11/08/14.
  */
 var CColor = function(color,level){
-    return {color:color,level:level || 5};
+    if (level == undefined || level == null)
+        level = 5;
+    return {color:color,level:level};
 }/**
  * Created by dvircn on 12/10/14.
  */
@@ -1914,6 +1950,10 @@ var CBuilder = Class({
      * Build all objects.
      */
     buildAll: function(onFinish){
+        if (CUtils.isEmpty(CObjectsHandler.appContainerId)){
+            CLog.error('Error: Can\'t build. No App Container exist.');
+            return;
+        }
         CObjectsHandler.object(CObjectsHandler.appContainerId).setParent('body');
         this.buildFromObject(CObjectsHandler.appContainerId,onFinish || function(){});
     },
@@ -1937,48 +1977,56 @@ var CBuilder = Class({
         // Get root object.
         var currentObject   = CObjectsHandler.object(id);
 
-        // Assign References to all objects to avoid any conflicts.
-        currentObject.assignReferences();
-        _.each(CObjectsHandler.objectsById,function(object){
-            object.assignReferences();
-        },CBuilder);
+        try {
+            // Assign References to all objects to avoid any conflicts.
+            currentObject.assignReferences();
+            _.each(CObjectsHandler.objectsById,function(object){
+                object.assignReferences();
+            },CBuilder);
 
-        // Clear prepared objects.
-        CObjectsHandler.clearPreparedObjects();
+            // Clear prepared objects.
+            CObjectsHandler.clearPreparedObjects();
 
-        // Prepare for build and get the view (If the objects aren't in the DOM).
-        var view            = new CStringBuilder();
+            // Prepare for build and get the view (If the objects aren't in the DOM).
+            var view            = new CStringBuilder();
 
-        var viewBuilder     = currentObject.prepareBuild({view:view});
+            var viewBuilder     = currentObject.prepareBuild({view:view});
 
-        // Append the view to the parent in the DOM.
-        // Note: If the objects are already in the DOM, viewStr will be empty
-        //       and the DOM won't change.
-        var viewStr = viewBuilder.build(' ');
-        CDom.addChild(currentObject.getParent(),viewStr);
+            // Append the view to the parent in the DOM.
+            // Note: If the objects are already in the DOM, viewStr will be empty
+            //       and the DOM won't change.
+            var viewStr = viewBuilder.build(' ');
+            CDom.addChild(currentObject.getParent(),viewStr);
 
-        // Restructure before logic is applied.
-        _.each(CObjectsHandler.getPreparedObjects(),function(object){
-            //Restructure containers children.
-            if (object.isContainer())
-                object.restructureChildren();
-        },CBuilder);
+            // Restructure before logic is applied.
+            _.each(CObjectsHandler.getPreparedObjects(),function(object){
+                //Restructure containers children.
+                if (object.isContainer())
+                    object.restructureChildren();
+            },CBuilder);
 
-        // Build relevant Objects by the order of their build (Parent->Child).
-        _.each(CObjectsHandler.getPreparedObjects(),function(object){
-            // Apply Logic and Design on the Object.
-            CLogic.applyLogic(object);
-            CDesigner.applyDesign(object);
-        },CBuilder);
+            // Build relevant Objects by the order of their build (Parent->Child).
+            _.each(CObjectsHandler.getPreparedObjects(),function(object){
+                // Apply Logic and Design on the Object.
+                CLogic.applyLogic(object);
+                CDesigner.applyDesign(object);
+            },CBuilder);
 
-        // Clear Whitespaces.
-        CUtils.cleanWhitespace();
+            // Clear Whitespaces.
+            CUtils.cleanWhitespace();
 
 
-        CBuilder.inBuilding = false;
+            CBuilder.inBuilding = false;
 
-        if (!CUtils.isEmpty(onFinish))
-            onFinish();
+            if (!CUtils.isEmpty(onFinish))
+                onFinish();
+        }
+        catch (e) {
+            CLog.error('Error occurred in app building.');
+            CLog.log(e);
+            if (!CUtils.isEmpty(onFinish))
+                onFinish();
+        }
 
     },
     objectJSON: function(type,uname,design,logic,data){
@@ -2335,16 +2383,40 @@ var CDesigner = Class({
 var CLogic = Class({
     $singleton: true,
     logics: {
+        onCreate: function(object,value){
+            if (!CUtils.isEmpty(value))
+                value();
+        },
+        onCreateAsync: function(object,value){
+            if (!CUtils.isEmpty(value))
+                CThreads.start(value);
+        },
         onClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
         onTemplateElementClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
+        phoneCall: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                window.location = 'tel:'+value;
+            });
+        },
+        openNavigationApp: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+            });
+        },
         link: function(object,value){
-            if (!CUtils.isURLLocal(value.path) && !CPlatforms.isWeb()){
+            if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
+                return;
+            if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
-                    CUtils.openURL(value);
+                    CUtils.openURL(value.path);
                 });
             }
             else {
@@ -2828,7 +2900,7 @@ var CThemes = Class({
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            gpuAccelerated: true
+//            gpuAccelerated: true
         },
         DEFAULT_LOGIC: {
         },
@@ -4082,13 +4154,18 @@ var CSideMenu = Class(CContainer,{
         CSideMenu.$super.call(this, values);
         this.leftContainer  = values.data.leftContainer  || null;
         this.rightContainer = values.data.rightContainer || null;
-
+        var leftMenuChilds = [];
+        if (!CUtils.isEmpty(this.leftContainer))
+            leftMenuChilds.push(this.leftContainer);
+        var rightMenuChilds = [];
+        if (!CUtils.isEmpty(this.rightContainer))
+            rightMenuChilds.push(this.rightContainer);
         // Create left and right menus.
         this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
-            data: {  childs: [this.leftContainer] }
+            data: {  childs: leftMenuChilds }
         });
         this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
-            data: {  childs: [this.rightContainer] }
+            data: {  childs: rightMenuChilds }
         });
 
         // Set Children.
@@ -4713,8 +4790,8 @@ var CIFrame = Class(CObject,{
         CObject.setObjectDefaults(values,CIFrame);
 
         // Invoke parent's constructor
-        CVideo.$super.call(this, values);
-
+        CIFrame.$super.call(this, values);
+        values.data = values.data || {};
         this.data.src = values.data.src || '';
     },
     /**
@@ -4853,6 +4930,51 @@ var CLoadSpinner = Class(CObject,{
     stopSpin: function(){
         var spinner = CUtils.element(this.uid());
         CUtils.removeClass(spinner,CLoadSpinner.spinClass);
+    }
+
+
+});
+
+/**
+ * Created by dvircn on 15/08/14.
+ */
+var CStaticMap = Class(CImage,{
+    $statics: {
+        DEFAULT_DESIGN: {
+            classes: ""
+        },
+        DEFAULT_LOGIC: {
+        }
+
+    },
+
+    constructor: function(values) {
+        if (CUtils.isEmpty(values)) return;
+        // Merge Defaults.
+        CObject.setObjectDefaults(values,CStaticMap);
+
+        // Invoke parent's constructor
+        CStaticMap.$super.call(this, values);
+
+        this.data.mapData = this.data.mapData ||
+                                {width:'600',height:'300',center:'',zoom:13,
+                                    maptype:'roadmap',marker:{color:'blue',position:''}};
+        this.data.src = 'https://maps.googleapis.com/maps/api/staticmap?center='+
+            this.data.mapData.center+'&zoom='+this.data.mapData.zoom
+            +'&size='+this.data.mapData.width+'x'+this.data.mapData.height
+            +'&maptype='+this.data.mapData.maptype+'&markers=color:'+this.data.mapData.marker.color
+            +'%7C'+this.data.mapData.marker.position;
+    },
+    /**
+     *  Build Object.
+     */
+    prepareBuild: function(data){
+        // Prepare this element - wrap it's children.
+        return CStaticMap.$superp.prepareBuild.call(this,{
+            tag: 'img',
+            attributes: ['src="'+this.data.src+'"'],
+            tagHasInner: false
+        });
     }
 
 
@@ -5353,6 +5475,8 @@ var CInput = Class(CObject,{
         CUtils.element(this.uid()).setAttribute('value',value);
     },
     clear: function() {
+        if (this.data.disabled === true) // Do not clear if disabled.
+            return;
         CUtils.element(this.uid()).value = '';
         CUtils.element(this.uid()).setAttribute('value','');
     },
@@ -5363,9 +5487,11 @@ var CInput = Class(CObject,{
         return this.data.validators;
     },
     disable: function(){
+        this.data.disabled = true;
         CUtils.element(this.uid()).setAttribute('disabled','');
     },
     enable: function(){
+        this.data.disabled = false;
         CUtils.element(this.uid()).removeAttribute('disabled');
     }
 
@@ -5409,6 +5535,7 @@ var CAppHandler = Class({
     appVersionKey:      'app-version',
     appData:            {},
     localDataPath:      'core/data.dcaf',
+    failedLoadDCAF:     false,
     start: function(callback){
         callback = callback || function(){};
         CAppHandler.loadAppObjects(function(){
@@ -5416,6 +5543,12 @@ var CAppHandler = Class({
         });
     },
     initialize: function(callback){
+        // Load objects failure.
+//        if (CAppHandler.failedLoadDCAF === true) {
+//            CThreads.start(callback);
+//            return;
+//        }
+
         var startLoadObjects = (new  Date()).getTime();
 
         var appData = CAppHandler.appData;
@@ -5429,6 +5562,11 @@ var CAppHandler = Class({
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});
+
+        // Check if objects empty. If so, create app-container so the build won't fail.
+        if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
+            appData.objects = [{type: "AppContainer", uname: "app-container"}];
+        }
 
         // Load Objects.
         CObjectsHandler.loadObjects(appData.objects || []);
@@ -5466,7 +5604,11 @@ var CAppHandler = Class({
                     CAppHandler.appData = JSONfn.parse(content);
                 }
                 callback();
-            },callback);
+            },function() {
+                CAppHandler.failedLoadDCAF = true;
+                CLog.error('Failed to load local objects, waiting for remote load.');
+                callback();
+            });
         }
     }
 
@@ -5552,6 +5694,13 @@ var Caf = Class({
                 Caf.startUpdate();
         });
 
+        // Phonegap on ready.
+        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
+    },
+    onDeviceReady : function() {
+        if (navigator && navigator.splashscreen)
+            navigator.splashscreen.hide();
     },
     startUpdate: function(){
         // Run parallel.
@@ -5576,7 +5725,7 @@ var Caf = Class({
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
         }
         else {
-            if (Caf.appUpdated) {
+            if (Caf.appUpdated || Caf.coreUpdated) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
                     title: 'Update Ready',
@@ -6027,6 +6176,22 @@ var CBuilderObject = Class({
     },
     onClick: function(onClickHandler) {
         this.properties.logic.onClick = onClickHandler;
+        return this;
+    },
+    onCreate: function(onCreateHandler) {
+        this.properties.logic.onCreate = onCreateHandler;
+        return this;
+    },
+    onCreateAsync: function(onCreateAsyncHandler) {
+        this.properties.logic.onCreateAsync = onCreateAsyncHandler;
+        return this;
+    },
+    phoneCall: function(number) {
+        this.properties.logic.phoneCall = number;
+        return this;
+    },
+    openNavigationApp: function(address) {
+        this.properties.logic.openNavigationApp = address;
         return this;
     },
     link: function(path,data,globalData) {

@@ -4,7 +4,7 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            gpuAccelerated: true
+//            gpuAccelerated: true
         },
         DEFAULT_LOGIC: {
         },

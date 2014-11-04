@@ -26,6 +26,13 @@ var Caf = Class({
                 Caf.startUpdate();
         });
 
+        // Phonegap on ready.
+        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
+    },
+    onDeviceReady : function() {
+        if (navigator && navigator.splashscreen)
+            navigator.splashscreen.hide();
     },
     startUpdate: function(){
         // Run parallel.
@@ -50,7 +57,7 @@ var Caf = Class({
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
         }
         else {
-            if (Caf.appUpdated) {
+            if (Caf.appUpdated || Caf.coreUpdated) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
                     title: 'Update Ready',

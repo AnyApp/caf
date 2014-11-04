@@ -65,6 +65,8 @@ var CInput = Class(CObject,{
         CUtils.element(this.uid()).setAttribute('value',value);
     },
     clear: function() {
+        if (this.data.disabled === true) // Do not clear if disabled.
+            return;
         CUtils.element(this.uid()).value = '';
         CUtils.element(this.uid()).setAttribute('value','');
     },
@@ -75,9 +77,11 @@ var CInput = Class(CObject,{
         return this.data.validators;
     },
     disable: function(){
+        this.data.disabled = true;
         CUtils.element(this.uid()).setAttribute('disabled','');
     },
     enable: function(){
+        this.data.disabled = false;
         CUtils.element(this.uid()).removeAttribute('disabled');
     }
 

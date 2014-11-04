@@ -359,6 +359,14 @@ var CBuilderObject = Class({
         this.properties.logic.onCreateAsync = onCreateAsyncHandler;
         return this;
     },
+    phoneCall: function(number) {
+        this.properties.logic.phoneCall = number;
+        return this;
+    },
+    openNavigationApp: function(address) {
+        this.properties.logic.openNavigationApp = address;
+        return this;
+    },
     link: function(path,data,globalData) {
         this.properties.logic.link = {
             path:           path || null,

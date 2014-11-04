@@ -7,6 +7,7 @@ var CAppHandler = Class({
     appVersionKey:      'app-version',
     appData:            {},
     localDataPath:      'core/data.dcaf',
+    failedLoadDCAF:     false,
     start: function(callback){
         callback = callback || function(){};
         CAppHandler.loadAppObjects(function(){
@@ -14,6 +15,12 @@ var CAppHandler = Class({
         });
     },
     initialize: function(callback){
+        // Load objects failure.
+//        if (CAppHandler.failedLoadDCAF === true) {
+//            CThreads.start(callback);
+//            return;
+//        }
+
         var startLoadObjects = (new  Date()).getTime();
 
         var appData = CAppHandler.appData;
@@ -27,6 +34,11 @@ var CAppHandler = Class({
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});
+
+        // Check if objects empty. If so, create app-container so the build won't fail.
+        if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
+            appData.objects = [{type: "AppContainer", uname: "app-container"}];
+        }
 
         // Load Objects.
         CObjectsHandler.loadObjects(appData.objects || []);
@@ -64,7 +76,11 @@ var CAppHandler = Class({
                     CAppHandler.appData = JSONfn.parse(content);
                 }
                 callback();
-            },callback);
+            },function() {
+                CAppHandler.failedLoadDCAF = true;
+                CLog.error('Failed to load local objects, waiting for remote load.');
+                callback();
+            });
         }
     }
 

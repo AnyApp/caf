@@ -4,6 +4,7 @@
 var CNetwork = Class({
     $singleton: true,
     send: function(url,data,callback,errorHandler,type){
+        type = type || 'application/json';
         $.ajax({
             type: 'POST',
             async: true,
