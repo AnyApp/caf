@@ -94,9 +94,8 @@ li{
     right: 0;
 }
 .yScrollable{
-    overflow-y: auto;
+    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
-    -webkit-transform: translatez(0)
 }
 .xScrollable{
     overflow-x: scroll;

@@ -12,7 +12,7 @@ var CScrolling = Class({
         object.design.scrollable  = true;
     },
     scrollableClass: function(){
-        return 'yScrollable';
+        return 'overthrow';
     },
     isScroller: function(object){
         if (CScrolling.isNativeScrolling())

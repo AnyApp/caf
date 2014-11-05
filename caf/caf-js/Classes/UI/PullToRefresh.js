@@ -9,6 +9,7 @@ var CPullToRefresh = Class({
     minDistance: 70,
     enabled: true,
     applyPullToRefresh: function(template){
+        return;
         var element = CUtils.element(template.uid());
         // Set element to be relative.
         element.style.display = 'relative';
