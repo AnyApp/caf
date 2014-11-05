@@ -195,7 +195,7 @@ var CPager = Class({
             else { //Parent dynamic page.
                 var pageElement = CUtils.element(pageId);
                 if (!CUtils.isEmpty(pageElement))
-                    pageElement.style.zIndex = '-1';
+                    pageElement.style.display = 'none';
             }
         },CPager);
     },

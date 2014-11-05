@@ -89,7 +89,7 @@ var CUtils = Class({
         }
     },
     getPointerEvent: function(event) {
-        return event.targetTouches ? event.targetTouches[0] : event;
+        return (event.targetTouches && event.targetTouches.length>0) ? event.targetTouches[0] : event;
     },
     openLocalURL: function(url){
         window.location = '#'+url;

@@ -719,7 +719,7 @@ var CUtils = Class({
         }
     },
     getPointerEvent: function(event) {
-        return event.targetTouches ? event.targetTouches[0] : event;
+        return (event.targetTouches && event.targetTouches.length>0) ? event.targetTouches[0] : event;
     },
     openLocalURL: function(url){
         window.location = '#'+url;
@@ -1122,6 +1122,7 @@ var CAnimations = Class({
  */
 var CClicker = Class({
     $singleton: true,
+    isScrolling: undefined,
     lastClick: 0,
     /**
      * Prevent burst of clicks.
@@ -1180,7 +1181,7 @@ var CClicker = Class({
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
-            //e.preventDefault();
+//            e.preventDefault();
 
             if (object.logic.doStopPropagation===true)
                 e.stopPropagation();
@@ -1197,22 +1198,26 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
+//            CLog.dlog(e);
             var currentTime = (new  Date()).getTime();
-            if (currentTime - object.touchData.startTime > 100){
-                //e.preventDefault();
-            }
-
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
             object.touchData.lastY = pointer.pageY;
+//            if (!CClicker.isTouchOutOfBoundries(object,5,500)){
+//                CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXX')
+//                e.preventDefault();
+//            }
+//            CLog.dlog('---------------------------')
+//            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
+//            if (isSwipeEvent)
+//                CClicker.resetTouch(object);
         }
         object.events.onTouchEndEvent = function(e)
         {
-            var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
-            var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
-            var boxSize = 15;
-            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout'
+//            CLog.dlog(e);
+            var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
+            if (!notAClick && CClicker.canClick() && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
             {
                 if (object.onClicks.length>0)
@@ -1223,12 +1228,7 @@ var CClicker = Class({
                 },this);
             }
             // Reset
-            object.touchData.startX = -100000;
-            object.touchData.startY = -100000;
-            object.touchData.lastX = -200000;
-            object.touchData.lastY = -200000;
-            CUtils.removeClass(element,object.clicker.activeClasses);
-            CUtils.addClass(element,object.clicker.activeRemoveClasses);
+            CClicker.resetTouch(object);
 
         }
 
@@ -1242,11 +1242,85 @@ var CClicker = Class({
         element.addEventListener("touchmove",object.events.onTouchMoveEvent);
         element.addEventListener("mousemove",object.events.onTouchMoveEvent);
 
+    },
+    isTouchOutOfBoundries: function(object,radiusX,radiusY){
+        var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
+        var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
+        return diffX > radiusX || diffY > radiusY;
+    },
+    resetTouch: function(object){
+        var element = CUtils.element(object.uid());
+        object.touchData.startX = -100000;
+        object.touchData.startY = -100000;
+        object.touchData.lastX = -200000;
+        object.touchData.lastY = -200000;
+        CUtils.removeClass(element,object.clicker.activeClasses);
+        CUtils.addClass(element,object.clicker.activeRemoveClasses);
     }
 
 
 });
 
+window.setTimeout(function(){
+    body.cinScroll = false;
+    body.touchData = {
+        startX:-100000,
+        startY:-100000,
+        lastX:-200000,
+        lastY:-200000,
+        startTime: 0
+    };
+    body.events = {};
+    body.events.onTouchStartEvent = function(e){
+        var pointer = CUtils.getPointerEvent(e);
+        // caching the start x & y
+        body.touchData.startX     = pointer.pageX;
+        body.touchData.startY     = pointer.pageY;
+        body.touchData.lastX      = pointer.pageX;
+        body.touchData.lastY      = pointer.pageY;
+        body.touchData.startTime  = (new  Date()).getTime();
+        body.cinScroll = false;
+    };
+    body.events.onTouchMoveEvent = function(e){
+        var pointer = CUtils.getPointerEvent(e);
+        // caching the last x & y
+        body.touchData.lastX = pointer.pageX;
+        body.touchData.lastY = pointer.pageY;
+        var isScrollEvent = CClicker.isTouchOutOfBoundries(body,3,500) &&
+            body.touchData.lastX !== 0 && body.touchData.lastY !== 0;
+        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+        CLog.dlog(body.cinScroll);
+        CLog.dlog(isScrollEvent);
+        CLog.dlog(body.touchData.lastX !== 0 && body.touchData.lastY !== 0);
+        CLog.dlog(CClicker.isTouchOutOfBoundries(body,0,500));
+        CLog.dlog(body.touchData);
+        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+        if (!isScrollEvent && body.cinScroll === false)
+            e.preventDefault();
+        else
+            body.cinScroll = true;
+    };
+    body.events.onTouchEndEvent = function(e){
+        body.touchData = {
+            startX:-100000,
+            startY:-100000,
+            lastX:-200000,
+            lastY:-200000,
+            startTime: 0
+        };
+        body.cinScroll = false;
+    };
+
+//    body.addEventListener("touchstart",body.events.onTouchStartEvent);
+//    body.addEventListener("mousedown",body.events.onTouchStartEvent);
+//    body.addEventListener("touchend",body.events.onTouchEndEvent);
+//    body.addEventListener("mouseup",body.events.onTouchEndEvent);
+//    body.addEventListener("mouseout",body.events.onTouchEndEvent);
+//    body.addEventListener("touchcancel",body.events.onTouchMoveEvent);
+//    body.addEventListener("touchmove",body.events.onTouchMoveEvent);
+//    body.addEventListener("mousemove",body.events.onTouchMoveEvent);
+
+},600)
 
 /**
  * Created by dvircn on 11/08/14.
@@ -1473,7 +1547,7 @@ var CPager = Class({
             else { //Parent dynamic page.
                 var pageElement = CUtils.element(pageId);
                 if (!CUtils.isEmpty(pageElement))
-                    pageElement.style.zIndex = '-1';
+                    pageElement.style.display = 'none';
             }
         },CPager);
     },
@@ -4404,7 +4478,6 @@ var CContent = Class(CContainer,{
         this.design.top     =   CGlobals.get('headerSize');
         this.design.bottom  =   CGlobals.get('footerSize');
 
-        CScrolling.setScrollable(this);
 
     }
 
@@ -4438,6 +4511,7 @@ var CPage = Class(CContainer,{
 
         // Invoke parent's constructor
         CPage.$super.call(this, values);
+        CScrolling.setScrollable(this);
 
         // Page properties.
         this.data.page         = this.data.page           || {};
@@ -5031,7 +5105,7 @@ var CVideo = Class(CObject,{
         if (!CUtils.isEmpty(youtubeId))
             url = 'http://www.youtube.com/embed/'+youtubeId;
         else if (!CUtils.isEmpty(vimeoId))
-            url = '//player.vimeo.com/video/'+vimeoId;
+            url = 'http://player.vimeo.com/video/'+vimeoId;
         else
             url = 'incorrect';
         // Prepare this element - wrap it's children.

@@ -49,7 +49,7 @@ var CVideo = Class(CObject,{
         if (!CUtils.isEmpty(youtubeId))
             url = 'http://www.youtube.com/embed/'+youtubeId;
         else if (!CUtils.isEmpty(vimeoId))
-            url = '//player.vimeo.com/video/'+vimeoId;
+            url = 'http://player.vimeo.com/video/'+vimeoId;
         else
             url = 'incorrect';
         // Prepare this element - wrap it's children.

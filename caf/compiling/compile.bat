@@ -13,3 +13,14 @@ copy /b ..\css\caf-all.css ..\compiling\caf-all.css
 cd ..\compiling
 java -jar yuicompressor-2.4.8.jar -o caf.min.css caf-all.css
 copy /b caf.min.css ..\core\caf.min.css
+
+@echo off
+echo user admin> ftpcmd.dat
+echo CodLetTech9192>> ftpcmd.dat
+echo cd /domains/codletech.net/public_html/CAF/core>> ftpcmd.dat
+echo put caf.min.js>> ftpcmd.dat
+echo put caf.min.css>> ftpcmd.dat
+echo quit>> ftpcmd.dat
+ftp -n -s:ftpcmd.dat ftp.codletech.net
+del ftpcmd.dat
+

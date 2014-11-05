@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Builder"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Crypto"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/FormUtils"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Initialize"/>
+	<classpathentry excluding="SideMenu/|Widgets/|Slider/|Structure/|Dialog/|Form/" kind="src" path="caf/caf-js/Classes/Objects"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/Dialog"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/Form"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/SideMenu"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/Slider"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/Structure"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Objects/Widgets"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Templating"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Themes"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/UI"/>
+	<classpathentry kind="src" path="caf/caf-js/Classes/Utils"/>
+	<classpathentry kind="src" path="caf/caf-js/libs"/>
+	<classpathentry excluding="colorGenerator/" kind="src" path="caf/compiling"/>
+	<classpathentry kind="src" path="caf/compiling/colorGenerator"/>
+	<classpathentry kind="src" path="caf/core"/>
+	<classpathentry kind="src" path="caf/js"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary/StandardBrowser/html5"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
