@@ -1209,9 +1209,9 @@ var CClicker = Class({
 //                e.preventDefault();
 //            }
 //            CLog.dlog('---------------------------')
-//            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
-//            if (isSwipeEvent)
-//                CClicker.resetTouch(object);
+            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
+            if (isSwipeEvent)
+                CClicker.resetTouch(object);
         }
         object.events.onTouchEndEvent = function(e)
         {
@@ -1238,7 +1238,7 @@ var CClicker = Class({
         element.addEventListener("touchend",object.events.onTouchEndEvent);
         element.addEventListener("mouseup",object.events.onTouchEndEvent);
         element.addEventListener("mouseout",object.events.onTouchEndEvent);
-        element.addEventListener("touchcancel",object.events.onTouchEndEvent);
+        element.addEventListener("touchcancel",object.events.onTouchMoveEvent);
         element.addEventListener("touchmove",object.events.onTouchMoveEvent);
         element.addEventListener("mousemove",object.events.onTouchMoveEvent);
 
@@ -1547,7 +1547,7 @@ var CPager = Class({
             else { //Parent dynamic page.
                 var pageElement = CUtils.element(pageId);
                 if (!CUtils.isEmpty(pageElement))
-                    pageElement.style.display = 'none';
+                    pageElement.style.zIndex = '-1';
             }
         },CPager);
     },
@@ -1582,7 +1582,6 @@ var CPullToRefresh = Class({
     minDistance: 70,
     enabled: true,
     applyPullToRefresh: function(template){
-        return;
         var element = CUtils.element(template.uid());
         // Set element to be relative.
         element.style.display = 'relative';
@@ -1647,7 +1646,7 @@ var CPullToRefresh = Class({
             template.pullToRefreshData.lastX = pointer.pageX;
             template.pullToRefreshData.lastY = pointer.pageY;
             var distance = template.pullToRefreshData.lastY-template.pullToRefreshData.startY;
-            distance = distance -30;
+            distance = distance -10;
 
             if (distance<=0)
                 return;
@@ -1705,7 +1704,7 @@ var CPullToRefresh = Class({
         element.addEventListener("touchend",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("mouseup",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("mouseout",template.events.onPullToRefreshListenerEnd);
-        element.addEventListener("touchcancel",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("touchcancel",template.events.onPullToRefreshListenerMove);
         element.addEventListener("touchmove",template.events.onPullToRefreshListenerMove);
         element.addEventListener("mousemove",template.events.onPullToRefreshListenerMove);
     },
@@ -1954,8 +1953,7 @@ var CSwiper = Class({
         //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable,
-            minDragDistance: 30
+            disable: disable
         });
     },
     openOrCloseSideMenu: function(name) {
@@ -4280,7 +4278,7 @@ var CSideMenuContainer = Class(CContainer,{
         CSideMenuContainer.$super.call(this, values);
         this.design             = this.design || {};
         this.design.height      = '100%';
-        CScrolling.setScrollable(this);
+//        CScrolling.setScrollable(this);
 
     }
 
@@ -4479,7 +4477,6 @@ var CContent = Class(CContainer,{
         this.design.top     =   CGlobals.get('headerSize');
         this.design.bottom  =   CGlobals.get('footerSize');
 
-
     }
 
 
@@ -4513,7 +4510,6 @@ var CPage = Class(CContainer,{
         // Invoke parent's constructor
         CPage.$super.call(this, values);
         CScrolling.setScrollable(this);
-
         // Page properties.
         this.data.page         = this.data.page           || {};
         this.data.page.name    = this.data.page.name      || '';
@@ -11303,7 +11299,7 @@ var doc=this.document,docElem=doc.documentElement,enabledClassName="overthrow-en
                         cache.animatingInterval = setInterval(function() {
                             utils.dispatchEvent('animating');
                         }, 1);
-                        
+
                         utils.events.addEvent(settings.element, utils.transitionCallback(), action.translate.easeCallback);
                         action.translate.x(n);
                     }
@@ -11315,7 +11311,7 @@ var doc=this.document,docElem=doc.documentElement,enabledClassName="overthrow-en
                     if( (settings.disable==='left' && n>0) ||
                         (settings.disable==='right' && n<0)
                     ){ return; }
-                    
+
                     if( !settings.hyperextensible ){
                         if( n===settings.maxPosition || n>settings.maxPosition ){
                             n=settings.maxPosition;
@@ -11323,7 +11319,7 @@ var doc=this.document,docElem=doc.documentElement,enabledClassName="overthrow-en
                             n=settings.minPosition;
                         }
                     }
-                    
+
                     n = parseInt(n, 10);
                     if(isNaN(n)){
                         n = 0;
@@ -11362,25 +11358,25 @@ var doc=this.document,docElem=doc.documentElement,enabledClassName="overthrow-en
                     // No drag on ignored elements
                     var target = e.target ? e.target : e.srcElement,
                         ignoreParent = utils.parentUntil(target, 'data-snap-ignore');
-                    
+
                     if (ignoreParent) {
                         utils.dispatchEvent('ignore');
                         return;
                     }
-                    
-                    
+
+
                     if(settings.dragger){
                         var dragParent = utils.parentUntil(target, settings.dragger);
-                        
+
                         // Only use dragger if we're in a closed state
-                        if( !dragParent && 
-                            (cache.translation !== settings.minPosition && 
+                        if( !dragParent &&
+                            (cache.translation !== settings.minPosition &&
                             cache.translation !== settings.maxPosition
                         )){
                             return;
                         }
                     }
-                    
+
                     utils.dispatchEvent('start');
                     settings.element.style[cache.vendor+'Transition'] = '';
                     cache.isDragging = true;
@@ -12448,7 +12444,7 @@ var Swiper = function (selector, params) {
         var _width = _this.h.getWidth(_this.container, false, params.roundLengths);
         var _height = _this.h.getHeight(_this.container, false, params.roundLengths);
         if (_width === _this.width && _height === _this.height && !force) return;
-        
+
         _this.width = _width;
         _this.height = _height;
 
@@ -12555,7 +12551,7 @@ var Swiper = function (selector, params) {
                                 _this.snapGrid.push(slideLeft);
                             }
                         }
-                            
+
                     }
                     else {
                         _this.snapGrid.push(slideLeft);
@@ -13801,7 +13797,7 @@ var Swiper = function (selector, params) {
                     else {
                         _this.fireCallback(params.onSlideChangeEnd, _this, direction);
                     }
-                    
+
                 }
                 _this.setWrapperTranslate(newPosition);
                 _this._DOMAnimating = false;

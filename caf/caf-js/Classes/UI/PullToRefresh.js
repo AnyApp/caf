@@ -9,7 +9,6 @@ var CPullToRefresh = Class({
     minDistance: 70,
     enabled: true,
     applyPullToRefresh: function(template){
-        return;
         var element = CUtils.element(template.uid());
         // Set element to be relative.
         element.style.display = 'relative';
@@ -74,7 +73,7 @@ var CPullToRefresh = Class({
             template.pullToRefreshData.lastX = pointer.pageX;
             template.pullToRefreshData.lastY = pointer.pageY;
             var distance = template.pullToRefreshData.lastY-template.pullToRefreshData.startY;
-            distance = distance -30;
+            distance = distance -10;
 
             if (distance<=0)
                 return;
@@ -132,7 +131,7 @@ var CPullToRefresh = Class({
         element.addEventListener("touchend",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("mouseup",template.events.onPullToRefreshListenerEnd);
         element.addEventListener("mouseout",template.events.onPullToRefreshListenerEnd);
-        element.addEventListener("touchcancel",template.events.onPullToRefreshListenerEnd);
+        element.addEventListener("touchcancel",template.events.onPullToRefreshListenerMove);
         element.addEventListener("touchmove",template.events.onPullToRefreshListenerMove);
         element.addEventListener("mousemove",template.events.onPullToRefreshListenerMove);
     },

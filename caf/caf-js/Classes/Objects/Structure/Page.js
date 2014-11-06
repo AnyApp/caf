@@ -26,7 +26,6 @@ var CPage = Class(CContainer,{
         // Invoke parent's constructor
         CPage.$super.call(this, values);
         CScrolling.setScrollable(this);
-
         // Page properties.
         this.data.page         = this.data.page           || {};
         this.data.page.name    = this.data.page.name      || '';

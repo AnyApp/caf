@@ -79,24 +79,17 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
-//            CLog.dlog(e);
             var currentTime = (new  Date()).getTime();
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
             object.touchData.lastY = pointer.pageY;
-//            if (!CClicker.isTouchOutOfBoundries(object,5,500)){
-//                CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXX')
-//                e.preventDefault();
-//            }
-//            CLog.dlog('---------------------------')
-//            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
-//            if (isSwipeEvent)
-//                CClicker.resetTouch(object);
+            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
+            if (isSwipeEvent)
+                CClicker.resetTouch(object);
         }
         object.events.onTouchEndEvent = function(e)
         {
-//            CLog.dlog(e);
             var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
             if (!notAClick && CClicker.canClick() && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
@@ -119,7 +112,7 @@ var CClicker = Class({
         element.addEventListener("touchend",object.events.onTouchEndEvent);
         element.addEventListener("mouseup",object.events.onTouchEndEvent);
         element.addEventListener("mouseout",object.events.onTouchEndEvent);
-        element.addEventListener("touchcancel",object.events.onTouchEndEvent);
+        element.addEventListener("touchcancel",object.events.onTouchMoveEvent);
         element.addEventListener("touchmove",object.events.onTouchMoveEvent);
         element.addEventListener("mousemove",object.events.onTouchMoveEvent);
 

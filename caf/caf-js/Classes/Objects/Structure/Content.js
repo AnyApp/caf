@@ -25,7 +25,6 @@ var CContent = Class(CContainer,{
         this.design.top     =   CGlobals.get('headerSize');
         this.design.bottom  =   CGlobals.get('footerSize');
 
-
     }
 
 
