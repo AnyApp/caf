@@ -1198,24 +1198,17 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
-//            CLog.dlog(e);
             var currentTime = (new  Date()).getTime();
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
             object.touchData.lastY = pointer.pageY;
-//            if (!CClicker.isTouchOutOfBoundries(object,5,500)){
-//                CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXX')
-//                e.preventDefault();
-//            }
-//            CLog.dlog('---------------------------')
             var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
             if (isSwipeEvent)
                 CClicker.resetTouch(object);
         }
         object.events.onTouchEndEvent = function(e)
         {
-//            CLog.dlog(e);
             var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
             if (!notAClick && CClicker.canClick() && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
@@ -1479,7 +1472,6 @@ var CPager = Class({
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
-        var dynamicPageId       = '';
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
@@ -1519,11 +1511,29 @@ var CPager = Class({
         if (!CUtils.isEmpty(lastPage) && !CTemplator.objectHasDynamic(lastPage))
             CAnimations.hide(lastPage,{});
 
+        // Check to-page dynamic.
+        var toPageBareId    = CPager.pages[name];
+        var toPageBare      = CObjectsHandler.object(toPageBareId);
+        // Template page
+        if (toPageBare && toPageBare.data && toPageBare.data.template){
+            CUtils.element(toPageBareId).style.zIndex       = '';
+        }
+
+
         var animationOptions    = {};
         // Page Load.
         animationOptions.onAnimShowComplete = function() {
             var page = CObjectsHandler.object(CPager.currentPage);
             page.reload();
+            // Check from-page dynamic.
+            if (!CUtils.isEmpty(lastPage)){
+                var fromPage                = CObjectsHandler.object(lastPage);
+                var fromPageBareParent    = CObjectsHandler.object(fromPage.parent );
+                // Template page
+                if (fromPageBareParent && fromPageBareParent.data && fromPageBareParent.data.template){
+                    CUtils.element(fromPage.parent).style.zIndex       = '-1';
+                }
+            }
         };
         var page = CObjectsHandler.object(CPager.currentPage);
         CTitleHandler.setTitle(page.getPageTitle());
@@ -1546,8 +1556,10 @@ var CPager = Class({
                 CAnimations.quickHide(pageId);
             else { //Parent dynamic page.
                 var pageElement = CUtils.element(pageId);
-                if (!CUtils.isEmpty(pageElement))
+                if (!CUtils.isEmpty(pageElement)) {
                     pageElement.style.zIndex = '-1';
+                    pageElement.style.background   = 'rgba(0, 0, 0, 0)';
+                }
             }
         },CPager);
     },
@@ -1941,7 +1953,7 @@ var CSwiper = Class({
     moveSwiperToSlide: function(swiperContainerId,slide) {
         this.mSwipers[swiperContainerId].swipeTo(slide);
     },
-    initSideMenu: function(positions) {
+    initSideMenu: function(positions,width) {
         var hasLeft     = positions.indexOf('left')>=0;
         var hasRight    = positions.indexOf('right')>=0;
         var disable     = 'none';
@@ -1953,7 +1965,9 @@ var CSwiper = Class({
         //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable
+            disable: disable,
+            maxPosition: width,
+            minPosition: -width
         });
     },
     openOrCloseSideMenu: function(name) {
@@ -2007,6 +2021,9 @@ var CThemeFlatBlue = Class({
             paddingLeft:6,boxSizing:'borderBox',textAlign:'left',height:45, widthXS: 12,
             fontSize:16,color: CColor('Gray',2), marginTop:1, round: 0,
             active: { bgColor:CColor('Indigo',17),color: CColor('White') }
+        },
+        'left-menu-button/blue': {
+            parents: ['left-menu-button']
         }
     }
 });
@@ -2567,7 +2584,7 @@ var CLogic = Class({
             });
         },
         sideMenu: function(object,value){
-            CSwiper.initSideMenu(value.positions);
+            CSwiper.initSideMenu(value.positions,value.width || 266);
         },
         swipeView: function(object,value){
             //CThreads.start(function(){
@@ -3273,6 +3290,9 @@ var CObject = Class({
         if (CUtils.isString(this.design)){
             this.design = this.replaceReferencesInString(this.design);
             this.design = CObject.setObjectDesignDefaults(this.design,this);
+        }
+        else {
+            this.parseReferences(this.design);
         }
     },
     isContainer: function(){
@@ -4225,8 +4245,14 @@ var CSideMenu = Class(CContainer,{
         CObject.setObjectDefaults(values,CSideMenu);
         // Invoke parent's constructor
         CSideMenu.$super.call(this, values);
+        this.data.sideMenuWidth = this.data.sideMenuWidth || null;
+        var design = {};
+        if (!CUtils.isEmpty(this.data.sideMenuWidth))
+            design.width = this.data.sideMenuWidth;
+
         this.leftContainer  = values.data.leftContainer  || null;
         this.rightContainer = values.data.rightContainer || null;
+
         var leftMenuChilds = [];
         if (!CUtils.isEmpty(this.leftContainer))
             leftMenuChilds.push(this.leftContainer);
@@ -4235,10 +4261,12 @@ var CSideMenu = Class(CContainer,{
             rightMenuChilds.push(this.rightContainer);
         // Create left and right menus.
         this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
-            data: {  childs: leftMenuChilds }
+            data: {  childs: leftMenuChilds },
+            design: design
         });
         this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
-            data: {  childs: rightMenuChilds }
+            data: {  childs: rightMenuChilds },
+            design: design
         });
 
         // Set Children.
@@ -4249,8 +4277,10 @@ var CSideMenu = Class(CContainer,{
         if (this.rightContainer != null)
             positions.push('right');
 
+
         this.logic.sideMenu = {
-            positions: positions
+            positions:  positions,
+            width:      this.data.sideMenuWidth
         };
 
     }
@@ -5620,16 +5650,17 @@ var CAppHandler = Class({
 //            return;
 //        }
 
-        var startLoadObjects = (new  Date()).getTime();
+        var startLoadObjects        = (new  Date()).getTime();
 
-        var appData = CAppHandler.appData;
-        CAppHandler.appData = null; // Remove reference.
+        var appData                 = CAppHandler.appData;
+        CAppHandler.appData         = null; // Remove reference.
 
-        appData.data = appData.data || {};
+        appData.data                = appData.data || {};
+        appData.data.app_settings   = appData.data.app_settings || {};
 
         // Load Theme if chosen.
-        if (appData.data['app-main-theme'] && !CUtils.isEmpty(appData.data['app-main-theme']))
-            CThemes.loadTheme(appData.data['app-main-theme']);
+        if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
+            CThemes.loadTheme(appData.data['app_main_theme']);
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});
@@ -5940,6 +5971,10 @@ var CBuilderObject = Class({
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoad = onLoad  || function() {};
         this.properties.logic.page = true;
+        return this;
+    },
+    sideMenuWidth: function(width) {
+        this.properties.data.sideMenuWidth = width;
         return this;
     },
     sideMenuLeftContainer: function(leftContainer) {

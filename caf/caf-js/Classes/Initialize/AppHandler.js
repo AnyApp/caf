@@ -21,16 +21,17 @@ var CAppHandler = Class({
 //            return;
 //        }
 
-        var startLoadObjects = (new  Date()).getTime();
+        var startLoadObjects        = (new  Date()).getTime();
 
-        var appData = CAppHandler.appData;
-        CAppHandler.appData = null; // Remove reference.
+        var appData                 = CAppHandler.appData;
+        CAppHandler.appData         = null; // Remove reference.
 
-        appData.data = appData.data || {};
+        appData.data                = appData.data || {};
+        appData.data.app_settings   = appData.data.app_settings || {};
 
         // Load Theme if chosen.
-        if (appData.data['app-main-theme'] && !CUtils.isEmpty(appData.data['app-main-theme']))
-            CThemes.loadTheme(appData.data['app-main-theme']);
+        if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
+            CThemes.loadTheme(appData.data['app_main_theme']);
         // Set named designs and globals.
         CDesignHandler.addDesigns(appData.designs || {});
         CGlobals.setGlobals(appData.data || {});

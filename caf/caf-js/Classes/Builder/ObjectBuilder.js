@@ -44,6 +44,10 @@ var CBuilderObject = Class({
         this.properties.logic.page = true;
         return this;
     },
+    sideMenuWidth: function(width) {
+        this.properties.data.sideMenuWidth = width;
+        return this;
+    },
     sideMenuLeftContainer: function(leftContainer) {
         this.properties.data.leftContainer = leftContainer;
         return this;

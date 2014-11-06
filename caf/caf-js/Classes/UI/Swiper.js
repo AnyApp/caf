@@ -114,7 +114,7 @@ var CSwiper = Class({
     moveSwiperToSlide: function(swiperContainerId,slide) {
         this.mSwipers[swiperContainerId].swipeTo(slide);
     },
-    initSideMenu: function(positions) {
+    initSideMenu: function(positions,width) {
         var hasLeft     = positions.indexOf('left')>=0;
         var hasRight    = positions.indexOf('right')>=0;
         var disable     = 'none';
@@ -126,7 +126,9 @@ var CSwiper = Class({
         //disable = 'right';
         this.sideMenu = new Snap({
             element: CUtils.element(CObjectsHandler.mainViewId),
-            disable: disable
+            disable: disable,
+            maxPosition: width,
+            minPosition: -width
         });
     },
     openOrCloseSideMenu: function(name) {

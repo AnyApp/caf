@@ -305,6 +305,9 @@ var CObject = Class({
             this.design = this.replaceReferencesInString(this.design);
             this.design = CObject.setObjectDesignDefaults(this.design,this);
         }
+        else {
+            this.parseReferences(this.design);
+        }
     },
     isContainer: function(){
         return false;

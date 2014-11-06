@@ -115,7 +115,7 @@ var CLogic = Class({
             });
         },
         sideMenu: function(object,value){
-            CSwiper.initSideMenu(value.positions);
+            CSwiper.initSideMenu(value.positions,value.width || 266);
         },
         swipeView: function(object,value){
             //CThreads.start(function(){

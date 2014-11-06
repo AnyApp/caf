@@ -127,7 +127,6 @@ var CPager = Class({
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
-        var dynamicPageId       = '';
         if (!CUtils.isEmpty(params)) {
             var pagePath = CPager.getPagePath(name,params);
             id = CPager.pages[pagePath];
@@ -167,11 +166,29 @@ var CPager = Class({
         if (!CUtils.isEmpty(lastPage) && !CTemplator.objectHasDynamic(lastPage))
             CAnimations.hide(lastPage,{});
 
+        // Check to-page dynamic.
+        var toPageBareId    = CPager.pages[name];
+        var toPageBare      = CObjectsHandler.object(toPageBareId);
+        // Template page
+        if (toPageBare && toPageBare.data && toPageBare.data.template){
+            CUtils.element(toPageBareId).style.zIndex       = '';
+        }
+
+
         var animationOptions    = {};
         // Page Load.
         animationOptions.onAnimShowComplete = function() {
             var page = CObjectsHandler.object(CPager.currentPage);
             page.reload();
+            // Check from-page dynamic.
+            if (!CUtils.isEmpty(lastPage)){
+                var fromPage                = CObjectsHandler.object(lastPage);
+                var fromPageBareParent    = CObjectsHandler.object(fromPage.parent );
+                // Template page
+                if (fromPageBareParent && fromPageBareParent.data && fromPageBareParent.data.template){
+                    CUtils.element(fromPage.parent).style.zIndex       = '-1';
+                }
+            }
         };
         var page = CObjectsHandler.object(CPager.currentPage);
         CTitleHandler.setTitle(page.getPageTitle());
@@ -194,8 +211,10 @@ var CPager = Class({
                 CAnimations.quickHide(pageId);
             else { //Parent dynamic page.
                 var pageElement = CUtils.element(pageId);
-                if (!CUtils.isEmpty(pageElement))
+                if (!CUtils.isEmpty(pageElement)) {
                     pageElement.style.zIndex = '-1';
+                    pageElement.style.background   = 'rgba(0, 0, 0, 0)';
+                }
             }
         },CPager);
     },
