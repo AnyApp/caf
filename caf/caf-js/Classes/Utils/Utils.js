@@ -259,6 +259,23 @@ var CUtils = Class({
     },
     stringEndsWith: function(str,suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    },
+    stringCountOccurencesInHead: function(needle,haystack){
+        return CUtils.stringCountOccurencesInHeadHelper(needle,haystack,0);
+    },
+    stringCountOccurencesInHeadHelper: function(needle,haystack,count){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringCountOccurencesInHeadHelper(needle,
+                            haystack.replace(needle,''),count+1);
+        else
+            return count;
+    },
+    stringRemoveAllOccurencesInHead: function(needle,haystack){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringRemoveAllOccurencesInHead(needle,
+                haystack.replace(needle,''));
+        else
+            return haystack;
     }
 
 

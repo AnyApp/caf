@@ -35,6 +35,7 @@ var CTemplator = Class({
 
         // For each row in data.
         _.each(data,function(currentData){
+            currentData = CTemplator.fixRetreivedData(currentData);
             // Create container.
             var templateData = object.data.template;
 
@@ -79,6 +80,21 @@ var CTemplator = Class({
         if (preventRebuild !== true)
             object.rebuild(onFinish);
     },
+    fixRetreivedData: function(retreived){
+        // DO NOT MAKE any changes to the source data.
+        retreived = CUtils.clone(retreived);
+        var fixed = {
+            data: retreived.data || {},
+            design: retreived.design || {},
+            logic: retreived.logic || {}
+        }
+        delete retreived.data;
+        delete retreived.design;
+        delete retreived.logic;
+        // Merge left data in retreived into fixed.data
+        fixed.data = CUtils.mergeJSONs(fixed.data,retreived);
+        return fixed;
+    },
     createItemOnClick: function(index,data,callback,callbacksCallback){
         return function() {
             callbacksCallback(data);
@@ -108,6 +124,8 @@ var CTemplator = Class({
             object.data.template.data = object.data.template.data[0];
         }
         data = object.data.template.data;
+        // Prepare the data before using it.
+        data = object.data.template.prepareFunction(data);
 
         this.duplicateWithData(object,data, onFinish, reset, preventRebuild);
     },
@@ -133,6 +151,7 @@ var CTemplator = Class({
 
     },
     load: function(objectId, queryData, onFinish, reset) {
+        onFinish = onFinish || function(){};
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object.data.template.url) ||
             (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){

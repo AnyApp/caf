@@ -7,7 +7,7 @@ var CLoadSpinner = Class(CObject,{
             height: 60,
             width: '100%',
             fontStyle:['bold'],
-            color:CColor('Cyan',10)
+            color:CColor('TealE',7)
 
         },
         DEFAULT_LOGIC: {

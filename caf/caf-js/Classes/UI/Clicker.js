@@ -8,11 +8,10 @@ var CClicker = Class({
     /**
      * Prevent burst of clicks.
      */
-    canClick: function()
+    canClick: function(e)
     {
-        var currentTime = (new Date()).getTime();
-        if (currentTime-CClicker.lastClick>400)
-        {
+        var currentTime = e.timeStamp;
+        if (currentTime-CClicker.lastClick>400) {
             CClicker.lastClick = currentTime;
             return true;
         }
@@ -79,7 +78,7 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
-            var currentTime = (new  Date()).getTime();
+            if (object.touchData.startX<0) return; // Not Started.
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
@@ -90,12 +89,18 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
+            if (object.touchData.startX<0) return; // Not Started.
+
             var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
-            if (!notAClick && CClicker.canClick() && e.type!='mouseout'
+
+            if (!notAClick && CClicker.canClick(e) && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
             {
-                if (object.onClicks.length>0)
+                if (object.onClicks.length>0){
                     e.preventDefault();
+                    // Prevent unneccesary pull.
+                    CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
+                }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
                     onClick();
@@ -103,7 +108,6 @@ var CClicker = Class({
             }
             // Reset
             CClicker.resetTouch(object);
-
         }
 
         // Set Events Handlers.
@@ -135,64 +139,4 @@ var CClicker = Class({
 
 });
 
-window.setTimeout(function(){
-    body.cinScroll = false;
-    body.touchData = {
-        startX:-100000,
-        startY:-100000,
-        lastX:-200000,
-        lastY:-200000,
-        startTime: 0
-    };
-    body.events = {};
-    body.events.onTouchStartEvent = function(e){
-        var pointer = CUtils.getPointerEvent(e);
-        // caching the start x & y
-        body.touchData.startX     = pointer.pageX;
-        body.touchData.startY     = pointer.pageY;
-        body.touchData.lastX      = pointer.pageX;
-        body.touchData.lastY      = pointer.pageY;
-        body.touchData.startTime  = (new  Date()).getTime();
-        body.cinScroll = false;
-    };
-    body.events.onTouchMoveEvent = function(e){
-        var pointer = CUtils.getPointerEvent(e);
-        // caching the last x & y
-        body.touchData.lastX = pointer.pageX;
-        body.touchData.lastY = pointer.pageY;
-        var isScrollEvent = CClicker.isTouchOutOfBoundries(body,3,500) &&
-            body.touchData.lastX !== 0 && body.touchData.lastY !== 0;
-        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-        CLog.dlog(body.cinScroll);
-        CLog.dlog(isScrollEvent);
-        CLog.dlog(body.touchData.lastX !== 0 && body.touchData.lastY !== 0);
-        CLog.dlog(CClicker.isTouchOutOfBoundries(body,0,500));
-        CLog.dlog(body.touchData);
-        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-        if (!isScrollEvent && body.cinScroll === false)
-            e.preventDefault();
-        else
-            body.cinScroll = true;
-    };
-    body.events.onTouchEndEvent = function(e){
-        body.touchData = {
-            startX:-100000,
-            startY:-100000,
-            lastX:-200000,
-            lastY:-200000,
-            startTime: 0
-        };
-        body.cinScroll = false;
-    };
-
-//    body.addEventListener("touchstart",body.events.onTouchStartEvent);
-//    body.addEventListener("mousedown",body.events.onTouchStartEvent);
-//    body.addEventListener("touchend",body.events.onTouchEndEvent);
-//    body.addEventListener("mouseup",body.events.onTouchEndEvent);
-//    body.addEventListener("mouseout",body.events.onTouchEndEvent);
-//    body.addEventListener("touchcancel",body.events.onTouchMoveEvent);
-//    body.addEventListener("touchmove",body.events.onTouchMoveEvent);
-//    body.addEventListener("mousemove",body.events.onTouchMoveEvent);
-
-},600)
 

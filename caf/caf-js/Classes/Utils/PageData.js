@@ -20,6 +20,9 @@ var CPageData = Class({
         }
         // Set
         CPageData.pagesData[CPager.currentPage][key] = value;
+    },
+    setPageData: function(page,data){
+        CPageData.pagesData[page] = data;
     }
 
 });

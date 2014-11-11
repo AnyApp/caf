@@ -128,7 +128,8 @@ var CSwiper = Class({
             element: CUtils.element(CObjectsHandler.mainViewId),
             disable: disable,
             maxPosition: width,
-            minPosition: -width
+            minPosition: -width,
+            resistance: 1000000
         });
     },
     openOrCloseSideMenu: function(name) {

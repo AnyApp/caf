@@ -19,9 +19,18 @@ var CStaticMap = Class(CImage,{
         // Invoke parent's constructor
         CStaticMap.$super.call(this, values);
 
-        this.data.mapData = this.data.mapData ||
-                                {width:'600',height:'300',center:'',zoom:13,
-                                    maptype:'roadmap',marker:{color:'blue',position:''}};
+        // Parameters.
+        this.data.mapData               = this.data.mapData         || {};
+        this.data.mapData.width         = this.data.mapData.width   || 600;
+        this.data.mapData.height        = this.data.mapData.height  || 300;
+        this.data.mapData.zoom          = this.data.mapData.zoom    || 13;
+        this.data.mapData.maptype       = this.data.mapData.maptype || 'roadmap';
+        this.data.mapData.center        = this.data.mapData.center  || '';
+        this.data.mapData.marker        = this.data.mapData.marker  || {};
+        this.data.mapData.marker.color  = this.data.mapData.marker.color        || 'blue';
+        // Position default to map center.
+        this.data.mapData.marker.position = this.data.mapData.marker.position   || this.data.mapData.center;
+
         this.data.src = 'https://maps.googleapis.com/maps/api/staticmap?center='+
             this.data.mapData.center+'&zoom='+this.data.mapData.zoom
             +'&size='+this.data.mapData.width+'x'+this.data.mapData.height

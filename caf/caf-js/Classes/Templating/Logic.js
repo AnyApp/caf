@@ -35,6 +35,7 @@ var CLogic = Class({
         link: function(object,value){
             if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
                 return;
+            value.path = value.path+''; // Cast to string.
             if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value.path);

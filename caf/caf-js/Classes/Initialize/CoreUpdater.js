@@ -7,8 +7,8 @@ var CCoreUpdater = Class({
     cafFilePrefix:          'caf-file-',
     coreCSSName:            'caf.min.css',
     coreJSName:             'caf.min.js',
-    coreCSSPath:            'https://codletech-builder.herokuapp.com/getGlobalFile',
-    coreJSPath:             'https://codletech-builder.herokuapp.com/getGlobalFile',
+    coreCSSPath:            'http://codletech.net/CAF/api/getGlobalFile.php',
+    coreJSPath:             'http://codletech.net/CAF/api/getGlobalFile.php',
 
 
     update: function(){
@@ -46,14 +46,14 @@ var CCoreUpdater = Class({
                 return;
             }
             var dontNeedUpdate = content.status === 1 || content.status === -1;
-            // Updated (data===true means the versions matched and no update needed).
+            // Updated (data===true means the versions matched and no update needed) .
             if (!dontNeedUpdate){
                 try {
                     CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
                     Caf.coreUpdated = true;
                 }
                 catch (e) {
-                    CLog.error('Error at:'+name);
+                    CLog.error('Error at: '+name);
                     CLog.error(e);
                 }
                 CLog.dlog('Update Needed:\t\t'+name);
@@ -68,6 +68,8 @@ var CCoreUpdater = Class({
         CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreCSSName,'');
         CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreJSName,'');
     }
+
+
 
 
 });

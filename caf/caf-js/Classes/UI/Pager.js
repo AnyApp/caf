@@ -10,7 +10,8 @@ var CPager = Class({
     pages: {},
     router: null,
     currentPageNumber: 0,
-
+    currentPage: '',
+    lastPage: '',
     initialize: function(){
         this.resetPages();
         this.setBackForwardDetection();
@@ -124,6 +125,8 @@ var CPager = Class({
         return name+CPager.dataToPath(params);
     },
     showPage: function(name,params){
+//        if (CPager.isChangePageLocked())
+
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
@@ -142,7 +145,6 @@ var CPager = Class({
                             CPager.pages[CPager.tempPagePath] = pageId;
                             CPager.showPage(name,params); // show page.
                         }
-
                         CPager.tempPageId     = '';
                         CPager.tempPagePath   = '';
                     };
@@ -155,11 +157,15 @@ var CPager = Class({
         // Cancel Pull to refresh.
         CPullToRefresh.interrupt();
 
-        var lastPage            = CPager.currentPage || '';
+        // Notice: Update Current Page can be called outside of CPager. Example: Page.
+        CPager.lastPage         = CPager.currentPage;
         CPager.currentPage      = id;
 
+        var currentPage = CPager.currentPage;
+        var lastPage = CPager.lastPage;
+
         // Do not reload the same page over and over again.
-        if (CPager.currentPage == lastPage)
+        if (currentPage == lastPage)
             return;
 
         // Normal page hide.
@@ -178,7 +184,7 @@ var CPager = Class({
         var animationOptions    = {};
         // Page Load.
         animationOptions.onAnimShowComplete = function() {
-            var page = CObjectsHandler.object(CPager.currentPage);
+            var page = CObjectsHandler.object(currentPage);
             page.reload();
             // Check from-page dynamic.
             if (!CUtils.isEmpty(lastPage)){
@@ -190,17 +196,15 @@ var CPager = Class({
                 }
             }
         };
-        var page = CObjectsHandler.object(CPager.currentPage);
+        var page = CObjectsHandler.object(currentPage);
         CTitleHandler.setTitle(page.getPageTitle());
         page.setParams(this.getParamsAsMap(params));
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
-            CAnimations.quickShow(CPager.currentPage);
+            CAnimations.quickShow(currentPage);
         else
-            CAnimations.show(CPager.currentPage,animationOptions);
-
-        //this.checkAndChangeBackButtonState();
+            CAnimations.show(currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.

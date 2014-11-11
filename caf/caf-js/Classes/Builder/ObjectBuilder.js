@@ -76,9 +76,14 @@ var CBuilderObject = Class({
         this.initTemplate();
         this.properties.data.template = {
             url:        url         || null,
-            autoLoad:   autoLoad    || null,
+            autoLoad:   autoLoad,
             queryData:  queryData   || null
         };
+        return this;
+    },
+    templateDataPrepareFunction: function(prepareFunction){
+        this.initTemplate();
+        this.properties.data.template.prepareFunction = prepareFunction;
         return this;
     },
     templateRootObjects: function(rootObjects) {
@@ -88,17 +93,27 @@ var CBuilderObject = Class({
     },
     templateObjects: function(objects) {
         this.initTemplate();
-        this.properties.data.template.objects = objects;
+        this.properties.data.template.objects = [];
+        // Build objects.
+        _.each(objects,function(objectBuilder){
+            this.properties.data.template.objects.push(objectBuilder.build());
+        },this);
+
         return this;
     },
     templateObject: function(object) {
         this.initTemplate();
-        this.properties.data.template.object = object;
+        this.properties.data.template.object = object.build();
         return this;
     },
     templatePullToRefresh: function() {
         this.initTemplate();
         this.properties.data.template.pullToRefresh = true;
+        return this;
+    },
+    templateLoaderColor: function(loaderColor) {
+        this.initTemplate();
+        this.properties.data.template.loaderColor = loaderColor || null;
         return this;
     },
     templateData: function(data) {
@@ -275,6 +290,10 @@ var CBuilderObject = Class({
     },
     imageSource: function(src) {
         this.properties.data.src = src;
+        return this;
+    },
+    staticMapData: function(staticMapData) {
+        this.properties.data.mapData = staticMapData;
         return this;
     },
     videoSource: function(src) {

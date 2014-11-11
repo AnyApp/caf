@@ -40,6 +40,8 @@ var CPage = Class(CContainer,{
         if ( !CUtils.equals(this.data.page.params,params)){
             this.data.page.params = params;
             this.data.page.paramsChanged = true;
+            // Set PageData
+            CPageData.setPageData(this.uid(),params);
         }
     },
     reload: function(force){

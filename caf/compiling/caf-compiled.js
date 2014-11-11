@@ -511,6 +511,9 @@ var CPageData = Class({
         }
         // Set
         CPageData.pagesData[CPager.currentPage][key] = value;
+    },
+    setPageData: function(page,data){
+        CPageData.pagesData[page] = data;
     }
 
 });
@@ -889,6 +892,23 @@ var CUtils = Class({
     },
     stringEndsWith: function(str,suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    },
+    stringCountOccurencesInHead: function(needle,haystack){
+        return CUtils.stringCountOccurencesInHeadHelper(needle,haystack,0);
+    },
+    stringCountOccurencesInHeadHelper: function(needle,haystack,count){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringCountOccurencesInHeadHelper(needle,
+                            haystack.replace(needle,''),count+1);
+        else
+            return count;
+    },
+    stringRemoveAllOccurencesInHead: function(needle,haystack){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringRemoveAllOccurencesInHead(needle,
+                haystack.replace(needle,''));
+        else
+            return haystack;
     }
 
 
@@ -1127,11 +1147,10 @@ var CClicker = Class({
     /**
      * Prevent burst of clicks.
      */
-    canClick: function()
+    canClick: function(e)
     {
-        var currentTime = (new Date()).getTime();
-        if (currentTime-CClicker.lastClick>400)
-        {
+        var currentTime = e.timeStamp;
+        if (currentTime-CClicker.lastClick>400) {
             CClicker.lastClick = currentTime;
             return true;
         }
@@ -1198,7 +1217,7 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
-            var currentTime = (new  Date()).getTime();
+            if (object.touchData.startX<0) return; // Not Started.
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
@@ -1209,12 +1228,18 @@ var CClicker = Class({
         }
         object.events.onTouchEndEvent = function(e)
         {
+            if (object.touchData.startX<0) return; // Not Started.
+
             var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
-            if (!notAClick && CClicker.canClick() && e.type!='mouseout'
+
+            if (!notAClick && CClicker.canClick(e) && e.type!='mouseout'
                 && !CPullToRefresh.inPullToRefresh())
             {
-                if (object.onClicks.length>0)
+                if (object.onClicks.length>0){
                     e.preventDefault();
+                    // Prevent unneccesary pull.
+                    CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
+                }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
                     onClick();
@@ -1222,7 +1247,6 @@ var CClicker = Class({
             }
             // Reset
             CClicker.resetTouch(object);
-
         }
 
         // Set Events Handlers.
@@ -1254,66 +1278,6 @@ var CClicker = Class({
 
 });
 
-window.setTimeout(function(){
-    body.cinScroll = false;
-    body.touchData = {
-        startX:-100000,
-        startY:-100000,
-        lastX:-200000,
-        lastY:-200000,
-        startTime: 0
-    };
-    body.events = {};
-    body.events.onTouchStartEvent = function(e){
-        var pointer = CUtils.getPointerEvent(e);
-        // caching the start x & y
-        body.touchData.startX     = pointer.pageX;
-        body.touchData.startY     = pointer.pageY;
-        body.touchData.lastX      = pointer.pageX;
-        body.touchData.lastY      = pointer.pageY;
-        body.touchData.startTime  = (new  Date()).getTime();
-        body.cinScroll = false;
-    };
-    body.events.onTouchMoveEvent = function(e){
-        var pointer = CUtils.getPointerEvent(e);
-        // caching the last x & y
-        body.touchData.lastX = pointer.pageX;
-        body.touchData.lastY = pointer.pageY;
-        var isScrollEvent = CClicker.isTouchOutOfBoundries(body,3,500) &&
-            body.touchData.lastX !== 0 && body.touchData.lastY !== 0;
-        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-        CLog.dlog(body.cinScroll);
-        CLog.dlog(isScrollEvent);
-        CLog.dlog(body.touchData.lastX !== 0 && body.touchData.lastY !== 0);
-        CLog.dlog(CClicker.isTouchOutOfBoundries(body,0,500));
-        CLog.dlog(body.touchData);
-        CLog.dlog('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-        if (!isScrollEvent && body.cinScroll === false)
-            e.preventDefault();
-        else
-            body.cinScroll = true;
-    };
-    body.events.onTouchEndEvent = function(e){
-        body.touchData = {
-            startX:-100000,
-            startY:-100000,
-            lastX:-200000,
-            lastY:-200000,
-            startTime: 0
-        };
-        body.cinScroll = false;
-    };
-
-//    body.addEventListener("touchstart",body.events.onTouchStartEvent);
-//    body.addEventListener("mousedown",body.events.onTouchStartEvent);
-//    body.addEventListener("touchend",body.events.onTouchEndEvent);
-//    body.addEventListener("mouseup",body.events.onTouchEndEvent);
-//    body.addEventListener("mouseout",body.events.onTouchEndEvent);
-//    body.addEventListener("touchcancel",body.events.onTouchMoveEvent);
-//    body.addEventListener("touchmove",body.events.onTouchMoveEvent);
-//    body.addEventListener("mousemove",body.events.onTouchMoveEvent);
-
-},600)
 
 /**
  * Created by dvircn on 11/08/14.
@@ -1355,7 +1319,8 @@ var CPager = Class({
     pages: {},
     router: null,
     currentPageNumber: 0,
-
+    currentPage: '',
+    lastPage: '',
     initialize: function(){
         this.resetPages();
         this.setBackForwardDetection();
@@ -1469,6 +1434,8 @@ var CPager = Class({
         return name+CPager.dataToPath(params);
     },
     showPage: function(name,params){
+//        if (CPager.isChangePageLocked())
+
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];
@@ -1487,7 +1454,6 @@ var CPager = Class({
                             CPager.pages[CPager.tempPagePath] = pageId;
                             CPager.showPage(name,params); // show page.
                         }
-
                         CPager.tempPageId     = '';
                         CPager.tempPagePath   = '';
                     };
@@ -1500,11 +1466,15 @@ var CPager = Class({
         // Cancel Pull to refresh.
         CPullToRefresh.interrupt();
 
-        var lastPage            = CPager.currentPage || '';
+        // Notice: Update Current Page can be called outside of CPager. Example: Page.
+        CPager.lastPage         = CPager.currentPage;
         CPager.currentPage      = id;
 
+        var currentPage = CPager.currentPage;
+        var lastPage = CPager.lastPage;
+
         // Do not reload the same page over and over again.
-        if (CPager.currentPage == lastPage)
+        if (currentPage == lastPage)
             return;
 
         // Normal page hide.
@@ -1523,7 +1493,7 @@ var CPager = Class({
         var animationOptions    = {};
         // Page Load.
         animationOptions.onAnimShowComplete = function() {
-            var page = CObjectsHandler.object(CPager.currentPage);
+            var page = CObjectsHandler.object(currentPage);
             page.reload();
             // Check from-page dynamic.
             if (!CUtils.isEmpty(lastPage)){
@@ -1535,17 +1505,15 @@ var CPager = Class({
                 }
             }
         };
-        var page = CObjectsHandler.object(CPager.currentPage);
+        var page = CObjectsHandler.object(currentPage);
         CTitleHandler.setTitle(page.getPageTitle());
         page.setParams(this.getParamsAsMap(params));
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage))
-            CAnimations.quickShow(CPager.currentPage);
+            CAnimations.quickShow(currentPage);
         else
-            CAnimations.show(CPager.currentPage,animationOptions);
-
-        //this.checkAndChangeBackButtonState();
+            CAnimations.show(currentPage,animationOptions);
 
     },
     // Immediate hide to all pages on first load.
@@ -1620,6 +1588,9 @@ var CPullToRefresh = Class({
         CUtils.unbindEvent(element,'mousemove',template.events.onPullToRefreshListenerMove);
 
         template.events.onPullToRefreshListenerStart = function(e){
+            var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
+            if (isRightClick) return;
+
             // Disabled.
             if (!CPullToRefresh.enabled)
                 return;
@@ -1663,7 +1634,7 @@ var CPullToRefresh = Class({
             if (distance<=0)
                 return;
 
-            distance = distance - (Math.max(0,distance/1.5-30)); // Slower speed when distance is high.
+            distance = distance - (Math.max(0,distance/1.5-10)); // Slower speed when distance is high.
             distance = Math.min(110,distance); // Set max distance
             template.pullToRefreshData.lastDistance = distance;
 
@@ -1701,10 +1672,9 @@ var CPullToRefresh = Class({
             }
 
             // refresh.
-            template.reload(null,function(){
-                // Reset
-                CPullToRefresh.reset(template);
-            },null);
+            template.reload(null,function(){},null);
+            // Reset and remove spinner.
+            CPullToRefresh.reset(template);
 
         };
 
@@ -1737,7 +1707,8 @@ var CPullToRefresh = Class({
             return;
 
         var spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
-            .design({position:'absolute',height:CPullToRefresh.spinnerSize}).build()
+            .design({position:'absolute',height:CPullToRefresh.spinnerSize,
+                        color: template.getLoaderColor()}).build()
         );
         template.pullToRefreshData.spinnerId = spinnerId;
         template.appendChild(spinnerId);
@@ -1967,7 +1938,8 @@ var CSwiper = Class({
             element: CUtils.element(CObjectsHandler.mainViewId),
             disable: disable,
             maxPosition: width,
-            minPosition: -width
+            minPosition: -width,
+            resistance: 1000000
         });
     },
     openOrCloseSideMenu: function(name) {
@@ -2504,6 +2476,7 @@ var CLogic = Class({
         link: function(object,value){
             if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
                 return;
+            value.path = value.path+''; // Cast to string.
             if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value.path);
@@ -2834,6 +2807,7 @@ var CTemplator = Class({
 
         // For each row in data.
         _.each(data,function(currentData){
+            currentData = CTemplator.fixRetreivedData(currentData);
             // Create container.
             var templateData = object.data.template;
 
@@ -2878,6 +2852,21 @@ var CTemplator = Class({
         if (preventRebuild !== true)
             object.rebuild(onFinish);
     },
+    fixRetreivedData: function(retreived){
+        // DO NOT MAKE any changes to the source data.
+        retreived = CUtils.clone(retreived);
+        var fixed = {
+            data: retreived.data || {},
+            design: retreived.design || {},
+            logic: retreived.logic || {}
+        }
+        delete retreived.data;
+        delete retreived.design;
+        delete retreived.logic;
+        // Merge left data in retreived into fixed.data
+        fixed.data = CUtils.mergeJSONs(fixed.data,retreived);
+        return fixed;
+    },
     createItemOnClick: function(index,data,callback,callbacksCallback){
         return function() {
             callbacksCallback(data);
@@ -2907,6 +2896,8 @@ var CTemplator = Class({
             object.data.template.data = object.data.template.data[0];
         }
         data = object.data.template.data;
+        // Prepare the data before using it.
+        data = object.data.template.prepareFunction(data);
 
         this.duplicateWithData(object,data, onFinish, reset, preventRebuild);
     },
@@ -2932,6 +2923,7 @@ var CTemplator = Class({
 
     },
     load: function(objectId, queryData, onFinish, reset) {
+        onFinish = onFinish || function(){};
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object.data.template.url) ||
             (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){
@@ -3055,6 +3047,7 @@ var CObject = Class({
             return this.relativeParent;
         var parentObject     = CObjectsHandler.object(this.parent);
         this.relativeParent  = null;
+        // Look for relative parent.
         while (!CUtils.isEmpty(parentObject)){
             if (parentObject.isRelative()){
                 this.relativeParent = parentObject.uid();
@@ -3064,7 +3057,18 @@ var CObject = Class({
                 parentObject = CObjectsHandler.object(parentObject.parent);
             }
         }
+        // If there is no relative parent and this object is relative, return this object.
+        if (this.relativeParent === null && this.isRelative())
+            this.relativeParent = this.uid();
         return this.relativeParent;
+    },
+    getDeepRelativeParent: function(depth){
+        if (depth === 0)
+            return this;
+        else if (depth === 1)
+            return CObjectsHandler.object(this.getRelativeParent() || '');
+        else
+            return CObjectsHandler.object(this.getDeepRelativeParent(depth-1) || '');
     },
     isRelative: function() {
         return this.relative;
@@ -3114,7 +3118,12 @@ var CObject = Class({
             return;
         obj.parseReferencesVisited = true;
         for (var property in obj) {
-            if (obj.hasOwnProperty(property) && property!='template') {
+            // Allow parse part of the template data
+            if (obj.hasOwnProperty(property) && property=='template') {
+                if (!CUtils.isEmpty(obj.template) && !CUtils.isEmpty(obj.template.queryData))
+                    this.parseReferences(obj.template.queryData);
+            }
+            else if (obj.hasOwnProperty(property) && property!='template') {
                 if (typeof obj[property] == "object"){
                     this.parseReferences(obj[property]);
                 }
@@ -3133,19 +3142,20 @@ var CObject = Class({
         }
         delete obj.parseReferencesVisited;
     },
-    parseLocalReference: function(str){
-        return eval(str);
+    parseLocalReference: function(workingObject,str){
+        return eval('workingObject.'+str);
     },
     parseGlobalReference: function(str){
         return CGlobals.get(str);
     },
+    parsePageReference: function(str){
+        return CPageData.get(str);
+    },
     parseDesignReference: function(str){
         return CDesignHandler.get(str);
     },
-    parseRelativeReference: function(str){
-        if (this.isRelative())
-            return eval('this'+str);
-        var relativeParentId = this.getRelativeParent();
+    parseRelativeReference: function(workingObject,str){
+        var relativeParentId = workingObject.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
             var relativeParent = CObjectsHandler.object(relativeParentId);
             return eval('relativeParent'+str);
@@ -3153,10 +3163,10 @@ var CObject = Class({
         return null;
     },
     // Extension of this method in: CObjectHandler.relativeObject
-    parseRelativeObjectId: function(str){
-        if (this.isRelative())
-            return eval(this.uid()+str);
-        var relativeParentId = this.getRelativeParent();
+    parseRelativeObjectId: function(workingObject,str){
+        if (workingObject.isRelative())
+            return eval(workingObject.uid()+str);
+        var relativeParentId = workingObject.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;
         return str.substr(1);
@@ -3187,16 +3197,28 @@ var CObject = Class({
             // not a reference.
             if (part.length<=0 || part[0]!='#')
                 continue;
-            if (part.length>6 && part.substr(0,6) == '#this.')
-                parts[i] = this.parseLocalReference(part.substr(1))       || null;
-            else if (part.length>2 && part.substr(0,2) == '#.')
-                parts[i] = this.parseRelativeReference(part.substr(1))    || null;
-            else if (part.length>2 && part.substr(0,2) == '#/')
-                parts[i] = this.parseRelativeObjectId(part.substr(1))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#globals.')
-                parts[i] = this.parseGlobalReference(part.substr(9))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#designs.')
-                parts[i] = this.parseDesignReference(part.substr(9))     || null;
+            /**
+             * Get the object that the data needed to be extracted from.
+             * Examples:'#*'    => workingObject = this
+             *          '##*'   => workingObject = this.getRelativeParent()
+             *          '###*'  => workingObject = this.getRelativeParent().getRelativeParent()
+             *          etc..
+            **/
+            var countHeadHashes =   CUtils.stringCountOccurencesInHead('#',part);
+            var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
+            part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
+            if (part.length>5 && part.substr(0,5) == 'this.')
+                parts[i] = this.parseLocalReference(workingObject,part.substr(5)) || null;
+            else if (part.length>1 && part.substr(0,1) == '.')
+                parts[i] = this.parseRelativeReference(workingObject,part)  || null;
+            else if (part.length>1 && part.substr(0,1) == '/')
+                parts[i] = this.parseRelativeObjectId(workingObject,part)   || null;
+            else if (part.length>8 && part.substr(0,8) == 'globals.')
+                parts[i] = this.parseGlobalReference(part.substr(8))        || null;
+            else if (part.length>5 && part.substr(0,5) == 'page.')
+                parts[i] = this.parsePageReference(part.substr(5))          || null;
+            else if (part.length>8 && part.substr(0,8) == 'designs.')
+                parts[i] = this.parseDesignReference(part.substr(8))        || null;
         }
         // Filter out empty elements.
         parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });
@@ -3526,11 +3548,13 @@ var CTemplate = Class(CContainer,{
         this.data.template              = this.data.template            || {};
         this.data.template.url          = this.data.template.url        || '';
         this.data.template.callback     = this.data.template.callback   || function(){};
+        this.data.template.prepareFunction = this.data.template.prepareFunction   || function(data){return data;};
         this.data.template.callbacks    = this.data.template.callbacks  || [];
         this.data.template.queryData    = this.data.template.queryData  || {};
         this.data.template.data         = this.data.template.data       || null;
         this.data.template.applied      = this.data.template.applied    || false;
         this.data.template.showLoader   = this.data.template.showLoader === false ? false : true;
+        this.data.template.loaderColor  = this.data.template.loaderColor|| CColor('TealE',9);
         this.data.template.autoLoad     = this.data.template.autoLoad   === false ? false : true;
         this.data.template.resetOnReload= this.data.template.resetOnReload=== false ? false : true;
         this.data.template.loaded       = this.data.template.loaded     || false;
@@ -3576,8 +3600,10 @@ var CTemplate = Class(CContainer,{
     showLoading: function(){
         if (this.data.template.showLoader!==true || !CUtils.isEmpty(this.spinnerId))
             return;
-        this.spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
-            .spinnerAutoStart().build());
+        this.spinnerId = CObjectsHandler.createObject('LoadSpinner',
+            co().spinnerAutoStart()
+                .design({color:this.getLoaderColor()}) // Set spinner color.
+                .build());
         this.addChildToStart(this.spinnerId);
         this.rebuild();
     },
@@ -3591,6 +3617,9 @@ var CTemplate = Class(CContainer,{
     reload: function(queryData,onFinish, reset){
         CTemplator.load(this.uid(),queryData||this.data.template.queryData,
             onFinish||function(){},reset||this.data.template.resetOnReload);
+    },
+    getLoaderColor: function(){
+        return this.data.template.loaderColor;
     }
 
 
@@ -3703,7 +3732,7 @@ var CDialog = Class(CContainer,{
         this.data.extraText         = this.data.extraText           || '';
         this.data.extraCallback     = this.data.extraCallback       || function(){};
         // Design
-        this.data.dialogColor       = this.data.dialogColor         || {color:'Cyan',level:6};
+        this.data.dialogColor       = this.data.dialogColor         || CColor('TealE',8);
         this.data.bgColor           = this.data.bgColor             || {color:'Gray',level:0};
         this.data.contentColor      = this.data.contentColor        || {color:'Gray',level:12};
         this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};
@@ -4308,7 +4337,7 @@ var CSideMenuContainer = Class(CContainer,{
         CSideMenuContainer.$super.call(this, values);
         this.design             = this.design || {};
         this.design.height      = '100%';
-//        CScrolling.setScrollable(this);
+        CScrolling.setScrollable(this);
 
     }
 
@@ -4554,6 +4583,8 @@ var CPage = Class(CContainer,{
         if ( !CUtils.equals(this.data.page.params,params)){
             this.data.page.params = params;
             this.data.page.paramsChanged = true;
+            // Set PageData
+            CPageData.setPageData(this.uid(),params);
         }
     },
     reload: function(force){
@@ -5000,7 +5031,7 @@ var CLoadSpinner = Class(CObject,{
             height: 60,
             width: '100%',
             fontStyle:['bold'],
-            color:CColor('Cyan',10)
+            color:CColor('TealE',7)
 
         },
         DEFAULT_LOGIC: {
@@ -5057,9 +5088,18 @@ var CStaticMap = Class(CImage,{
         // Invoke parent's constructor
         CStaticMap.$super.call(this, values);
 
-        this.data.mapData = this.data.mapData ||
-                                {width:'600',height:'300',center:'',zoom:13,
-                                    maptype:'roadmap',marker:{color:'blue',position:''}};
+        // Parameters.
+        this.data.mapData               = this.data.mapData         || {};
+        this.data.mapData.width         = this.data.mapData.width   || 600;
+        this.data.mapData.height        = this.data.mapData.height  || 300;
+        this.data.mapData.zoom          = this.data.mapData.zoom    || 13;
+        this.data.mapData.maptype       = this.data.mapData.maptype || 'roadmap';
+        this.data.mapData.center        = this.data.mapData.center  || '';
+        this.data.mapData.marker        = this.data.mapData.marker  || {};
+        this.data.mapData.marker.color  = this.data.mapData.marker.color        || 'blue';
+        // Position default to map center.
+        this.data.mapData.marker.position = this.data.mapData.marker.position   || this.data.mapData.center;
+
         this.data.src = 'https://maps.googleapis.com/maps/api/staticmap?center='+
             this.data.mapData.center+'&zoom='+this.data.mapData.zoom
             +'&size='+this.data.mapData.width+'x'+this.data.mapData.height
@@ -5649,41 +5689,45 @@ var CAppHandler = Class({
 //            CThreads.start(callback);
 //            return;
 //        }
+        try {
+            var startLoadObjects        = (new  Date()).getTime();
 
-        var startLoadObjects        = (new  Date()).getTime();
+            var appData                 = CAppHandler.appData;
+            CAppHandler.appData         = null; // Remove reference.
 
-        var appData                 = CAppHandler.appData;
-        CAppHandler.appData         = null; // Remove reference.
+            appData.data                = appData.data || {};
+            appData.data.app_settings   = appData.data.app_settings || {};
 
-        appData.data                = appData.data || {};
-        appData.data.app_settings   = appData.data.app_settings || {};
+            // Load Theme if chosen.
+            if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
+                CThemes.loadTheme(appData.data['app_main_theme']);
+            // Set named designs and globals.
+            CDesignHandler.addDesigns(appData.designs || {});
+            CGlobals.setGlobals(appData.data || {});
 
-        // Load Theme if chosen.
-        if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
-            CThemes.loadTheme(appData.data['app_main_theme']);
-        // Set named designs and globals.
-        CDesignHandler.addDesigns(appData.designs || {});
-        CGlobals.setGlobals(appData.data || {});
+            // Check if objects empty. If so, create app-container so the build won't fail.
+            if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
+                appData.objects = [{type: "AppContainer", uname: "app-container"}];
+            }
 
-        // Check if objects empty. If so, create app-container so the build won't fail.
-        if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
-            appData.objects = [{type: "AppContainer", uname: "app-container"}];
+            // Load Objects.
+            CObjectsHandler.loadObjects(appData.objects || []);
+            var endLoadObjects  = (new  Date()).getTime();
+
+            var startBuildAll = (new  Date()).getTime();
+
+            CBuilder.buildAll();
+            var endBuildAll = (new  Date()).getTime();
+            CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
+            CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
+            CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
+
+            CPager.initialize();
         }
-
-        // Load Objects.
-        CObjectsHandler.loadObjects(appData.objects || []);
-        var endLoadObjects  = (new  Date()).getTime();
-
-        var startBuildAll = (new  Date()).getTime();
-
-        CBuilder.buildAll();
-        var endBuildAll = (new  Date()).getTime();
-        CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
-        CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
-        CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
-
-        CPager.initialize();
-
+        catch (e){
+            CLog.error('CAppHandler.initialize error occured.');
+            CLog.log(e);
+        }
         // After finished, we can run the callback.
         CThreads.start(callback);
     },
@@ -5777,12 +5821,16 @@ var Caf = Class({
     coreCSSUpdateChecked: false,
     appUpdateChecked: false,
     appUpdated: false,
+    appUpdateStarted: false,
     coreUpdated: false,
     updateCheckFinished: false,
     waitToLoadDialog: null,
     firstLoadKey: 'caf-first-load',
     firstLoad: false,
     start: function(){
+        // Check for update start in 5 seconds - make sure the app will get updated in any case.
+        CThreads.run(Caf.updateStartCheck,5000);
+
         Caf.firstLoad = CLocalStorage.get(Caf.firstLoadKey);
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
@@ -5805,10 +5853,18 @@ var Caf = Class({
             navigator.splashscreen.hide();
     },
     startUpdate: function(){
+        if (Caf.appUpdateStarted === true) // Update check already performed.
+            return;
+        Caf.appUpdateStarted = true; // Mark as started.
+
         // Run parallel.
         CThreads.start(CAppUpdater.update);
         CThreads.start(CCoreUpdater.update);
         CThreads.run(Caf.updatedCheck,300);
+    },
+    updateStartCheck: function(){
+        if (Caf.appUpdateStarted === false)
+            Caf.startUpdate();
     },
     updatedCheck: function(){
         if (Caf.coreCSSUpdateChecked && Caf.coreJSUpdateChecked
@@ -5830,11 +5886,11 @@ var Caf = Class({
             if (Caf.appUpdated || Caf.coreUpdated) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
-                    title: 'Update Ready',
-                    textContent: 'In order to apply the changes, you need to restart the application.',
-                    dialogColor: CColor('Blue',9),
-                    cancelText: 'Later',
-                    confirmText: 'Restart',
+                    title: 'עדכון מוכן',
+                    textContent: 'כדי להחיל את השינויים, אנא הפעל את האפליקציה מחדש.',
+                    dialogColor: CColor('TealE',8),
+                    cancelText: 'מאוחר יותר',
+                    confirmText: 'הפעל מחדש',
                     confirmCallback: function() { CAppHandler.resetApp(); },
 
                 });
@@ -5846,8 +5902,8 @@ var Caf = Class({
     showWaitToLoad: function(){
         Caf.waitToLoadDialog = CDialog.showDialog({
             hideOnOutClick: false,
-            title: 'Setting Up Some Things..',
-            dialogColor: CColor('Blue',9)
+            title: 'מכין מספר דברים...',
+            dialogColor: CColor('TealE',8)
         }, { minHeight: 'auto'});
     }
 
@@ -5862,8 +5918,8 @@ var CCoreUpdater = Class({
     cafFilePrefix:          'caf-file-',
     coreCSSName:            'caf.min.css',
     coreJSName:             'caf.min.js',
-    coreCSSPath:            'https://codletech-builder.herokuapp.com/getGlobalFile',
-    coreJSPath:             'https://codletech-builder.herokuapp.com/getGlobalFile',
+    coreCSSPath:            'http://codletech.net/CAF/api/getGlobalFile.php',
+    coreJSPath:             'http://codletech.net/CAF/api/getGlobalFile.php',
 
 
     update: function(){
@@ -5901,14 +5957,14 @@ var CCoreUpdater = Class({
                 return;
             }
             var dontNeedUpdate = content.status === 1 || content.status === -1;
-            // Updated (data===true means the versions matched and no update needed).
+            // Updated (data===true means the versions matched and no update needed) .
             if (!dontNeedUpdate){
                 try {
                     CLocalStorage.save(CCoreUpdater.cafFilePrefix+name,content);
                     Caf.coreUpdated = true;
                 }
                 catch (e) {
-                    CLog.error('Error at:'+name);
+                    CLog.error('Error at: '+name);
                     CLog.error(e);
                 }
                 CLog.dlog('Update Needed:\t\t'+name);
@@ -5923,6 +5979,8 @@ var CCoreUpdater = Class({
         CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreCSSName,'');
         CLocalStorage.save(CCoreUpdater.cafFilePrefix+CCoreUpdater.coreJSName,'');
     }
+
+
 
 
 });
@@ -6005,9 +6063,14 @@ var CBuilderObject = Class({
         this.initTemplate();
         this.properties.data.template = {
             url:        url         || null,
-            autoLoad:   autoLoad    || null,
+            autoLoad:   autoLoad,
             queryData:  queryData   || null
         };
+        return this;
+    },
+    templateDataPrepareFunction: function(prepareFunction){
+        this.initTemplate();
+        this.properties.data.template.prepareFunction = prepareFunction;
         return this;
     },
     templateRootObjects: function(rootObjects) {
@@ -6017,17 +6080,27 @@ var CBuilderObject = Class({
     },
     templateObjects: function(objects) {
         this.initTemplate();
-        this.properties.data.template.objects = objects;
+        this.properties.data.template.objects = [];
+        // Build objects.
+        _.each(objects,function(objectBuilder){
+            this.properties.data.template.objects.push(objectBuilder.build());
+        },this);
+
         return this;
     },
     templateObject: function(object) {
         this.initTemplate();
-        this.properties.data.template.object = object;
+        this.properties.data.template.object = object.build();
         return this;
     },
     templatePullToRefresh: function() {
         this.initTemplate();
         this.properties.data.template.pullToRefresh = true;
+        return this;
+    },
+    templateLoaderColor: function(loaderColor) {
+        this.initTemplate();
+        this.properties.data.template.loaderColor = loaderColor || null;
         return this;
     },
     templateData: function(data) {
@@ -6204,6 +6277,10 @@ var CBuilderObject = Class({
     },
     imageSource: function(src) {
         this.properties.data.src = src;
+        return this;
+    },
+    staticMapData: function(staticMapData) {
+        this.properties.data.mapData = staticMapData;
         return this;
     },
     videoSource: function(src) {

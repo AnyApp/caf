@@ -20,41 +20,45 @@ var CAppHandler = Class({
 //            CThreads.start(callback);
 //            return;
 //        }
+        try {
+            var startLoadObjects        = (new  Date()).getTime();
 
-        var startLoadObjects        = (new  Date()).getTime();
+            var appData                 = CAppHandler.appData;
+            CAppHandler.appData         = null; // Remove reference.
 
-        var appData                 = CAppHandler.appData;
-        CAppHandler.appData         = null; // Remove reference.
+            appData.data                = appData.data || {};
+            appData.data.app_settings   = appData.data.app_settings || {};
 
-        appData.data                = appData.data || {};
-        appData.data.app_settings   = appData.data.app_settings || {};
+            // Load Theme if chosen.
+            if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
+                CThemes.loadTheme(appData.data['app_main_theme']);
+            // Set named designs and globals.
+            CDesignHandler.addDesigns(appData.designs || {});
+            CGlobals.setGlobals(appData.data || {});
 
-        // Load Theme if chosen.
-        if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
-            CThemes.loadTheme(appData.data['app_main_theme']);
-        // Set named designs and globals.
-        CDesignHandler.addDesigns(appData.designs || {});
-        CGlobals.setGlobals(appData.data || {});
+            // Check if objects empty. If so, create app-container so the build won't fail.
+            if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
+                appData.objects = [{type: "AppContainer", uname: "app-container"}];
+            }
 
-        // Check if objects empty. If so, create app-container so the build won't fail.
-        if (CUtils.isEmpty(appData.objects) || _.keys(appData.objects).length===0 /*Empty object*/){
-            appData.objects = [{type: "AppContainer", uname: "app-container"}];
+            // Load Objects.
+            CObjectsHandler.loadObjects(appData.objects || []);
+            var endLoadObjects  = (new  Date()).getTime();
+
+            var startBuildAll = (new  Date()).getTime();
+
+            CBuilder.buildAll();
+            var endBuildAll = (new  Date()).getTime();
+            CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
+            CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
+            CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
+
+            CPager.initialize();
         }
-
-        // Load Objects.
-        CObjectsHandler.loadObjects(appData.objects || []);
-        var endLoadObjects  = (new  Date()).getTime();
-
-        var startBuildAll = (new  Date()).getTime();
-
-        CBuilder.buildAll();
-        var endBuildAll = (new  Date()).getTime();
-        CLog.dlog('Load Objects Time     : '+(endLoadObjects-startLoadObjects)+' Milliseconds.');
-        CLog.dlog('Build Time            : '+(endBuildAll-startBuildAll)+' Milliseconds.');
-        CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
-
-        CPager.initialize();
-
+        catch (e){
+            CLog.error('CAppHandler.initialize error occured.');
+            CLog.log(e);
+        }
         // After finished, we can run the callback.
         CThreads.start(callback);
     },

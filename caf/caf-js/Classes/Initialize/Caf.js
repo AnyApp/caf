@@ -7,12 +7,16 @@ var Caf = Class({
     coreCSSUpdateChecked: false,
     appUpdateChecked: false,
     appUpdated: false,
+    appUpdateStarted: false,
     coreUpdated: false,
     updateCheckFinished: false,
     waitToLoadDialog: null,
     firstLoadKey: 'caf-first-load',
     firstLoad: false,
     start: function(){
+        // Check for update start in 5 seconds - make sure the app will get updated in any case.
+        CThreads.run(Caf.updateStartCheck,5000);
+
         Caf.firstLoad = CLocalStorage.get(Caf.firstLoadKey);
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
@@ -35,10 +39,18 @@ var Caf = Class({
             navigator.splashscreen.hide();
     },
     startUpdate: function(){
+        if (Caf.appUpdateStarted === true) // Update check already performed.
+            return;
+        Caf.appUpdateStarted = true; // Mark as started.
+
         // Run parallel.
         CThreads.start(CAppUpdater.update);
         CThreads.start(CCoreUpdater.update);
         CThreads.run(Caf.updatedCheck,300);
+    },
+    updateStartCheck: function(){
+        if (Caf.appUpdateStarted === false)
+            Caf.startUpdate();
     },
     updatedCheck: function(){
         if (Caf.coreCSSUpdateChecked && Caf.coreJSUpdateChecked
@@ -60,11 +72,11 @@ var Caf = Class({
             if (Caf.appUpdated || Caf.coreUpdated) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
-                    title: 'Update Ready',
-                    textContent: 'In order to apply the changes, you need to restart the application.',
-                    dialogColor: CColor('Blue',9),
-                    cancelText: 'Later',
-                    confirmText: 'Restart',
+                    title: 'עדכון מוכן',
+                    textContent: 'כדי להחיל את השינויים, אנא הפעל את האפליקציה מחדש.',
+                    dialogColor: CColor('TealE',8),
+                    cancelText: 'מאוחר יותר',
+                    confirmText: 'הפעל מחדש',
                     confirmCallback: function() { CAppHandler.resetApp(); },
 
                 });
@@ -76,8 +88,8 @@ var Caf = Class({
     showWaitToLoad: function(){
         Caf.waitToLoadDialog = CDialog.showDialog({
             hideOnOutClick: false,
-            title: 'Setting Up Some Things..',
-            dialogColor: CColor('Blue',9)
+            title: 'מכין מספר דברים...',
+            dialogColor: CColor('TealE',8)
         }, { minHeight: 'auto'});
     }
 

@@ -35,6 +35,9 @@ var CPullToRefresh = Class({
         CUtils.unbindEvent(element,'mousemove',template.events.onPullToRefreshListenerMove);
 
         template.events.onPullToRefreshListenerStart = function(e){
+            var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
+            if (isRightClick) return;
+
             // Disabled.
             if (!CPullToRefresh.enabled)
                 return;
@@ -78,7 +81,7 @@ var CPullToRefresh = Class({
             if (distance<=0)
                 return;
 
-            distance = distance - (Math.max(0,distance/1.5-30)); // Slower speed when distance is high.
+            distance = distance - (Math.max(0,distance/1.5-10)); // Slower speed when distance is high.
             distance = Math.min(110,distance); // Set max distance
             template.pullToRefreshData.lastDistance = distance;
 
@@ -116,10 +119,9 @@ var CPullToRefresh = Class({
             }
 
             // refresh.
-            template.reload(null,function(){
-                // Reset
-                CPullToRefresh.reset(template);
-            },null);
+            template.reload(null,function(){},null);
+            // Reset and remove spinner.
+            CPullToRefresh.reset(template);
 
         };
 
@@ -152,7 +154,8 @@ var CPullToRefresh = Class({
             return;
 
         var spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
-            .design({position:'absolute',height:CPullToRefresh.spinnerSize}).build()
+            .design({position:'absolute',height:CPullToRefresh.spinnerSize,
+                        color: template.getLoaderColor()}).build()
         );
         template.pullToRefreshData.spinnerId = spinnerId;
         template.appendChild(spinnerId);

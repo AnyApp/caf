@@ -69,6 +69,7 @@ var CObject = Class({
             return this.relativeParent;
         var parentObject     = CObjectsHandler.object(this.parent);
         this.relativeParent  = null;
+        // Look for relative parent.
         while (!CUtils.isEmpty(parentObject)){
             if (parentObject.isRelative()){
                 this.relativeParent = parentObject.uid();
@@ -78,7 +79,18 @@ var CObject = Class({
                 parentObject = CObjectsHandler.object(parentObject.parent);
             }
         }
+        // If there is no relative parent and this object is relative, return this object.
+        if (this.relativeParent === null && this.isRelative())
+            this.relativeParent = this.uid();
         return this.relativeParent;
+    },
+    getDeepRelativeParent: function(depth){
+        if (depth === 0)
+            return this;
+        else if (depth === 1)
+            return CObjectsHandler.object(this.getRelativeParent() || '');
+        else
+            return CObjectsHandler.object(this.getDeepRelativeParent(depth-1) || '');
     },
     isRelative: function() {
         return this.relative;
@@ -128,7 +140,12 @@ var CObject = Class({
             return;
         obj.parseReferencesVisited = true;
         for (var property in obj) {
-            if (obj.hasOwnProperty(property) && property!='template') {
+            // Allow parse part of the template data
+            if (obj.hasOwnProperty(property) && property=='template') {
+                if (!CUtils.isEmpty(obj.template) && !CUtils.isEmpty(obj.template.queryData))
+                    this.parseReferences(obj.template.queryData);
+            }
+            else if (obj.hasOwnProperty(property) && property!='template') {
                 if (typeof obj[property] == "object"){
                     this.parseReferences(obj[property]);
                 }
@@ -147,19 +164,20 @@ var CObject = Class({
         }
         delete obj.parseReferencesVisited;
     },
-    parseLocalReference: function(str){
-        return eval(str);
+    parseLocalReference: function(workingObject,str){
+        return eval('workingObject.'+str);
     },
     parseGlobalReference: function(str){
         return CGlobals.get(str);
     },
+    parsePageReference: function(str){
+        return CPageData.get(str);
+    },
     parseDesignReference: function(str){
         return CDesignHandler.get(str);
     },
-    parseRelativeReference: function(str){
-        if (this.isRelative())
-            return eval('this'+str);
-        var relativeParentId = this.getRelativeParent();
+    parseRelativeReference: function(workingObject,str){
+        var relativeParentId = workingObject.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
             var relativeParent = CObjectsHandler.object(relativeParentId);
             return eval('relativeParent'+str);
@@ -167,10 +185,10 @@ var CObject = Class({
         return null;
     },
     // Extension of this method in: CObjectHandler.relativeObject
-    parseRelativeObjectId: function(str){
-        if (this.isRelative())
-            return eval(this.uid()+str);
-        var relativeParentId = this.getRelativeParent();
+    parseRelativeObjectId: function(workingObject,str){
+        if (workingObject.isRelative())
+            return eval(workingObject.uid()+str);
+        var relativeParentId = workingObject.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId))
             return relativeParentId+str;
         return str.substr(1);
@@ -201,16 +219,28 @@ var CObject = Class({
             // not a reference.
             if (part.length<=0 || part[0]!='#')
                 continue;
-            if (part.length>6 && part.substr(0,6) == '#this.')
-                parts[i] = this.parseLocalReference(part.substr(1))       || null;
-            else if (part.length>2 && part.substr(0,2) == '#.')
-                parts[i] = this.parseRelativeReference(part.substr(1))    || null;
-            else if (part.length>2 && part.substr(0,2) == '#/')
-                parts[i] = this.parseRelativeObjectId(part.substr(1))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#globals.')
-                parts[i] = this.parseGlobalReference(part.substr(9))     || null;
-            else if (part.length>9 && part.substr(0,9) == '#designs.')
-                parts[i] = this.parseDesignReference(part.substr(9))     || null;
+            /**
+             * Get the object that the data needed to be extracted from.
+             * Examples:'#*'    => workingObject = this
+             *          '##*'   => workingObject = this.getRelativeParent()
+             *          '###*'  => workingObject = this.getRelativeParent().getRelativeParent()
+             *          etc..
+            **/
+            var countHeadHashes =   CUtils.stringCountOccurencesInHead('#',part);
+            var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
+            part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
+            if (part.length>5 && part.substr(0,5) == 'this.')
+                parts[i] = this.parseLocalReference(workingObject,part.substr(5)) || null;
+            else if (part.length>1 && part.substr(0,1) == '.')
+                parts[i] = this.parseRelativeReference(workingObject,part)  || null;
+            else if (part.length>1 && part.substr(0,1) == '/')
+                parts[i] = this.parseRelativeObjectId(workingObject,part)   || null;
+            else if (part.length>8 && part.substr(0,8) == 'globals.')
+                parts[i] = this.parseGlobalReference(part.substr(8))        || null;
+            else if (part.length>5 && part.substr(0,5) == 'page.')
+                parts[i] = this.parsePageReference(part.substr(5))          || null;
+            else if (part.length>8 && part.substr(0,8) == 'designs.')
+                parts[i] = this.parseDesignReference(part.substr(8))        || null;
         }
         // Filter out empty elements.
         parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });

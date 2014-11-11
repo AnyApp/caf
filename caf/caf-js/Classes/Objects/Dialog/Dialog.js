@@ -73,7 +73,7 @@ var CDialog = Class(CContainer,{
         this.data.extraText         = this.data.extraText           || '';
         this.data.extraCallback     = this.data.extraCallback       || function(){};
         // Design
-        this.data.dialogColor       = this.data.dialogColor         || {color:'Cyan',level:6};
+        this.data.dialogColor       = this.data.dialogColor         || CColor('TealE',8);
         this.data.bgColor           = this.data.bgColor             || {color:'Gray',level:0};
         this.data.contentColor      = this.data.contentColor        || {color:'Gray',level:12};
         this.data.listBorderColor   = this.data.listBorderColor     || {color:'Gray',level:2};

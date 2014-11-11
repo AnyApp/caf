@@ -18,7 +18,7 @@ var CSideMenuContainer = Class(CContainer,{
         CSideMenuContainer.$super.call(this, values);
         this.design             = this.design || {};
         this.design.height      = '100%';
-//        CScrolling.setScrollable(this);
+        CScrolling.setScrollable(this);
 
     }
 

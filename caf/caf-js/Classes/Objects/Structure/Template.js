@@ -32,11 +32,13 @@ var CTemplate = Class(CContainer,{
         this.data.template              = this.data.template            || {};
         this.data.template.url          = this.data.template.url        || '';
         this.data.template.callback     = this.data.template.callback   || function(){};
+        this.data.template.prepareFunction = this.data.template.prepareFunction   || function(data){return data;};
         this.data.template.callbacks    = this.data.template.callbacks  || [];
         this.data.template.queryData    = this.data.template.queryData  || {};
         this.data.template.data         = this.data.template.data       || null;
         this.data.template.applied      = this.data.template.applied    || false;
         this.data.template.showLoader   = this.data.template.showLoader === false ? false : true;
+        this.data.template.loaderColor  = this.data.template.loaderColor|| CColor('TealE',9);
         this.data.template.autoLoad     = this.data.template.autoLoad   === false ? false : true;
         this.data.template.resetOnReload= this.data.template.resetOnReload=== false ? false : true;
         this.data.template.loaded       = this.data.template.loaded     || false;
@@ -82,8 +84,10 @@ var CTemplate = Class(CContainer,{
     showLoading: function(){
         if (this.data.template.showLoader!==true || !CUtils.isEmpty(this.spinnerId))
             return;
-        this.spinnerId = CObjectsHandler.createObject('LoadSpinner',co()
-            .spinnerAutoStart().build());
+        this.spinnerId = CObjectsHandler.createObject('LoadSpinner',
+            co().spinnerAutoStart()
+                .design({color:this.getLoaderColor()}) // Set spinner color.
+                .build());
         this.addChildToStart(this.spinnerId);
         this.rebuild();
     },
@@ -97,6 +101,9 @@ var CTemplate = Class(CContainer,{
     reload: function(queryData,onFinish, reset){
         CTemplator.load(this.uid(),queryData||this.data.template.queryData,
             onFinish||function(){},reset||this.data.template.resetOnReload);
+    },
+    getLoaderColor: function(){
+        return this.data.template.loaderColor;
     }
 
 
