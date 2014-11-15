@@ -32,12 +32,12 @@ var CHeader = Class(CContainer,{
         this.data.right = this.data.right || [];
 
         this.data.titleDesign = this.data.titleDesign || {};
-        this.data.titleDesign = CUtils.mergeJSONs(this.data.titleDesign,{
+        this.data.titleDesign = CUtils.mergeJSONs({
             position: 'absolute',
             left: this.data.itemSize * this.data.left.length,
             right: this.data.itemSize * this.data.right.length,
             top: 0, bottom:0, margin: 'none', height:'auto'
-        });
+        }, this.data.titleDesign);
         // Create Title.
         this.data.title = CObjectsHandler.createObject('Label',{
             design: this.data.titleDesign

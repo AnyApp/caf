@@ -21,6 +21,10 @@ var Caf = Class({
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
 
+        // Phonegap on ready.
+        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
+        // Start.
         CAppHandler.start(function(){
             if (Caf.firstLoad) {
                 Caf.showWaitToLoad();
@@ -30,8 +34,7 @@ var Caf = Class({
                 Caf.startUpdate();
         });
 
-        // Phonegap on ready.
-        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
 
     },
     onDeviceReady : function() {
@@ -90,8 +93,9 @@ var Caf = Class({
             hideOnOutClick: false,
             title: 'מכין מספר דברים...',
             dialogColor: CColor('TealE',8)
-        }, { minHeight: 'auto'});
+        }, { direction:'rtl',minHeight: 'auto'});
     }
+
 
 });
 

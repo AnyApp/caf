@@ -1,0 +1,474 @@
+.iconAlignRight{
+    float: right;
+    margin-left: 2px;
+    margin-right: 6px;
+}
+.iconAlignLeft{
+    float: left;
+    margin-left: 6px;
+    margin-right: 2px;
+}
+.iconAlignright{
+    float: right;
+    margin-left: 2px;
+    margin-right: 6px;
+}
+.iconAlignleft{
+    float: left;
+    margin-left: 6px;
+    margin-right: 2px;
+}
+
+.iconSize0{
+    font-size:0px;
+}
+.iconSize1{
+    font-size:1px;
+}
+.iconSize2{
+    font-size:2px;
+}
+.iconSize3{
+    font-size:3px;
+}
+.iconSize4{
+    font-size:4px;
+}
+.iconSize5{
+    font-size:5px;
+}
+.iconSize6{
+    font-size:6px;
+}
+.iconSize7{
+    font-size:7px;
+}
+.iconSize8{
+    font-size:8px;
+}
+.iconSize9{
+    font-size:9px;
+}
+.iconSize10{
+    font-size:10px;
+}
+.iconSize11{
+    font-size:11px;
+}
+.iconSize12{
+    font-size:12px;
+}
+.iconSize13{
+    font-size:13px;
+}
+.iconSize14{
+    font-size:14px;
+}
+.iconSize15{
+    font-size:15px;
+}
+.iconSize16{
+    font-size:16px;
+}
+.iconSize17{
+    font-size:17px;
+}
+.iconSize18{
+    font-size:18px;
+}
+.iconSize19{
+    font-size:19px;
+}
+.iconSize20{
+    font-size:20px;
+}
+.iconSize21{
+    font-size:21px;
+}
+.iconSize22{
+    font-size:22px;
+}
+.iconSize23{
+    font-size:23px;
+}
+.iconSize24{
+    font-size:24px;
+}
+.iconSize25{
+    font-size:25px;
+}
+.iconSize26{
+    font-size:26px;
+}
+.iconSize27{
+    font-size:27px;
+}
+.iconSize28{
+    font-size:28px;
+}
+.iconSize29{
+    font-size:29px;
+}
+.iconSize30{
+    font-size:30px;
+}
+.iconSize31{
+    font-size:31px;
+}
+.iconSize32{
+    font-size:32px;
+}
+.iconSize33{
+    font-size:33px;
+}
+.iconSize34{
+    font-size:34px;
+}
+.iconSize35{
+    font-size:35px;
+}
+.iconSize36{
+    font-size:36px;
+}
+.iconSize37{
+    font-size:37px;
+}
+.iconSize38{
+    font-size:38px;
+}
+.iconSize39{
+    font-size:39px;
+}
+.iconSize40{
+    font-size:40px;
+}
+.iconSize41{
+    font-size:41px;
+}
+.iconSize42{
+    font-size:42px;
+}
+.iconSize43{
+    font-size:43px;
+}
+.iconSize44{
+    font-size:44px;
+}
+.iconSize45{
+    font-size:45px;
+}
+.iconSize46{
+    font-size:46px;
+}
+.iconSize47{
+    font-size:47px;
+}
+.iconSize48{
+    font-size:48px;
+}
+.iconSize49{
+    font-size:49px;
+}
+.iconSize50{
+    font-size:50px;
+}
+.iconSize51{
+    font-size:51px;
+}
+.iconSize52{
+    font-size:52px;
+}
+.iconSize53{
+    font-size:53px;
+}
+.iconSize54{
+    font-size:54px;
+}
+.iconSize55{
+    font-size:55px;
+}
+.iconSize56{
+    font-size:56px;
+}
+.iconSize57{
+    font-size:57px;
+}
+.iconSize58{
+    font-size:58px;
+}
+.iconSize59{
+    font-size:59px;
+}
+.iconSize60{
+    font-size:60px;
+}
+.iconSize61{
+    font-size:61px;
+}
+.iconSize62{
+    font-size:62px;
+}
+.iconSize63{
+    font-size:63px;
+}
+.iconSize64{
+    font-size:64px;
+}
+.iconSize65{
+    font-size:65px;
+}
+.iconSize66{
+    font-size:66px;
+}
+.iconSize67{
+    font-size:67px;
+}
+.iconSize68{
+    font-size:68px;
+}
+.iconSize69{
+    font-size:69px;
+}
+.iconSize70{
+    font-size:70px;
+}
+.iconSize71{
+    font-size:71px;
+}
+.iconSize72{
+    font-size:72px;
+}
+.iconSize73{
+    font-size:73px;
+}
+.iconSize74{
+    font-size:74px;
+}
+.iconSize75{
+    font-size:75px;
+}
+.iconSize76{
+    font-size:76px;
+}
+.iconSize77{
+    font-size:77px;
+}
+.iconSize78{
+    font-size:78px;
+}
+.iconSize79{
+    font-size:79px;
+}
+.iconSize80{
+    font-size:80px;
+}
+.iconSize81{
+    font-size:81px;
+}
+.iconSize82{
+    font-size:82px;
+}
+.iconSize83{
+    font-size:83px;
+}
+.iconSize84{
+    font-size:84px;
+}
+.iconSize85{
+    font-size:85px;
+}
+.iconSize86{
+    font-size:86px;
+}
+.iconSize87{
+    font-size:87px;
+}
+.iconSize88{
+    font-size:88px;
+}
+.iconSize89{
+    font-size:89px;
+}
+.iconSize90{
+    font-size:90px;
+}
+.iconSize91{
+    font-size:91px;
+}
+.iconSize92{
+    font-size:92px;
+}
+.iconSize93{
+    font-size:93px;
+}
+.iconSize94{
+    font-size:94px;
+}
+.iconSize95{
+    font-size:95px;
+}
+.iconSize96{
+    font-size:96px;
+}
+.iconSize97{
+    font-size:97px;
+}
+.iconSize98{
+    font-size:98px;
+}
+.iconSize99{
+    font-size:99px;
+}
+.iconSize100{
+    font-size:100px;
+}
+.iconSize101{
+    font-size:101px;
+}
+.iconSize102{
+    font-size:102px;
+}
+.iconSize103{
+    font-size:103px;
+}
+.iconSize104{
+    font-size:104px;
+}
+.iconSize105{
+    font-size:105px;
+}
+.iconSize106{
+    font-size:106px;
+}
+.iconSize107{
+    font-size:107px;
+}
+.iconSize108{
+    font-size:108px;
+}
+.iconSize109{
+    font-size:109px;
+}
+.iconSize110{
+    font-size:110px;
+}
+.iconSize111{
+    font-size:111px;
+}
+.iconSize112{
+    font-size:112px;
+}
+.iconSize113{
+    font-size:113px;
+}
+.iconSize114{
+    font-size:114px;
+}
+.iconSize115{
+    font-size:115px;
+}
+.iconSize116{
+    font-size:116px;
+}
+.iconSize117{
+    font-size:117px;
+}
+.iconSize118{
+    font-size:118px;
+}
+.iconSize119{
+    font-size:119px;
+}
+.iconSize120{
+    font-size:120px;
+}
+.iconSize121{
+    font-size:121px;
+}
+.iconSize122{
+    font-size:122px;
+}
+.iconSize123{
+    font-size:123px;
+}
+.iconSize124{
+    font-size:124px;
+}
+.iconSize125{
+    font-size:125px;
+}
+.iconSize126{
+    font-size:126px;
+}
+.iconSize127{
+    font-size:127px;
+}
+.iconSize128{
+    font-size:128px;
+}
+.iconSize129{
+    font-size:129px;
+}
+.iconSize130{
+    font-size:130px;
+}
+.iconSize131{
+    font-size:131px;
+}
+.iconSize132{
+    font-size:132px;
+}
+.iconSize133{
+    font-size:133px;
+}
+.iconSize134{
+    font-size:134px;
+}
+.iconSize135{
+    font-size:135px;
+}
+.iconSize136{
+    font-size:136px;
+}
+.iconSize137{
+    font-size:137px;
+}
+.iconSize138{
+    font-size:138px;
+}
+.iconSize139{
+    font-size:139px;
+}
+.iconSize140{
+    font-size:140px;
+}
+.iconSize141{
+    font-size:141px;
+}
+.iconSize142{
+    font-size:142px;
+}
+.iconSize143{
+    font-size:143px;
+}
+.iconSize144{
+    font-size:144px;
+}
+.iconSize145{
+    font-size:145px;
+}
+.iconSize146{
+    font-size:146px;
+}
+.iconSize147{
+    font-size:147px;
+}
+.iconSize148{
+    font-size:148px;
+}
+.iconSize149{
+    font-size:149px;
+}
+.iconSize150{
+    font-size:150px;
+}

@@ -16,10 +16,6 @@ var CAppHandler = Class({
     },
     initialize: function(callback){
         // Load objects failure.
-//        if (CAppHandler.failedLoadDCAF === true) {
-//            CThreads.start(callback);
-//            return;
-//        }
         try {
             var startLoadObjects        = (new  Date()).getTime();
 
@@ -54,6 +50,12 @@ var CAppHandler = Class({
             CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
             CPager.initialize();
+
+            // Load custom css,js and css,js links.
+            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
+            CThreads.start(function(){ CAppHandler.loadCSSLinks(    appData.cssLinks    || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
         }
         catch (e){
             CLog.error('CAppHandler.initialize error occured.');
@@ -87,7 +89,52 @@ var CAppHandler = Class({
                 callback();
             });
         }
-    }
+    },
+    loadJSLinks: function(links){
+        // Append default links.
+        _.each(links, function(link){
+            var resource = document.createElement('script');
+            resource.setAttribute("type","text/javascript");
+            resource.setAttribute("src", link);
+            var head = document.head || document.getElementsByTagName("head")[0];
+            head.appendChild(resource);
+        });
+    },
+    loadCSSLinks: function(links){
+        // Append default links.
+        links.unshift('core/icons/flaticon.css');
+
+        _.each(links, function(link){
+            var resource = document.createElement('link');
+            resource.setAttribute("rel", "stylesheet");
+            resource.setAttribute("href",link);
+            resource.setAttribute("type","text/css");
+            var head = document.head || document.getElementsByTagName("head")[0];
+            head.appendChild(resource);
+        });
+    },
+    loadCustomCSS: function(cssArray){
+        var cssStyle = new CStringBuilder();
+        var cssStyleElement     = document.createElement('style');
+        cssStyleElement.id      = 'app-custom-css-style';
+        cssStyleElement.type    = 'text/css';
+        _.each(cssArray, function(css){
+            cssStyle.append(css);
+        });
+        // Append CSS string.
+        cssStyleElement.innerHTML = cssStyle.build(' ');
+        // Load css
+        var head = document.head || document.getElementsByTagName("head")[0];
+        head.appendChild(cssStyleElement);
+    },
+    loadCustomJS: function(jsArray){
+        var jsCode = new CStringBuilder();
+        _.each(jsArray, function(js){
+            jsCode.append(js);
+        });
+        eval.call(window,jsCode.build(' '));
+    },
+
 
 });
 

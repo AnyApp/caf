@@ -155,6 +155,11 @@ var CDesigner = Class({
             if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
             return "hp"+data;
         },
+        lineHeight: function(data){
+            data = ""+data;
+            if (data==='auto') return 'lineHeightAuto';
+            return "lhp"+data;
+        },
         minHeight: function(data){
             return "mhp"+data;
         },

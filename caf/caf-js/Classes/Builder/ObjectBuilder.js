@@ -64,6 +64,10 @@ var CBuilderObject = Class({
         this.properties.data.right = right;
         return this;
     },
+    headerTitleDesign: function(design) {
+        this.properties.data.titleDesign = design;
+        return this;
+    },
     text: function(text) {
         this.properties.logic.text = text;
         return this;
@@ -390,6 +394,40 @@ var CBuilderObject = Class({
         this.properties.logic.openNavigationApp = address;
         return this;
     },
+    /**
+         Mail: message, subject, image.
+         Twitter: message, image, link (which is automatically shortened).
+         Google+ / Hangouts: message, subject, link
+         Facebook iOS: message, image, link.
+         Facebook Android: sharing a message is not possible. Sharing links and images is, but a description can not be prefilled.
+     */
+    share: function(subject,msg,image,link) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   image   || null,
+            link:    link    || null
+        };
+        return this;
+    },
+    shareImage: function(subject,msg,image) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   image   || null,
+            link:    null
+        };
+        return this;
+    },
+    shareLink: function(subject,msg,link) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   null,
+            link:    link    || null
+        };
+        return this;
+    },
     link: function(path,data,globalData) {
         this.properties.logic.link = {
             path:           path || null,
@@ -398,28 +436,31 @@ var CBuilderObject = Class({
         };
         return this;
     },
-    icon: function(name,size,align,color) {
+    icon: function(name,size,align,color,design) {
         this.properties.logic.icon = {
-            name:   name || null,
-            size:   size || null,
-            align:  align || null,
-            color: color || null
+            name:   name    || null,
+            size:   size    || null,
+            align:  align   || null,
+            color: color    || null,
+            design: design  || null
         };
         return this;
     },
-    iconLeft: function(name,size,color) {
+    iconLeft: function(name,size,color,design) {
         this.properties.logic.iconLeft = {
             name:   name || null,
             size:   size || null,
-            color: color || null
+            color: color || null,
+            design: design  || null
         };
         return this;
     },
-    iconRight: function(name,size,color) {
+    iconRight: function(name,size,color,design) {
         this.properties.logic.iconRight = {
             name:   name || null,
             size:   size || null,
-            color: color || null
+            color: color || null,
+            design: design  || null
         };
         return this;
     },

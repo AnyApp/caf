@@ -568,6 +568,41 @@ var CPlatforms = Class({
 
 
 /**
+ * Created by dvircn on 06/08/14.
+ */
+var CSharer = Class({
+    $singleton: true,
+    base: '',
+    share: function(options){
+        if (CUtils.isEmpty(options))
+           return;
+        var msg     = options.msg       || null;
+        var subject = options.subject   || null;
+        var image   = options.image     || null;
+        var link    = options.link      || null;
+
+        // Empty or Base 64 image.
+        if (CUtils.isEmpty(image) || image.indexOf('data:')===0)
+            CSharer.shareAction(msg,subject,image,link); // Immidiate share.
+
+        // Link image
+        var shareFunction = function(base64Img){
+            CSharer.shareAction(msg,subject,base64Img,link); // Immidiate share.
+        };
+        CUtils.convertImgToBase64(image,shareFunction,'image/png');
+    },
+    shareAction: function(msg,subject,image,link){
+        // Sharing not supported.
+        if (!(window.plugins && window.plugins.socialsharing && window.plugins.socialsharing.share))
+            return;
+        // Share.
+        window.plugins.socialsharing.share(msg,subject,image,link);
+    }
+
+});
+
+
+/**
  * Created by dvircn on 09/08/14.
  */
 var CStringBuilder = Class({
@@ -909,6 +944,29 @@ var CUtils = Class({
                 haystack.replace(needle,''));
         else
             return haystack;
+    },
+    /**
+     * Convert an image
+     * to a base64 string
+     * @param  {String}   url
+     * @param  {Function} callback
+     * @param  {String}   [outputFormat=image/png]
+     */
+    convertImgToBase64: function(url, callback, outputFormat){
+        var canvas = document.createElement('CANVAS'),
+            ctx = canvas.getContext('2d'),
+            img = new Image;
+        img.crossOrigin = 'Anonymous';
+        img.onload = function(){
+            var dataURL;
+            canvas.height = img.height;
+            canvas.width = img.width;
+            ctx.drawImage(img, 0, 0);
+            dataURL = canvas.toDataURL(outputFormat);
+            callback.call(this, dataURL);
+            canvas = null;
+        };
+        img.src = url;
     }
 
 
@@ -2275,6 +2333,11 @@ var CDesigner = Class({
             if (data.indexOf('%')>=0)   return "h"+data.substring(0,data.length-1);
             return "hp"+data;
         },
+        lineHeight: function(data){
+            data = ""+data;
+            if (data==='auto') return 'lineHeightAuto';
+            return "lhp"+data;
+        },
         minHeight: function(data){
             return "mhp"+data;
         },
@@ -2477,6 +2540,8 @@ var CLogic = Class({
             if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
                 return;
             value.path = value.path+''; // Cast to string.
+            if (value.path === '/') // Main Page link.
+                value.path = '';
             if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value.path);
@@ -2494,6 +2559,12 @@ var CLogic = Class({
                     CUtils.openLocalURL(value.path+CPager.mapDataToPath(finalData));
                 });
             }
+        },
+        share: function(object,value){
+            // Retreive share data.
+            CClicker.addOnClick(object,function(){
+                CSharer.share(value || {});
+            });
         },
         showDialog: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -2528,9 +2599,11 @@ var CLogic = Class({
             var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
             var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
             var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
+            var classes = CUtils.isEmpty(value.design)?'':
+                ' '+CDesigner.designToClasses(value.design);
 //            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
 //            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
-            var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';
+            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'"></i>';
 
             var elm = CUtils.element(object.uid());
             elm.innerHTML = iconElmText+elm.innerHTML;
@@ -4463,12 +4536,12 @@ var CHeader = Class(CContainer,{
         this.data.right = this.data.right || [];
 
         this.data.titleDesign = this.data.titleDesign || {};
-        this.data.titleDesign = CUtils.mergeJSONs(this.data.titleDesign,{
+        this.data.titleDesign = CUtils.mergeJSONs({
             position: 'absolute',
             left: this.data.itemSize * this.data.left.length,
             right: this.data.itemSize * this.data.right.length,
             top: 0, bottom:0, margin: 'none', height:'auto'
-        });
+        }, this.data.titleDesign);
         // Create Title.
         this.data.title = CObjectsHandler.createObject('Label',{
             design: this.data.titleDesign
@@ -5685,10 +5758,6 @@ var CAppHandler = Class({
     },
     initialize: function(callback){
         // Load objects failure.
-//        if (CAppHandler.failedLoadDCAF === true) {
-//            CThreads.start(callback);
-//            return;
-//        }
         try {
             var startLoadObjects        = (new  Date()).getTime();
 
@@ -5723,6 +5792,12 @@ var CAppHandler = Class({
             CLog.dlog('Total Initialize Time : '+(endBuildAll-startLoadObjects)+' Milliseconds.');
 
             CPager.initialize();
+
+            // Load custom css,js and css,js links.
+            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
+            CThreads.start(function(){ CAppHandler.loadCSSLinks(    appData.cssLinks    || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
         }
         catch (e){
             CLog.error('CAppHandler.initialize error occured.');
@@ -5756,7 +5831,52 @@ var CAppHandler = Class({
                 callback();
             });
         }
-    }
+    },
+    loadJSLinks: function(links){
+        // Append default links.
+        _.each(links, function(link){
+            var resource = document.createElement('script');
+            resource.setAttribute("type","text/javascript");
+            resource.setAttribute("src", link);
+            var head = document.head || document.getElementsByTagName("head")[0];
+            head.appendChild(resource);
+        });
+    },
+    loadCSSLinks: function(links){
+        // Append default links.
+        links.unshift('core/icons/flaticon.css');
+
+        _.each(links, function(link){
+            var resource = document.createElement('link');
+            resource.setAttribute("rel", "stylesheet");
+            resource.setAttribute("href",link);
+            resource.setAttribute("type","text/css");
+            var head = document.head || document.getElementsByTagName("head")[0];
+            head.appendChild(resource);
+        });
+    },
+    loadCustomCSS: function(cssArray){
+        var cssStyle = new CStringBuilder();
+        var cssStyleElement     = document.createElement('style');
+        cssStyleElement.id      = 'app-custom-css-style';
+        cssStyleElement.type    = 'text/css';
+        _.each(cssArray, function(css){
+            cssStyle.append(css);
+        });
+        // Append CSS string.
+        cssStyleElement.innerHTML = cssStyle.build(' ');
+        // Load css
+        var head = document.head || document.getElementsByTagName("head")[0];
+        head.appendChild(cssStyleElement);
+    },
+    loadCustomJS: function(jsArray){
+        var jsCode = new CStringBuilder();
+        _.each(jsArray, function(js){
+            jsCode.append(js);
+        });
+        eval.call(window,jsCode.build(' '));
+    },
+
 
 });
 
@@ -5835,6 +5955,10 @@ var Caf = Class({
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
 
+        // Phonegap on ready.
+        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
+        // Start.
         CAppHandler.start(function(){
             if (Caf.firstLoad) {
                 Caf.showWaitToLoad();
@@ -5844,8 +5968,7 @@ var Caf = Class({
                 Caf.startUpdate();
         });
 
-        // Phonegap on ready.
-        document.addEventListener('deviceready', Caf.onDeviceReady, false);
+
 
     },
     onDeviceReady : function() {
@@ -5904,8 +6027,9 @@ var Caf = Class({
             hideOnOutClick: false,
             title: 'מכין מספר דברים...',
             dialogColor: CColor('TealE',8)
-        }, { minHeight: 'auto'});
+        }, { direction:'rtl',minHeight: 'auto'});
     }
+
 
 });
 
@@ -6049,6 +6173,10 @@ var CBuilderObject = Class({
     },
     headerRight: function(right) {
         this.properties.data.right = right;
+        return this;
+    },
+    headerTitleDesign: function(design) {
+        this.properties.data.titleDesign = design;
         return this;
     },
     text: function(text) {
@@ -6377,6 +6505,40 @@ var CBuilderObject = Class({
         this.properties.logic.openNavigationApp = address;
         return this;
     },
+    /**
+         Mail: message, subject, image.
+         Twitter: message, image, link (which is automatically shortened).
+         Google+ / Hangouts: message, subject, link
+         Facebook iOS: message, image, link.
+         Facebook Android: sharing a message is not possible. Sharing links and images is, but a description can not be prefilled.
+     */
+    share: function(subject,msg,image,link) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   image   || null,
+            link:    link    || null
+        };
+        return this;
+    },
+    shareImage: function(subject,msg,image) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   image   || null,
+            link:    null
+        };
+        return this;
+    },
+    shareLink: function(subject,msg,link) {
+        this.properties.logic.share = {
+            msg:     msg     || null,
+            subject: subject || null,
+            image:   null,
+            link:    link    || null
+        };
+        return this;
+    },
     link: function(path,data,globalData) {
         this.properties.logic.link = {
             path:           path || null,
@@ -6385,28 +6547,31 @@ var CBuilderObject = Class({
         };
         return this;
     },
-    icon: function(name,size,align,color) {
+    icon: function(name,size,align,color,design) {
         this.properties.logic.icon = {
-            name:   name || null,
-            size:   size || null,
-            align:  align || null,
-            color: color || null
+            name:   name    || null,
+            size:   size    || null,
+            align:  align   || null,
+            color: color    || null,
+            design: design  || null
         };
         return this;
     },
-    iconLeft: function(name,size,color) {
+    iconLeft: function(name,size,color,design) {
         this.properties.logic.iconLeft = {
             name:   name || null,
             size:   size || null,
-            color: color || null
+            color: color || null,
+            design: design  || null
         };
         return this;
     },
-    iconRight: function(name,size,color) {
+    iconRight: function(name,size,color,design) {
         this.properties.logic.iconRight = {
             name:   name || null,
             size:   size || null,
-            color: color || null
+            color: color || null,
+            design: design  || null
         };
         return this;
     },

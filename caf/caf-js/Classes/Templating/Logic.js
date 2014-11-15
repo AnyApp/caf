@@ -36,6 +36,8 @@ var CLogic = Class({
             if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
                 return;
             value.path = value.path+''; // Cast to string.
+            if (value.path === '/') // Main Page link.
+                value.path = '';
             if ((!CUtils.isURLLocal(value.path))){
                 CClicker.addOnClick(object,function(){
                     CUtils.openURL(value.path);
@@ -53,6 +55,12 @@ var CLogic = Class({
                     CUtils.openLocalURL(value.path+CPager.mapDataToPath(finalData));
                 });
             }
+        },
+        share: function(object,value){
+            // Retreive share data.
+            CClicker.addOnClick(object,function(){
+                CSharer.share(value || {});
+            });
         },
         showDialog: function(object,value){
             CClicker.addOnClick(object,function(){
@@ -87,9 +95,11 @@ var CLogic = Class({
             var size    = CUtils.isEmpty(value.size)? '': ' iconSize'+value.size;
             var align   = CUtils.isEmpty(value.align)?'': ' iconAlign'+value.align;
             var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
+            var classes = CUtils.isEmpty(value.design)?'':
+                ' '+CDesigner.designToClasses(value.design);
 //            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
 //            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
-            var iconElmText = '<i class="flaticon-'+value.name+size+align+color+'"></i>';
+            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'"></i>';
 
             var elm = CUtils.element(object.uid());
             elm.innerHTML = iconElmText+elm.innerHTML;

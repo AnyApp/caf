@@ -8,7 +8,7 @@ copy /b caf-compiled.js ..\core\caf.min.js
 
 cd ..\caf-css
 del ..\css\caf-all.css
-copy /b idangerous.swiper.css+snap.css+utils\elementTransitions.css+dialogs.css+utils\animations.css+utils\responsive.css+utils\heights.css+utils\min-heights.css+utils\heights.css+utils\max-heights.css+utils\font-sizes.css+utils\widths.css+utils\paddings.css+utils\absolutes.css+utils\margins.css+caf.css ..\css\caf-all.css
+copy /b idangerous.swiper.css+snap.css+utils\elementTransitions.css+dialogs.css+utils\animations.css+utils\responsive.css+utils\heights.css+utils\lineHeights.css+utils\min-heights.css+utils\heights.css+utils\max-heights.css+utils\font-sizes.css+utils\widths.css+utils\paddings.css+utils\absolutes.css+utils\margins.css+caf.css+utils\margins.css+utils\icons.css ..\css\caf-all.css
 copy /b ..\css\caf-all.css ..\compiling\caf-all.css
 cd ..\compiling
 java -jar yuicompressor-2.4.8.jar -o caf.min.css caf-all.css
