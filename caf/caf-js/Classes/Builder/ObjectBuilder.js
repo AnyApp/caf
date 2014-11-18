@@ -34,14 +34,48 @@ var CBuilderObject = Class({
     },
     page: function(name,title,onLoad){
         this.properties.data.page =
-                { name: name || '', title: title || '', onLoad: onLoad || function() {} };
+                { name: name || '', title: title || '', onLoads: [onLoad] || [] };
         this.properties.logic.page = true;
         return this;
     },
     pageOnLoad: function(onLoad){
         this.properties.data.page = this.properties.data.page || {};
-        this.properties.data.page.onLoad = onLoad  || function() {};
+        this.properties.data.page.onLoads = this.properties.data.page.onLoads || [];
+        this.properties.data.page.onLoads.push(onLoad  || function() {});
         this.properties.logic.page = true;
+        return this;
+    },
+    pageOnLoadPrepare: function(onLoadPrepare){
+        this.properties.data.page = this.properties.data.page || {};
+        this.properties.data.page.onLoadPrepares = this.properties.data.page.onLoadPrepares || [];
+        this.properties.data.page.onLoadPrepares.push(onLoadPrepare  || function() {});
+        this.properties.logic.page = true;
+        return this;
+    },
+    onShowAnimateChildren: function(animations,intervals,start) {
+        this.properties.logic.onShowAnimateChildren = {
+            animations:     animations,
+            intervals:      intervals,
+            start:          start
+        };
+        return this;
+    },
+    onShowAnimation: function(objects,animations,intervals,start) {
+        this.properties.logic.onShowAnimation = {
+            objects:        objects,
+            animations:     animations,
+            intervals:      intervals,
+            start:          start
+        };
+        return this;
+    },
+    onShowSelfAnimation: function(animation,start) {
+        this.properties.logic.onShowAnimation = {
+            objects:        null,
+            animations:     animation,
+            intervals:      0,
+            start:          start
+        };
         return this;
     },
     sideMenuWidth: function(width) {
@@ -392,6 +426,16 @@ var CBuilderObject = Class({
     },
     openNavigationApp: function(address) {
         this.properties.logic.openNavigationApp = address;
+        return this;
+    },
+    openFacebookPageOrProfile: function(pageId) {
+        this.properties.logic.openFacebookPageOrProfile = pageId;
+        return this;
+    },
+    openMailTo: function(mail) {
+        this.properties.logic.openMail = {
+            to:[mail || '']
+        };
         return this;
     },
     /**

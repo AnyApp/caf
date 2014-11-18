@@ -308,6 +308,36 @@ var CValidators = Class({
 
 
 /**
+ * Created by dvircn on 17/11/14.
+ */
+var CAppAvailability = Class({
+    $singleton: true,
+    hasFacebook: function(onHas,onHasnt){
+        if (CUtils.isEmpty(window.appAvailability))
+            onHasnt();
+        else if (CPlatforms.isIOS())
+            appAvailability.check( 'fb://',onHas,onHasnt );
+        else if (CPlatforms.isAndroid())
+            appAvailability.check( 'com.facebook.katana',onHas,onHasnt );
+        else
+            onHasnt();
+    },
+    hasWhatsapp: function(onHas,onHasnt){
+        if (CUtils.isEmpty(window.appAvailability))
+            onHasnt();
+        else if (CPlatforms.isIOS())
+            appAvailability.check( 'whatsapp://',onHas,onHasnt );
+        else if (CPlatforms.isAndroid())
+            appAvailability.check( 'com.whatsapp',onHas,onHasnt );
+        else
+            onHasnt();
+    }
+
+
+});
+
+
+/**
  * Created by dvircn on 17/08/14.
  */
 var CDom = Class({
@@ -375,6 +405,70 @@ var CDom = Class({
     }
 
 });
+/**
+ * Created by dvircn on 15/11/14.
+ */
+var CEvents = Class({
+    events: {
+        reshow: 'reshow',
+        prepareReshow: 'prepareReshow'
+    },
+    $singleton: true,
+    eventsRegistrations: {},
+    /**
+     *
+     * @param eventName
+     * @param objectId
+     * @param func - Can be function or function-path in the object.
+     *               In that case, the function will apply from inside the object.
+     */
+    register: function(eventName,objectId,func){
+        // Create event entry
+        if (CUtils.isEmpty(CEvents.eventsRegistrations[eventName]))
+            CEvents.eventsRegistrations[eventName] = [];
+        CEvents.eventsRegistrations[eventName].push({objectId:objectId,func:func});
+    },
+    fire: function(eventName,caller,data,filter){
+        if (CUtils.isEmpty(CEvents.eventsRegistrations[eventName]))
+            return;
+        filter = filter || function(object,data) {return true;};
+        // Create Event.
+        var event = {
+            name: eventName,
+            caller: caller,
+            data: data
+        };
+        _.each(CEvents.eventsRegistrations[eventName],function(subscriber){
+            var object = CObjectsHandler.object(subscriber.objectId);
+            // Filter the object.
+            if (!filter(object,data))
+                return;
+
+            // If the subscriber sent a function.
+            if (CUtils.isFunction(subscriber.func))
+                subscriber.func(event);
+            // If the subscriber sent a function reference at the object.
+            // Execute the function from the object with the event.
+            else {
+                try {
+                    var func = eval('object.'+subscriber.func+'(event);');
+                }
+                catch(e){
+                    CLog.error('Failed to execute event subscriber function.');
+                    CLog.error('Logging subscriber...');
+                    CLog.log(subscriber);
+                    CLog.error('Logging error...');
+                    CLog.log(e);
+                }
+
+            }
+        });
+    }
+
+
+});
+
+
 /**
  * Created by dvircn on 17/08/14.
  */
@@ -446,6 +540,32 @@ var CLog = Class({
     },
     error: function(error){
         window.console.log('%c'+error, 'color: #D20000');
+    }
+
+
+});
+
+
+/**
+ * Created by dvircn on 18/11/14.
+ */
+var CMail = Class({
+    $singleton: true,
+    open: function(options){
+        options = options || {};
+        options.to = options.to || [''];
+        if (window && window.plugin && window.plugin.email && window.plugin.email.isServiceAvailable){
+            window.plugin.email.isServiceAvailable(function(isAvailable){
+                if (isAvailable){
+                    window.plugin.email.open({
+                        to: options.to
+                    });
+                }
+            });
+        }
+        else
+            CUtils.openURL("mailto:" + options.to[0], "_system");
+
     }
 
 
@@ -565,6 +685,47 @@ var CPlatforms = Class({
 
 });
 
+
+
+/**
+ * Created by dvircn on 17/11/14.
+ */
+var CPush = Class({
+    $singleton: true,
+    googleProjectID: 206306306355,
+    initialize: function(pushData){
+        var pushToken = pushData.pushToken || '';
+        CPush.registerDeviceForPush(pushToken);
+    },
+    registerDeviceForPush: function(pushToken) {
+        if (CUtils.isEmpty(window.PushNotification))
+            return;
+
+        var PUSHAPPS_APP_TOKEN = pushToken;
+
+        PushNotification.registerDevice(CPush.googleProjectID, PUSHAPPS_APP_TOKEN, function (pushToken) {
+            //no use right now
+        }, function (error) {
+            //TODO: add error handling
+        });
+
+        document.removeEventListener('pushapps.message-received');
+        document.addEventListener('pushapps.message-received', function (event) {
+            var notification = event.notification;
+
+            var devicePlatform = device.platform;
+            if (devicePlatform === 'iOS') {
+
+                //TODO: add handling for IOS notification
+            } else {
+                //TODO: add handling for Android notification
+            }
+        });
+
+    }
+
+
+});
 
 
 /**
@@ -720,6 +881,9 @@ var CUtils = Class({
     },
     isArray: function(variable){
         return Object.prototype.toString.call( variable ) === '[object Array]';
+    },
+    isFunction: function(variable){
+        return typeof(variable) == "function";
     },
     isStringFunction: function(variable)
     {
@@ -1063,24 +1227,68 @@ var CAnimations = Class({
         object.data.lastOnEnd           = 0;
         object.data.lastOnStart         = 0;
     },
-    cascadeShow: function(objectsIds){
-        for (var i in objectsIds){
-            var index = Number(i);
-            var objectId        = objectsIds[index];
-            // Hide all elements.
-            CUtils.addClass(CUtils.element(objectId),'hidden');
+    cascadeAnimate: function(objects,intervals,animations,start){
+        start = start || 0;
+        if (CUtils.isEmpty(objects) || CUtils.isEmpty(animations))
+            return;
+        // Setup animations.
+        animations = CAnimations.cascadeAnimateSetupAnimations(animations,objects.length);
+        // Animate each object after the last one finished.
+        if (CUtils.isEmpty(intervals)){
+            CAnimations.cascadeAnimateEachAfterEnd(objects,animations);
+            return;
+        }
+        // Setup intervals
+        intervals = CAnimations.cascadeAnimateSetupIntervals(intervals,objects.length);
+        // Do Cascade animate.
+        for (var i in objects){
+            var objectId = objects[i];
+            // Run animation
+            CThreads.run(
+                CAnimations.createCascadeShowFunction(objectId,animations[i]),
+                intervals[i]+start // Run time.
+            );
+        }
+    },
+    createCascadeShowFunction: function(objectId,animation){
+        return function(){
+            CAnimations.show(objectId,{animation:animation});
+        };
+    },
+    cascadeAnimateSetupAnimations: function(animations,total){
+        if (CUtils.isString(animations))
+            animations = [animations];
+        while (animations.length < total)
+            animations.push(animations[0]);
+        return animations;
+    },
+    cascadeAnimateSetupIntervals: function(intervals,total){
+        // If Array, return, else: number, setup intervals.
+        if (CUtils.isArray(intervals))
+            return intervals;
+        interval = Number(intervals); // intervals is a number.
+        intrvals = [];
+        for (var i=0;i<total;i++) {
+            intrvals.push(interval * i);
+        }
+        return intrvals;
+    },
+    cascadeAnimateEachAfterEnd: function(objects,animations){
+        for (var i in objects){
+            var index       = Number(i);
+            var objectId    = objects[index];
 
-            if (index+1 == objectsIds.length)
-                continue;
-
-            var nextObjectId    = objectsIds[index+1];
+            var nextObjectId    = objects[index+1];
             var object          = CObjectsHandler.object(objectId);
-            object.data.onAnimShowComplete = CAnimations.createCascadeFunction(nextObjectId);
+            object.data.animation = animations[index] || '';
+
+            if (index+1 < objects.length)
+                object.data.onAnimShowComplete = CAnimations.createCascadeEachAfterEndFunction(nextObjectId);
         }
 
-        CAnimations.show(objectsIds[0]);
+        CAnimations.show(objects[0]);
     },
-    createCascadeFunction: function(nextObjectId){
+    createCascadeEachAfterEndFunction: function(nextObjectId){
         return function(){
             CAnimations.show(nextObjectId);
         };
@@ -1377,8 +1585,8 @@ var CPager = Class({
     pages: {},
     router: null,
     currentPageNumber: 0,
-    currentPage: '',
-    lastPage: '',
+    currentPage: null,
+    lastPage: null,
     initialize: function(){
         this.resetPages();
         this.setBackForwardDetection();
@@ -1481,16 +1689,6 @@ var CPager = Class({
         else
             CUtils.removeClass(CUtils.element(CPager.backButtonId),'hidden');
     },
-    onLoadPage: function(pageId) {
-        var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
-        if (CUtils.isEmpty(onPageLoad))
-            return;
-        // Execute onPageLoad.
-        onPageLoad();
-    },
-    getPagePath: function(name,params){
-        return name+CPager.dataToPath(params);
-    },
     showPage: function(name,params){
 //        if (CPager.isChangePageLocked())
 
@@ -1567,12 +1765,27 @@ var CPager = Class({
         CTitleHandler.setTitle(page.getPageTitle());
         page.setParams(this.getParamsAsMap(params));
 
+        // Prepare Load of Page.
+        page.prepareReload();
+
         // Showing current page.
-        if (CUtils.isEmpty(lastPage))
+        if (CUtils.isEmpty(lastPage)){
             CAnimations.quickShow(currentPage);
+            animationOptions.onAnimShowComplete();
+        }
         else
             CAnimations.show(currentPage,animationOptions);
 
+    },
+    onLoadPage: function(pageId) {
+        var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
+        if (CUtils.isEmpty(onPageLoad))
+            return;
+        // Execute onPageLoad.
+        onPageLoad();
+    },
+    getPagePath: function(name,params){
+        return name+CPager.dataToPath(params);
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {
@@ -2522,6 +2735,21 @@ var CLogic = Class({
         onTemplateElementClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
+        openFacebookPageOrProfile: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CAppAvailability.hasFacebook(
+                    function(){
+                        CUtils.openURL('fb://profile/' + value, "_system");
+                    },
+                    function(){
+                        CUtils.openURL('http://facebook.com/' + value+'', "_system");
+                    }
+                )
+            });
+
+        },
         phoneCall: function(object,value){
             if (CUtils.isEmpty(value))
                 return;
@@ -2533,7 +2761,19 @@ var CLogic = Class({
             if (CUtils.isEmpty(value))
                 return;
             CClicker.addOnClick(object,function(){
-                CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+                if (CPlatforms.isIOS())
+                    CUtils.openURL("maps:q=" + value, "_system");
+                else if (CPlatforms.isAndroid())
+                    CUtils.openURL("geo:0,0?q=" + value, "_system");
+                else
+                    CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+            });
+        },
+        openMail: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CMail.open(value);
             });
         },
         link: function(object,value){
@@ -2601,9 +2841,10 @@ var CLogic = Class({
             var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
             var classes = CUtils.isEmpty(value.design)?'':
                 ' '+CDesigner.designToClasses(value.design);
+            var inline  = CUtils.isEmpty(value.design)?'': value.design.inline || '';
 //            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
 //            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
-            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'"></i>';
+            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'" style="'+inline+'"></i>';
 
             var elm = CUtils.element(object.uid());
             elm.innerHTML = iconElmText+elm.innerHTML;
@@ -2706,6 +2947,41 @@ var CLogic = Class({
             // Old android only
             if (!CScrolling.isNativeScrolling())
                 object.scroller = $('#'+object.uid()).niceScroll({});
+        },
+        // Lazy get children - support template that reload and replace children.
+        onShowAnimateChildren: function(object,value){
+            // Register on prepare show
+            CEvents.register(CEvents.events.prepareReshow,object.uid(),function(event){
+                _.each(object.getChilds(),function(objectId){
+                    CAnimations.quickHide(objectId);
+                });
+            });
+
+            // Register on show
+            CEvents.register(CEvents.events.reshow,object.uid(),function(event){
+                CThreads.start(function(){
+                    CAnimations.cascadeAnimate(object.getChilds(),value.intervals,value.animations,value.start);
+                });
+            });
+        },
+        onShowAnimation: function(object,value){
+            // If value.objects is empty then animate this object.
+            if (CUtils.isEmpty(value.objects))
+                value.objects = [object.uid()];
+
+            // Register on prepare show
+            CEvents.register(CEvents.events.prepareReshow,object.uid(),function(event){
+                _.each(value.objects,function(objectId){
+                    CAnimations.quickHide(objectId);
+                });
+            });
+
+            // Register on show
+            CEvents.register(CEvents.events.reshow,object.uid(),function(event){
+                CThreads.start(function(){
+                    CAnimations.cascadeAnimate(value.objects,value.intervals,value.animations,value.start);
+                });
+            });
         }
 
     },
@@ -2922,8 +3198,20 @@ var CTemplator = Class({
         },this);
         object.appendChilds(object.data.template.duplicates);
 
+
+        // Append reshow call.
+        var onFinishWithEventCall = function(){
+            onFinish();
+            // Fire prepare-reshow.
+            object.firePrepareReshowEvent();
+            // Fire reshow.
+            object.fireReshowEvent();
+        };
+
         if (preventRebuild !== true)
-            object.rebuild(onFinish);
+            object.rebuild(onFinishWithEventCall);
+
+
     },
     fixRetreivedData: function(retreived){
         // DO NOT MAKE any changes to the source data.
@@ -2997,6 +3285,7 @@ var CTemplator = Class({
     },
     load: function(objectId, queryData, onFinish, reset) {
         onFinish = onFinish || function(){};
+
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object.data.template.url) ||
             (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){
@@ -3402,6 +3691,26 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.rebuild();
 
+    },
+    isPage: function() {
+        return !CUtils.isEmpty(this.data.page);
+    },
+    // Return the page that this object is in it.
+    getObjectPage: function(){
+        if (this.isPage())
+            return this.uid();
+        var parentObject     = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.getObjectPage();
+        return '';
+    },
+    isChildOf: function(id){
+        if (this.parent === id)
+            return true;
+        var parentObject = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.isChildOf(id);
+        return false;
     }
 
 
@@ -3668,7 +3977,7 @@ var CTemplate = Class(CContainer,{
         },this);
     },
     clearFilter: function(){
-      this.filter();
+        this.filter();
     },
     showLoading: function(){
         if (this.data.template.showLoader!==true || !CUtils.isEmpty(this.spinnerId))
@@ -3688,11 +3997,35 @@ var CTemplate = Class(CContainer,{
         delete this.spinnerId;
     },
     reload: function(queryData,onFinish, reset){
+        onFinish = onFinish||function(){};
         CTemplator.load(this.uid(),queryData||this.data.template.queryData,
-            onFinish||function(){},reset||this.data.template.resetOnReload);
+            onFinish,reset||this.data.template.resetOnReload);
+
     },
     getLoaderColor: function(){
         return this.data.template.loaderColor;
+    },
+    fireReshowEvent: function(){
+        // re-show event.
+        if (this.getObjectPage() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.reshow,this.uid(),{templateId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.uid() === data.templateId ||
+                            object.isChildOf(data.templateId);
+                }
+            );
+        }
+    },
+    firePrepareReshowEvent: function(){
+        // re-show event.
+        if (this.getObjectPage() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.prepareReshow,this.uid(),{templateId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.uid() === data.templateId ||
+                            object.isChildOf(data.templateId);
+                }
+            );
+        }
     }
 
 
@@ -4171,8 +4504,9 @@ var CDialog = Class(CContainer,{
         };
 
         // Set Borders.
-        if (currentButton===0 && countButtons>1/**/)
-            design.border = {right:1}
+        // DONOT border right because in rtl things go wild..
+//        if (currentButton===0 && countButtons>1/**/)
+//            design.border = {right:1}
         if (currentButton===2)
             design.border = {top:1}
         // Change width if needed.
@@ -4643,14 +4977,15 @@ var CPage = Class(CContainer,{
         CPage.$super.call(this, values);
         CScrolling.setScrollable(this);
         // Page properties.
-        this.data.page         = this.data.page           || {};
-        this.data.page.name    = this.data.page.name      || '';
-        this.data.page.title   = this.data.page.title     || '';
-        this.data.page.onLoad  = this.data.page.onLoad    || function(){};
-        this.data.page.id      = this.uid();
-        this.data.page.loaded  = false;
-        this.data.page.params  = {};
-        this.data.page.paramsChanged  = false;
+        this.data.page                  = this.data.page           || {};
+        this.data.page.name             = this.data.page.name      || '';
+        this.data.page.title            = this.data.page.title     || '';
+        this.data.page.onLoads          = this.data.page.onLoads   || [];
+        this.data.page.onLoadPrepares   = this.data.page.onLoadPrepares || [];
+        this.data.page.id               = this.uid();
+        this.data.page.loaded           = false;
+        this.data.page.params           = {};
+        this.data.page.paramsChanged    = false;
     },
     setParams: function(params){
         if ( !CUtils.equals(this.data.page.params,params)){
@@ -4662,18 +4997,52 @@ var CPage = Class(CContainer,{
     },
     reload: function(force){
         force = force || false;
-        if (this.data.page.loaded===false || this.data.page.paramsChanged || force ===true) {
+        var needReload = this.data.page.loaded===false || this.data.page.paramsChanged || force ===true;
+        if (needReload) {
             this.data.page.loaded = true;
             this.data.page.paramsChanged = false;
-            this.data.page.onLoad(this.data.page.params);
+            // Run each onLoad .
+            _.each(this.data.page.onLoads,function(onLoad){
+                if (onLoad)
+                    onLoad(this.data.page.params);
+            },this);
         }
+
+        // re-show event.
+        if (this.uid() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.reshow,this.uid(),{pageId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.uid() === data.pageId ||
+                            object.getObjectPage() === data.pageId;
+                }
+            );
+        }
+
         CSwiper.resizeFix();
+    },
+    prepareReload: function(){
+        // Run load prepares.
+        _.each(this.data.page.onLoadPrepares,function(onLoadPrepare){
+            if (onLoadPrepare)
+                onLoadPrepare(this.data.page.params);
+        },this);
+        // prepare re-show event.
+        if (this.uid() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.prepareReshow,this.uid(),{pageId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.getObjectPage() === data.pageId;
+                }
+            );
+        }
     },
     getPageTitle: function(){
         return this.data.page.title;
     },
     getPageName: function(){
         return this.data.page.name;
+    },
+    isPageLoaded: function(){
+        return this.data.page.loaded === true;
     }
 
 
@@ -5123,6 +5492,9 @@ var CLoadSpinner = Class(CObject,{
         CLoadSpinner.$super.call(this, values);
         this.data.spinnerSize = this.data.spinnerSize || 40;
         this.logic.icon.size = this.data.spinnerSize;
+        this.logic.icon.design = this.logic.icon.design || {};
+        this.logic.icon.design.inline = this.logic.icon.design.inline ||'';
+        this.logic.icon.design.inline += 'vertical-align: initial;';
         if (this.data.spinnerAutoStart===true){
             this.design.classes = this.design.classes || '';
             this.design.classes += CLoadSpinner.spinClass;
@@ -5767,6 +6139,14 @@ var CAppHandler = Class({
             appData.data                = appData.data || {};
             appData.data.app_settings   = appData.data.app_settings || {};
 
+
+            // Load custom css,js and css,js links.
+            CAppHandler.loadCSSLinks(    appData.cssLinks    || []);
+            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
+
+
             // Load Theme if chosen.
             if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
                 CThemes.loadTheme(appData.data['app_main_theme']);
@@ -5793,11 +6173,9 @@ var CAppHandler = Class({
 
             CPager.initialize();
 
-            // Load custom css,js and css,js links.
-            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
-            CThreads.start(function(){ CAppHandler.loadCSSLinks(    appData.cssLinks    || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
+            // Initialize Push Notifications
+            CThreads.run(function(){ CPush.initialize(appData.pushData || {}); },5000);
+
         }
         catch (e){
             CLog.error('CAppHandler.initialize error occured.');
@@ -5875,7 +6253,7 @@ var CAppHandler = Class({
             jsCode.append(js);
         });
         eval.call(window,jsCode.build(' '));
-    },
+    }
 
 
 });
@@ -5948,6 +6326,17 @@ var Caf = Class({
     firstLoadKey: 'caf-first-load',
     firstLoad: false,
     start: function(){
+
+        var isApp = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
+
+        // Phonegap on ready.
+        if (isApp === true)
+            document.addEventListener('deviceready', Caf.onDeviceReady, false);
+        else
+            Caf.actualStart();
+
+    },
+    actualStart : function() {
         // Check for update start in 5 seconds - make sure the app will get updated in any case.
         CThreads.run(Caf.updateStartCheck,5000);
 
@@ -5955,25 +6344,20 @@ var Caf = Class({
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
 
-        // Phonegap on ready.
-        document.addEventListener('deviceready', Caf.onDeviceReady, false);
-
         // Start.
         CAppHandler.start(function(){
             if (Caf.firstLoad) {
                 Caf.showWaitToLoad();
-                Caf.startUpdate();
+                CThreads.run(Caf.startUpdate,3000); // Let the app begin.
             }
             else
-                Caf.startUpdate();
+                CThreads.run(Caf.startUpdate,3000); // Let the app begin.
         });
-
-
-
     },
     onDeviceReady : function() {
         if (navigator && navigator.splashscreen)
             navigator.splashscreen.hide();
+        Caf.actualStart();
     },
     startUpdate: function(){
         if (Caf.appUpdateStarted === true) // Update check already performed.
@@ -6006,7 +6390,7 @@ var Caf = Class({
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
         }
         else {
-            if (Caf.appUpdated || Caf.coreUpdated) {
+            if (Caf.appUpdated/* || Caf.coreUpdated*/ /*Notify only when app is updated.*/) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
                     title: 'עדכון מוכן',
@@ -6014,8 +6398,7 @@ var Caf = Class({
                     dialogColor: CColor('TealE',8),
                     cancelText: 'מאוחר יותר',
                     confirmText: 'הפעל מחדש',
-                    confirmCallback: function() { CAppHandler.resetApp(); },
-
+                    confirmCallback: function() { CAppHandler.resetApp(); }
                 });
             }
 
@@ -6055,14 +6438,16 @@ var CCoreUpdater = Class({
             function() {
                 // Marked as checked.
                 Caf.coreJSUpdateChecked = true;
-            });
+            }
+        );
     },
     updateCSS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreCSSPath,CCoreUpdater.coreCSSName,
             function(){
                 // Marked as checked.
                 Caf.coreCSSUpdateChecked = true;
-            });
+            }
+        );
     },
     updateFile: function(path,name,callback){
         callback            = callback || function(){};
@@ -6070,7 +6455,7 @@ var CCoreUpdater = Class({
         if (currentFileData == null || currentFileData == undefined)
             currentFileData = '';
         var shaObj         = new jsSHA(currentFileData, "TEXT");
-        var sha            = shaObj.getHash("SHA-512", "HEX");
+        var sha            = shaObj.getHash("SHA-1", "HEX");
         CCoreUpdater.requestUpdateFile(path,name,sha,callback);
 
     },
@@ -6145,14 +6530,48 @@ var CBuilderObject = Class({
     },
     page: function(name,title,onLoad){
         this.properties.data.page =
-                { name: name || '', title: title || '', onLoad: onLoad || function() {} };
+                { name: name || '', title: title || '', onLoads: [onLoad] || [] };
         this.properties.logic.page = true;
         return this;
     },
     pageOnLoad: function(onLoad){
         this.properties.data.page = this.properties.data.page || {};
-        this.properties.data.page.onLoad = onLoad  || function() {};
+        this.properties.data.page.onLoads = this.properties.data.page.onLoads || [];
+        this.properties.data.page.onLoads.push(onLoad  || function() {});
         this.properties.logic.page = true;
+        return this;
+    },
+    pageOnLoadPrepare: function(onLoadPrepare){
+        this.properties.data.page = this.properties.data.page || {};
+        this.properties.data.page.onLoadPrepares = this.properties.data.page.onLoadPrepares || [];
+        this.properties.data.page.onLoadPrepares.push(onLoadPrepare  || function() {});
+        this.properties.logic.page = true;
+        return this;
+    },
+    onShowAnimateChildren: function(animations,intervals,start) {
+        this.properties.logic.onShowAnimateChildren = {
+            animations:     animations,
+            intervals:      intervals,
+            start:          start
+        };
+        return this;
+    },
+    onShowAnimation: function(objects,animations,intervals,start) {
+        this.properties.logic.onShowAnimation = {
+            objects:        objects,
+            animations:     animations,
+            intervals:      intervals,
+            start:          start
+        };
+        return this;
+    },
+    onShowSelfAnimation: function(animation,start) {
+        this.properties.logic.onShowAnimation = {
+            objects:        null,
+            animations:     animation,
+            intervals:      0,
+            start:          start
+        };
         return this;
     },
     sideMenuWidth: function(width) {
@@ -6505,6 +6924,16 @@ var CBuilderObject = Class({
         this.properties.logic.openNavigationApp = address;
         return this;
     },
+    openFacebookPageOrProfile: function(pageId) {
+        this.properties.logic.openFacebookPageOrProfile = pageId;
+        return this;
+    },
+    openMailTo: function(mail) {
+        this.properties.logic.openMail = {
+            to:[mail || '']
+        };
+        return this;
+    },
     /**
          Mail: message, subject, image.
          Twitter: message, image, link (which is automatically shortened).
@@ -6622,7 +7051,21 @@ var CBuilderObjects = Class({
     constructor: function() {
         this.objects = [];
         this.designs = {};
+        this.plugins = [];
+        this.appPrefs = {};
         this.data = {};
+    },
+    addPlugin: function(name,version){
+        var plugin = {
+            name: name
+        };
+        if (!CUtils.isEmpty(version))
+            plugin.version = version;
+
+        this.plugins.push(plugin);
+    },
+    setAppPref: function(key,value){
+        this.appPrefs[key] = value;
     },
     addDesign: function(name,design){
         this.designs[name] = design;
@@ -6646,17 +7089,16 @@ var CBuilderObjects = Class({
         var appData = {
             objects:    builtObjects,
             designs:    this.designs,
+            plugins:    this.plugins,
             data:       this.data
         };
+        appData = CUtils.mergeJSONs(appData,this.appPrefs);
         return appData;
     },
     create: function(type,uname){
         var objectBuilder = new CBuilderObject(type || '',uname || '');
         this.objects.push(objectBuilder);
         return objectBuilder;
-    },
-    saveAppDataToFile: function(path){
-
     }
 
 

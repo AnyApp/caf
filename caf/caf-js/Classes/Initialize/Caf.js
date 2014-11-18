@@ -14,6 +14,17 @@ var Caf = Class({
     firstLoadKey: 'caf-first-load',
     firstLoad: false,
     start: function(){
+
+        var isApp = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
+
+        // Phonegap on ready.
+        if (isApp === true)
+            document.addEventListener('deviceready', Caf.onDeviceReady, false);
+        else
+            Caf.actualStart();
+
+    },
+    actualStart : function() {
         // Check for update start in 5 seconds - make sure the app will get updated in any case.
         CThreads.run(Caf.updateStartCheck,5000);
 
@@ -21,25 +32,20 @@ var Caf = Class({
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
 
-        // Phonegap on ready.
-        document.addEventListener('deviceready', Caf.onDeviceReady, false);
-
         // Start.
         CAppHandler.start(function(){
             if (Caf.firstLoad) {
                 Caf.showWaitToLoad();
-                Caf.startUpdate();
+                CThreads.run(Caf.startUpdate,3000); // Let the app begin.
             }
             else
-                Caf.startUpdate();
+                CThreads.run(Caf.startUpdate,3000); // Let the app begin.
         });
-
-
-
     },
     onDeviceReady : function() {
         if (navigator && navigator.splashscreen)
             navigator.splashscreen.hide();
+        Caf.actualStart();
     },
     startUpdate: function(){
         if (Caf.appUpdateStarted === true) // Update check already performed.
@@ -72,7 +78,7 @@ var Caf = Class({
                 CObjectsHandler.object(Caf.waitToLoadDialog).hide();
         }
         else {
-            if (Caf.appUpdated || Caf.coreUpdated) {
+            if (Caf.appUpdated/* || Caf.coreUpdated*/ /*Notify only when app is updated.*/) {
                 CDialog.showDialog({
                     hideOnOutClick: false,
                     title: 'עדכון מוכן',
@@ -80,8 +86,7 @@ var Caf = Class({
                     dialogColor: CColor('TealE',8),
                     cancelText: 'מאוחר יותר',
                     confirmText: 'הפעל מחדש',
-                    confirmCallback: function() { CAppHandler.resetApp(); },
-
+                    confirmCallback: function() { CAppHandler.resetApp(); }
                 });
             }
 

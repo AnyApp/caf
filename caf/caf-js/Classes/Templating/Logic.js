@@ -18,6 +18,21 @@ var CLogic = Class({
         onTemplateElementClick: function(object,value){
             CClicker.addOnClick(object,value);
         },
+        openFacebookPageOrProfile: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CAppAvailability.hasFacebook(
+                    function(){
+                        CUtils.openURL('fb://profile/' + value, "_system");
+                    },
+                    function(){
+                        CUtils.openURL('http://facebook.com/' + value+'', "_system");
+                    }
+                )
+            });
+
+        },
         phoneCall: function(object,value){
             if (CUtils.isEmpty(value))
                 return;
@@ -29,7 +44,19 @@ var CLogic = Class({
             if (CUtils.isEmpty(value))
                 return;
             CClicker.addOnClick(object,function(){
-                CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+                if (CPlatforms.isIOS())
+                    CUtils.openURL("maps:q=" + value, "_system");
+                else if (CPlatforms.isAndroid())
+                    CUtils.openURL("geo:0,0?q=" + value, "_system");
+                else
+                    CUtils.openURL("http://maps.google.com/?q=" + value, "_system");
+            });
+        },
+        openMail: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CMail.open(value);
             });
         },
         link: function(object,value){
@@ -97,9 +124,10 @@ var CLogic = Class({
             var color   = CUtils.isEmpty(value.color)?'': ' '+CDesigner.designs.color(value.color);
             var classes = CUtils.isEmpty(value.design)?'':
                 ' '+CDesigner.designToClasses(value.design);
+            var inline  = CUtils.isEmpty(value.design)?'': value.design.inline || '';
 //            var align   = CUtils.isEmpty(value.align)?'': ' ml'+value.marginLeft;
 //            var align   = CUtils.isEmpty(value.align)?'': ' mr'+value.marginRight;
-            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'"></i>';
+            var iconElmText = '<i class="icon-'+value.name+size+align+color+classes+'" style="'+inline+'"></i>';
 
             var elm = CUtils.element(object.uid());
             elm.innerHTML = iconElmText+elm.innerHTML;
@@ -202,6 +230,41 @@ var CLogic = Class({
             // Old android only
             if (!CScrolling.isNativeScrolling())
                 object.scroller = $('#'+object.uid()).niceScroll({});
+        },
+        // Lazy get children - support template that reload and replace children.
+        onShowAnimateChildren: function(object,value){
+            // Register on prepare show
+            CEvents.register(CEvents.events.prepareReshow,object.uid(),function(event){
+                _.each(object.getChilds(),function(objectId){
+                    CAnimations.quickHide(objectId);
+                });
+            });
+
+            // Register on show
+            CEvents.register(CEvents.events.reshow,object.uid(),function(event){
+                CThreads.start(function(){
+                    CAnimations.cascadeAnimate(object.getChilds(),value.intervals,value.animations,value.start);
+                });
+            });
+        },
+        onShowAnimation: function(object,value){
+            // If value.objects is empty then animate this object.
+            if (CUtils.isEmpty(value.objects))
+                value.objects = [object.uid()];
+
+            // Register on prepare show
+            CEvents.register(CEvents.events.prepareReshow,object.uid(),function(event){
+                _.each(value.objects,function(objectId){
+                    CAnimations.quickHide(objectId);
+                });
+            });
+
+            // Register on show
+            CEvents.register(CEvents.events.reshow,object.uid(),function(event){
+                CThreads.start(function(){
+                    CAnimations.cascadeAnimate(value.objects,value.intervals,value.animations,value.start);
+                });
+            });
         }
 
     },

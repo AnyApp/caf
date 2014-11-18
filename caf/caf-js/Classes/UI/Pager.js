@@ -10,8 +10,8 @@ var CPager = Class({
     pages: {},
     router: null,
     currentPageNumber: 0,
-    currentPage: '',
-    lastPage: '',
+    currentPage: null,
+    lastPage: null,
     initialize: function(){
         this.resetPages();
         this.setBackForwardDetection();
@@ -114,16 +114,6 @@ var CPager = Class({
         else
             CUtils.removeClass(CUtils.element(CPager.backButtonId),'hidden');
     },
-    onLoadPage: function(pageId) {
-        var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
-        if (CUtils.isEmpty(onPageLoad))
-            return;
-        // Execute onPageLoad.
-        onPageLoad();
-    },
-    getPagePath: function(name,params){
-        return name+CPager.dataToPath(params);
-    },
     showPage: function(name,params){
 //        if (CPager.isChangePageLocked())
 
@@ -200,12 +190,27 @@ var CPager = Class({
         CTitleHandler.setTitle(page.getPageTitle());
         page.setParams(this.getParamsAsMap(params));
 
+        // Prepare Load of Page.
+        page.prepareReload();
+
         // Showing current page.
-        if (CUtils.isEmpty(lastPage))
+        if (CUtils.isEmpty(lastPage)){
             CAnimations.quickShow(currentPage);
+            animationOptions.onAnimShowComplete();
+        }
         else
             CAnimations.show(currentPage,animationOptions);
 
+    },
+    onLoadPage: function(pageId) {
+        var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
+        if (CUtils.isEmpty(onPageLoad))
+            return;
+        // Execute onPageLoad.
+        onPageLoad();
+    },
+    getPagePath: function(name,params){
+        return name+CPager.dataToPath(params);
     },
     // Immediate hide to all pages on first load.
     resetPages: function() {

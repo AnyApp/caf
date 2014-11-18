@@ -439,8 +439,9 @@ var CDialog = Class(CContainer,{
         };
 
         // Set Borders.
-        if (currentButton===0 && countButtons>1/**/)
-            design.border = {right:1}
+        // DONOT border right because in rtl things go wild..
+//        if (currentButton===0 && countButtons>1/**/)
+//            design.border = {right:1}
         if (currentButton===2)
             design.border = {top:1}
         // Change width if needed.

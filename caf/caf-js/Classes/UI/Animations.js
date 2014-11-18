@@ -85,24 +85,68 @@ var CAnimations = Class({
         object.data.lastOnEnd           = 0;
         object.data.lastOnStart         = 0;
     },
-    cascadeShow: function(objectsIds){
-        for (var i in objectsIds){
-            var index = Number(i);
-            var objectId        = objectsIds[index];
-            // Hide all elements.
-            CUtils.addClass(CUtils.element(objectId),'hidden');
+    cascadeAnimate: function(objects,intervals,animations,start){
+        start = start || 0;
+        if (CUtils.isEmpty(objects) || CUtils.isEmpty(animations))
+            return;
+        // Setup animations.
+        animations = CAnimations.cascadeAnimateSetupAnimations(animations,objects.length);
+        // Animate each object after the last one finished.
+        if (CUtils.isEmpty(intervals)){
+            CAnimations.cascadeAnimateEachAfterEnd(objects,animations);
+            return;
+        }
+        // Setup intervals
+        intervals = CAnimations.cascadeAnimateSetupIntervals(intervals,objects.length);
+        // Do Cascade animate.
+        for (var i in objects){
+            var objectId = objects[i];
+            // Run animation
+            CThreads.run(
+                CAnimations.createCascadeShowFunction(objectId,animations[i]),
+                intervals[i]+start // Run time.
+            );
+        }
+    },
+    createCascadeShowFunction: function(objectId,animation){
+        return function(){
+            CAnimations.show(objectId,{animation:animation});
+        };
+    },
+    cascadeAnimateSetupAnimations: function(animations,total){
+        if (CUtils.isString(animations))
+            animations = [animations];
+        while (animations.length < total)
+            animations.push(animations[0]);
+        return animations;
+    },
+    cascadeAnimateSetupIntervals: function(intervals,total){
+        // If Array, return, else: number, setup intervals.
+        if (CUtils.isArray(intervals))
+            return intervals;
+        interval = Number(intervals); // intervals is a number.
+        intrvals = [];
+        for (var i=0;i<total;i++) {
+            intrvals.push(interval * i);
+        }
+        return intrvals;
+    },
+    cascadeAnimateEachAfterEnd: function(objects,animations){
+        for (var i in objects){
+            var index       = Number(i);
+            var objectId    = objects[index];
 
-            if (index+1 == objectsIds.length)
-                continue;
-
-            var nextObjectId    = objectsIds[index+1];
+            var nextObjectId    = objects[index+1];
             var object          = CObjectsHandler.object(objectId);
-            object.data.onAnimShowComplete = CAnimations.createCascadeFunction(nextObjectId);
+            object.data.animation = animations[index] || '';
+
+            if (index+1 < objects.length)
+                object.data.onAnimShowComplete = CAnimations.createCascadeEachAfterEndFunction(nextObjectId);
         }
 
-        CAnimations.show(objectsIds[0]);
+        CAnimations.show(objects[0]);
     },
-    createCascadeFunction: function(nextObjectId){
+    createCascadeEachAfterEndFunction: function(nextObjectId){
         return function(){
             CAnimations.show(nextObjectId);
         };

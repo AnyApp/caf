@@ -26,6 +26,9 @@ var CLoadSpinner = Class(CObject,{
         CLoadSpinner.$super.call(this, values);
         this.data.spinnerSize = this.data.spinnerSize || 40;
         this.logic.icon.size = this.data.spinnerSize;
+        this.logic.icon.design = this.logic.icon.design || {};
+        this.logic.icon.design.inline = this.logic.icon.design.inline ||'';
+        this.logic.icon.design.inline += 'vertical-align: initial;';
         if (this.data.spinnerAutoStart===true){
             this.design.classes = this.design.classes || '';
             this.design.classes += CLoadSpinner.spinClass;

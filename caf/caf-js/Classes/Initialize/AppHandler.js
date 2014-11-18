@@ -25,6 +25,14 @@ var CAppHandler = Class({
             appData.data                = appData.data || {};
             appData.data.app_settings   = appData.data.app_settings || {};
 
+
+            // Load custom css,js and css,js links.
+            CAppHandler.loadCSSLinks(    appData.cssLinks    || []);
+            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
+            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
+
+
             // Load Theme if chosen.
             if (appData.data.app_settings['app_main_theme'] && !CUtils.isEmpty(appData.data.app_settings['app_main_theme']))
                 CThemes.loadTheme(appData.data['app_main_theme']);
@@ -51,11 +59,9 @@ var CAppHandler = Class({
 
             CPager.initialize();
 
-            // Load custom css,js and css,js links.
-            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
-            CThreads.start(function(){ CAppHandler.loadCSSLinks(    appData.cssLinks    || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
+            // Initialize Push Notifications
+            CThreads.run(function(){ CPush.initialize(appData.pushData || {}); },5000);
+
         }
         catch (e){
             CLog.error('CAppHandler.initialize error occured.');
@@ -133,7 +139,7 @@ var CAppHandler = Class({
             jsCode.append(js);
         });
         eval.call(window,jsCode.build(' '));
-    },
+    }
 
 
 });

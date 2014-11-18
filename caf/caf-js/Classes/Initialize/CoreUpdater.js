@@ -20,14 +20,16 @@ var CCoreUpdater = Class({
             function() {
                 // Marked as checked.
                 Caf.coreJSUpdateChecked = true;
-            });
+            }
+        );
     },
     updateCSS: function(){
         CCoreUpdater.updateFile(CCoreUpdater.coreCSSPath,CCoreUpdater.coreCSSName,
             function(){
                 // Marked as checked.
                 Caf.coreCSSUpdateChecked = true;
-            });
+            }
+        );
     },
     updateFile: function(path,name,callback){
         callback            = callback || function(){};
@@ -35,7 +37,7 @@ var CCoreUpdater = Class({
         if (currentFileData == null || currentFileData == undefined)
             currentFileData = '';
         var shaObj         = new jsSHA(currentFileData, "TEXT");
-        var sha            = shaObj.getHash("SHA-512", "HEX");
+        var sha            = shaObj.getHash("SHA-1", "HEX");
         CCoreUpdater.requestUpdateFile(path,name,sha,callback);
 
     },

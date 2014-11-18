@@ -53,6 +53,9 @@ var CUtils = Class({
     isArray: function(variable){
         return Object.prototype.toString.call( variable ) === '[object Array]';
     },
+    isFunction: function(variable){
+        return typeof(variable) == "function";
+    },
     isStringFunction: function(variable)
     {
         return variable.trim().indexOf("function")==0;

@@ -77,8 +77,20 @@ var CTemplator = Class({
         },this);
         object.appendChilds(object.data.template.duplicates);
 
+
+        // Append reshow call.
+        var onFinishWithEventCall = function(){
+            onFinish();
+            // Fire prepare-reshow.
+            object.firePrepareReshowEvent();
+            // Fire reshow.
+            object.fireReshowEvent();
+        };
+
         if (preventRebuild !== true)
-            object.rebuild(onFinish);
+            object.rebuild(onFinishWithEventCall);
+
+
     },
     fixRetreivedData: function(retreived){
         // DO NOT MAKE any changes to the source data.
@@ -152,6 +164,7 @@ var CTemplator = Class({
     },
     load: function(objectId, queryData, onFinish, reset) {
         onFinish = onFinish || function(){};
+
         var object = CObjectsHandler.object(objectId);
         if (CUtils.isEmpty(object.data.template.url) ||
             (object.data.template.loaded === true && !CUtils.equals(queryData,object.data.template.queryData) )){

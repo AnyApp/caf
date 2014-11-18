@@ -79,7 +79,7 @@ var CTemplate = Class(CContainer,{
         },this);
     },
     clearFilter: function(){
-      this.filter();
+        this.filter();
     },
     showLoading: function(){
         if (this.data.template.showLoader!==true || !CUtils.isEmpty(this.spinnerId))
@@ -99,11 +99,35 @@ var CTemplate = Class(CContainer,{
         delete this.spinnerId;
     },
     reload: function(queryData,onFinish, reset){
+        onFinish = onFinish||function(){};
         CTemplator.load(this.uid(),queryData||this.data.template.queryData,
-            onFinish||function(){},reset||this.data.template.resetOnReload);
+            onFinish,reset||this.data.template.resetOnReload);
+
     },
     getLoaderColor: function(){
         return this.data.template.loaderColor;
+    },
+    fireReshowEvent: function(){
+        // re-show event.
+        if (this.getObjectPage() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.reshow,this.uid(),{templateId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.uid() === data.templateId ||
+                            object.isChildOf(data.templateId);
+                }
+            );
+        }
+    },
+    firePrepareReshowEvent: function(){
+        // re-show event.
+        if (this.getObjectPage() === CPager.currentPage) {
+            CEvents.fire(CEvents.events.prepareReshow,this.uid(),{templateId:this.uid()},
+                function(object,data){ // Filter out objects that aren't in this page.
+                    return object.uid() === data.templateId ||
+                            object.isChildOf(data.templateId);
+                }
+            );
+        }
     }
 
 

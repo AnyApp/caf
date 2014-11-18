@@ -351,6 +351,26 @@ var CObject = Class({
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.rebuild();
 
+    },
+    isPage: function() {
+        return !CUtils.isEmpty(this.data.page);
+    },
+    // Return the page that this object is in it.
+    getObjectPage: function(){
+        if (this.isPage())
+            return this.uid();
+        var parentObject     = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.getObjectPage();
+        return '';
+    },
+    isChildOf: function(id){
+        if (this.parent === id)
+            return true;
+        var parentObject = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.isChildOf(id);
+        return false;
     }
 
 
