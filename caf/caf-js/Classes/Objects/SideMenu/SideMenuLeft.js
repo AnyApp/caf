@@ -15,10 +15,10 @@ var CSideMenuLeft = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenuLeft);
+        CObject.setObjectDefaults(values,CSideMenuLeft);
         // Invoke parent's constructor
         CSideMenuLeft.$super.call(this, values);
-        this.uname = 'side-menu-left';
+        //this.uname = 'side-menu-left';
     }
 
 });

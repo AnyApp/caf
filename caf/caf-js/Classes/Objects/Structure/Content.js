@@ -7,8 +7,7 @@ var CContent = Class(CContainer,{
             classes: 'content',
             bgColor:{
                 color: 'White'
-            },
-            overflow: 'scrollable'
+            }
         },
         DEFAULT_LOGIC: {
         }
@@ -18,14 +17,13 @@ var CContent = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CContent);
+        CObject.setObjectDefaults(values,CContent);
 
         // Invoke parent's constructor
         CContent.$super.call(this, values);
 
-        this.design.top     =   CAppConfig.get('headerSize');
-        this.design.bottom  =   CAppConfig.get('footerSize');
-
+        this.design.top     =   CGlobals.get('headerSize');
+        this.design.bottom  =   CGlobals.get('footerSize');
 
     }
 

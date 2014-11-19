@@ -4,25 +4,32 @@
 var CObject = Class({
     $statics: {
         DEFAULT_DESIGN: {
-            gpuAccelerated: true
+//            gpuAccelerated: true
         },
         DEFAULT_LOGIC: {
         },
 
-
         generateID: function() {
             return "c_"+Math.random().toString(36).substring(2);
         },
-        mergeWithDefaults: function(values,useClass){
-            values.design = CUtils.mergeJSONs(useClass.DEFAULT_DESIGN,values.design);
+        setObjectDefaults: function(values,useClass){
+            values.design = values.design || {};
+            if (!CUtils.isString(values.design))
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
             values.logic = CUtils.mergeJSONs(useClass.DEFAULT_LOGIC,values.logic);
+        },
+        setObjectDesignDefaults: function(values,useClass){
+            values.design = values.design || {};
+            if (!CUtils.isString(values.design))
+                values.design.defaults = CUtils.mergeJSONs(values.design.defaults,useClass.DEFAULT_DESIGN);
         }
+
     },
 
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CObject);
+        CObject.setObjectDefaults(values,CObject);
 
         this.id             = values.id         || CObject.generateID();
         this.appId          = values.appId;
@@ -36,26 +43,10 @@ var CObject = Class({
         this.lastClasses    = "";
         this.lastLogic      = {};
         this.parent         = -1; // Object's Container Parent
-        this.enterAnimation = '';
-        this.entered        = false;
+        this.relativeParent = -1; // This object relative parent.
+        this.relative       = values.relative || false; // Is this object relative.
         this.logic.doStopPropagation = values.logic.doStopPropagation || false;
 
-        // Replace all references.
-        this.applyDynamicVariables(this.logic);
-    },
-    applyDynamicVariables: function(obj) {
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (typeof obj[property] == "object")
-                    this.applyDynamicVariables(obj[property]);
-                else if (typeof obj[property] == 'string' || obj[property] instanceof String){
-                    // Evaluate dynamic data.
-                    if (obj[property].substr(0,6)==="$this.")
-                        obj[property] = eval(obj[property].substr(1));
-                }
-
-            }
-        }
     },
     /**
      * Return Unique identifier.
@@ -63,7 +54,7 @@ var CObject = Class({
      * @returns unique identifier.
      */
     uid: function(){
-        if (CUtils.isEmpty(this.uname))
+        if (CUtils.isEmpty(this.uname) || this.uname.indexOf('#/')>=0)
             return this.id;
         return this.uname;
     },
@@ -73,32 +64,42 @@ var CObject = Class({
     getParent: function() {
         return this.parent;
     },
-    setLink: function(link) {
-        if (CUtils.isUrlRelative(link)) {
-            this.data.link = CAppConfig.baseUrl()+'/'+link;
+    getRelativeParent: function() {
+        if (this.relativeParent !== -1)
+            return this.relativeParent;
+        var parentObject     = CObjectsHandler.object(this.parent);
+        this.relativeParent  = null;
+        // Look for relative parent.
+        while (!CUtils.isEmpty(parentObject)){
+            if (parentObject.isRelative()){
+                this.relativeParent = parentObject.uid();
+                break;
+            }
+            else {
+                parentObject = CObjectsHandler.object(parentObject.parent);
+            }
         }
-        else {
-            this.data.link = link;
-        }
-
+        // If there is no relative parent and this object is relative, return this object.
+        if (this.relativeParent === null && this.isRelative())
+            this.relativeParent = this.uid();
+        return this.relativeParent;
+    },
+    getDeepRelativeParent: function(depth){
+        if (depth === 0)
+            return this;
+        else if (depth === 1)
+            return CObjectsHandler.object(this.getRelativeParent() || '');
+        else
+            return CObjectsHandler.object(this.getDeepRelativeParent(depth-1) || '');
+    },
+    isRelative: function() {
+        return this.relative;
+    },
+    setRelative: function(relative) {
+        this.relative = relative;
     },
     getLink: function() {
         return this.data.link || '';
-    },
-    hasLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLink: function(){
-        return !CUtils.isEmpty(this.logic.link);
-    },
-    isLinkLocal: function(){
-        return this.data.link.indexOf(CAppConfig.baseUrl())>=0;
-    },
-    setEnterAnimation: function(enterAnimation) {
-        this.enterAnimation = enterAnimation;
-    },
-    getEnterAnimation: function() {
-        return this.enterAnimation;
     },
     getParentObject: function() {
         return CObjectsHandler.object(this.parent);
@@ -121,6 +122,9 @@ var CObject = Class({
     getClasses: function(){
         return this.classes;
     },
+    setText: function(text){
+        CUtils.element(this.uid()).innerHTML = text||'';
+    },
     getLastLogic: function(){
         return this.lastLogic;
     },
@@ -130,6 +134,125 @@ var CObject = Class({
     clearLastBuild: function(){
         this.lastClasses = '';
         this.lastLogic = {};
+    },
+    parseReferences: function(obj) {
+        if (CUtils.isEmpty(obj) || obj.parseReferencesVisited === true /* Circular*/)
+            return;
+        obj.parseReferencesVisited = true;
+        for (var property in obj) {
+            // Allow parse part of the template data
+            if (obj.hasOwnProperty(property) && property=='template') {
+                if (!CUtils.isEmpty(obj.template) && !CUtils.isEmpty(obj.template.queryData))
+                    this.parseReferences(obj.template.queryData);
+            }
+            else if (obj.hasOwnProperty(property) && property!='template') {
+                if (typeof obj[property] == "object"){
+                    this.parseReferences(obj[property]);
+                }
+                else if (typeof obj[property] == 'string' || obj[property] instanceof String){
+                    // Evaluate dynamic data.
+                    var evaluated   = this.replaceReferencesInString(obj[property]);
+                    obj[property] = evaluated;
+                }
+                else if (typeof obj[property] == 'function' || obj[property] instanceof Function){
+                    // Evaluate references inside functions.
+                    var evaluated   = this.replaceReferencesInFunction(obj[property]);
+                    obj[property] = evaluated;
+                }
+
+            }
+        }
+        delete obj.parseReferencesVisited;
+    },
+    parseLocalReference: function(workingObject,str){
+        return eval('workingObject.'+str);
+    },
+    parseGlobalReference: function(str){
+        return CGlobals.getDeep(str) || null;
+    },
+    parsePageReference: function(str){
+        return CPageData.getDeep(str) || null;
+    },
+    parseDesignReference: function(str){
+        return CDesignHandler.get(str) || null;
+    },
+    parseRelativeReference: function(workingObject,str){
+        var relativeParentId = workingObject.getRelativeParent();
+        if (!CUtils.isEmpty(relativeParentId)){
+            var relativeParent = CObjectsHandler.object(relativeParentId);
+            return eval('relativeParent'+str);
+        }
+        return null;
+    },
+    // Extension of this method in: CObjectHandler.relativeObject
+    parseRelativeObjectId: function(workingObject,str){
+        if (workingObject.isRelative())
+            return eval(workingObject.uid()+str);
+        var relativeParentId = workingObject.getRelativeParent();
+        if (!CUtils.isEmpty(relativeParentId))
+            return relativeParentId+str;
+        return str.substr(1);
+    },
+    replaceReferencesInFunction: function(func) {
+        if (CUtils.isEmpty(func))
+            return func;
+        var thisObjectStr = 'thisObject';
+        var funcAsString = JSONfn.stringify(func);
+        if (funcAsString.indexOf(thisObjectStr) < 0)
+            return func;
+
+        var thisObjectReference = 'CObjectsHandler.object(\''+this.uid()+'\')';
+        // Replace all 'thisObject' to reference to this object.
+        var replacedReferencesFunc = CUtils.replaceAll(funcAsString,'thisObject',
+            thisObjectReference);
+        return JSONfn.parse(replacedReferencesFunc);
+    },
+    parsePartReference: function(part){
+        // not a reference.
+        if (part === null || part.length<=0 || part[0]!='#')
+            return part;
+        /**
+         * Get the object that the data needed to be extracted from.
+         * Examples:'#*'    => workingObject = this
+         *          '##*'   => workingObject = this.getRelativeParent()
+         *          '###*'  => workingObject = this.getRelativeParent().getRelativeParent()
+         *          etc..
+         **/
+        var countHeadHashes =   CUtils.stringCountOccurencesInHead('#',part);
+        var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
+        part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
+
+        if (part.length>5 && part.substr(0,5) == 'this.')
+            return this.parseLocalReference(workingObject,part.substr(5)) || null;
+        else if (part.length>1 && part.substr(0,1) == '.')
+            return this.parseRelativeReference(workingObject,part)  || null;
+        else if (part.length>1 && part.substr(0,1) == '/')
+            return this.parseRelativeObjectId(workingObject,part)   || null;
+        else if (part.length>8 && part.substr(0,8) == 'globals.')
+            return this.parseGlobalReference(part.substr(8))        || null;
+        else if (part.length>5 && part.substr(0,5) == 'page.')
+            return this.parsePageReference(part.substr(5))          || null;
+        else if (part.length>8 && part.substr(0,8) == 'designs.')
+            return this.parseDesignReference(part.substr(8))        || null;
+    },
+    replaceReferencesInString: function(str) {
+        if (CUtils.isEmpty(str))
+            return str;
+        if (str.indexOf('#') < 0)
+            return str;
+        // Multiple reference.
+        var parts = str.split(' ');
+        for (var i=0; i<parts.length; i++){
+            parts[i] = this.parsePartReference(parts[i]) || null;
+            parts[i] = this.parsePartReference(parts[i]) || null;
+        }
+        // Filter out empty elements.
+        parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });
+        // Case of single variable - could be an object reference. Otherwise, String.
+        if (parts.length==1)
+            return parts[0];
+
+        return parts.join(' ');
     },
     /**
      *  Build Object.
@@ -153,7 +276,7 @@ var CObject = Class({
 
         // Prepare Design.
         // Save original classes - append them.
-        CDesign.prepareDesign(this);
+        CDesigner.prepareDesign(this);
 
         // If already created, don't need to recreate the DOM element.
         // Notice: If parent element isn't created, neither its children.
@@ -169,15 +292,12 @@ var CObject = Class({
         // Add class attribute.
         attributes.push('id="'+this.uid()+'"');
         attributes.push('class="'+this.classes+'"');
+        var inlineDesign = CDesigner.getFinalInlineStyle(this.design);
+        if (!CUtils.isEmpty(inlineDesign)) {
+            attributes.push('style="'+inlineDesign+'"');
+        }
 
         // Custom tag - can be used to insert a,input..
-        if (this.hasLink()){
-            this.setLink(this.logic.link.path+ CPager.dataToPath(this.logic.link.data));
-            tag = 'a';
-            // Allow outer links only in browser. Avoid links opening inside app.
-            if (this.isLinkLocal() || CPlatforms.isWeb())
-                attributes.push('href="'+this.data.link+'"');
-        }
         tag         = CUtils.isEmpty(tag)? 'div' : tag;
         var tagOpen = '<'+tag;
 
@@ -201,22 +321,60 @@ var CObject = Class({
 
 
     },
-    isContainer: function(){
-        return false;
-    },
-    showAnimation: function(){
-        if (!this.entered){
-            this.entered = true;
-            CAnimations.applyAnimation(this.uid(),
-                this.logic.anim,this.logic.animDuration,this.logic.animOnComplete);
+    assignReferences: function(){
+        // Parse relative uname.
+        var prevUID = this.uid();
+        this.uname = this.replaceReferencesInString(this.uname);
+        CObjectsHandler.updateUname(prevUID,this.uname);
+        // Update reference in parent.
+        if (!CUtils.isEmpty(this.getRelativeParent())){
+            var parentObject = CObjectsHandler.object(this.getRelativeParent());
+            var thisIndex = parentObject.getChilds().indexOf(prevUID);
+            parentObject.setChildInPosition(this.uid(),thisIndex);
+        }
+        // Retrieve relative and local references.
+        this.parseReferences(this.data);
+        this.parseReferences(this.logic);
+        if (CUtils.isString(this.design)){
+            this.design = this.replaceReferencesInString(this.design);
+            this.design = CObject.setObjectDesignDefaults(this.design,this);
+        }
+        else {
+            this.parseReferences(this.design);
         }
     },
-    hideAnimation: function(){
-
+    isContainer: function(){
+        return false;
     },
     removeSelf: function(){
         var parentContainer = CObjectsHandler.object(this.parent);
         parentContainer.removeChild(this.uid());
+        parentContainer.rebuild();
+    },
+    rebuild: function() {
+        var parentContainer = CObjectsHandler.object(this.parent);
+        parentContainer.rebuild();
+
+    },
+    isPage: function() {
+        return !CUtils.isEmpty(this.data.page);
+    },
+    // Return the page that this object is in it.
+    getObjectPage: function(){
+        if (this.isPage())
+            return this.uid();
+        var parentObject     = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.getObjectPage();
+        return '';
+    },
+    isChildOf: function(id){
+        if (this.parent === id)
+            return true;
+        var parentObject = CObjectsHandler.object(this.parent);
+        if (!CUtils.isEmpty(parentObject))
+            return parentObject.isChildOf(id);
+        return false;
     }
 
 

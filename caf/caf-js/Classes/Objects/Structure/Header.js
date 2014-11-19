@@ -18,12 +18,12 @@ var CHeader = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CHeader);
+        CObject.setObjectDefaults(values,CHeader);
 
         // Invoke parent's constructor
         CHeader.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('headerSize');
+        this.design.height = CGlobals.get('headerSize');
 
         this.data.itemSize = this.design.height;
 
@@ -32,22 +32,22 @@ var CHeader = Class(CContainer,{
         this.data.right = this.data.right || [];
 
         this.data.titleDesign = this.data.titleDesign || {};
-        this.data.titleDesign = CUtils.mergeJSONs(this.data.titleDesign,{
+        this.data.titleDesign = CUtils.mergeJSONs({
             position: 'absolute',
             left: this.data.itemSize * this.data.left.length,
             right: this.data.itemSize * this.data.right.length,
             top: 0, bottom:0, margin: 'none', height:'auto'
-        });
+        }, this.data.titleDesign);
         // Create Title.
         this.data.title = CObjectsHandler.createObject('Label',{
             design: this.data.titleDesign
         });
-        CUI.setTitleObject(this.data.title);
+        CTitleHandler.setTitleObject(this.data.title);
 
         // Set up childs array.
-        this.data.childs = this.data.childs.concat(this.data.left);
-        this.data.childs = this.data.childs.concat([this.data.title]);
-        this.data.childs = this.data.childs.concat(this.data.right);
+        this.appendChilds(this.data.left);
+        this.appendChilds([this.data.title]);
+        this.appendChilds(this.data.right);
 
         // Set Force Design
         this.forceDesign = {

@@ -10,7 +10,7 @@ var CLog = Class({
         window.console.log(data);
     },
     error: function(error){
-        window.console.log(error);
+        window.console.log('%c'+error, 'color: #D20000');
     }
 
 

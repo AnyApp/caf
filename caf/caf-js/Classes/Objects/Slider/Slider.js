@@ -17,7 +17,7 @@ var CSlider = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSlider);
+        CObject.setObjectDefaults(values,CSlider);
 
         // Invoke parent's constructor
         CSlider.$super.call(this, values);
@@ -36,7 +36,7 @@ var CSlider = Class(CContainer,{
             var sliderId = CObjectsHandler.createObject('SliderSlide',{
                 data: {  childs: [child] }
             });
-            this.data.childs.push(sliderId);
+            this.appendChild(sliderId);
         },this);
 
         var wrapperChilds = this.data.childs;
@@ -50,14 +50,23 @@ var CSlider = Class(CContainer,{
 
         this.data.loop       = this.data.loop     === false ? false : true;
         this.data.autoPlay   = this.data.autoPlay === false ? false : true;
-        this.data.slideTime  = this.data.slideTime   || 3000;
+        this.data.slideTime  = this.data.slideTime      || 3000;
+        this.data.onSlideLoad= this.data.onSlideLoad    || function(){};
+        this.data.tabberButtons= this.data.tabberButtons    || [];
+        this.data.animation= this.data.animation    || null;
+        this.data.slidesPerView= this.data.slidesPerView    || null;
 
         this.logic.swipeView = {
             container:  this.uid(),
             pagination: this.pagination,
-            loop:       this.data.loop,
+            loop:       false,//this.data.loop,
             autoPlay:   this.data.autoPlay,
-            slideTime:  this.data.slideTime
+            slideTime:  this.data.slideTime,
+            onSlideLoad: this.data.onSlideLoad,
+            tabberButtons: this.data.tabberButtons,
+            animation: this.data.animation,
+            slidesPerView: this.data.slidesPerView,
+            centeredSlides: this.data.centeredSlides
         };
 
 

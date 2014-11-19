@@ -3,15 +3,15 @@
  */
 var CClicker = Class({
     $singleton: true,
+    isScrolling: undefined,
     lastClick: 0,
     /**
      * Prevent burst of clicks.
      */
-    canClick: function()
+    canClick: function(e)
     {
-        var currentTime = (new Date()).getTime();
-        if (currentTime-CClicker.lastClick>400)
-        {
+        var currentTime = e.timeStamp;
+        if (currentTime-CClicker.lastClick>400) {
             CClicker.lastClick = currentTime;
             return true;
         }
@@ -30,8 +30,8 @@ var CClicker = Class({
         var design = object.getDesign();
         // Check
         object.clicker = {};
-        object.clicker.activeClasses       = CDesign.designToClasses(object.getDesign().active);
-        object.clicker.activeRemoveClasses = CDesign.designToClasses(object.getDesign().activeRemove);
+        object.clicker.activeClasses       = CDesigner.designToClasses(CDesigner.mergeParents(object.getDesign()||{}).active);
+        object.clicker.activeRemoveClasses = CDesigner.designToClasses(CDesigner.mergeParents(object.getDesign()||{}).activeRemove);
         object.doStopPropogation = object.doStopPropogation || false;
         object.touchData = {
             startX:-100000,
@@ -58,16 +58,13 @@ var CClicker = Class({
         // Create events.
         object.events.onTouchStartEvent = function(e)
         {
-            //return;
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
-            //e.preventDefault();
+//            e.preventDefault();
 
             if (object.logic.doStopPropagation===true)
-            {
                 e.stopPropagation();
-            }
 
             var pointer = CUtils.getPointerEvent(e);
             // caching the start x & y
@@ -81,39 +78,36 @@ var CClicker = Class({
         }
         object.events.onTouchMoveEvent = function(e)
         {
-            var currentTime = (new  Date()).getTime();
-            if (currentTime - object.touchData.startTime > 100){
-                //e.preventDefault();
-            }
-
+            if (object.touchData.startX<0) return; // Not Started.
             var pointer = CUtils.getPointerEvent(e);
             // caching the last x & y
             object.touchData.lastX = pointer.pageX;
             object.touchData.lastY = pointer.pageY;
+            var isSwipeEvent = CClicker.isTouchOutOfBoundries(object,30,30);
+            if (isSwipeEvent)
+                CClicker.resetTouch(object);
         }
         object.events.onTouchEndEvent = function(e)
         {
-            if (object.onClicks.length>0)
-                e.preventDefault();
+            if (object.touchData.startX<0) return; // Not Started.
 
-            var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
-            var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
-            var boxSize = 15;
-            if (diffX<boxSize && diffY<boxSize && CClicker.canClick() && e.type!='mouseout')
+            var notAClick = CClicker.isTouchOutOfBoundries(object,15,15);
+
+            if (!notAClick && CClicker.canClick(e) && e.type!='mouseout'
+                && !CPullToRefresh.inPullToRefresh())
             {
+                if (object.onClicks.length>0){
+                    e.preventDefault();
+                    // Prevent unneccesary pull.
+                    CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
+                }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
                     onClick();
                 },this);
             }
             // Reset
-            object.touchData.startX = -100000;
-            object.touchData.startY = -100000;
-            object.touchData.lastX = -200000;
-            object.touchData.lastY = -200000;
-            CUtils.removeClass(element,object.clicker.activeClasses);
-            CUtils.addClass(element,object.clicker.activeRemoveClasses);
-
+            CClicker.resetTouch(object);
         }
 
         // Set Events Handlers.
@@ -122,10 +116,24 @@ var CClicker = Class({
         element.addEventListener("touchend",object.events.onTouchEndEvent);
         element.addEventListener("mouseup",object.events.onTouchEndEvent);
         element.addEventListener("mouseout",object.events.onTouchEndEvent);
-        element.addEventListener("touchcancel",object.events.onTouchEndEvent);
+        element.addEventListener("touchcancel",object.events.onTouchMoveEvent);
         element.addEventListener("touchmove",object.events.onTouchMoveEvent);
         element.addEventListener("mousemove",object.events.onTouchMoveEvent);
 
+    },
+    isTouchOutOfBoundries: function(object,radiusX,radiusY){
+        var diffX = Math.abs(object.touchData.lastX-object.touchData.startX);
+        var diffY = Math.abs(object.touchData.lastY-object.touchData.startY);
+        return diffX > radiusX || diffY > radiusY;
+    },
+    resetTouch: function(object){
+        var element = CUtils.element(object.uid());
+        object.touchData.startX = -100000;
+        object.touchData.startY = -100000;
+        object.touchData.lastX = -200000;
+        object.touchData.lastY = -200000;
+        CUtils.removeClass(element,object.clicker.activeClasses);
+        CUtils.addClass(element,object.clicker.activeRemoveClasses);
     }
 
 

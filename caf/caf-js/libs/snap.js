@@ -47,7 +47,7 @@
         },
         eventList = {},
         utils = {
-            hasTouch: ('ontouchstart' in doc.documentElement || win.navigator.msPointerEnabled),
+            hasTouch: CUtils.isTouchDevice(),//(window.Modernizr && Modernizr.touch === true),
             eventType: function(action) {
                 var eventTypes = {
                         down: (utils.hasTouch ? 'touchstart' : 'mousedown'),
@@ -185,16 +185,21 @@
                     cache.easing = false;
                     clearInterval(cache.animatingInterval);
 
+                    var content = CUtils.element(CObjectsHandler.contentId);
                     if(cache.easingTo===0){
                         utils.klass.remove(doc.body, 'snapjs-right');
                         utils.klass.remove(doc.body, 'snapjs-left');
+                        CUtils.removeClass(content,'unreachable');
+                        CPullToRefresh.enable();
+                    }
+                    else{
+                        CUtils.addClass(content,'unreachable');
                     }
 
                     utils.dispatchEvent('animated');
                     utils.events.removeEvent(settings.element, utils.transitionCallback(), action.translate.easeCallback);
                 },
                 easeTo: function(n) {
-
                     if( !utils.canTransform() ){
                         cache.translation = n;
                         action.translate.x(n);
@@ -207,19 +212,19 @@
                         cache.animatingInterval = setInterval(function() {
                             utils.dispatchEvent('animating');
                         }, 1);
-                        
+
                         utils.events.addEvent(settings.element, utils.transitionCallback(), action.translate.easeCallback);
                         action.translate.x(n);
                     }
                     if(n===0){
                            settings.element.style[cache.vendor+'Transform'] = '';
-                       }
+                    }
                 },
                 x: function(n) {
                     if( (settings.disable==='left' && n>0) ||
                         (settings.disable==='right' && n<0)
                     ){ return; }
-                    
+
                     if( !settings.hyperextensible ){
                         if( n===settings.maxPosition || n>settings.maxPosition ){
                             n=settings.maxPosition;
@@ -227,7 +232,7 @@
                             n=settings.minPosition;
                         }
                     }
-                    
+
                     n = parseInt(n, 10);
                     if(isNaN(n)){
                         n = 0;
@@ -242,6 +247,9 @@
                         settings.element.style.left = n+'px';
                         settings.element.style.right = '';
                     }
+                    // Disable pulling.
+                    CPullToRefresh.disable();
+
                 }
             },
             drag: {
@@ -258,28 +266,30 @@
                     utils.events.removeEvent(settings.element, utils.eventType('up'), action.drag.endDrag);
                 },
                 startDrag: function(e) {
+                    if (CPullToRefresh.inPull)
+                        return;
                     // No drag on ignored elements
                     var target = e.target ? e.target : e.srcElement,
                         ignoreParent = utils.parentUntil(target, 'data-snap-ignore');
-                    
+
                     if (ignoreParent) {
                         utils.dispatchEvent('ignore');
                         return;
                     }
-                    
-                    
+
+
                     if(settings.dragger){
                         var dragParent = utils.parentUntil(target, settings.dragger);
-                        
+
                         // Only use dragger if we're in a closed state
-                        if( !dragParent && 
-                            (cache.translation !== settings.minPosition && 
+                        if( !dragParent &&
+                            (cache.translation !== settings.minPosition &&
                             cache.translation !== settings.maxPosition
                         )){
                             return;
                         }
                     }
-                    
+
                     utils.dispatchEvent('start');
                     settings.element.style[cache.vendor+'Transition'] = '';
                     cache.isDragging = true;
@@ -308,6 +318,11 @@
                     };
                 },
                 dragging: function(e) {
+                    if (CPullToRefresh.inPull){
+                        action.drag.endDrag(e);
+                        return;
+                    }
+
                     if (cache.isDragging && settings.touchToDrag) {
 
                         var thePageX = utils.page('X', e),
@@ -523,7 +538,6 @@
                 eventList[evt] = false;
             }
         };
-
         this.enable = function() {
             utils.dispatchEvent('enable');
             action.drag.listen();

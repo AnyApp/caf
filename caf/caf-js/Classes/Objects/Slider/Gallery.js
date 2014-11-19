@@ -13,7 +13,7 @@ var CGallery = Class(CSlider,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CGallery);
+        CObject.setObjectDefaults(values,CGallery);
 
         this.data = values.data || {};
         this.data.childs = values.data.childs || [];
@@ -23,7 +23,7 @@ var CGallery = Class(CSlider,{
             var imageId = CObjectsHandler.createObject('ZoomedImage',{
                 data: {  src: [imageSrc] }
             });
-            this.data.childs.push(imageId);
+            this.appendChild(imageId);
         },this);
 
         // Invoke parent's constructor

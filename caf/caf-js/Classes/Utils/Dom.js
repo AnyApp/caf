@@ -46,7 +46,8 @@ var CDom = Class({
     },
     removeFromDOM: function(nodeId){
         var node = CUtils.element(nodeId);
-        node.parentElement.removeChild(node);
+        if (!CUtils.isEmpty(node) && !CUtils.isEmpty(node.parentElement))
+            node.parentElement.removeChild(node);
     },
     /**
      * Move node to index and push all other nodes forward.

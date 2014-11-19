@@ -3,16 +3,24 @@
  */
 var CLocalStorage = Class({
     $singleton: true,
+    base: '',
+    initBase: function(){
+        CLocalStorage.base = CSettings.get('appID') || '';
+        CLocalStorage.base += '/';
+    },
     save: function(key,value){
-        window.localStorage.setItem(key,value);
+        CLocalStorage.initBase();
+        window.localStorage.setItem(CLocalStorage.base+key,JSONfn.stringify(value));
     },
     get: function(key){
-        var value = window.localStorage.getItem(key);
+        CLocalStorage.initBase();
+        var value = window.localStorage.getItem(CLocalStorage.base+key);
         if (CUtils.isEmpty(value)) return null;
-        return value;
+        return JSONfn.parse(value);
     },
     empty: function(key){
-        return CUtils.isEmpty(window.localStorage.getItem(key));
+        CLocalStorage.initBase();
+        return CUtils.isEmpty(window.localStorage.getItem(CLocalStorage.base+key));
     }
 
 });

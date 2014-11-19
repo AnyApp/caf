@@ -6,7 +6,9 @@ var CObjectsHandler = Class({
     objectsById: {},
     preparedObjects: Array(),
     appContainerId: "",
+    dialogsContainerId: "",
     mainViewId: "",
+    contentId: "",
 
     addObject: function(object){
         this.objectsById[object.uid()] = object;
@@ -28,6 +30,34 @@ var CObjectsHandler = Class({
     object: function(id){
         return this.objectsById[id];
     },
+    // Extend CObject method: parseRelativeObjectId
+    relativeObject: function(baseObjectId,relativeId){
+        var baseObject = CObjectsHandler.object(baseObjectId);
+        if (CUtils.isEmpty(baseObject)) {
+            baseObject = baseObjectId; // Case CObject sent and not id.
+            baseObjectId = baseObject.uid();
+        }
+        if (CUtils.isEmpty(baseObject))
+            return null;
+        var relativeParentId = '';
+        if (baseObject.isRelative())
+            relativeParentId = baseObjectId;
+        else
+            relativeParentId = baseObject.getRelativeParent();
+        if (!CUtils.isEmpty(relativeParentId))
+            return relativeParentId+'/'+relativeId;
+
+    },
+    isCObject: function(id){
+        return !CUtils.isEmpty(this.object(id));
+    },
+    updateUname: function(last,current){
+        if (last === current)
+            return;
+        var object = this.object(last);
+        //delete this.objectsById[last];
+        this.objectsById[current] = object;
+    },
     getPreparedObjects: function(){
         return this.preparedObjects;
     },
@@ -39,12 +69,12 @@ var CObjectsHandler = Class({
             var type = object.type; // Get the Object type.
             if (CUtils.isEmpty(type)) return;
             // Try to create object.
-            try {
+            //try {
                 this.createObject(type,object);
-            }
-            catch (e){
-                CLog.log("Failed to create object from type: "+type+". Error: "+e);
-            }
+            //}
+            //catch (e){
+            //    CLog.log("Failed to create object from type: "+type+". Error: "+e);
+            //}
 
         },this);
     },
@@ -53,12 +83,13 @@ var CObjectsHandler = Class({
         CObjectsHandler.addObject(cObject);
         if (type=="AppContainer") CObjectsHandler.appContainerId = cObject.uid(); // Identify App Container Object.
         if (type=="MainView") CObjectsHandler.mainViewId = cObject.uid(); // Identify Main Object.
+        if (type=="Content") CObjectsHandler.contentId = cObject.uid(); // Identify Main Object.
         return cObject.uid();
     },
-    createFromDynamicObject: function(dynamicObject,data,logic,design){
+    createFromTemplateObject: function(abstractObject,data,logic,design){
         var duplicatedObjectBase        = {};
-        for (var key in dynamicObject.data.object){
-            duplicatedObjectBase[key] = CUtils.clone(dynamicObject.data.object[key]);
+        for (var key in abstractObject){
+            duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
 
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data);

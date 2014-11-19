@@ -15,7 +15,7 @@ var CPagination = Class(CObject,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CPagination);
+        CObject.setObjectDefaults(values,CPagination);
 
         // Invoke parent's constructor
         CPagination.$super.call(this, values);

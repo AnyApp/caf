@@ -8,7 +8,7 @@ var  CDialogContainer = Class(CContainer,{
             minHeight: 100,
             maxWidth: '90%',
             maxHeight: '80%',
-            round:2,
+            //round:2,
             bgColor:{color:'White'},
             //border: { all: 1},
             borderColor:{color:'Gray',level:2}
@@ -20,11 +20,11 @@ var  CDialogContainer = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CDialogContainer);
+        CObject.setObjectDefaults(values,CDialogContainer);
         // Invoke parent's constructor
         CDialogContainer.$super.call(this, values);
 
-        this.design.top = CAppConfig.get('headerSize')+20;
+        this.design.top = CGlobals.get('headerSize')+20;
     }
 
 });

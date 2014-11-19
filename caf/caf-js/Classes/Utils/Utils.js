@@ -48,11 +48,13 @@ var CUtils = Class({
     },
     isString: function(variable)
     {
-        return (typeof variable == 'string' || variable instanceof String)
-            && variable.trim().indexOf("function")!=0;
+        return (typeof variable == 'string' || variable instanceof String);
     },
     isArray: function(variable){
         return Object.prototype.toString.call( variable ) === '[object Array]';
+    },
+    isFunction: function(variable){
+        return typeof(variable) == "function";
     },
     isStringFunction: function(variable)
     {
@@ -64,15 +66,17 @@ var CUtils = Class({
     },
     hasClass: function(el, name)
     {
+        if (!el)
+            return false;
         return new RegExp('(\\s|^)'+name+'(\\s|$)').test(el.className);
     },
     addClass: function(el, name)
     {
-        if (!CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
+        if (el && !CUtils.hasClass(el, name)) { el.className += (el.className ? ' ' : '') +name; }
     },
     removeClass: function(el, name)
     {
-        if (CUtils.hasClass(el, name)) {
+        if (el && CUtils.hasClass(el, name)) {
             el.className=el.className.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ').replace(/^\s+|\s+$/g, '');
         }
     },
@@ -88,25 +92,28 @@ var CUtils = Class({
         }
     },
     getPointerEvent: function(event) {
-        return event.targetTouches ? event.targetTouches[0] : event;
+        return (event.targetTouches && event.targetTouches.length>0) ? event.targetTouches[0] : event;
     },
-    openURL: function(url)
-    {
-        if (CPlatforms.isIOS())
-        {
+    openLocalURL: function(url){
+        window.location = '#'+url;
+    },
+    openURL: function(url) {
+        if (CPlatforms.isIOS()) {
             window.open(url,  '_system', 'location=yes');
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 navigator.app.loadUrl(url, {openExternal:true});
             }
-            catch (e)
-            {
+            catch (e) {
                 window.open(url,  '_system', 'location=yes');
             }
         }
+    },
+    isURLLocal: function(url){
+        if (CUtils.isEmpty(url))
+            return true;
+        return ( (url.indexOf('www.')<0) && (url.indexOf('http://')<0) );
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};
@@ -183,7 +190,135 @@ var CUtils = Class({
             hash: a.hash,
             search: a.search
         };
+    },
+    isTouchDevice: function() {
+        try {
+            document.createEvent("TouchEvent");
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+    arrayFromObjectsKey: function(objects,key1,key2,key3){
+        var arr = [];
+        _.each(objects,function(element){
+            var value = element[key1];
+            if (key2)
+                value = value[key2];
+            if (key3)
+                value = value[key3];
+            arr.push(value || null);
+        },this);
+        return arr;
+    },
+    doElementsCollide: function(el1, el2) {
+        if (CUtils.isEmpty(el1) || CUtils.isEmpty(el2))
+            return false;
+        el1.offsetBottom = el1.offsetTop + el1.offsetHeight;
+        el1.offsetRight = el1.offsetLeft + el1.offsetWidth;
+        el2.offsetBottom = el2.offsetTop + el2.offsetHeight;
+        el2.offsetRight = el2.offsetLeft + el2.offsetWidth;
+
+        return !((el1.offsetBottom < el2.offsetTop) ||
+            (el1.offsetTop > el2.offsetBottom) ||
+            (el1.offsetRight < el2.offsetLeft) ||
+            (el1.offsetLeft > el2.offsetRight))
+    },
+    /**
+     * Check that the object is really showing:
+     * 1. not hidden under any element.
+     * 2. on screen.
+     * 3. area > 0 (visibility + display:none).
+     * @param element
+     * @returns {boolean}
+     */
+    isRealVisible: function(element) {
+        if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
+        var height = document.documentElement.clientHeight,
+            rects = element.getClientRects(),
+            on_top = function(r) {
+                var x = (r.left + r.right)/2, y = (r.top + r.bottom)/2;
+                var showingElement = document.elementFromPoint(x, y);
+                return showingElement.id === element.id ||
+                    CUtils.isDeepChild(element.id,showingElement);
+            };
+        for (var i = 0, l = rects.length; i < l; i++) {
+            var r = rects[i],
+                in_viewport = r.top > 0 ? r.top <= height : (r.bottom > 0 && r.bottom <= height);
+            if (in_viewport && on_top(r)) return true;
+        }
+        return false;
+    },
+    isDeepChild: function(parentId,element){
+        if (CUtils.isEmpty(element))
+            return false;
+        return parentId === element.id || CUtils.isDeepChild(parentId,element.parentElement);
+    },
+    replaceAll: function(string, find, replace) {
+        return string.replace(new RegExp(CUtils.escapeRegExp(find), 'g'), replace);
+    },
+    escapeRegExp: function(string) {
+        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    },
+    stringEndsWith: function(str,suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    },
+    stringCountOccurencesInHead: function(needle,haystack){
+        return CUtils.stringCountOccurencesInHeadHelper(needle,haystack,0);
+    },
+    stringCountOccurencesInHeadHelper: function(needle,haystack,count){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringCountOccurencesInHeadHelper(needle,
+                            haystack.replace(needle,''),count+1);
+        else
+            return count;
+    },
+    stringRemoveAllOccurencesInHead: function(needle,haystack){
+        if (haystack.indexOf(needle)===0)
+            return CUtils.stringRemoveAllOccurencesInHead(needle,
+                haystack.replace(needle,''));
+        else
+            return haystack;
+    },
+    /**
+     * Convert an image
+     * to a base64 string
+     * @param  {String}   url
+     * @param  {Function} callback
+     * @param  {String}   [outputFormat=image/png]
+     */
+    convertImgToBase64: function(url, callback, outputFormat){
+        var canvas = document.createElement('CANVAS'),
+            ctx = canvas.getContext('2d'),
+            img = new Image;
+        img.crossOrigin = 'Anonymous';
+        img.onload = function(){
+            var dataURL;
+            canvas.height = img.height;
+            canvas.width = img.width;
+            ctx.drawImage(img, 0, 0);
+            dataURL = canvas.toDataURL(outputFormat);
+            callback.call(this, dataURL);
+            canvas = null;
+        };
+        img.src = url;
+    },
+    deepFind: function(obj, path) {
+        var paths = path.split('.')
+            , current = obj
+            , i;
+
+        for (i = 0; i < paths.length; ++i) {
+            if (current[paths[i]] == undefined) {
+                return undefined;
+            } else {
+                current = current[paths[i]];
+            }
+        }
+        return current;
     }
+
+
 
 
 });

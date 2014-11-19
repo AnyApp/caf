@@ -19,12 +19,12 @@ var CFooter = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CFooter);
+        CObject.setObjectDefaults(values,CFooter);
 
         // Invoke parent's constructor
         CFooter.$super.call(this, values);
 
-        this.design.height = CAppConfig.get('footerSize');
+        this.design.height = CGlobals.get('footerSize');
 
     }
 

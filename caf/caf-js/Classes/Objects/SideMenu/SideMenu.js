@@ -13,30 +13,45 @@ var CSideMenu = Class(CContainer,{
     constructor: function(values) {
         if (CUtils.isEmpty(values)) return;
         // Merge Defaults.
-        CObject.mergeWithDefaults(values,CSideMenu);
+        CObject.setObjectDefaults(values,CSideMenu);
         // Invoke parent's constructor
         CSideMenu.$super.call(this, values);
+        this.data.sideMenuWidth = this.data.sideMenuWidth || null;
+        var design = {};
+        if (!CUtils.isEmpty(this.data.sideMenuWidth))
+            design.width = this.data.sideMenuWidth;
+
         this.leftContainer  = values.data.leftContainer  || null;
         this.rightContainer = values.data.rightContainer || null;
 
+        var leftMenuChilds = [];
+        if (!CUtils.isEmpty(this.leftContainer))
+            leftMenuChilds.push(this.leftContainer);
+        var rightMenuChilds = [];
+        if (!CUtils.isEmpty(this.rightContainer))
+            rightMenuChilds.push(this.rightContainer);
         // Create left and right menus.
         this.leftMenu   = CObjectsHandler.createObject('SideMenuLeft',{
-            data: {  childs: [this.leftContainer] }
+            data: {  childs: leftMenuChilds },
+            design: design
         });
         this.rightMenu  = CObjectsHandler.createObject('SideMenuRight',{
-            data: {  childs: [this.rightContainer] }
+            data: {  childs: rightMenuChilds },
+            design: design
         });
 
         // Set Children.
-        this.data.childs = ['side-menu-left','side-menu-right'];
+        this.data.childs = [this.leftMenu,this.rightMenu];
         var positions = [];
         if (this.leftContainer != null)
             positions.push('left');
         if (this.rightContainer != null)
             positions.push('right');
 
+
         this.logic.sideMenu = {
-            positions: positions
+            positions:  positions,
+            width:      this.data.sideMenuWidth
         };
 
     }

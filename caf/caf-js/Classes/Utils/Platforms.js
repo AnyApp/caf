@@ -15,15 +15,22 @@ var CPlatforms = Class({
      * @returns {boolean}
      */
     isIOS: function() {
-        return navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+        try {
+            var result = navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+            return result;
+        }
+        catch (e){
+            return false;
+        }
+
     },
     /**
      * Return whether or not the device platform is android.
      * @returns {boolean}
      */
     isAndroid: function() {
-        if (caf.utils.isEmpty(device))      return false;
-        return device.platform.toLowerCase() == 'android';
+        if (window.device===undefined || CUtils.isEmpty(window.device || null) || CUtils.isEmpty(window.device.platform || null))      return false;
+        return window.device.platform.toLowerCase() == 'android';
     },
     /**
      * Return the android series.
@@ -31,7 +38,7 @@ var CPlatforms = Class({
      * @returns {number}
      */
     androidSeries: function() {
-        if (!this.isAndroid()) return 0;
+        if (!this.isAndroid()) return -1;
 
         var deviceOSVersion = device.version;  //fetch the device OS version
         return Number(deviceOSVersion.substring(0,deviceOSVersion.indexOf(".")));

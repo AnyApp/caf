@@ -8,6 +8,14 @@ var CThreads = Class({
     },
     run: function(task,time){
         window.setTimeout(task,time);
+    },
+    runTimes: function(task,start,interval,times){
+        for (var i=0;i<times;i++){
+            window.setTimeout(task,start+interval*i);
+        }
+    },
+    runIntervaly: function(task,interval){
+        window.setInterval(task,interval);
     }
 
 });
