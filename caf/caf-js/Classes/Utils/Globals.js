@@ -15,6 +15,12 @@ var CGlobals = Class({
             value = CGlobals.defaults[name];
         return value;
     },
+    getDeep: function(path){
+        var value = CUtils.deepFind(CGlobals.globals,path);
+        if (CUtils.isEmpty(value) && !CUtils.isEmpty(CGlobals.defaults[path]))
+            value = CGlobals.defaults[path];
+        return value || null;
+    },
     exist: function(name){
         return !CUtils.isEmpty(CGlobals.get(name));
     },

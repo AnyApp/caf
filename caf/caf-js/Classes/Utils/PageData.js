@@ -10,6 +10,11 @@ var CPageData = Class({
             return pagesData[name];
         return null;
     },
+    getDeep: function(path){
+        var pagesData = CPageData.pagesData[CPager.currentPage];
+        if (!CUtils.isEmpty(pagesData))
+            return CUtils.deepFind(pagesData,path) || null;
+    },
     exist: function(name){
         return !CUtils.isEmpty(CPageData.get(name));
     },

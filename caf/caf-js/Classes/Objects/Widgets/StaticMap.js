@@ -30,17 +30,16 @@ var CStaticMap = Class(CImage,{
         this.data.mapData.marker.color  = this.data.mapData.marker.color        || 'blue';
         // Position default to map center.
         this.data.mapData.marker.position = this.data.mapData.marker.position   || this.data.mapData.center;
-
-        this.data.src = 'https://maps.googleapis.com/maps/api/staticmap?center='+
-            this.data.mapData.center+'&zoom='+this.data.mapData.zoom
-            +'&size='+this.data.mapData.width+'x'+this.data.mapData.height
-            +'&maptype='+this.data.mapData.maptype+'&markers=color:'+this.data.mapData.marker.color
-            +'%7C'+this.data.mapData.marker.position;
     },
     /**
      *  Build Object.
      */
     prepareBuild: function(data){
+        this.data.src = 'https://maps.googleapis.com/maps/api/staticmap?center='+
+            this.data.mapData.center+'&zoom='+this.data.mapData.zoom
+            +'&size='+this.data.mapData.width+'x'+this.data.mapData.height
+            +'&maptype='+this.data.mapData.maptype+'&markers=color:'+this.data.mapData.marker.color
+            +'%7C'+this.data.mapData.marker.position;
         // Prepare this element - wrap it's children.
         return CStaticMap.$superp.prepareBuild.call(this,{
             tag: 'img',

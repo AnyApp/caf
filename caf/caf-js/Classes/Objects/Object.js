@@ -168,13 +168,13 @@ var CObject = Class({
         return eval('workingObject.'+str);
     },
     parseGlobalReference: function(str){
-        return CGlobals.get(str);
+        return CGlobals.getDeep(str) || null;
     },
     parsePageReference: function(str){
-        return CPageData.get(str);
+        return CPageData.getDeep(str) || null;
     },
     parseDesignReference: function(str){
-        return CDesignHandler.get(str);
+        return CDesignHandler.get(str) || null;
     },
     parseRelativeReference: function(workingObject,str){
         var relativeParentId = workingObject.getRelativeParent();
@@ -207,6 +207,34 @@ var CObject = Class({
             thisObjectReference);
         return JSONfn.parse(replacedReferencesFunc);
     },
+    parsePartReference: function(part){
+        // not a reference.
+        if (part === null || part.length<=0 || part[0]!='#')
+            return part;
+        /**
+         * Get the object that the data needed to be extracted from.
+         * Examples:'#*'    => workingObject = this
+         *          '##*'   => workingObject = this.getRelativeParent()
+         *          '###*'  => workingObject = this.getRelativeParent().getRelativeParent()
+         *          etc..
+         **/
+        var countHeadHashes =   CUtils.stringCountOccurencesInHead('#',part);
+        var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
+        part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
+
+        if (part.length>5 && part.substr(0,5) == 'this.')
+            return this.parseLocalReference(workingObject,part.substr(5)) || null;
+        else if (part.length>1 && part.substr(0,1) == '.')
+            return this.parseRelativeReference(workingObject,part)  || null;
+        else if (part.length>1 && part.substr(0,1) == '/')
+            return this.parseRelativeObjectId(workingObject,part)   || null;
+        else if (part.length>8 && part.substr(0,8) == 'globals.')
+            return this.parseGlobalReference(part.substr(8))        || null;
+        else if (part.length>5 && part.substr(0,5) == 'page.')
+            return this.parsePageReference(part.substr(5))          || null;
+        else if (part.length>8 && part.substr(0,8) == 'designs.')
+            return this.parseDesignReference(part.substr(8))        || null;
+    },
     replaceReferencesInString: function(str) {
         if (CUtils.isEmpty(str))
             return str;
@@ -215,32 +243,8 @@ var CObject = Class({
         // Multiple reference.
         var parts = str.split(' ');
         for (var i=0; i<parts.length; i++){
-            var part = parts[i];
-            // not a reference.
-            if (part.length<=0 || part[0]!='#')
-                continue;
-            /**
-             * Get the object that the data needed to be extracted from.
-             * Examples:'#*'    => workingObject = this
-             *          '##*'   => workingObject = this.getRelativeParent()
-             *          '###*'  => workingObject = this.getRelativeParent().getRelativeParent()
-             *          etc..
-            **/
-            var countHeadHashes =   CUtils.stringCountOccurencesInHead('#',part);
-            var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
-            part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
-            if (part.length>5 && part.substr(0,5) == 'this.')
-                parts[i] = this.parseLocalReference(workingObject,part.substr(5)) || null;
-            else if (part.length>1 && part.substr(0,1) == '.')
-                parts[i] = this.parseRelativeReference(workingObject,part)  || null;
-            else if (part.length>1 && part.substr(0,1) == '/')
-                parts[i] = this.parseRelativeObjectId(workingObject,part)   || null;
-            else if (part.length>8 && part.substr(0,8) == 'globals.')
-                parts[i] = this.parseGlobalReference(part.substr(8))        || null;
-            else if (part.length>5 && part.substr(0,5) == 'page.')
-                parts[i] = this.parsePageReference(part.substr(5))          || null;
-            else if (part.length>8 && part.substr(0,8) == 'designs.')
-                parts[i] = this.parseDesignReference(part.substr(8))        || null;
+            parts[i] = this.parsePartReference(parts[i]) || null;
+            parts[i] = this.parsePartReference(parts[i]) || null;
         }
         // Filter out empty elements.
         parts = parts.filter(function(n){ return n != undefined && n!='' && n!=null });
