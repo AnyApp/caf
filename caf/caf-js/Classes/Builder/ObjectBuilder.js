@@ -5,7 +5,13 @@ var CBuilderObject = Class({
     $statics: {
 
     },
-
+    /***
+     * Creates new Object Builder.
+     * Initiate Object's type, uname, data, design, logic.
+     * @param type  - The Object's type.
+     * @param uname - The Object's unique name.
+     *                If empty - the Object's id will be auto generated.
+     */
     constructor: function(type,uname) {
         this.properties         = {};
         this.properties.type    = type   || 'Object';
@@ -15,29 +21,63 @@ var CBuilderObject = Class({
         this.properties.design      = {};
         this.properties.logic       = {};
     },
+    /***
+     *  Build the object - return the actual object representation.
+     * @returns {{}|*|CBuilderObject.properties}
+     */
     build: function(){
         return this.properties;
     },
+    /***
+     * Initiate template data for this Object.
+     * Use ONLY internally in CBuilderObject.
+     */
     initTemplate: function(){
         this.properties.data.template   = this.properties.data.template || {};
         this.properties.data.template.container    = this.properties.data.template.container  || {type:'Container'};
         this.properties.logic.template  = true;
     },
+    /***
+     * Set child object for this Object.
+     * This Object must be a Container.
+     * @param childs - Array of Objects ids.
+     * @returns {CBuilderObject}
+     */
     childs: function(childs){
         this.properties.data.childs    = childs;
         return this;
     },
+    /**
+     * Append single child to this Object.
+     * This Object must be a Container.
+     * @param child - Object's id.
+     * @returns {CBuilderObject}
+     */
     child: function(child){
         this.properties.data.childs    = this.properties.data.childs || [];
         this.properties.data.childs.push(child);
         return this;
     },
+    /***
+     * Set Page data for this Object.
+     * @param name  -   Page name: The name that will be used to link
+     *                  to this Page.
+     * @param title -   The Page title. Will be autoset in the application
+     *                  header and in HTML.header.title.
+     * @param onLoad-   Function that will be called when this page is fully loaded.
+     * @returns {CBuilderObject}
+     */
     page: function(name,title,onLoad){
         this.properties.data.page =
                 { name: name || '', title: title || '', onLoads: [onLoad] || [] };
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Append onLoad function.
+     * @param onLoad    - Function that will be executed when this page is fully loaded.
+     * @returns {CBuilderObject}
+     */
     pageOnLoad: function(onLoad){
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoads = this.properties.data.page.onLoads || [];
@@ -45,6 +85,11 @@ var CBuilderObject = Class({
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Append onLoadPrepare function.
+     * @param onLoadPrepare - Function that will be called when this page is starts showing.
+     * @returns {CBuilderObject}
+     */
     pageOnLoadPrepare: function(onLoadPrepare){
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoadPrepares = this.properties.data.page.onLoadPrepares || [];
@@ -52,6 +97,29 @@ var CBuilderObject = Class({
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Apply animation on this Object children when this Object is shown.
+     * Object Show cases: Page move in, Template reloads.
+     * @param animations - Animation name or list of animations from CAnimations.anims.
+     *                     If animation name send, it will be duplicated as times as
+     *                     the number of the objects that need to be animated.
+     *                     If the list size is smaller than the number of the objects
+     *                     that need to be animated, then the first animation in the
+     *                     list will be duplicated.
+     *                     Eventually, the resulted animation list will be used to animate
+     *                     to corresponding Object in the animated Objects list.
+     * @param intervals -  The timestamps when the objects will animate from START.
+     *                     - empty:  The Objects will animate after each of them finish.
+     *                     - number: The number will be the difference between each object
+     *                               animate start time.
+     *                               For Example: intervals = 200, intervals will be
+     *                                            translated into intervals list =>
+     *                                            [0,200,400,600,800,1000,...,200*(n-1)]
+     *                     - list:   Each object-i will animate in time =>
+     *                               start + intervals[i]
+     * @param start     - The relative start time of the animations.
+     * @returns {CBuilderObject}
+     */
     onShowAnimateChildren: function(animations,intervals,start) {
         this.properties.logic.onShowAnimateChildren = {
             animations:     animations,
