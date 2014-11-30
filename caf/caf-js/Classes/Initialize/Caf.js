@@ -46,6 +46,8 @@ var Caf = Class({
         if (navigator && navigator.splashscreen)
             navigator.splashscreen.hide();
         Caf.actualStart();
+        // prevent ghost real clicks on body
+        document.body.addEventListener('click', CClicker.preventGhostClick, true);
     },
     startUpdate: function(){
         if (Caf.appUpdateStarted === true) // Update check already performed.

@@ -4,6 +4,8 @@
 var CClicker = Class({
     $singleton: true,
     isScrolling: undefined,
+    ghostClickTimeout: 500,
+    preventGhostClick: true,
     lastClick: 0,
     /**
      * Prevent burst of clicks.
@@ -11,7 +13,7 @@ var CClicker = Class({
     canClick: function(e)
     {
         var currentTime = e.timeStamp;
-        if (currentTime-CClicker.lastClick>400) {
+        if (currentTime-CClicker.lastClick>800) {
             CClicker.lastClick = currentTime;
             return true;
         }
@@ -100,6 +102,9 @@ var CClicker = Class({
                     e.preventDefault();
                     // Prevent unneccesary pull.
                     CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
+                    if (CClicker.preventGhostClick) {
+                        e.isCafClick = true;
+                    }
                 }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
@@ -109,7 +114,6 @@ var CClicker = Class({
             // Reset
             CClicker.resetTouch(object);
         }
-
         // Set Events Handlers.
         element.addEventListener("touchstart",object.events.onTouchStartEvent);
         element.addEventListener("mousedown",object.events.onTouchStartEvent);
@@ -136,7 +140,7 @@ var CClicker = Class({
         CUtils.addClass(element,object.clicker.activeRemoveClasses);
     }
 
-
 });
+
 
 

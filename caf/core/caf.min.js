@@ -1434,6 +1434,8 @@ var CAnimations = Class({
 var CClicker = Class({
     $singleton: true,
     isScrolling: undefined,
+    ghostClickTimeout: 500,
+    preventGhostClick: true,
     lastClick: 0,
     /**
      * Prevent burst of clicks.
@@ -1441,7 +1443,7 @@ var CClicker = Class({
     canClick: function(e)
     {
         var currentTime = e.timeStamp;
-        if (currentTime-CClicker.lastClick>400) {
+        if (currentTime-CClicker.lastClick>800) {
             CClicker.lastClick = currentTime;
             return true;
         }
@@ -1530,6 +1532,9 @@ var CClicker = Class({
                     e.preventDefault();
                     // Prevent unneccesary pull.
                     CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
+                    if (CClicker.preventGhostClick) {
+                        e.isCafClick = true;
+                    }
                 }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
@@ -1539,7 +1544,6 @@ var CClicker = Class({
             // Reset
             CClicker.resetTouch(object);
         }
-
         // Set Events Handlers.
         element.addEventListener("touchstart",object.events.onTouchStartEvent);
         element.addEventListener("mousedown",object.events.onTouchStartEvent);
@@ -1566,8 +1570,8 @@ var CClicker = Class({
         CUtils.addClass(element,object.clicker.activeRemoveClasses);
     }
 
-
 });
+
 
 
 /**
@@ -6386,6 +6390,8 @@ var Caf = Class({
         if (navigator && navigator.splashscreen)
             navigator.splashscreen.hide();
         Caf.actualStart();
+        // prevent ghost real clicks on body
+        document.body.addEventListener('click', CClicker.preventGhostClick, true);
     },
     startUpdate: function(){
         if (Caf.appUpdateStarted === true) // Update check already performed.
@@ -6529,7 +6535,13 @@ var CBuilderObject = Class({
     $statics: {
 
     },
-
+    /***
+     * Creates new Object Builder.
+     * Initiate Object's type, uname, data, design, logic.
+     * @param type  - The Object's type.
+     * @param uname - The Object's unique name.
+     *                If empty - the Object's id will be auto generated.
+     */
     constructor: function(type,uname) {
         this.properties         = {};
         this.properties.type    = type   || 'Object';
@@ -6539,29 +6551,63 @@ var CBuilderObject = Class({
         this.properties.design      = {};
         this.properties.logic       = {};
     },
+    /***
+     *  Build the object - return the actual object representation.
+     * @returns {{}|*|CBuilderObject.properties}
+     */
     build: function(){
         return this.properties;
     },
+    /***
+     * Initiate template data for this Object.
+     * Use ONLY internally in CBuilderObject.
+     */
     initTemplate: function(){
         this.properties.data.template   = this.properties.data.template || {};
         this.properties.data.template.container    = this.properties.data.template.container  || {type:'Container'};
         this.properties.logic.template  = true;
     },
+    /***
+     * Set child object for this Object.
+     * This Object must be a Container.
+     * @param childs - Array of Objects ids.
+     * @returns {CBuilderObject}
+     */
     childs: function(childs){
         this.properties.data.childs    = childs;
         return this;
     },
+    /**
+     * Append single child to this Object.
+     * This Object must be a Container.
+     * @param child - Object's id.
+     * @returns {CBuilderObject}
+     */
     child: function(child){
         this.properties.data.childs    = this.properties.data.childs || [];
         this.properties.data.childs.push(child);
         return this;
     },
+    /***
+     * Set Page data for this Object.
+     * @param name  -   Page name: The name that will be used to link
+     *                  to this Page.
+     * @param title -   The Page title. Will be autoset in the application
+     *                  header and in HTML.header.title.
+     * @param onLoad-   Function that will be called when this page is fully loaded.
+     * @returns {CBuilderObject}
+     */
     page: function(name,title,onLoad){
         this.properties.data.page =
                 { name: name || '', title: title || '', onLoads: [onLoad] || [] };
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Append onLoad function.
+     * @param onLoad    - Function that will be executed when this page is fully loaded.
+     * @returns {CBuilderObject}
+     */
     pageOnLoad: function(onLoad){
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoads = this.properties.data.page.onLoads || [];
@@ -6569,6 +6615,11 @@ var CBuilderObject = Class({
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Append onLoadPrepare function.
+     * @param onLoadPrepare - Function that will be called when this page is starts showing.
+     * @returns {CBuilderObject}
+     */
     pageOnLoadPrepare: function(onLoadPrepare){
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoadPrepares = this.properties.data.page.onLoadPrepares || [];
@@ -6576,6 +6627,29 @@ var CBuilderObject = Class({
         this.properties.logic.page = true;
         return this;
     },
+    /***
+     * Apply animation on this Object children when this Object is shown.
+     * Object Show cases: Page move in, Template reloads.
+     * @param animations - Animation name or list of animations from CAnimations.anims.
+     *                     If animation name send, it will be duplicated as times as
+     *                     the number of the objects that need to be animated.
+     *                     If the list size is smaller than the number of the objects
+     *                     that need to be animated, then the first animation in the
+     *                     list will be duplicated.
+     *                     Eventually, the resulted animation list will be used to animate
+     *                     to corresponding Object in the animated Objects list.
+     * @param intervals -  The timestamps when the objects will animate from START.
+     *                     - empty:  The Objects will animate after each of them finish.
+     *                     - number: The number will be the difference between each object
+     *                               animate start time.
+     *                               For Example: intervals = 200, intervals will be
+     *                                            translated into intervals list =>
+     *                                            [0,200,400,600,800,1000,...,200*(n-1)]
+     *                     - list:   Each object-i will animate in time =>
+     *                               start + intervals[i]
+     * @param start     - The relative start time of the animations.
+     * @returns {CBuilderObject}
+     */
     onShowAnimateChildren: function(animations,intervals,start) {
         this.properties.logic.onShowAnimateChildren = {
             animations:     animations,
@@ -6584,6 +6658,29 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    /***
+     * Apply animation on objects when this Object is shown.
+     * Object Show cases: Page move in, Template reloads.
+     * @param animations - Animation name or list of animations from CAnimations.anims.
+     *                     If animation name send, it will be duplicated as times as
+     *                     the number of the objects that need to be animated.
+     *                     If the list size is smaller than the number of the objects
+     *                     that need to be animated, then the first animation in the
+     *                     list will be duplicated.
+     *                     Eventually, the resulted animation list will be used to animate
+     *                     to corresponding Object in the animated Objects list.
+     * @param intervals -  The timestamps when the objects will animate from START.
+     *                     - empty:  The Objects will animate after each of them finish.
+     *                     - number: The number will be the difference between each object
+     *                               animate start time.
+     *                               For Example: intervals = 200, intervals will be
+     *                                            translated into intervals list =>
+     *                                            [0,200,400,600,800,1000,...,200*(n-1)]
+     *                     - list:   Each object-i will animate in time =>
+     *                               start + intervals[i]
+     * @param start     - The relative start time of the animations.
+     * @returns {CBuilderObject}
+     */
     onShowAnimation: function(objects,animations,intervals,start) {
         this.properties.logic.onShowAnimation = {
             objects:        objects,
@@ -6593,6 +6690,12 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    /**
+     * As Above - only objects is auto set to be this object.
+     * @param animation
+     * @param start
+     * @returns {CBuilderObject}
+     */
     onShowSelfAnimation: function(animation,start) {
         this.properties.logic.onShowAnimation = {
             objects:        null,
@@ -6602,38 +6705,92 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    /**
+     * Set the side menu width in pixels.
+     * Apply on 'SideMenu' Object.
+     * @param width
+     * @returns {CBuilderObject}
+     */
     sideMenuWidth: function(width) {
         this.properties.data.sideMenuWidth = width;
         return this;
     },
+    /**
+     * Set LeftContainer Object to the SideMenu.
+     * Apply on 'SideMenu' Object.
+     * @param leftContainer: The ID of the LeftContainer Object.
+     * @returns {CBuilderObject}
+     */
     sideMenuLeftContainer: function(leftContainer) {
         this.properties.data.leftContainer = leftContainer;
         return this;
     },
+    /**
+     * Set RightContainer Object to the SideMenu.
+     * Apply on 'SideMenu' Object.
+     * @param rightContainer: The ID of the RightContainer Object.
+     * @returns {CBuilderObject}
+     */
     sideMenuRightContainer: function(rightContainer) {
         this.properties.data.rightContainer = rightContainer;
         return this;
     },
+    /**
+     * Array of Objects to appear on the left of the Header.
+     * Those Object's width and position in the Header will be auto-set.
+     * @param left - Array of Objects.
+     * @returns {CBuilderObject}
+     */
     headerLeft: function(left) {
         this.properties.data.left = left;
         return this;
     },
+    /**
+     * Array of Objects to appear on the right of the Header.
+     * Those Object's width and position in the Header will be auto-set.
+     * @param right - Array of Objects.
+     * @returns {CBuilderObject}
+     */
     headerRight: function(right) {
         this.properties.data.right = right;
         return this;
     },
+    /**
+     * The design that will be applied on the Header title Object.
+     * The Header title Object is auto generated.
+     * @param design - design JSON.
+     * @returns {CBuilderObject}
+     */
     headerTitleDesign: function(design) {
         this.properties.data.titleDesign = design;
         return this;
     },
+    /**
+     * Set innerHTML to be the text provided.
+     * Can be used to set text inside Button, Label and relatives.
+     * @param text - text to display inside innerHTML.
+     * @returns {CBuilderObject}
+     */
     text: function(text) {
         this.properties.logic.text = text;
         return this;
     },
+    /**
+     * Set this Container to be scrollable.
+     * WARNING: DO NOT SET SCROLLABLE IN ANY OTHER WAY THAN THIS.
+     * @returns {CBuilderObject}
+     */
     scrollable: function() {
         CScrolling.setScrollable(this.properties);
         return this;
     },
+    /***
+     * Initializing a template.
+     * @param url       - URL to query for data OR None if the data will be set locally.
+     * @param autoLoad  - Will this Template auto-load when created.
+     * @param queryData - JSON that will be send to the server and will be used as the query.
+     * @returns {CBuilderObject}
+     */
     template: function(url,autoLoad,queryData){
         this.initTemplate();
         this.properties.data.template = {
@@ -6643,16 +6800,38 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    /**
+     * Template Data Prepare Function is a Function that will be called
+     * after the data was loaded and right before the data is used to
+     * create the Template.
+     * This function will be used in order to change or manipulate the data
+     * right before it loads to the Template.
+     * @param prepareFunction - function(data) { return preparedData; }
+     * @returns {CBuilderObject}
+     */
     templateDataPrepareFunction: function(prepareFunction){
         this.initTemplate();
         this.properties.data.template.prepareFunction = prepareFunction;
         return this;
     },
+    /**
+     * Template Root Objects are the Objects that are placed
+     * as the root Objects of each Template Row.
+     * Use Case: - When there is more than one Object in the Template.
+     *           - When Hierarchy needed in the Template.
+     * @param rootObjects - Array of Objects
+     * @returns {CBuilderObject}
+     */
     templateRootObjects: function(rootObjects) {
         this.initTemplate();
         this.properties.data.template.rootObjects = rootObjects;
         return this;
     },
+    /**
+     * Set the Objects array to be used in order to create the template.
+     * @param objects - Array of Objects.
+     * @returns {CBuilderObject}
+     */
     templateObjects: function(objects) {
         this.initTemplate();
         this.properties.data.template.objects = [];
@@ -6663,36 +6842,80 @@ var CBuilderObject = Class({
 
         return this;
     },
+    /**
+     * Set the Template objects to be a single Object.
+     * @param object - Object.
+     * @returns {CBuilderObject}
+     */
     templateObject: function(object) {
         this.initTemplate();
         this.properties.data.template.object = object.build();
         return this;
     },
+    /**
+     * Let this Template the ability to be puuled in order
+     * to be refreshed.
+     * @returns {CBuilderObject}
+     */
     templatePullToRefresh: function() {
         this.initTemplate();
         this.properties.data.template.pullToRefresh = true;
         return this;
     },
+    /**
+     * Set the Template animated loader Color.
+     * @param loaderColor - CColor
+     * @returns {CBuilderObject}
+     */
     templateLoaderColor: function(loaderColor) {
         this.initTemplate();
         this.properties.data.template.loaderColor = loaderColor || null;
         return this;
     },
+    /**
+     * Set local data that this Template will use when it loads.
+     * @param data
+     * @returns {CBuilderObject}
+     */
     templateData: function(data) {
         this.initTemplate();
         this.properties.data.template.data = data;
         return this;
     },
+    /**
+     * Each Template Row is wrapped with a Container.
+     * This method allows you to set design to this Container.
+     * @param design - design JSON.
+     * @returns {CBuilderObject}
+     */
     templateContainerDesign: function(design) {
         this.initTemplate();
-        this.properties.data.template.container.design = design;
+        this.properties.data.template.container.design
+            = this.properties.data.template.container.design || {};
+        this.properties.data.template.container.design =
+            CUtils.mergeJSONs(this.properties.data.template.container.design,design);
         return this;
     },
+    /**
+     * Force reset template on reload or not.
+     * Reset means that all the Template's duplicates will be removed before
+     * the new duplicates creation.
+     * Default: true.
+     * @param resetOnReload - boolean.
+     * @returns {CBuilderObject}
+     */
     templateResetOnReload: function(resetOnReload) {
         this.initTemplate();
         this.properties.data.template.resetOnReload = resetOnReload;
         return this;
     },
+    /**
+     * Set Template border color and size.
+     * Template border is the border that separates each row in the Template.
+     * @param color - CColor.
+     * @param size  - Number - Border Thickness.
+     * @returns {CBuilderObject}
+     */
     templateBorder: function(color,size) {
         this.initTemplate();
         this.properties.data.template.container.design
