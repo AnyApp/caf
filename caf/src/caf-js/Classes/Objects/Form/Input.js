@@ -22,7 +22,7 @@ var CInput = Class(CObject,{
         CObject.setObjectDefaults(values,CInput);
 
         // Invoke parent's constructor
-        this.$class.$super.call(this, values);
+        CInput.$super.call(this, values);
         this.data.name               = values.data.name          || '';
         this.data.type               = values.data.type          || 'text';
         this.data.value              = values.data.value         || '';
@@ -35,6 +35,18 @@ var CInput = Class(CObject,{
 
         if (this.data.required)
             this.data.validators.unshift('notEmpty');
+
+        // Add OnClick Focus to the Input - Fix a Bug.
+        this.logic = this.logic || {};
+        this.logic.onClicks = this.logic.onClicks || [];
+        this.logic.onClicks.push(this.inputCreateOnClick(this));
+    },
+    inputCreateOnClick: function(input){
+        return function(){
+            var inputElement = CUtils.element(input.uid());
+            if (inputElement !== document.activeElement)
+                CUtils.element(input.uid()).focus();
+        };
     },
     /**
      *  Build Object.

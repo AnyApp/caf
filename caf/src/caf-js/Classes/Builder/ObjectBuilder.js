@@ -59,6 +59,9 @@ var CBuilderObject = Class({
         this.properties.data.childs.push(child);
         return this;
     },
+    mainPageChooser: function(chooser){
+        this.properties.data.mainPageChooser = chooser;
+    },
     /***
      * Set Page data for this Object.
      * @param name  -   Page name: The name that will be used to link
@@ -87,6 +90,13 @@ var CBuilderObject = Class({
         this.properties.data.page = this.properties.data.page || {};
         this.properties.data.page.onLoads = this.properties.data.page.onLoads || [];
         this.properties.data.page.onLoads.push(onLoad  || function() {});
+        this.properties.logic.page = true;
+        return this;
+    },
+    pageOnShow: function(onShow){
+        this.properties.data.page = this.properties.data.page || {};
+        this.properties.data.page.onShows = this.properties.data.page.onShows || [];
+        this.properties.data.page.onShows.push(onShow  || function() {});
         this.properties.logic.page = true;
         return this;
     },
@@ -240,6 +250,10 @@ var CBuilderObject = Class({
         this.properties.data.titleDesign = design;
         return this;
     },
+    headerItemSize: function(size) {
+        this.properties.data.itemSize = size;
+        return this;
+    },
     mainHeader: function() {
         this.properties.data.isMainHeader = true;
         return this;
@@ -336,6 +350,11 @@ var CBuilderObject = Class({
     templateDataPrepareFunction: function(prepareFunction){
         this.initTemplate();
         this.properties.data.template.prepareFunction = prepareFunction;
+        return this;
+    },
+    templateDataPrepareRowFunction: function(prepareRowFunction){
+        this.initTemplate();
+        this.properties.data.template.prepareRowFunction = prepareRowFunction;
         return this;
     },
     /**
@@ -475,12 +494,20 @@ var CBuilderObject = Class({
         }
         return this;
     },
-    formSaveToUrl: function(url) {
-        this.properties.data.saveToUrl = url || null;
+    formSendToUrl: function(url) {
+        this.properties.data.sendToUrl = url || null;
         return this;
     },
-    formSaveToUrlCallback: function(callback) {
-        this.properties.data.saveToUrlCallback = callback || null;
+    formSendToUrlPrepare: function(prepare) {
+        this.properties.data.sendToUrlPrepare = prepare || null;
+        return this;
+    },
+    formSendToUrlCallback: function(callback) {
+        this.properties.data.sendToUrlCallback = callback || null;
+        return this;
+    },
+    formOnValidationFailure: function(callback) {
+        this.properties.data.formOnValidationFailure = callback || null;
         return this;
     },
     formOnSubmit: function(onSubmit) {
@@ -521,6 +548,13 @@ var CBuilderObject = Class({
     },
     inputPlaceholder: function(placeholder) {
         this.properties.data.placeholder = placeholder;
+        return this;
+    },
+    checkboxIcon: function(size,color,name,design) {
+        this.properties.data.iconName = name || null;
+        this.properties.data.iconSize = size || null;
+        this.properties.data.iconColor = color || null;
+        this.properties.data.iconDesign = design || null;
         return this;
     },
     inputOnFileSelect: function(inputOnFileSelect) {
@@ -676,6 +710,11 @@ var CBuilderObject = Class({
         return this;
     },
     onClick: function(onClickHandler) {
+        this.properties.logic.onClicks = this.properties.logic.onClicks || [];
+        this.properties.logic.onClicks.push(onClickHandler);
+        return this;
+    },
+    addOnClick: function(onClickHandler) {
         this.properties.logic.onClick = onClickHandler;
         return this;
     },

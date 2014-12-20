@@ -12,7 +12,7 @@ var CTitleHandler = Class({
         document.title = text || '';
         // Set CAF page title.
         var titleObject = CObjectsHandler.object(this.titleId);
-        if (!CUtils.isEmpty(titleObject))
+        if (!CUtils.isEmpty(titleObject) && !CUtils.isEmpty(CUtils.element(this.titleId)))
             titleObject.setText(text);
 
     }

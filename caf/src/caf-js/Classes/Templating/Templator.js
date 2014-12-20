@@ -35,6 +35,9 @@ var CTemplator = Class({
 
         // For each row in data.
         _.each(data,function(currentData){
+            if (object.data.template.prepareRowFunction)
+                currentData = object.data.template.prepareRowFunction(CUtils.clone(currentData));
+
             currentData = CTemplator.fixRetreivedData(currentData);
             // Create container.
             var templateData = object.data.template;
@@ -97,6 +100,8 @@ var CTemplator = Class({
     fixRetreivedData: function(retreived){
         // DO NOT MAKE any changes to the source data.
         retreived = CUtils.clone(retreived);
+        if (CUtils.isEmpty(retreived))
+            retreived = {};
         var fixed = {
             data: retreived.data || {},
             design: retreived.design || {},
@@ -105,7 +110,7 @@ var CTemplator = Class({
         delete retreived.data;
         delete retreived.design;
         delete retreived.logic;
-        // Merge left data in retreived into fixed.data
+        // Merge left data in retrieved into fixed.data
         fixed.data = CUtils.mergeJSONs(fixed.data,retreived);
         return fixed;
     },

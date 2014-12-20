@@ -121,6 +121,9 @@ var CObjectsHandler = Class({
             duplicatedObjectBase[key] = CUtils.clone(abstractObject[key]);
         }
 
+        duplicatedObjectBase.data   = duplicatedObjectBase.data || {};
+        duplicatedObjectBase.logic  = duplicatedObjectBase.logic || {};
+        duplicatedObjectBase.design = duplicatedObjectBase.design || {};
         duplicatedObjectBase.data   = CUtils.mergeJSONs(duplicatedObjectBase.data,data || {});
         duplicatedObjectBase.logic  = CUtils.mergeJSONs(duplicatedObjectBase.logic,logic || {});
         duplicatedObjectBase.design = CUtils.mergeJSONs(duplicatedObjectBase.design,design || {});
@@ -218,6 +221,9 @@ var CObjectsHandler = Class({
 
 window.cobject = function(id) {
     return CObjectsHandler.object(id);
+};
+window.celement = function(id) {
+    return CUtils.element(id);
 };
 window.crelativeObject =function(baseObjectId,relativeId) {
     return CObjectsHandler.relativeObject(baseObjectId,relativeId);

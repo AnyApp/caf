@@ -6,13 +6,18 @@ var CPager = Class({
     firstLoad: true,
     historyStack: new Array(),
     mainPage: '',
-    backButtonId: '',
+    backButtonIds: [],
     pages: {},
     router: null,
     currentPageNumber: 0,
     currentPage: null,
     lastPage: null,
     initialize: function(){
+        // Move to current main page.
+        var mainPageChooser = CGlobals.get('main-chooser');
+        if (!CUtils.isEmpty(mainPageChooser))
+            window.location.hash = mainPageChooser(window.location.hash || '');
+
         this.resetPages();
         this.setBackForwardDetection();
         // Add all pages names to the router.
@@ -55,7 +60,7 @@ var CPager = Class({
         this.moveToPage(mainPage);
     },
     setBackButton: function(backButtonId) {
-        this.backButtonId = backButtonId;
+        this.backButtonIds.push(backButtonId);
         this.checkAndChangeBackButtonState();
     },
     dataToPath: function (data) {
@@ -70,6 +75,8 @@ var CPager = Class({
         data = data || {};
         var path = '';
         _.each(data,function(value,key){
+            if (CUtils.isEmpty(value))
+                value = 'null';
             path += '/'+key+'/'+value;
         });
         return path;
@@ -108,11 +115,14 @@ var CPager = Class({
         window.addEventListener("hashchange", detectBackOrForward());
     },
     checkAndChangeBackButtonState:function() {
-        if (CUtils.isEmpty(CPager.backButtonId) || !CPager.hashHistory ) return;
-        if (CPager.currentPageNumber===0)
-            CUtils.addClass(CUtils.element(CPager.backButtonId),'hidden');
-        else
-            CUtils.removeClass(CUtils.element(CPager.backButtonId),'hidden');
+        if (CUtils.isEmpty(CPager.backButtonIds) || !CPager.hashHistory ) return;
+        _.each(CPager.backButtonIds,function(backButtonID){
+            if (CPager.currentPageNumber===0)
+                CUtils.addClass(CUtils.element(backButtonID),'hidden');
+            else
+                CUtils.removeClass(CUtils.element(backButtonID),'hidden');
+        });
+
     },
     showPage: function(name,params){
 //        if (CPager.isChangePageLocked())
@@ -185,17 +195,23 @@ var CPager = Class({
                     CUtils.element(fromPage.parent).style.zIndex       = '-1';
                 }
             }
-            // Replace Header if needed.
-            CPager.replaceHeader(page);
             // Fire pageLoaded Event
             CEvents.fire(CEvents.pageLoaded,'Pager',page);
         };
         var page = CObjectsHandler.object(currentPage);
+
+        // Replace Header if needed.
+        var usedHeader = CPager.replaceHeader(page);
+        // Replace title object
+        var currentTitleID = cobject(usedHeader).getHeaderTitleID();
+        CTitleHandler.setTitleObject(currentTitleID);
         CTitleHandler.setTitle(page.getPageTitle());
+
         page.setParams(this.getParamsAsMap(params));
 
         // Prepare Load of Page.
         page.prepareReload();
+
 
         // Showing current page.
         if (CUtils.isEmpty(lastPage)){
@@ -207,16 +223,21 @@ var CPager = Class({
 
     },
     replaceHeader: function(page){
-        var headerID = page.getPageHeaderID();
-        var allHeaders = CObjectsHandler.getHeaders();
+        var headerID    = page.getPageHeaderID();
+        var allHeaders  = CObjectsHandler.getHeaders();
+        var usedHeader  = '';
         _.each(allHeaders,function(currentHeaderID){
             var header = CObjectsHandler.object(currentHeaderID);
             var isMainHeader = allHeaders.length == 1 || header.isMainHeader();
-            if (headerID == currentHeaderID || (isMainHeader && CUtils.isEmpty(headerID)) )
+            if (headerID == currentHeaderID || (isMainHeader && CUtils.isEmpty(headerID)) ){
                 CAnimations.quickShow(currentHeaderID);
-            else
+                usedHeader = currentHeaderID;
+            }
+            else {
                 CAnimations.quickHide(currentHeaderID);
+            }
         });
+        return usedHeader;
     },
     onLoadPage: function(pageId) {
         var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;

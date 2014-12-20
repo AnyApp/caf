@@ -24,6 +24,9 @@ var CContent = Class(CContainer,{
 
         this.design.top     =   CGlobals.get('headerSize');
         this.design.bottom  =   CGlobals.get('footerSize');
+        this.data.mainPageChooser = this.data.mainPageChooser || null;
+        if (!CUtils.isEmpty(this.data.mainPageChooser))
+            CGlobals.set('main-chooser',this.data.mainPageChooser);
 
     }
 

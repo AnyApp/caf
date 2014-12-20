@@ -13,6 +13,11 @@ var CValidators = Class({
             function(value){
                 return !CUtils.isEmpty(value);
             }
+        ),
+        isTrue: new CValidator('Error','Value is not true','','',
+            function(value){
+                return value === true;
+            }
         )
     },
 

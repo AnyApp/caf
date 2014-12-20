@@ -184,6 +184,7 @@ var CObject = Class({
         return JSONfn.parse(replacedReferencesFunc);
     },
     parsePartReference: function(part){
+        var originPart = part;
         // not a reference.
         if (part === null || part.length<=0 || part[0]!='#')
             return part;
@@ -198,13 +199,18 @@ var CObject = Class({
         var workingObject   =   this.getDeepRelativeParent(countHeadHashes-1);
         part                =   CUtils.stringRemoveAllOccurencesInHead('#',part);
 
-        return CData.parseReference(part,workingObject);
+        var parseResult = CData.parseReference(part,workingObject);
+        if (parseResult && parseResult.result && parseResult.result == 'not-ref')
+            return originPart;
+        else
+            return parseResult;
     },
     replaceReferencesInString: function(str) {
         if (CUtils.isEmpty(str))
             return str;
         if (str.indexOf('#') < 0)
             return str;
+
         // Multiple reference.
         var parts = str.split(' ');
         for (var i=0; i<parts.length; i++){
@@ -216,6 +222,8 @@ var CObject = Class({
         // Case of single variable - could be an object reference. Otherwise, String.
         if (parts.length==1)
             return parts[0];
+
+
 
         return parts.join(' ');
     },

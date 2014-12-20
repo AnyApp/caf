@@ -6,7 +6,7 @@ var CPageData = Class({
     pagesData: {},
     get: function(name){
         var pagesData = CPageData.pagesData[CPager.currentPage];
-        if (!CUtils.isEmpty(pagesData))
+        if (!CUtils.isEmpty(pagesData) && !CUtils.isEmpty(pagesData[name]))
             return pagesData[name];
         return null;
     },

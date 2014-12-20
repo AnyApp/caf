@@ -54,6 +54,8 @@ var CData = Class({
         else if (str.length>8 && str.substr(0,8) == 'designs.')
             value = CData.parseDesignReference(str.substr(8))        || null;
 
+        if (value === str)
+            return {result:'not-ref'};
         return value;
     },
     parseLocalReference: function(workingObject,str){
@@ -91,8 +93,10 @@ var CData = Class({
     parseRelativeReference: function(workingObject,str){
         var relativeParentId = workingObject.getRelativeParent();
         if (!CUtils.isEmpty(relativeParentId)){
+            // Remove .
+            str = str.substr(1);
             var relativeParent = CObjectsHandler.object(relativeParentId);
-            return eval('relativeParent'+str);
+            return CUtils.deepFind(relativeParent,str) || null;
         }
         return null;
     },

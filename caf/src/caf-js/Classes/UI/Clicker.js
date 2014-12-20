@@ -108,7 +108,7 @@ var CClicker = Class({
                 }
                 // Execute OnClicks.
                 _.each(object.onClicks,function(onClick){
-                    onClick();
+                    onClick(object);
                 },this);
             }
             // Reset

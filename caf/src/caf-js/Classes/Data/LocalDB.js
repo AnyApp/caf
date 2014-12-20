@@ -46,6 +46,7 @@ var CLocalDB = Class({
         return scheme.index;
     },
     update: function(type,id,rowData){
+        rowData.id = id;
         var data = CLocalDB.getTypeData(type);
         var returned = true;
         // Doesn't exist
@@ -71,7 +72,7 @@ var CLocalDB = Class({
         var data = CLocalDB.getTypeData(type);
         // Doesn't exist
         if (CUtils.isEmpty(data[id]))
-            return null;
+            return {};
         return data[id];
     },
     empty: function(type,id){

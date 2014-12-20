@@ -32,21 +32,35 @@ var CPage = Class(CContainer,{
         this.data.page.title            = this.data.page.title          || '';
         this.data.page.header           = this.data.page.header         || '';
         this.data.page.onLoads          = this.data.page.onLoads        || [];
+        this.data.page.onShows          = this.data.page.onShows        || [];
         this.data.page.onLoadPrepares   = this.data.page.onLoadPrepares || [];
         this.data.page.id               = this.uid();
         this.data.page.loaded           = false;
         this.data.page.params           = {};
         this.data.page.paramsChanged    = false;
+
+        this.design = this.design || {};
+        this.design.classes = this.design.classes || '';
+        var classPageName = this.data.page.name;
+        if (CUtils.isEmpty(classPageName))
+            classPageName = 'page-main';
+        this.design.classes += ' co-page-'+classPageName+' ';
     },
     setParams: function(params){
+        // Set PageData
+        CPageData.setPageData(this.uid(),params);
         if ( !CUtils.equals(this.data.page.params,params)){
             this.data.page.params = params;
             this.data.page.paramsChanged = true;
-            // Set PageData
-            CPageData.setPageData(this.uid(),params);
         }
     },
     reload: function(force){
+        // On Show.
+        _.each(this.data.page.onShows,function(onShow){
+            if (onShow)
+                onShow(this.data.page.params,this);
+        },this);
+
         force = force || false;
         var needReload = this.data.page.loaded===false || this.data.page.paramsChanged || force ===true;
         if (needReload) {

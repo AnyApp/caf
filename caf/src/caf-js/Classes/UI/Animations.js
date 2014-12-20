@@ -61,6 +61,7 @@ var CAnimations = Class({
         moveToRight3: {'in':'pt-page-moveFromLeft',out:'pt-page-moveToRight',duration:600},
         moveToLeft3: {'in':'pt-page-moveFromRight',out:'pt-page-moveToLeft',duration:600},
         scaleUpCenter: {'in':'pt-page-scaleUpCenter pt-page-delay400',out:'pt-page-scaleDownCenter',duration:800},
+        scaleUpCenterNoDelay: {'in':'pt-page-scaleUpCenter',out:'pt-page-scaleDownCenter',duration:800},
         scaleUpToBottom: {'in':'pt-page-scaleUp et-page-ontop',out:'pt-page-moveToBottom',duration:700},
         scaleUpToTop: {'in':'pt-page-scaleUp et-page-ontop',out:'pt-page-moveToTop',duration:700},
         scaleUpToLeft: {'in':'pt-page-scaleUp et-page-ontop',out:'pt-page-moveToLeft',duration:700},

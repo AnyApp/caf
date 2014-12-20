@@ -6,14 +6,23 @@ var CLogic = Class({
     logics: {
         onCreate: function(object,value){
             if (!CUtils.isEmpty(value))
-                value();
+                value(object);
         },
         onCreateAsync: function(object,value){
             if (!CUtils.isEmpty(value))
-                CThreads.start(value);
+                CThreads.start(function(){
+                    value(object);
+                });
         },
         onClick: function(object,value){
             CClicker.addOnClick(object,value);
+        },
+        onClicks: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            _.each(value,function(onClick){
+                CClicker.addOnClick(object,onClick);
+            });
         },
         onTemplateElementClick: function(object,value){
             CClicker.addOnClick(object,value);
@@ -61,6 +70,13 @@ var CLogic = Class({
                 CMail.open(CData.value(value));
             });
         },
+        scan: function(object,value){
+            if (CUtils.isEmpty(value))
+                return;
+            CClicker.addOnClick(object,function(){
+                CBarcodeScanner.scan(value.onSuccess || null,value.onFailure || null);
+            });
+        },
         link: function(object,value){
             if (CUtils.isEmpty(value) || CUtils.isEmpty(value.path))
                 return;
@@ -69,7 +85,7 @@ var CLogic = Class({
             CClicker.addOnClick(object,function(){
                 var linkValue = CData.value(value,true);
                 if ((!CUtils.isURLLocal(linkValue.path))) // HTTP url
-                    CUtils.openURL(linkValue);
+                    CUtils.openURL(linkValue.path);
                 else { // Local URL
                     if (linkValue.path === '/') // Main Page link.
                         linkValue.path = '';

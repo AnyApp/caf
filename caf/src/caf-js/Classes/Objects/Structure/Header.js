@@ -27,7 +27,7 @@ var CHeader = Class(CContainer,{
 
         this.data.isMainHeader  = this.data.isMainHeader    || false;
         this.data.titleCentered = this.data.titleCentered   || false;
-        this.data.itemSize = this.design.height;
+        this.data.itemSize = this.data.itemSize || this.design.height;
 
         // Declare Left & Right Buttons
         this.data.left  = this.data.left  || [];
@@ -84,6 +84,9 @@ var CHeader = Class(CContainer,{
     },
     isMainHeader: function(){
         return this.data.isMainHeader === true;
+    },
+    getHeaderTitleID: function(){
+        return this.data.title || '';
     }
 
 

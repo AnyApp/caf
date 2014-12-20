@@ -30,6 +30,19 @@ var CDialog = Class(CContainer,{
             CObjectsHandler.object(CObjectsHandler.dialogsContainerId).rebuild(onBuildFinish);
             return newDialog;
         },
+        dialog: function(color,title,text,cancelText,confirmText,cancelCallback,confirmCallback,extraText,extraCallback,design){
+            var data                                        = {};
+            if (color)              data.dialogColor        = color;
+            if (title)              data.title              = title;
+            if (text)               data.textContent        = text;
+            if (cancelText)         data.cancelText         = cancelText;
+            if (confirmText)        data.confirmText        = confirmText;
+            if (cancelCallback)     data.cancelCallback     = cancelCallback;
+            if (confirmCallback)    data.confirmCallback    = confirmCallback;
+            if (extraText)          data.extraText          = extraText;
+            if (extraCallback)      data.extraCallback      = extraCallback;
+            return CDialog.showDialog(data,design || {});
+        },
         hideDialogContainer: function(){
             CUtils.element(CObjectsHandler.dialogsContainerId).style.zIndex='';
             CUtils.element(CObjectsHandler.dialogsContainerId).style.display='';
@@ -231,8 +244,9 @@ var CDialog = Class(CContainer,{
     },
     createContent: function () {
         var contentId = null;
-        if (!CUtils.isEmpty(this.data.objectContent))
+        if (!CUtils.isEmpty(this.data.objectContent)){
             contentId = this.data.objectContent;
+        }
         else if (!CUtils.isEmpty(this.data.textContent)){
             contentId = CObjectsHandler.createObject('Object',{
                 design: {
@@ -481,9 +495,13 @@ var CDialog = Class(CContainer,{
             var containerMaxHeight = windowSize.height;
             if (dialog.data.topView===CObjectsHandler.appContainerId){
                 var top = ((windowSize.height*0.7-containerRect.height)/2);
-                if (top<0)  top = CGlobals.get('headerSize') || 40;
+                if (top<0)  top = 5;//CGlobals.get('headerSize') || 40;
                 container.style.top = top+'px';
                 containerMaxHeight = (windowSize.height-70);
+                if (containerMaxHeight < 350 && top <20)
+                    containerMaxHeight = windowSize.height - top - 5;
+                else if (containerMaxHeight < 350)
+                    containerMaxHeight = windowSize.height - 15;
             }
             else {
                 var distanceFromBottom = (windowSize.height-(topViewRect.top+topViewRect.height));

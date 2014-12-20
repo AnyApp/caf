@@ -22,8 +22,10 @@ var CForm = Class(CContainer,{
         // Invoke parent's constructor
         this.$class.$super.call(this, values);
         this.data.inputs            = values.data.inputs || [];
-        this.data.saveToUrl         = values.data.saveToUrl || '';
-        this.data.saveToUrlCallback = values.data.saveToUrlCallback || function(){};
+        this.data.sendToUrl         = values.data.sendToUrl || '';
+        this.data.sendToUrlPrepare  = values.data.sendToUrlPrepare || function(){};
+        this.data.formOnValidationFailure  = values.data.formOnValidationFailure || function(){};
+        this.data.sendToUrlCallback = values.data.sendToUrlCallback || function(){};
         this.data.onSubmit          = values.data.onSubmit ||  function(){};
         this.data.prepareValues     = values.data.prepareValues ||  function(values) {return values;};
     },
@@ -40,13 +42,20 @@ var CForm = Class(CContainer,{
                     var validationResult = CValidators.validator(name).validate(value);
                     // Validation Failed!
                     if (!validationResult.isValid()){
+                        /*
                         CDialog.showDialog({
                             title: validationResult.getTitle(),
                             textContent: validationResult.getMessage(),
                             cancelText: 'OK',
                             dialogColor: {color:'Red', level: 4}
                         });
-                        throw "Error"; // Return empty result.
+                        */
+                        throw {
+                            source: 'formValues',
+                            msg: 'Validation Error: '+validationResult.getMessage(),
+                            input: input.getName(),
+                            validator: name
+                        }; // Throw Exception.
                     }
                 },this);
                 // Add value to result values.
@@ -55,6 +64,8 @@ var CForm = Class(CContainer,{
         } catch (e){
             CLog.error('Error occured while getting Form.formValues.');
             CLog.log(e);
+            if (this.data.formOnValidationFailure)
+                this.data.formOnValidationFailure(this,e);
             return null;
         }
         values = this.data.prepareValues(values);
@@ -82,8 +93,15 @@ var CForm = Class(CContainer,{
         var values = this.formValues();
         // Check if the was validation error.
         if (values == null)     return;
+        if (this.data.sendToUrlPrepare)
+            this.data.sendToUrlPrepare(this);
         // Run send with the values.
-        CNetwork.send(this.data.saveToUrl,values,this.data.saveToUrlCallback);
+        CNetwork.send(this.data.sendToUrl,values,this.getFormSendToURLCallback(this),this.getFormSendToURLCallback(this));
+    },
+    getFormSendToURLCallback: function(form){
+        return function(result){
+            form.data.sendToUrlCallback(form,result);
+        }
     },
     saveFormToLocalStorage: function() {
         // Retrieve the values from the form.

@@ -26,13 +26,14 @@ var CTemplate = Class(CContainer,{
         this.design.classes             = this.design.classes           || '';
         //this.design.classes             += ' ' +CTemplate.gifLoaders.default+ ' ';
         this.logic.template             = true;
+        this.data.template              = this.data.template            || {};
         this.data.template.pullToRefresh= this.data.template.pullToRefresh || false;
         if (this.data.template.pullToRefresh === true)
             this.logic.pullToRefresh    = true;
-        this.data.template              = this.data.template            || {};
         this.data.template.url          = this.data.template.url        || '';
         this.data.template.callback     = this.data.template.callback   || function(){};
         this.data.template.prepareFunction = this.data.template.prepareFunction   || function(data){return data;};
+        this.data.template.prepareRowFunction = this.data.template.prepareRowFunction   || function(data){return data;};
         this.data.template.callbacks    = this.data.template.callbacks  || [];
         this.data.template.queryData    = this.data.template.queryData  || {};
         this.data.template.data         = this.data.template.data       || null;
@@ -67,6 +68,9 @@ var CTemplate = Class(CContainer,{
         this.data.template.data = data;
         this.parseReferences(this.data.template.data);
         CTemplator.loadObjectWithData(this,data,null,true);
+    },
+    getTemplateRow: function(position){
+        return this.getChilds()[position] || '';
     },
     filter: function(filterFunction){
         filterFunction = filterFunction || function(data) { return true; };

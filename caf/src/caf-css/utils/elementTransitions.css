@@ -107,21 +107,21 @@
 /* fade */
 
 .pt-page-fade {
-    -webkit-animation: fade .7s ease both;
-    -moz-animation: fade .7s ease both;
-    animation: fade .7s ease both;
+    -webkit-animation: fade .4s ease both;
+    -moz-animation: fade .4s ease both;
+    animation: fade .4s ease both;
 }
 
 .pt-page-fadeIn {
-    -webkit-animation: fadeIn .6s ease both;
-    -moz-animation: fadeIn .6s ease both;
-    animation: fadeIn .6s ease both;
+    -webkit-animation: fadeIn .4s ease both;
+    -moz-animation: fadeIn .4s ease both;
+    animation: fadeIn .4s ease both;
 }
 
 .pt-page-fadeOut {
-    -webkit-animation: fadeOut .6s ease both;
-    -moz-animation: fadeOut .6s ease both;
-    animation: fadeOut .6s ease both;
+    -webkit-animation: fadeOut .25s ease both;
+    -moz-animation: fadeOut .25s ease both;
+    animation: fadeOut .25s ease both;
 }
 
 /* move from / to and fade */
