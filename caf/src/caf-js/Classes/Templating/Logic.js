@@ -84,20 +84,9 @@ var CLogic = Class({
 
             CClicker.addOnClick(object,function(){
                 var linkValue = CData.value(value,true);
-                if ((!CUtils.isURLLocal(linkValue.path))) // HTTP url
-                    CUtils.openURL(linkValue.path);
-                else { // Local URL
-                    if (linkValue.path === '/') // Main Page link.
-                        linkValue.path = '';
-                    linkValue.data = linkValue.data || {};
-                    linkValue.globalData = linkValue.globalData || {};
-                    var finalData = CUtils.clone(linkValue.data);
-                    // Evaluate dynamic global data.
-                    _.each(linkValue.globalData,function(globalName,key){
-                        finalData[key] = CGlobals.get(globalName) || '';
-                    });
-                    CUtils.openLocalURL(linkValue.path+CPager.mapDataToPath(finalData));
-                }
+                // Open link.
+                CPager.open(linkValue.path,linkValue.getData || linkValue.data, /*backward compatibility*/
+                    linkValue.postData,linkValue.globalData);
             });
 
         },

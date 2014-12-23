@@ -827,11 +827,12 @@ var CBuilderObject = Class({
         };
         return this;
     },
-    link: function(path,data,globalData) {
+    link: function(path,getData,postData,globalData) {
         this.properties.logic.link = {
-            path:           path || null,
-            data:           data || null,
-            globalData:     globalData || null
+            path:           path        || null,
+            getData:        getData     || null,
+            postData:       postData    || null,
+            globalData:     globalData  || null
         };
         return this;
     },

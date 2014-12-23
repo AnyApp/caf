@@ -30,9 +30,7 @@ var CObjectsHandler = Class({
         this.preparedObjects.push(object);
     },
     object: function(id){
-        if (this.objectsById[id])
-            return this.objectsById[id];
-
+        return CObjectsHandler.objectsById[id];
     },
     // Extend CObject method: parseRelativeObjectId
     relativeObject: function(baseObjectId,relativeId){

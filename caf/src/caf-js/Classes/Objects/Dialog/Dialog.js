@@ -113,7 +113,7 @@ var CDialog = Class(CContainer,{
 
         this.logic.init = function(){ dialog.onResize(); }
         // Set destroy on hide handler.
-        this.setDestroyOnHideHandler();
+        this.setOnHideFinishHandler(this);
         // Create sub views.
         this.createContainerAndOverlay(containerDesign);
         // Create title view if needed.
@@ -128,8 +128,9 @@ var CDialog = Class(CContainer,{
     },
     hide: function(callback){
         if (CAnimations.objectInAnim(this) && this.isHidden === false)
-            return;CDialog.dialogsHiding
+            return;
         CDialog.dialogsShown -= 1;
+        CDialog.dialogsHiding += 1;
         // Check if need to set cancel callback\use the given callback
         // or do not call callback - empty function;
         if (CUtils.isEmpty(callback) && !CUtils.isEmpty(this.data.cancelCallback)
@@ -149,8 +150,13 @@ var CDialog = Class(CContainer,{
         },100);
     },
     show: function(){
+        if (CDialog.dialogsHiding > 0){
+            this.postponeShow(this);
+            return;
+        }
         if (CAnimations.objectInAnim(this) && this.isHidden === true)
             return;
+
         CDialog.dialogsShown += 1;
         CDialog.showDialogContainer();
         CAnimations.show(this.uid());
@@ -165,13 +171,13 @@ var CDialog = Class(CContainer,{
         CAnimations.hideOrShow(this.uid());
         this.onResize();
     },
-    setDestroyOnHideHandler: function(){
-        var object = this;
+    setOnHideFinishHandler: function(dialog){
         if (this.data.destroyOnHide){
             this.data.onAnimHideComplete = function(){
                 this.isHidden = true;
-                object.removeSelf();
-                CUtils.unbindEvent(window,'resize',object.onResize);
+                CDialog.dialogsHiding -= 1;
+                dialog.removeSelf();
+                CUtils.unbindEvent(window,'resize',dialog.onResize);
                 // Hide dialogs container.
                 CDialog.hideDialogContainer();
             };
@@ -179,6 +185,7 @@ var CDialog = Class(CContainer,{
         else {
             this.data.onAnimHideComplete = function(){
                 this.isHidden = true;
+                CDialog.dialogsHiding -= 1;
                 // Hide dialogs container.
                 CDialog.hideDialogContainer();
             };

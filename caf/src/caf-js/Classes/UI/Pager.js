@@ -61,10 +61,6 @@ var CPager = Class({
     addPage: function(object){
         this.pages[object.getPageName()] = object.uid();
     },
-    setMainPage: function(mainPage) {
-        this.mainPage = mainPage;
-        this.moveToPage(mainPage);
-    },
     setBackButton: function(backButtonId) {
         this.backButtonIds.push(backButtonId);
         this.checkAndChangeBackButtonState();
@@ -89,6 +85,23 @@ var CPager = Class({
     },
     moveBack: function() {
         window.history.back();
+    },
+    open: function(path,getData,postData,globalData){
+        if ((!CUtils.isURLLocal(path))) // HTTP url
+            CUtils.openURL(path);
+        else { // Local URL
+            if (path === '/') // Main Page link.
+                path = '';
+            getData     = getData    || {};
+            globalData  = globalData || {};
+            postData    = postData   || {};
+            var finalData = CUtils.clone(getData);
+            // Evaluate dynamic global data.
+            _.each(globalData,function(globalName,key){
+                finalData[key] = CGlobals.get(globalName) || '';
+            });
+            CUtils.openLocalURL(path+CPager.mapDataToPath(getData));
+        }
     },
     setBackForwardDetection: function () {
         var detectBackOrForward = function() {
@@ -131,8 +144,6 @@ var CPager = Class({
 
     },
     showPage: function(name,params){
-//        if (CPager.isChangePageLocked())
-
         // Check if the page need to be reloaded with template data
         // or already loaded template page.
         var id                  = CPager.pages[name];

@@ -117,7 +117,7 @@ var CUtils = Class({
     isURLLocal: function(url){
         if (CUtils.isEmpty(url))
             return true;
-        return ( (url.indexOf('www.')<0) && (url.indexOf('http://')<0) );
+        return ( (url.indexOf('www.')<0) && (url.indexOf('http://')<0) && (url.indexOf('https://')<0) );
     },
     mergeJSONs: function(base,strong){
         if (this.isEmpty(base)) return strong || {};

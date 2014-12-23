@@ -10,4 +10,6 @@ window.cobject = CObjectsHandler.object;
 window.celement = CUtils.element;
 window.crelativeObject = CObjectsHandler.relativeObject;
 window.showDialog= CDialog.dialog;
+window.openLocalURL= CUtils.openLocalURL;
+window.openURL= CUtils.openURL;
 
