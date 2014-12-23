@@ -24,8 +24,13 @@ var CFooter = Class(CContainer,{
         // Invoke parent's constructor
         CFooter.$super.call(this, values);
         this.design.height = CGlobals.get('footerSize');
+        this.data.isMainFooter  = this.data.isMainFooter    || false;
 
+    },
+    isMainFooter: function(){
+        return this.data.isMainFooter === true;
     }
+
 
 
 });

@@ -31,6 +31,7 @@ var CPage = Class(CContainer,{
         this.data.page.name             = this.data.page.name           || '';
         this.data.page.title            = this.data.page.title          || '';
         this.data.page.header           = this.data.page.header         || '';
+        this.data.page.footer           = this.data.page.footer         || '';
         this.data.page.onLoads          = this.data.page.onLoads        || [];
         this.data.page.onShows          = this.data.page.onShows        || [];
         this.data.page.onLoadPrepares   = this.data.page.onLoadPrepares || [];
@@ -102,6 +103,9 @@ var CPage = Class(CContainer,{
     },
     getPageHeaderID: function(){
         return this.data.page.header;
+    },
+    getPageFooterID: function(){
+        return this.data.page.footer;
     },
     getPageTitle: function(){
         return this.data.page.title;

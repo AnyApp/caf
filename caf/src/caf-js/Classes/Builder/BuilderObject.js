@@ -273,14 +273,19 @@ var CBuilderObject = Class({
         this.properties.data.itemSize = size;
         return this;
     },
-    mainHeader: function() {
-        this.properties.data.isMainHeader = true;
-        return this;
-    },
     headerTitleCentered: function() {
         this.properties.data.titleCentered = true;
         return this;
     },
+    mainHeader: function() {
+        this.properties.data.isMainHeader = true;
+        return this;
+    },
+    mainFooter: function() {
+        this.properties.data.isMainFooter = true;
+        return this;
+    },
+
     /**
      * Set innerHTML to be the text provided.
      * Can be used to set text inside Button, Label and relatives.

@@ -11,6 +11,7 @@ var CPager = Class({
     router: null,
     currentPageNumber: 0,
     currentPage: null,
+    nextPOSTData: {},
     lastPage: null,
     initialize: function(){
         // Move to current main page.
@@ -93,13 +94,14 @@ var CPager = Class({
             if (path === '/') // Main Page link.
                 path = '';
             getData     = getData    || {};
-            globalData  = globalData || {};
             postData    = postData   || {};
-            var finalData = CUtils.clone(getData);
+            globalData  = globalData || {};
+            var finalPostData = CUtils.clone(postData);
             // Evaluate dynamic global data.
             _.each(globalData,function(globalName,key){
-                finalData[key] = CGlobals.get(globalName) || '';
+                finalPostData[key] = CGlobals.get(globalName) || '';
             });
+            CPager.nextPOSTData = finalPostData;
             CUtils.openLocalURL(path+CPager.mapDataToPath(getData));
         }
     },
@@ -224,7 +226,10 @@ var CPager = Class({
         CTitleHandler.setTitleObject(currentTitleID);
         CTitleHandler.setTitle(page.getPageTitle());
 
-        page.setParams(this.getParamsAsMap(params));
+        var pageTotalParams = this.getParamsAsMap(params);
+        pageTotalParams = CUtils.mergeJSONs(pageTotalParams,CPager.nextPOSTData || {});
+        page.setParams(pageTotalParams);
+        CPager.nextPOSTData = null; // Empty nextPOSTData.
 
         // Prepare Load of Page.
         page.prepareReload();
@@ -255,6 +260,23 @@ var CPager = Class({
             }
         });
         return usedHeader;
+    },
+    replaceFooter: function(page){
+        var footerID    = page.getPageFooterID();
+        var allFooters  = CObjectsHandler.getFooters();
+        var usedFooter  = '';
+        _.each(allFooters,function(currentFooterID){
+            var footer = CObjectsHandler.object(currentFooterID);
+            var isMainFooter = allFooters.length == 1 || footer.isMainHeader();
+            if (footerID == currentFooterID || (isMainFooter && CUtils.isEmpty(footerID)) ){
+                CAnimations.quickShow(currentFooterID);
+                usedFooter = currentFooterID;
+            }
+            else {
+                CAnimations.quickHide(currentFooterID);
+            }
+        });
+        return usedFooter;
     },
     onLoadPage: function(pageId) {
         var onPageLoad = CObjectsHandler.object(pageId).getLogic().page.onLoad;
