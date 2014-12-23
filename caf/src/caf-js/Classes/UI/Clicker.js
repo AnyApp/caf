@@ -63,7 +63,7 @@ var CClicker = Class({
             var isRightClick = ((e.which && e.which == 3) || (e.button && e.button == 2));
             if (isRightClick) return false;
 
-//            e.preventDefault();
+            // e.preventDefault();
 
             if (object.logic.doStopPropagation===true)
                 e.stopPropagation();
@@ -75,6 +75,7 @@ var CClicker = Class({
             object.touchData.lastX      = pointer.pageX;
             object.touchData.lastY      = pointer.pageY;
             object.touchData.startTime  = (new  Date()).getTime();
+            CUtils.addClass(element,'active');
             CUtils.addClass(element,object.clicker.activeClasses);
             CUtils.removeClass(element,object.clicker.activeRemoveClasses);
         }
@@ -100,7 +101,7 @@ var CClicker = Class({
             {
                 if (object.onClicks.length>0){
                     e.preventDefault();
-                    // Prevent unneccesary pull.
+                    // Prevent unnecessary pull.
                     CThreads.runTimes(CPullToRefresh.interrupt,0,100,7);
                     if (CClicker.preventGhostClick) {
                         e.isCafClick = true;
@@ -136,6 +137,7 @@ var CClicker = Class({
         object.touchData.startY = -100000;
         object.touchData.lastX = -200000;
         object.touchData.lastY = -200000;
+        CUtils.removeClass(element,'active');
         CUtils.removeClass(element,object.clicker.activeClasses);
         CUtils.addClass(element,object.clicker.activeRemoveClasses);
     }

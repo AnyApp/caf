@@ -3,7 +3,7 @@
  */
 var CBuilderObjects = Class({
     $statics: {
-
+        currentBuilder : null
     },
 
     constructor: function() {
@@ -12,6 +12,7 @@ var CBuilderObjects = Class({
         this.plugins = [];
         this.appPrefs = {};
         this.data = {};
+        CBuilderObjects.currentBuilder = this;
     },
     addPlugin: function(name,version){
         var plugin = {
@@ -57,6 +58,11 @@ var CBuilderObjects = Class({
         var objectBuilder = new CBuilderObject(type || '',uname || '');
         this.objects.push(objectBuilder);
         return objectBuilder;
+    },
+    createFromBuilderObject: function(builderObject){
+        var createdBuilderObject = this.create();
+        createdBuilderObject.properties = builderObject.properties;
+        return createdBuilderObject;
     }
 
 

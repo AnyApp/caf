@@ -39,14 +39,7 @@ var CInput = Class(CObject,{
         // Add OnClick Focus to the Input - Fix a Bug.
         this.logic = this.logic || {};
         this.logic.onClicks = this.logic.onClicks || [];
-        this.logic.onClicks.push(this.inputCreateOnClick(this));
-    },
-    inputCreateOnClick: function(input){
-        return function(){
-            var inputElement = CUtils.element(input.uid());
-            if (inputElement !== document.activeElement)
-                CUtils.element(input.uid()).focus();
-        };
+
     },
     /**
      *  Build Object.

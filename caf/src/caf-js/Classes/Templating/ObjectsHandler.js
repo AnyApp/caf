@@ -30,7 +30,9 @@ var CObjectsHandler = Class({
         this.preparedObjects.push(object);
     },
     object: function(id){
-        return this.objectsById[id];
+        if (this.objectsById[id])
+            return this.objectsById[id];
+
     },
     // Extend CObject method: parseRelativeObjectId
     relativeObject: function(baseObjectId,relativeId){
@@ -218,13 +220,3 @@ var CObjectsHandler = Class({
 
 });
 
-
-window.cobject = function(id) {
-    return CObjectsHandler.object(id);
-};
-window.celement = function(id) {
-    return CUtils.element(id);
-};
-window.crelativeObject =function(baseObjectId,relativeId) {
-    return CObjectsHandler.relativeObject(baseObjectId,relativeId);
-};

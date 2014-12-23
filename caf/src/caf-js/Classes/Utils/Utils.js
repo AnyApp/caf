@@ -46,6 +46,10 @@ var CUtils = Class({
     {
         return obj === undefined || obj === null || obj === '' || obj.toString()==='';
     },
+    isNotEmpty: function(obj)
+    {
+        return !CUtils.isEmpty(obj);
+    },
     isString: function(variable)
     {
         return (typeof variable == 'string' || variable instanceof String);

@@ -15,6 +15,8 @@ var CDialog = Class(CContainer,{
         },
         DEFAULT_LOGIC: {
         },
+        dialogsShown: 0,
+        dialogsHiding: 0,
         showDialog: function(data,design){
             data                = data || {
                 destroyOnHide: true
@@ -44,6 +46,8 @@ var CDialog = Class(CContainer,{
             return CDialog.showDialog(data,design || {});
         },
         hideDialogContainer: function(){
+            if (CDialog.dialogsShown > 0)
+                return;
             CUtils.element(CObjectsHandler.dialogsContainerId).style.zIndex='';
             CUtils.element(CObjectsHandler.dialogsContainerId).style.display='';
         },
@@ -124,7 +128,8 @@ var CDialog = Class(CContainer,{
     },
     hide: function(callback){
         if (CAnimations.objectInAnim(this) && this.isHidden === false)
-            return;
+            return;CDialog.dialogsHiding
+        CDialog.dialogsShown -= 1;
         // Check if need to set cancel callback\use the given callback
         // or do not call callback - empty function;
         if (CUtils.isEmpty(callback) && !CUtils.isEmpty(this.data.cancelCallback)
@@ -146,7 +151,7 @@ var CDialog = Class(CContainer,{
     show: function(){
         if (CAnimations.objectInAnim(this) && this.isHidden === true)
             return;
-
+        CDialog.dialogsShown += 1;
         CDialog.showDialogContainer();
         CAnimations.show(this.uid());
         this.onResize();

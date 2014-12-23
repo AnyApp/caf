@@ -75,6 +75,13 @@ var CBuilder = Class({
             // Clear Whitespaces.
             CUtils.cleanWhitespace();
 
+            // Attach FastClick of not attached.
+            _.each(CObjectsHandler.getPreparedObjects(),function(object){
+                if (object.isFastClickAttached !== true){
+                    FastClick.attach(CUtils.element(object.uid()));
+                    object.isFastClickAttached = true;
+                }
+            },CBuilder);
 
             CBuilder.inBuilding = false;
 

@@ -40,23 +40,42 @@ var CBuilderObject = Class({
     /***
      * Set child object for this Object.
      * This Object must be a Container.
-     * @param childs - Array of Objects ids.
+     * @param childs - Array of Objects ids OR ObjectBuilders.
      * @returns {CBuilderObject}
      */
     childs: function(childs){
-        this.properties.data.childs = this.properties.data.childs || [];
-        this.properties.data.childs.push.apply(this.properties.data.childs,childs);
+        _.each(childs,function(child){
+            this.child(child);
+        },this);
         return this;
     },
     /**
      * Append single child to this Object.
      * This Object must be a Container.
-     * @param child - Object's id.
+     * @param child - Object's id OR ObjectBuilder.
      * @returns {CBuilderObject}
      */
     child: function(child){
         this.properties.data.childs    = this.properties.data.childs || [];
+        // Check if String ID or ObjectBuilder.
+        if (!CUtils.isString(child)){
+            var builderObject = CBuilderObjects.currentBuilder.createFromBuilderObject(child);
+            if (CUtils.isEmpty(builderObject.properties.uname))
+                builderObject.properties.uname = CObject.generateID();
+            child = builderObject.properties.uname;
+        }
         this.properties.data.childs.push(child);
+        return this;
+    },
+    childsInTemplate: function(childs){
+        _.each(childs,function(child){
+            this.childInTemplate(child);
+        },this);
+        return this;
+    },
+    childInTemplate: function(child){
+        this.properties.data.templateChilds    = this.properties.data.templateChilds || [];
+        this.properties.data.templateChilds.push(child);
         return this;
     },
     mainPageChooser: function(chooser){
@@ -338,6 +357,16 @@ var CBuilderObject = Class({
         };
         return this;
     },
+    templateRequestOptions: function(options){
+        this.initTemplate();
+        this.properties.data.template.requestOptions = options;
+        return this;
+    },
+    templateRemoteLoadErrorHandler: function(remoteLoadErrorHandler){
+        this.initTemplate();
+        this.properties.data.template.remoteLoadErrorHandler = remoteLoadErrorHandler;
+        return this;
+    },
     /**
      * Template Data Prepare Function is a Function that will be called
      * after the data was loaded and right before the data is used to
@@ -477,11 +506,13 @@ var CBuilderObject = Class({
         this.properties.data.template.callbacks = onClicks;
         return this;
     },
-    request: function(url,data,callback){
+    request: function(url,data,callback,errorHandler,options){
         this.properties.logic.request = {
-            url:        url             || null,
-            data:       data            || null,
-            callback:   callback        || null
+            url:            url             || null,
+            data:           data            || null,
+            callback:       callback        || null,
+            errorHandler:   errorHandler    || null,
+            options:        options         || null
         }
         return this;
     },
@@ -496,6 +527,10 @@ var CBuilderObject = Class({
     },
     formSendToUrl: function(url) {
         this.properties.data.sendToUrl = url || null;
+        return this;
+    },
+    formSendToUrlRequestOptions: function(requestOptions) {
+        this.properties.data.sendToUrlRequestOptions = requestOptions || null;
         return this;
     },
     formSendToUrlPrepare: function(prepare) {
@@ -847,6 +882,10 @@ var CBuilderObject = Class({
         this.properties.data    = data;
         return this;
     },
+    logic: function(logic){
+        this.properties.logic   = logic;
+        return this;
+    },
     design: function(design,weakerDesign){
         if (!CUtils.isEmpty(weakerDesign))
             design = CUtils.mergeJSONs(weakerDesign,design);
@@ -854,17 +893,22 @@ var CBuilderObject = Class({
         this.properties.design  = design;
         return this;
     },
-    logic: function(logic){
-        this.properties.logic   = logic;
+    classes: function(classes){
+        this.properties.design.classes = classes;
+        return this;
+    },
+    classesActive: function(classes){
+        this.properties.design = this.properties.design || {};
+        this.properties.design.active = this.properties.design.active  || {};
+        this.properties.design.active.classes = classes;
         return this;
     }
+
+
 
 
 });
 
 
-window.co = function(type,uname){
-    var objectBuilder = new CBuilderObject(type || '',uname || '');
-    return objectBuilder;
-};
+
 

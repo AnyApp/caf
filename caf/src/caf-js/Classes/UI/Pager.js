@@ -15,8 +15,14 @@ var CPager = Class({
     initialize: function(){
         // Move to current main page.
         var mainPageChooser = CGlobals.get('main-chooser');
-        if (!CUtils.isEmpty(mainPageChooser))
-            window.location.hash = mainPageChooser(window.location.hash || '');
+        if (!CUtils.isEmpty(mainPageChooser)){
+            //window.location.hash = mainPageChooser(window.location.hash || '');
+            if (!CUtils.isEmpty(window.location.hash))
+                window.location.replace(''+mainPageChooser(window.location.hash || ''));
+            else
+                window.location.replace('#'+mainPageChooser(window.location.hash || ''));
+
+        }
 
         this.resetPages();
         this.setBackForwardDetection();

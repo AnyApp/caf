@@ -11,7 +11,8 @@ var CForm = Class(CContainer,{
             textAlign: 'center'
         },
         DEFAULT_LOGIC: {
-        }
+        },
+        inputTypes: ['Input','Checkbox']
     },
 
     constructor: function(values) {
@@ -23,6 +24,7 @@ var CForm = Class(CContainer,{
         this.$class.$super.call(this, values);
         this.data.inputs            = values.data.inputs || [];
         this.data.sendToUrl         = values.data.sendToUrl || '';
+        this.data.sendToUrlRequestOptions         = values.data.sendToUrlRequestOptions || {};
         this.data.sendToUrlPrepare  = values.data.sendToUrlPrepare || function(){};
         this.data.formOnValidationFailure  = values.data.formOnValidationFailure || function(){};
         this.data.sendToUrlCallback = values.data.sendToUrlCallback || function(){};
@@ -32,7 +34,7 @@ var CForm = Class(CContainer,{
     formValues: function() {
         var values = {};
         try {
-            _.each(this.data.inputs,function(inputId){
+            _.each(this.getFormInputs(),function(inputId){
                 var input = CObjectsHandler.object(inputId);
                 var name = input.getName();
                 var value = input.value();
@@ -73,7 +75,7 @@ var CForm = Class(CContainer,{
     },
     clearForm: function() {
         // Clear each input.
-        _.each(this.data.inputs,function(inputId){
+        _.each(this.getFormInputs(),function(inputId){
             CObjectsHandler.object(inputId).clear();
         },this);
     },
@@ -96,7 +98,7 @@ var CForm = Class(CContainer,{
         if (this.data.sendToUrlPrepare)
             this.data.sendToUrlPrepare(this);
         // Run send with the values.
-        CNetwork.send(this.data.sendToUrl,values,this.getFormSendToURLCallback(this),this.getFormSendToURLCallback(this));
+        CNetwork.send(this.data.sendToUrl,values,this.getFormSendToURLCallback(this),this.getFormSendToURLCallback(this),this.data.sendToUrlRequestOptions);
     },
     getFormSendToURLCallback: function(form){
         return function(result){
@@ -112,6 +114,16 @@ var CForm = Class(CContainer,{
         _.each(values,function(value,key){
             CLocalStorage.save(key,value);
         },this);
+    },
+    getFormInputs: function(){
+        if (!CUtils.isEmpty(this.data.inputs))
+            return this.data.inputs;
+        this.data.inputs = [];
+        _.each(this.data.childs,function(childID){
+            if (CForm.inputTypes.indexOf(cobject(childID).type) >= 0)
+                this.data.inputs.push(childID);
+        },this);
+        return this.data.inputs;
     }
 
 });

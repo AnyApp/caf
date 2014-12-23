@@ -26,21 +26,26 @@ var Caf = Class({
     },
     actualStart : function() {
         // Check for update start in 5 seconds - make sure the app will get updated in any case.
+        /*
         CThreads.run(Caf.updateStartCheck,5000);
 
+
         Caf.firstLoad = CLocalStorage.get(Caf.firstLoadKey);
+
         if (CUtils.isEmpty(Caf.firstLoad))
             Caf.firstLoad = true;
+        */
 
         // Start.
-        CAppHandler.start(function(){
+        CAppHandler.start();
+        /*CAppHandler.start(function(){
             if (Caf.firstLoad) {
                 Caf.showWaitToLoad();
                 CThreads.run(Caf.startUpdate,3000); // Let the app begin.
             }
             else
                 CThreads.run(Caf.startUpdate,3000); // Let the app begin.
-        });
+        });*/
     },
     onDeviceReady : function(){
         if (navigator && navigator.splashscreen)

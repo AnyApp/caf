@@ -5,7 +5,7 @@ var CLocalStorage = Class({
     $singleton: true,
     base: '',
     initBase: function(){
-        CLocalStorage.base = CSettings.get('appID') || '';
+        CLocalStorage.base = CGlobals.get('appID') || '';
         CLocalStorage.base += '/';
     },
     save: function(key,value){

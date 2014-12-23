@@ -20,6 +20,20 @@ var CContainer = Class(CObject,{
         this.data.childs        = this.data.childs || [];
         this.data.lastChilds    = this.data.lastChilds || [];
         this.data.toRemoveChilds= [];
+        this.createChildsIfNeeded();
+    },
+    createChildsIfNeeded: function(){
+        _.each(this.data.childs,function(child,index){
+            this.createChildIfNeeded(child,index);
+        },this);
+    },
+    createChildIfNeeded: function(child,index){
+        // Check if String ID or ObjectBuilder.
+        if (!CUtils.isString(child) && !CUtils.isString(child.properties)){
+            var objectData = child.properties;
+            var objectID = CObjectsHandler.createObject(objectData.type,objectData);
+            this.data.childs[index] = objectID;
+        }
     },
     /**
      *  Build Object.

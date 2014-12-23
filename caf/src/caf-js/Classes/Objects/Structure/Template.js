@@ -31,11 +31,13 @@ var CTemplate = Class(CContainer,{
         if (this.data.template.pullToRefresh === true)
             this.logic.pullToRefresh    = true;
         this.data.template.url          = this.data.template.url        || '';
+        this.data.template.remoteLoadErrorHandler     = this.data.template.remoteLoadErrorHandler   || function(){};
         this.data.template.callback     = this.data.template.callback   || function(){};
         this.data.template.prepareFunction = this.data.template.prepareFunction   || function(data){return data;};
         this.data.template.prepareRowFunction = this.data.template.prepareRowFunction   || function(data){return data;};
         this.data.template.callbacks    = this.data.template.callbacks  || [];
         this.data.template.queryData    = this.data.template.queryData  || {};
+        this.data.template.requestOptions = this.data.template.requestOptions || {};
         this.data.template.data         = this.data.template.data       || null;
         this.data.template.applied      = this.data.template.applied    || false;
         this.data.template.showLoader   = this.data.template.showLoader === false ? false : true;

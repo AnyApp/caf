@@ -10,9 +10,20 @@ var CAppHandler = Class({
     failedLoadDCAF:     false,
     start: function(callback){
         callback = callback || function(){};
+        /*
         CAppHandler.loadAppObjects(function(){
             CAppHandler.initialize(callback);
         });
+        */
+        CAppHandler.appData = window.cAppDataJSON || null;
+        if (CUtils.isEmpty(CAppHandler.appData)){
+            callback();
+            return;
+        }
+        // Parse data.
+        CAppHandler.appData = JSONfn.parse(CAppHandler.appData);
+        CAppHandler.initialize(callback);
+
     },
     initialize: function(callback){
         // Load objects failure.
@@ -64,7 +75,7 @@ var CAppHandler = Class({
 
         }
         catch (e){
-            CLog.error('CAppHandler.initialize error occured.');
+            CLog.error('CAppHandler.initialize error occurred.');
             CLog.log(e);
         }
         // After finished, we can run the callback.

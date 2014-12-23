@@ -10,7 +10,7 @@ var CObject = Class({
         },
 
         generateID: function() {
-            return "c_"+Math.random().toString(36).substring(2);
+            return "c_"+Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2);
         },
         setObjectDefaults: function(values,useClass){
             values.design = values.design || {};
@@ -34,6 +34,7 @@ var CObject = Class({
         this.id             = values.id         || CObject.generateID();
         this.appId          = values.appId;
         this.uname          = values.uname;
+        this.type           = values.type;
         this.version        = values.version;
         this.platform       = values.platform   || ['All'];
         this.logic          = values.logic      || {};
@@ -70,7 +71,7 @@ var CObject = Class({
         return this.parent;
     },
     getRelativeParent: function() {
-        if (this.relativeParent !== -1)
+        if (this.relativeParent !== -1 && !CUtils.isEmpty(this.relativeParent))
             return this.relativeParent;
         var parentObject     = CObjectsHandler.object(this.parent);
         this.relativeParent  = null;
@@ -206,6 +207,9 @@ var CObject = Class({
             return parseResult;
     },
     replaceReferencesInString: function(str) {
+        if (str == '#/benefits') {
+            var x = 3;
+        }
         if (CUtils.isEmpty(str))
             return str;
         if (str.indexOf('#') < 0)
@@ -298,13 +302,17 @@ var CObject = Class({
     assignReferences: function(){
         // Parse relative uname.
         var prevUID = this.uid();
+        if (this.uname == '#/benefits') {
+            var x = 3;
+        }
         this.uname = this.replaceReferencesInString(this.uname);
         CObjectsHandler.updateUname(prevUID,this.uname);
         // Update reference in parent.
         if (!CUtils.isEmpty(this.getRelativeParent())){
             var parentObject = CObjectsHandler.object(this.getRelativeParent());
             var thisIndex = parentObject.getChilds().indexOf(prevUID);
-            parentObject.setChildInPosition(this.uid(),thisIndex);
+            if (thisIndex >=0)
+                parentObject.setChildInPosition(this.uid(),thisIndex);
         }
         // Retrieve relative and local references.
         this.parseReferences(this.data);

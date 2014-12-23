@@ -69,6 +69,8 @@ var CTemplator = Class({
                 // Set relative parent.
                 var duplicatedObject   = CObjectsHandler.object(duplicateId);
                 duplicatedObject.relativeParent = containerId;
+                // Add Template Childs.
+                CTemplator.addTemplateChildsToRow(containerId,duplicatedObject,currentData);
                 // If root object or there is only one object, add to the top container.
                 if ( rootObjects.indexOf(abstractObject.uname || '') >=0 || templateData.objects.length === 1
                         || rootObjects.length === 0)
@@ -96,6 +98,21 @@ var CTemplator = Class({
             object.rebuild(onFinishWithEventCall);
 
 
+    },
+    addTemplateChildsToRow: function(containerId,duplicatedObject,currentData){
+        if (!CUtils.isEmpty(duplicatedObject.data.templateChilds)){
+            duplicatedObject.data.childs = duplicatedObject.data.childs || [];
+            _.each(duplicatedObject.data.templateChilds,function(templateChild){
+                var duplicateChildId = CObjectsHandler.createFromTemplateObject(templateChild.properties,
+                    currentData.data||{},currentData.logic||{},currentData.design||{});
+                // Set relative parent.
+                var duplicatedChildObject   = CObjectsHandler.object(duplicateChildId);
+                duplicatedChildObject.relativeParent = containerId;
+                // Not using the uid() because it drops '#/..' unames. But here, it's important.
+                duplicatedObject.data.childs.push(duplicatedChildObject.uname || duplicatedChildObject.id);
+                CTemplator.addTemplateChildsToRow(containerId,duplicatedChildObject,currentData);
+            });
+        }
     },
     fixRetreivedData: function(retreived){
         // DO NOT MAKE any changes to the source data.
@@ -191,7 +208,15 @@ var CTemplator = Class({
             function(retrievedData){
                 CTemplator.loadObjectWithData(objectId, retrievedData, onFinish, reset);
                 object.stopLoading();
-        });
+            },
+            function(error){
+                CLog.error('Template Request Error.');
+                if (!CUtils.isEmpty(object.data.template.remoteLoadErrorHandler))
+                    object.data.template.remoteLoadErrorHandler(error);
+                object.stopLoading();
+            },
+            object.data.template.requestOptions || {}
+        );
 
     }
 
