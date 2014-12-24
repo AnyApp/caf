@@ -31,7 +31,7 @@ var CAppHandler = Class({
             var startLoadObjects        = (new  Date()).getTime();
 
             var appData                 = CAppHandler.appData;
-            CAppHandler.appData         = null; // Remove reference.
+//            CAppHandler.appData         = null; // Remove reference.
 
             appData.data                = appData.data || {};
             appData.data.app_settings   = appData.data.app_settings || {};

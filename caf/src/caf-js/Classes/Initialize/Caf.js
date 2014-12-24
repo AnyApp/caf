@@ -48,9 +48,15 @@ var Caf = Class({
         });*/
     },
     onDeviceReady : function(){
-        if (navigator && navigator.splashscreen)
-            navigator.splashscreen.hide();
         Caf.actualStart();
+
+        if (navigator && navigator.splashscreen){
+            var splashHideDelay = 0;
+            if (CAppHandler.appData && CAppHandler.appData.data && CAppHandler.appData.data.splashHideDelay)
+                splashHideDelay = CAppHandler.appData.data.splashHideDelay;
+            CThreads.run(function(){ navigator.splashscreen.hide(); },splashHideDelay);
+        }
+
         // prevent ghost real clicks on body
         document.body.addEventListener('click', CClicker.preventGhostClick, true);
         if (CPlatforms.isIOS() && window.StatusBar !== undefined && window.StatusBar.overlaysWebView !== undefined)

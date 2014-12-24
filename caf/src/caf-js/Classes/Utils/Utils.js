@@ -284,6 +284,9 @@ var CUtils = Class({
         else
             return haystack;
     },
+    stringReplaceBetween: function(str,start, end, replacement){
+        return str.substring(0, start) + replacement + str.substring(end);
+    },
     /**
      * Convert an image
      * to a base64 string

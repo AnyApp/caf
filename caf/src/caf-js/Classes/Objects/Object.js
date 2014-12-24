@@ -207,12 +207,9 @@ var CObject = Class({
             return parseResult;
     },
     replaceReferencesInString: function(str) {
-        if (str == '#/benefits') {
-            var x = 3;
-        }
         if (CUtils.isEmpty(str))
             return str;
-        if (str.indexOf('#') < 0)
+        if (str.indexOf('#') < 0 && str.indexOf('[[') < 0 )
             return str;
 
         // Multiple reference.
@@ -227,9 +224,27 @@ var CObject = Class({
         if (parts.length==1)
             return parts[0];
 
+        // Check if we have caf expression and evaluate.
+        var result = parts.join(' ');
+        while (true) {
+            var firstIndex = result.indexOf('[[');
+            var secondIndex = result.indexOf(']]');
+            if (firstIndex < 0 || secondIndex < 0 || secondIndex <= firstIndex)
+                break;
+            var toEvaluate  = result.substring(result.indexOf('[[')+2,result.indexOf(']]'));
+            var evaluated   = null;
+            try{
+                evaluated = eval.call(this,toEvaluate);
+            } catch (e) {
+                CLog.error('CObject.replaceReferencesInString failed to evaluate: '+toEvaluate);
+                CLog.log(e);
+            }
+            if (evaluated === undefined || evaluated === null)
+                evaluated   = '';
+            result = CUtils.stringReplaceBetween(result,firstIndex,secondIndex+2,evaluated);
+        }
 
-
-        return parts.join(' ');
+        return result;
     },
     /**
      *  Build Object.
@@ -302,9 +317,6 @@ var CObject = Class({
     assignReferences: function(){
         // Parse relative uname.
         var prevUID = this.uid();
-        if (this.uname == '#/benefits') {
-            var x = 3;
-        }
         this.uname = this.replaceReferencesInString(this.uname);
         CObjectsHandler.updateUname(prevUID,this.uname);
         // Update reference in parent.

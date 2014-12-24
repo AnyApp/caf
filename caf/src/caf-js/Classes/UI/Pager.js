@@ -17,12 +17,19 @@ var CPager = Class({
         // Move to current main page.
         var mainPageChooser = CGlobals.get('main-chooser');
         if (!CUtils.isEmpty(mainPageChooser)){
-            //window.location.hash = mainPageChooser(window.location.hash || '');
-            if (!CUtils.isEmpty(window.location.hash))
-                window.location.replace(''+mainPageChooser(window.location.hash || ''));
-            else
-                window.location.replace('#'+mainPageChooser(window.location.hash || ''));
-
+            var chosenMainPage = mainPageChooser(window.location.hash || '');
+            if (window.history){
+                if (!CUtils.isEmpty(window.location.hash) && window.location.hash != '#')
+                    history.replaceState(undefined, undefined, ''+chosenMainPage);
+                else
+                    history.replaceState(undefined, undefined, '#'+chosenMainPage);
+            }
+            else {
+                if (!CUtils.isEmpty(window.location.hash))
+                    window.location.replace(''+chosenMainPage);
+                else
+                    window.location.replace('#'+chosenMainPage);
+            }
         }
 
         this.resetPages();
