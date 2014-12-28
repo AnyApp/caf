@@ -6978,9 +6978,9 @@ var CAppHandler = Class({
 
             // Load custom css,js and css,js links.
             CAppHandler.loadCSSLinks(    appData.cssLinks    || []);
-            CThreads.start(function(){ CAppHandler.loadJSLinks(     appData.jsLinks     || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomCSS(   appData.cssCustom   || []) });
-            CThreads.start(function(){ CAppHandler.loadCustomJS(    appData.jsCustom    || []) });
+            CAppHandler.loadJSLinks(     appData.jsLinks     || []);
+            CAppHandler.loadCustomCSS(   appData.cssCustom   || []);
+            CAppHandler.loadCustomJS(    appData.jsCustom    || []);
 
 
             // Load Theme if chosen.
@@ -7216,7 +7216,6 @@ var Caf = Class({
     },
     onDeviceReady : function(){
         Caf.actualStart();
-
         if (navigator && navigator.splashscreen){
             var splashHideDelay = 0;
             if (CAppHandler.appData && CAppHandler.appData.data && CAppHandler.appData.data.splashHideDelay)

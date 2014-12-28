@@ -164,7 +164,8 @@
                     matrix: function(index) {
 
                         if( !utils.canTransform() ){
-                            return parseInt(settings.element.style.left, 10);
+                            return Math.round(parseFloat(settings.element.style.left));
+//                            return parseInt(settings.element.style.left, 10);
                         } else {
                             var matrix = win.getComputedStyle(settings.element)[cache.vendor+'Transform'].match(/\((.*)\)/),
                                 ieOffset = 8;
@@ -173,7 +174,8 @@
                                 if(matrix.length===16){
                                     index+=ieOffset;
                                 }
-                                return parseInt(matrix[index], 10);
+                                return Math.round(parseFloat(matrix[index]));
+//                                return parseInt(matrix[index], 10);
                             }
                             return 0;
                         }
@@ -233,7 +235,8 @@
                         }
                     }
 
-                    n = parseInt(n, 10);
+                    n = Math.round(parseFloat(n));
+//                    n = parseInt(n, 10);
                     if(isNaN(n)){
                         n = 0;
                     }
